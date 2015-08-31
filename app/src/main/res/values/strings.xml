@@ -1,0 +1,81 @@
+<resources>
+    <string name="app_name">Move It!</string>
+
+    <string name="action_settings">Settings</string>
+
+    <string name="service_started">Service started.</string>
+    <string name="service_stopped">Service stopped.</string>
+    <string name="go">Go!</string>
+    <string name="stop">Stop!</string>
+    <string name="again">Let\'s do it again!</string>
+    <string name="rewards">Rewards</string>
+    <string name="time_limit">Time Limit</string>
+    <string name="reached_time_limit_30_minutes">You have reached the time limit of 30 minutes.</string>
+    <string name="lost_connection">Connection Lost :(</string>
+    <string name="connection_lost_restart">Connection lost.  Please restart your run.</string>
+    <string name="done">Done</string>
+
+    <!-- list of activities -->
+    <string-array
+        name="string_array_activities">
+        <item>Walking</item>
+        <item>Biking</item>
+        <item>Scootering</item>
+        <item>Running</item>
+    </string-array>
+
+    <!-- usernames //TODO: to implement a secure login method-->
+    <string-array
+        name="string_array_username">
+        <item>parent</item>
+        <item>child1</item>
+        <item>child2</item>
+        <item>child3</item>
+    </string-array>
+
+    <!-- passwords //TODO: to implement a secure login method-->
+    <string-array
+        name="string_array_password">
+        <item>parent</item>
+        <item>child1</item>
+        <item>child2</item>
+        <item>child3</item>
+    </string-array>
+
+    <!-- flag weight //TODO: to implement a secure login method -->
+    <string-array
+        name="string_array_weight">
+        <item>Choose:</item>
+        <item>40</item>
+        <item>50</item>
+        <item>60</item>
+        <item>70</item>
+        <item>80</item>
+        <item>90</item>
+        <item>100</item>
+        <item>110</item>
+        <item>120</item>
+        <item>130</item>
+    </string-array>
+
+    <!-- default rewards -->
+    <string-array
+        name="string_array_reward">
+        <item>Screen Time (15 min.)</item>
+        <item>Picking Dinner Menu</item>
+        <item>Dessert Outing</item>
+        <item>Beach Outing</item>
+        <item>Sleepover w/ Friend</item>
+    </string-array>
+
+    <!-- coin denominations -->
+    <string-array
+        name="string_array_coin_denomination">
+        <item>25</item>
+        <item>50</item>
+        <item>100</item>
+        <item>125</item>
+        <item>150</item>
+    </string-array>
+
+</resources>
