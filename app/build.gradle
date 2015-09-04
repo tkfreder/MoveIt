@@ -5,7 +5,7 @@ android {
     buildToolsVersion "22.0.1"
 
     defaultConfig {
-        applicationId "x40241.tina.fredericks.a5.app.a5_tinafredericks"
+        applicationId "com.tinakit.moveit"
         minSdkVersion 16
         targetSdkVersion 22
         versionCode 1

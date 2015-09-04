@@ -74,12 +74,15 @@ public class SensorAPI extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //TODO: DEBUG
-        message = (TextView)findViewById(R.id.message);
+
 
         // Put application specific code here.
         // [END auth_oncreate_setup_beginning]
         setContentView(R.layout.activity_sensor_api);
+
+        //TODO: DEBUG
+        message = (TextView)findViewById(R.id.message);
+
         // This method sets up our custom logger, which will print all log messages to the device
         // screen, as well as to adb logcat.
         initializeLogging();
@@ -128,9 +131,9 @@ public class SensorAPI extends AppCompatActivity {
                                 // If your connection to the sensor gets lost at some point,
                                 // you'll be able to determine the reason and react to it here.
                                 if (i == ConnectionCallbacks.CAUSE_NETWORK_LOST) {
-                                //    Log.i(TAG, "Connection lost.  Cause: Network Lost.");
+                                    //    Log.i(TAG, "Connection lost.  Cause: Network Lost.");
                                 } else if (i == ConnectionCallbacks.CAUSE_SERVICE_DISCONNECTED) {
-                                //    Log.i(TAG, "Connection lost.  Reason: Service Disconnected");
+                                    //    Log.i(TAG, "Connection lost.  Reason: Service Disconnected");
                                 }
                             }
                         }
@@ -258,6 +261,8 @@ public class SensorAPI extends AppCompatActivity {
             public void onDataPoint(DataPoint dataPoint) {
                 for (Field field : dataPoint.getDataType().getFields()) {
                     Value val = dataPoint.getValue(field);
+                    message.setText(message.getText() + "Detected DataPoint field: " + field.getName());
+                    message.setText(message.getText() + "Detected DataPoint value: " + val);
                 //    Log.i(TAG, "Detected DataPoint field: " + field.getName());
                 //    Log.i(TAG, "Detected DataPoint value: " + val);
                 }
@@ -276,8 +281,10 @@ public class SensorAPI extends AppCompatActivity {
                     @Override
                     public void onResult(Status status) {
                         if (status.isSuccess()) {
+                            message.setText(message.getText() + "Listener registered!");
                         //    Log.i(TAG, "Listener registered!");
                         } else {
+                            message.setText(message.getText() + "Listener not registered!");
                         //    Log.i(TAG, "Listener not registered.");
                         }
                     }
