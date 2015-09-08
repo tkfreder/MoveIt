@@ -3,11 +3,14 @@ package com.tinakit.moveit.activity;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -15,6 +18,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.Status;
@@ -46,6 +50,7 @@ public class SensorAPI extends AppCompatActivity {
 
     //TODO: DEBUG
     private TextView message;
+    private int mStepCount = 0;
 
     public static final String TAG = "BasicSensorsApi";
     // [START auth_variable_references]
@@ -66,8 +71,14 @@ public class SensorAPI extends AppCompatActivity {
     // Need to hold a reference to this listener, as it's passed into the "unregister"
     // method in order to stop all sensors from sending data to this listener.
     private OnDataPointListener mListener;
+    private OnDataPointListener listener;
     // [END mListener_variable_reference]
 
+
+    @Override
+    public boolean supportRequestWindowFeature(int featureId) {
+        return super.supportRequestWindowFeature(featureId);
+    }
 
     // [START auth_oncreate_setup_beginning]
     @Override
@@ -83,6 +94,7 @@ public class SensorAPI extends AppCompatActivity {
         //TODO: DEBUG
         message = (TextView)findViewById(R.id.message);
 
+
         // This method sets up our custom logger, which will print all log messages to the device
         // screen, as well as to adb logcat.
         initializeLogging();
@@ -94,7 +106,11 @@ public class SensorAPI extends AppCompatActivity {
         }
 
         buildFitnessClient();
+
     }
+
+
+
     // [END auth_oncreate_setup_ending]
 
     // [START auth_build_googleapiclient_beginning]
@@ -111,17 +127,23 @@ public class SensorAPI extends AppCompatActivity {
         mClient = new GoogleApiClient.Builder(this)
                 .addApi(Fitness.SENSORS_API)
                 .addScope(new Scope(Scopes.FITNESS_LOCATION_READ))
+                .addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ_WRITE))
                 .addConnectionCallbacks(
                         new GoogleApiClient.ConnectionCallbacks() {
 
                             @Override
                             public void onConnected(Bundle bundle) {
+
+
+                                //register request
+                                registerSensorRequest(mClient);
+
                                 //Log.i(TAG, "Connected!!!");
                                 // Now you can make calls to the Fitness APIs.
                                 // Put application specific code here.
                                 // [END auth_build_googleapiclient_beginning]
                                 //  What to do? Find some data sources!
-                                findFitnessDataSources();
+                                //findFitnessDataSources();
 
                                 // [START auth_build_googleapiclient_ending]
                             }
@@ -176,15 +198,18 @@ public class SensorAPI extends AppCompatActivity {
         super.onStart();
         // Connect to the Fitness API
         //Log.i(TAG, "Connecting...");
+
         mClient.connect();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+
         if (mClient.isConnected()) {
             mClient.disconnect();
         }
+
     }
 
     @Override
@@ -192,10 +217,12 @@ public class SensorAPI extends AppCompatActivity {
         if (requestCode == REQUEST_OAUTH) {
             authInProgress = false;
             if (resultCode == RESULT_OK) {
+
                 // Make sure the app is not already connected or attempting to connect
                 if (!mClient.isConnecting() && !mClient.isConnected()) {
                     mClient.connect();
                 }
+
             }
         }
     }
@@ -205,6 +232,72 @@ public class SensorAPI extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         outState.putBoolean(AUTH_PENDING, authInProgress);
     }
+
+    private void registerSensorRequest(GoogleApiClient client){
+
+        listener = new OnDataPointListener(){
+            @Override
+            public void onDataPoint(DataPoint dataPoint) {
+
+                for (Field field : dataPoint.getDataType().getFields()){
+
+                    new AsyncTask<Object,Void,Integer>(){
+
+                        @Override
+                        protected Integer doInBackground(Object...params){
+                            Field field = (Field)params[1];
+                            DataPoint dataPoint = (DataPoint)params[0];
+                            Value value = dataPoint.getValue(field);
+                            return value.asInt();
+                        }
+
+                        @Override
+                        protected void onPostExecute(Integer result) {
+                            mStepCount += result;
+                            message.setText("Your number of steps are: " + String.valueOf(mStepCount));
+                        }
+                    }.execute(dataPoint, field);
+
+
+                    //use the data
+                    //add to step counter
+                    //mStepCount += value.asInt();
+
+                    //message.setText("Your number of steps are: " + String.valueOf(value.asInt()));
+                }
+
+            }
+        };
+
+        SensorRequest sensorRequest = new SensorRequest.Builder()
+                .setDataType(DataType.TYPE_STEP_COUNT_DELTA)
+                .setSamplingRate(10, TimeUnit.SECONDS)
+                .build();
+
+        PendingResult<Status> pendingResult = Fitness.SensorsApi.add(client, sensorRequest, listener);
+        pendingResult.setResultCallback(new ResultCallback<Status>(){
+
+            @Override
+            public void onResult(Status status){
+
+                if(status.isSuccess()){
+                    System.out.println("Received result");
+                } else {
+                    System.out.println("No result received.");
+                }
+            }
+        });
+
+
+
+    }
+
+    public void removeSensorListener(View view){
+
+        Fitness.SensorsApi.remove(mClient, listener);
+
+    }
+
     // [END auth_connection_flow_in_activity_lifecycle_methods]
 
     /**
@@ -243,8 +336,6 @@ public class SensorAPI extends AppCompatActivity {
                                         DataType.TYPE_LOCATION_SAMPLE);
                             }
                         }
-
-                        message.setText(textMessage.toString());
                     }
                 });
         // [END find_data_sources]
