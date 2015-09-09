@@ -282,51 +282,55 @@ public class SensorAPI extends AppCompatActivity {
                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
                 .build();
 
-        Fitness.HistoryApi.readData(mClient, readRequest).setResultCallback(new ResultCallback<DataReadResult>(){
+        Fitness.HistoryApi.readData(mClient, readRequest).setResultCallback(new ResultCallback<DataReadResult>() {
 
             @Override
-            public void onResult(DataReadResult dataReadResult){
-                if (dataReadResult.getDataSets().size() > 0) {
-                    //Log.i(TAG, "dataSet.size(): " + dataReadResult.getDataSets().size());
+            public void onResult(DataReadResult dataReadResult) {
 
-                        //Log.i(TAG, "dataType: " + dataSet.getDataType().getName());
+                SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+                //The bucket is just a collection of datasets, but the API gives us choice, if there is only one bucket, we can access datasets without the additional step of iterating through the buckets.
+                if (dataReadResult.getBuckets().size() > 0) {
+                    Log.i(TAG, "DataSet.size(): "
+                            + dataReadResult.getBuckets().size());
+                    for (Bucket bucket : dataReadResult.getBuckets()) {
+                        List<DataSet> dataSets = bucket.getDataSets();
+                        for (DataSet dataSet : dataSets) {
+                            Log.i(TAG, "dataSet.dataType: " + dataSet.getDataType().getName());
 
-                    //TODO: something is wrong here.  still skipping frames, locking UI thread.
-                    //next time, wrap AsyncTask around line 285 Fitness.HistoryApi.readData()
-                        new AsyncTask<DataReadResult,Void,Integer>(){
-
-                            @Override
-                            protected Integer doInBackground(DataReadResult...params){
-                                int totalSteps = 0;
-
-                                for (DataSet dataSet : params[0].getDataSets()) {
-
-                                    SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
-                                    for (DataPoint dp : dataSet.getDataPoints()) {
-                                        //Log.i(TAG, "Data point:");
-                                        //Log.i(TAG, "\tType: " + dp.getDataType().getName());
-                                        //Log.i(TAG, "\tStart: " + dateFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)));
-                                        //Log.i(TAG, "\tEnd: " + dateFormat.format(dp.getEndTime(TimeUnit.MILLISECONDS)));
-                                        for (Field field : dp.getDataType().getFields()) {
-                                            totalSteps += dp.getValue(field).asInt();
-                                        }
-                                    }
-                                }
-                                return totalSteps;
+                            for (DataPoint dp : dataSet.getDataPoints()) {
+                                describeDataPoint(dp, dateFormat);
                             }
+                        }
+                    }
+                } else if (dataReadResult.getDataSets().size() > 0) {
+                    Log.i(TAG, "dataSet.size(): " + dataReadResult.getDataSets().size());
+                    for (DataSet dataSet : dataReadResult.getDataSets()) {
+                        Log.i(TAG, "dataType: " + dataSet.getDataType().getName());
 
-                            @Override
-                            protected void onPostExecute(Integer steps) {
-
-                                message.setText(String.valueOf(steps));
-                            }
-                        }.execute(dataReadResult);
-
+                        for (DataPoint dp : dataSet.getDataPoints()) {
+                            describeDataPoint(dp, dateFormat);
+                        }
                     }
                 }
 
+            }
         });
 
+    }
+
+    public void describeDataPoint(DataPoint dp, DateFormat dateFormat) {
+        String msg = "dataPoint: "
+                + "type: " + dp.getDataType().getName() +"\n"
+                + ", range: [" + dateFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)) + "-" + dateFormat.format(dp.getEndTime(TimeUnit.MILLISECONDS)) + "]\n"
+                + ", fields: [";
+
+        for(Field field : dp.getDataType().getFields()) {
+            msg += field.getName() + "=" + dp.getValue(field) + " ";
+        }
+
+        msg += "]";
+        //Log.i(TAG, msg);
+        message.setText(msg + message.getText());
     }
 
     //**********************************************************************************************

@@ -35,7 +35,6 @@ limitations under the License.
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/sample_text"
-        android:textSize="@dimen/notification_large_icon_width"
         android:gravity="center"/>
     <TextView
         android:id="@+id/steps"
