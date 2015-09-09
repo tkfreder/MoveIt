@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,17 +28,27 @@ import com.google.android.gms.common.api.Status;
 //import com.google.android.gms.fit.samples.common.logger.LogWrapper;
 //import com.google.android.gms.fit.samples.common.logger.MessageOnlyLogFilter;
 import com.google.android.gms.fitness.Fitness;
+import com.google.android.gms.fitness.FitnessStatusCodes;
+import com.google.android.gms.fitness.data.Bucket;
 import com.google.android.gms.fitness.data.DataPoint;
+import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataSource;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.data.Value;
+import com.google.android.gms.fitness.request.DataReadRequest;
 import com.google.android.gms.fitness.request.DataSourcesRequest;
 import com.google.android.gms.fitness.request.OnDataPointListener;
 import com.google.android.gms.fitness.request.SensorRequest;
+import com.google.android.gms.fitness.result.DataReadResult;
 import com.google.android.gms.fitness.result.DataSourcesResult;
 import com.tinakit.moveit.R;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
@@ -50,7 +61,12 @@ public class SensorAPI extends AppCompatActivity {
 
     //TODO: DEBUG
     private TextView message;
+    private Button startRecordButton;
+    private Button stopRecordButton;
+    private Button historyButton;
     private int mStepCount = 0;
+    private boolean mIsConnected = false;
+    private static final String DATE_FORMAT = "EEE MMM dd HH:mm";
 
     public static final String TAG = "BasicSensorsApi";
     // [START auth_variable_references]
@@ -92,7 +108,10 @@ public class SensorAPI extends AppCompatActivity {
         setContentView(R.layout.activity_sensor_api);
 
         //TODO: DEBUG
-        message = (TextView)findViewById(R.id.message);
+        message = (TextView)findViewById(R.id.stepCount);
+        startRecordButton = (Button)findViewById(R.id.startRecording);
+        stopRecordButton = (Button)findViewById(R.id.stopRecording);
+        historyButton = (Button)findViewById(R.id.historyButton);
 
 
         // This method sets up our custom logger, which will print all log messages to the device
@@ -122,10 +141,12 @@ public class SensorAPI extends AppCompatActivity {
      *  can address. Examples of this include the user never having signed in before, or having
      *  multiple accounts on the device and needing to specify which account to use, etc.
      */
-    private void buildFitnessClient() {
+    public void buildFitnessClient() {
         // Create the Google API Client
         mClient = new GoogleApiClient.Builder(this)
                 .addApi(Fitness.SENSORS_API)
+                .addApi(Fitness.RECORDING_API)
+                .addApi(Fitness.HISTORY_API)
                 .addScope(new Scope(Scopes.FITNESS_LOCATION_READ))
                 .addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ_WRITE))
                 .addConnectionCallbacks(
@@ -136,7 +157,13 @@ public class SensorAPI extends AppCompatActivity {
 
 
                                 //register request
-                                registerSensorRequest(mClient);
+                                //registerSensorRequest(mClient);
+
+                                //register Recording API
+                                //registerRecordingApi();
+                                mIsConnected = true;
+                                startRecordButton.setEnabled(true);
+
 
                                 //Log.i(TAG, "Connected!!!");
                                 // Now you can make calls to the Fitness APIs.
@@ -150,6 +177,10 @@ public class SensorAPI extends AppCompatActivity {
 
                             @Override
                             public void onConnectionSuspended(int i) {
+
+                                mIsConnected = false;
+
+
                                 // If your connection to the sensor gets lost at some point,
                                 // you'll be able to determine the reason and react to it here.
                                 if (i == ConnectionCallbacks.CAUSE_NETWORK_LOST) {
@@ -233,6 +264,126 @@ public class SensorAPI extends AppCompatActivity {
         outState.putBoolean(AUTH_PENDING, authInProgress);
     }
 
+    public void getHistory(View view){
+
+        //set time range
+        Calendar calendar = Calendar.getInstance();
+        Date now = new Date();
+        calendar.setTime(now);
+        long endTime = calendar.getTimeInMillis();
+        calendar.add(Calendar.WEEK_OF_YEAR, -1);
+        long startTime = calendar.getTimeInMillis();
+
+
+        //build data read request
+        DataReadRequest readRequest = new DataReadRequest.Builder()
+                .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
+                .bucketByTime(1, TimeUnit.HOURS)
+                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                .build();
+
+        Fitness.HistoryApi.readData(mClient, readRequest).setResultCallback(new ResultCallback<DataReadResult>(){
+
+            @Override
+            public void onResult(DataReadResult dataReadResult){
+                if (dataReadResult.getDataSets().size() > 0) {
+                    //Log.i(TAG, "dataSet.size(): " + dataReadResult.getDataSets().size());
+
+                        //Log.i(TAG, "dataType: " + dataSet.getDataType().getName());
+
+                    //TODO: something is wrong here.  still skipping frames, locking UI thread.
+                    //next time, wrap AsyncTask around line 285 Fitness.HistoryApi.readData()
+                        new AsyncTask<DataReadResult,Void,Integer>(){
+
+                            @Override
+                            protected Integer doInBackground(DataReadResult...params){
+                                int totalSteps = 0;
+
+                                for (DataSet dataSet : params[0].getDataSets()) {
+
+                                    SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+                                    for (DataPoint dp : dataSet.getDataPoints()) {
+                                        //Log.i(TAG, "Data point:");
+                                        //Log.i(TAG, "\tType: " + dp.getDataType().getName());
+                                        //Log.i(TAG, "\tStart: " + dateFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)));
+                                        //Log.i(TAG, "\tEnd: " + dateFormat.format(dp.getEndTime(TimeUnit.MILLISECONDS)));
+                                        for (Field field : dp.getDataType().getFields()) {
+                                            totalSteps += dp.getValue(field).asInt();
+                                        }
+                                    }
+                                }
+                                return totalSteps;
+                            }
+
+                            @Override
+                            protected void onPostExecute(Integer steps) {
+
+                                message.setText(String.valueOf(steps));
+                            }
+                        }.execute(dataReadResult);
+
+                    }
+                }
+
+        });
+
+    }
+
+    //**********************************************************************************************
+    //  isConnected()  returns true if GoogleApiClient is connected, otherwise return false
+    //**********************************************************************************************
+
+    private boolean isConnected(){
+        return(mClient != null && mIsConnected);
+    }
+
+    public void registerRecordingApi(View view){
+
+        if (!isConnected())
+            return;
+
+        Fitness.RecordingApi.subscribe(mClient, DataType.TYPE_STEP_COUNT_DELTA)
+            .setResultCallback(new ResultCallback<Status>() {
+
+                @Override
+                public void onResult(Status status) {
+                    if (status.isSuccess()) {
+                        if (status.getStatusCode() == FitnessStatusCodes.SUCCESS_ALREADY_SUBSCRIBED) {
+                            Log.i(TAG, "Existing subscription for activity detected.");
+                        } else {
+                            Log.i(TAG, "Successfully subscribed!");
+                            startRecordButton.setEnabled(false);
+                            stopRecordButton.setEnabled(true);
+                        }
+                    } else {
+                        Log.i(TAG, "There was a problem subscribing.");
+                    }
+                }
+            });
+
+
+
+    }
+
+    public void unsubscribeRecordingApi(View view){
+
+        Fitness.RecordingApi.unsubscribe(mClient, DataType.TYPE_STEP_COUNT_DELTA)
+                .setResultCallback(new ResultCallback<Status>() {
+                    @Override
+                    public void onResult(Status status) {
+                        if (status.isSuccess()) {
+                            Log.i(TAG, "Successfully unsubscribed recording api");
+                            startRecordButton.setEnabled(true);
+                            stopRecordButton.setEnabled(false);
+                        } else {
+                            // Subscription not removed
+                            Log.i(TAG, "Failed to unsubscribe recording api");
+                        }
+                    }
+                });
+
+    }
+
     private void registerSensorRequest(GoogleApiClient client){
 
         listener = new OnDataPointListener(){
@@ -254,7 +405,7 @@ public class SensorAPI extends AppCompatActivity {
                         @Override
                         protected void onPostExecute(Integer result) {
                             mStepCount += result;
-                            message.setText("Your number of steps are: " + String.valueOf(mStepCount));
+                            message.setText(String.valueOf(mStepCount));
                         }
                     }.execute(dataPoint, field);
 

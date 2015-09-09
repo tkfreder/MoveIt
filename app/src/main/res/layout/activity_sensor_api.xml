@@ -27,21 +27,58 @@ limitations under the License.
         android:id="@+id/sample_text"
         android:text="@string/intro_text"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
 
     <TextView
-        android:id="@+id/message"
+        android:id="@+id/stepCount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="message here"
-        android:layout_below="@+id/sample_text"/>
+        android:layout_below="@+id/sample_text"
+        android:textSize="@dimen/notification_large_icon_width"
+        android:gravity="center"/>
+    <TextView
+        android:id="@+id/steps"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="STEPS"
+        android:textSize="@dimen/notification_large_icon_width"
+        android:layout_below="@+id/stepCount"
+        android:gravity="center"/>
 
     <Button
         android:id="@+id/removeButton"
-        android:text="Remove Listener"
-        android:layout_width="wrap_content"
+        android:text="STOP"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="removeSensorListener"
-        android:layout_below="@+id/message"/>
+        android:layout_below="@+id/steps"/>
+
+    <Button
+        android:id="@+id/startRecording"
+        android:text="START RECORDING"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="registerRecordingApi"
+        android:layout_below="@+id/removeButton"
+        android:enabled="false"/>
+
+    <Button
+        android:id="@+id/stopRecording"
+        android:text="STOP RECORDING"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="unsubscribeRecordingApi"
+        android:layout_below="@+id/startRecording"
+        android:enabled="false"/>
+
+    <Button
+        android:id="@+id/historyButton"
+        android:text="GET HISTORY"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="getHistory"
+        android:layout_below="@+id/stopRecording"
+        />
 
 </RelativeLayout>
