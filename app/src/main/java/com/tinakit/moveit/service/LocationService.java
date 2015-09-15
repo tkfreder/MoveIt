@@ -193,7 +193,8 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(UPDATE_INTERVAL);//get location updates every 10 seconds
         mLocationRequest.setFastestInterval(FASTEST_INTERVAL);//not to exceed location updates every 5 seconds
-        mLocationRequest.setSmallestDisplacement(DISPLACEMENT);
+        //mLocationRequest.setSmallestDisplacement(DISPLACEMENT);// to avoid unnecessary updates, but we want to know if runner has not moved
+        // TODO:  build a warning system or tracker autoshutoff
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
