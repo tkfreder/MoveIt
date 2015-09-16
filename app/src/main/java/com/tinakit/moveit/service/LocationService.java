@@ -18,6 +18,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.tinakit.moveit.activity.TrackerActivity;
+import com.tinakit.moveit.model.LocationTime;
 
 import org.apache.commons.lang3.time.StopWatch;
 
@@ -67,7 +68,10 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     private NotificationManager mNotificationManager;
 
     // Location list
+    //TODO:to be replaced by mLocationTimeList
     private List<Location> mLocationList = new ArrayList<Location>();
+    private List<LocationTime> mLocationTimeList = new ArrayList<>();
+
     StopWatch mStopWatch = new StopWatch();
     private Date mStartDate;
     long mTimeElapsed = 0; //in seconds
@@ -79,7 +83,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     private static long FASTEST_INTERVAL = 5 * 1000; //5 second
     private static long DISPLACEMENT = 1; //meters //displacement takes precedent over interval/fastestInterval
     private static long STOP_SERVICE_TIME_LIMIT = 30 * 60 * 1000; // 30 minutes
-    private static final long LOCATION_DATA_PERIOD = 30; //number of seconds for the cycle of updating MainActivityt UI, careful this doesn't block UI
+    private static final long LOCATION_DATA_PERIOD = 30; //number of seconds for the cycle of updating MainActivity UI, careful this doesn't block UI
     private static final long LOCATION_ACCURACY = 20; //within 20 meter accuracy
     private boolean mIsTimeLimit = false;
 
@@ -165,7 +169,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         if (DEBUG) Log.d(LOGTAG, "Accuracy: " + location.getAccuracy());
 
         //only track data when it has high level of accuracy
-        if (location.getAccuracy() < LOCATION_ACCURACY){
+        if (isAccurate(location)){
             //update cache
             updateCache(location);
         }
@@ -176,6 +180,14 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
             stopServices();
         }
 
+    }
+
+    private boolean isAccurate(Location location){
+
+        if (location.getAccuracy() < LOCATION_ACCURACY)
+            return true;
+        else
+            return false;
     }
 
     private void stopServices(){
@@ -191,8 +203,8 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     //PERIODIC LOCATION UPDATES
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(UPDATE_INTERVAL);//get location updates every 10 seconds
-        mLocationRequest.setFastestInterval(FASTEST_INTERVAL);//not to exceed location updates every 5 seconds
+        mLocationRequest.setInterval(UPDATE_INTERVAL);//get location updates every x seconds
+        mLocationRequest.setFastestInterval(FASTEST_INTERVAL);//not to exceed location updates every x seconds
         //mLocationRequest.setSmallestDisplacement(DISPLACEMENT);// to avoid unnecessary updates, but we want to know if runner has not moved
         // TODO:  build a warning system or tracker autoshutoff
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -342,6 +354,9 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         }
 
         isBound = false;
+
+        stopServices();
+
         return true;
     }
 
@@ -361,9 +376,14 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     private void  updateCache(Location location) {
         if (DEBUG) Log.d(LOGTAG, "updateCache()");
 
+        //TODO:to be replaced by mLocationTimeList
         //save current location
         mLocationList.add(location);
 
+        //save current location and timestamp
+        Date date = new Date();
+        float timeStamp = date.getTime();
+        mLocationTimeList.add(new LocationTime(date, location));
 
         //save time elapsed
         //get time from Chronometer in MainActivity
@@ -441,6 +461,14 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
     public List<Location> getLocationList(){
         return mLocationList;
+    }
+
+    //**********************************************************************************************
+    //  getLocationTimeList()
+    //**********************************************************************************************
+
+    public List<LocationTime> getLocationTimeList(){
+        return mLocationTimeList;
     }
 
     //**********************************************************************************************

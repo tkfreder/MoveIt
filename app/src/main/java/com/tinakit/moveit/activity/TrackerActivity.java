@@ -34,6 +34,8 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.tinakit.moveit.fragment.LoginFragment;
 import com.tinakit.moveit.fragment.RegisterUserFragment;
+import com.tinakit.moveit.model.ActivityType;
+import com.tinakit.moveit.model.LocationTime;
 import com.tinakit.moveit.service.LocationService;
 
 import java.util.ArrayList;
@@ -47,6 +49,7 @@ public class TrackerActivity extends AppCompatActivity {
     //DEBUG
     private static final String LOG = "MAIN_ACTIVITY";
     private static final boolean DEBUG = true;
+    private static final ActivityType mActivityType = ActivityType.WALKING;
 
     //CONSTANTS
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
@@ -54,12 +57,6 @@ public class TrackerActivity extends AppCompatActivity {
     private static final float METER_FEET_CONVERSION = 3.28084f;
     private static final float FEET_COIN_CONVERSION = 0.5f; //2 feet = 1 coin
     protected static final String SHARED_PREFERENCES_COINS = "SHARED_PREFERENCES_COINS";
-
-    //ENUM ACTIVITY IDs
-    private static final int ACTIVITY_WALKING = 0;
-    private static final int ACTIVITY_BIKING  = 1;
-    private static final int ACTIVITY_SCOOTERING   = 2;
-    private static final int ACTIVITY_RUNNING     = 3;
 
     //UNITS
     private static final int MILES = 0;
@@ -70,6 +67,8 @@ public class TrackerActivity extends AppCompatActivity {
 
     //save all location points during location updates
     ArrayList<Location> mLocationList;
+    ArrayList<LocationTime> mLocationTimeList;
+
     protected static boolean mRequestedService = false;
     long mTimeElapsed = 0; //in seconds
 
@@ -106,10 +105,12 @@ public class TrackerActivity extends AppCompatActivity {
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_main);
 
+        //TODO: this came from Login screen, removing Login for now
         //get userId out of the intent
+        /*
         if(getIntent().getExtras().containsKey("userId"))
             mUserId = getIntent().getExtras().getInt("userId");
-
+        */
         //TODO: how to end this elegantly?
         //if(!checkPlayServices()){
         //    Toast.makeText(this, "You need to install Google Play Services for this app to work.", Toast.LENGTH_LONG);
@@ -206,9 +207,6 @@ public class TrackerActivity extends AppCompatActivity {
     protected void onDestroy() {
         if (DEBUG) Log.d(LOG, "onDestroy");
 
-        //always stop service then unbind from it
-        //http://stackoverflow.com/questions/3385554/do-i-need-to-call-both-unbindservice-and-stopservice-for-android-services
-        stopLocationService();
         doUnbindService();
 
         super.onDestroy();
@@ -255,7 +253,8 @@ public class TrackerActivity extends AppCompatActivity {
 
     private void stopRun(){
 
-        mRequestedService = false;
+        //unbind service
+        doUnbindService();
 
         //get latest data
         getData();
@@ -265,10 +264,14 @@ public class TrackerActivity extends AppCompatActivity {
         //stop chronometer
         mChronometer.stop();
 
+        //TODO:  disable this until main functionality is done
         //save the total number of coins
-        saveCoins(mUserId, Integer.parseInt(mCoins.getText().toString()));
+        //saveCoins(mUserId, Integer.parseInt(mCoins.getText().toString()));
+
         //display number of coins earned
         displayResults("You earned " + mCoins.getText() + " coins!");
+
+
     }
 
     private void saveCoins(int userId, int numberOfCoins){
@@ -336,11 +339,53 @@ public class TrackerActivity extends AppCompatActivity {
     }
 
     private void getData(){
-        mLocationList = (ArrayList)mBoundService.getLocationList();
-        //
+
+        //TODO: remove after mLocationTimeList is fully implemented
+        //mLocationList = (ArrayList)mBoundService.getLocationList();
+
+        mLocationTimeList = (ArrayList)mBoundService.getLocationTimeList();
+
         //mTimeElapsed = mBoundService.getTimeElapsed();
 
         mTimeElapsed = getSecondsFromChronometer();
+
+    }
+
+    private void removeOutliers(){
+
+        //assume first and last data points are accurate
+        if (mLocationTimeList.size() >= 4)
+
+        //check for outliers for all other data
+        for (int i = 1; i < mLocationTimeList.size() - 2; i++){
+
+            float distance = mLocationTimeList.get(i).getLocation().distanceTo(mLocationTimeList.get(i+1).getLocation());
+            float time = (mLocationTimeList.get(i+1).getTimeStamp().getTime() - mLocationTimeList.get(i).getTimeStamp().getTime())/1000;
+            float speed = distance/time;
+
+            //compare against world records for this activity
+            //if it exceeds the world records, the data must be inaccurate
+            if ( speed > mActivityType.getMaxSpeed()){
+
+                Log.i(LOG, "Removing location data: Distance: " + distance + ", Time: " + time + "\n");
+                //remove this datapoint
+                mLocationTimeList.remove(i+1);
+
+                //if there are more than 3 datapoints left, re-evaluate the next speed based on the previous and following data points from the one that was removed,
+                //by decrementing.  For example if there are 5 datapoints and the 3rd one was removed, need to reevaluate the speed between datapoint 2 and datapoint 4.
+                if(mLocationTimeList.size() >= 4){
+                    i--;
+                }
+            }
+        }
+
+        mLocationList = new ArrayList<>();
+
+        //copy Location data into mLocationList
+        for (LocationTime locationTime : mLocationTimeList){
+            mLocationList.add(locationTime.getLocation());
+
+        }
 
     }
 
@@ -377,6 +422,10 @@ public class TrackerActivity extends AppCompatActivity {
 
         if (isBound()) {
             if (DEBUG) Log.d(LOG, "Unbinding Service");
+
+            //always stop service then unbind from it
+            //http://stackoverflow.com/questions/3385554/do-i-need-to-call-both-unbindservice-and-stopservice-for-android-services
+            stopLocationService();
 
             //detach our existing connection.
             unbindService(mConnection);
@@ -459,7 +508,13 @@ public class TrackerActivity extends AppCompatActivity {
             //Service will send a message periodically until service is stopped
             if(mRequestedService && message.equals(LocationService.SERVICE_HAS_DATA)){
                 if(isBound()){
+
+                    //get data from Location service
                     getData();
+
+                    //remove outliers from LocationTimeList, save location data in mLocationList
+                    removeOutliers();
+
                     displayCurrent();
                 }
             }
@@ -517,7 +572,10 @@ public class TrackerActivity extends AppCompatActivity {
     }
 
     private void displayCurrent(){
+
+        //TODO: replace references of mLocationList with mLocationTimeList
         if (DEBUG) Log.d(LOG, "displayCurrent: intervalCount" + mLocationList.size());
+        if (DEBUG) Log.d(LOG, "displayCurrent: intervalCount" + mLocationTimeList.size());
 
         if (mLocationList.size() > 1){
 
