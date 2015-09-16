@@ -1,0 +1,67 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             tools:context="com.tinakit.moveit.fragment.ActivityChooserFragment">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/mapImage"
+            android:layout_gravity="center_horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/gps_map"/>
+        <TextView
+            android:text="@string/choose_activity_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/walkButton"
+                android:layout_height="100dp"
+                android:layout_width="100dp"
+                android:src="@drawable/run_icon_small">
+
+            </ImageButton>
+            <ImageButton
+                android:id="@+id/scooterButton"
+                android:layout_height="100dp"
+                android:layout_width="100dp"
+                android:src="@drawable/scooter_icon_small">
+
+            </ImageButton>
+            <ImageButton
+                android:id="@+id/bikeButton"
+                android:layout_height="100dp"
+                android:layout_width="100dp"
+                android:src="@drawable/bike_icon_small">
+
+            </ImageButton>
+            <ImageButton
+                android:id="@+id/hikeButton"
+                android:layout_height="100dp"
+                android:layout_width="100dp"
+                android:src="@drawable/hike_icon_small">
+
+            </ImageButton>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/goButton"
+            android:text="Go!"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:enabled="false"/>
+    </LinearLayout>
+
+</FrameLayout>

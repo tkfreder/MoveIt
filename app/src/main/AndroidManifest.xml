@@ -20,7 +20,6 @@
         <activity
             android:name=".activity.SensorAPI"
             android:label="@string/app_name" >
-
         </activity>
         <activity
             android:name=".activity.LoginActivity"
@@ -31,11 +30,7 @@
             android:name=".activity.TrackerActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <meta-data
@@ -45,7 +40,15 @@
         <activity
             android:name=".activity.FusedLocationApi"
             android:label="@string/title_activity_fused_location_api" >
+        </activity>
+        <activity
+            android:name=".activity.ActivityChooser"
+            android:label="@string/title_activity_activity_chooser" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
     </application>
 

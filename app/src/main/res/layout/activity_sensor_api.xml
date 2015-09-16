@@ -24,17 +24,9 @@ limitations under the License.
                 tools:context=".SensorAPI">
 
     <TextView
-        android:id="@+id/sample_text"
-        android:text="@string/intro_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"/>
-
-    <TextView
         android:id="@+id/stepCount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/sample_text"
         android:gravity="center"/>
     <TextView
         android:id="@+id/steps"
@@ -78,6 +70,24 @@ limitations under the License.
         android:layout_height="wrap_content"
         android:onClick="getHistory"
         android:layout_below="@+id/stopRecording"
+        />
+
+    <Button
+        android:id="@+id/insertButton"
+        android:text="INSERT DATA"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="insertData"
+        android:layout_below="@+id/historyButton"
+        />
+
+    <Button
+        android:id="@+id/deleteButton"
+        android:text="DELETE DATA"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="deleteData"
+        android:layout_below="@+id/insertButton"
         />
 
 </RelativeLayout>
