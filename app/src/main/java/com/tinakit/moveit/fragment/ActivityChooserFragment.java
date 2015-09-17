@@ -12,6 +12,7 @@ import android.widget.ImageButton;
 import android.support.v4.app.Fragment;
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.TrackerActivity;
+import com.tinakit.moveit.model.ActivityType;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -47,8 +48,6 @@ public class ActivityChooserFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
      * @return A new instance of fragment ActivityChooser.
      */
     // TODO: Rename and change types and number of parameters
@@ -93,7 +92,14 @@ public class ActivityChooserFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                startActivity(new Intent(getActivity(), TrackerActivity.class));
+                //TODO: pass activity details in intent bundle
+                Intent intent = new Intent(getActivity(), TrackerActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("activity_type", ActivityType.WALKING.getName());
+                bundle.putString("username", "Lucy");
+                intent.putExtras(bundle);
+                startActivity(intent);
+                //startActivity(new Intent(getActivity(), TrackerActivity.class));
             }
         });
 

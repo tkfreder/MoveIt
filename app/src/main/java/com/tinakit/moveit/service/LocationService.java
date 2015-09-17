@@ -245,8 +245,9 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     public void onConnected(Bundle connectionHint) {
         if (DEBUG) Log.d(LOGTAG, "GoogleAPIClient Connection successful.");
 
+        //TODO:  this isn't always accurate so not sure if it should be used
         //get the starting point
-        updateCache(LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient));
+        //updateCache(LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient));
 
         //start getting location data after there is a connection
         startLocationUpdates();

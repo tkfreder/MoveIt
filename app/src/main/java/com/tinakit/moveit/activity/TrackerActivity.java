@@ -77,13 +77,13 @@ public class TrackerActivity extends AppCompatActivity {
 
     //UI widgets
     private TextView mResults;
-    private TextView mStatsTextView;
     private Button mStartButton;
     private Button mStopButton;
+    private TextView mActivityDetails;
     private static Chronometer mChronometer;
     private TextView mDistance;
     private TextView mCoins;
-    private RadioGroup mActivityRadioGroup;
+    private TextView mCoinsPerMinute;
 
     //local cache
     private int mTotalCoins = 0;
@@ -117,41 +117,28 @@ public class TrackerActivity extends AppCompatActivity {
         //    finish();
         //}
 
+
+
+
         //wire up UI widgets
         mStartButton = (Button)findViewById(R.id.startButton);
         mResults = (TextView)findViewById(R.id.results);
-        mStatsTextView = (TextView)findViewById(R.id.stats);
+        mActivityDetails = (TextView)findViewById(R.id.activityDetails);
         mChronometer = (Chronometer)findViewById(R.id.chronometer);
         mDistance = (TextView)findViewById(R.id.distance);
         mCoins = (TextView)findViewById(R.id.coins);
-        mActivityRadioGroup = (RadioGroup)findViewById(R.id.activity_radio_group);
+        mCoinsPerMinute = (TextView)findViewById(R.id.coinsPerMinute);
 
-        //add radio buttons to radio group
-        String[] activityRadioButton = getResources().getStringArray(R.array.string_array_activities);
+        //TODO: get activity details from intent, to be displayed at the top of the screen
+        if(getIntent() != null){
 
-        int activityId = 0;
-
-        for(String radioButtonTitle : activityRadioButton){
-            RadioButton radioButton = new RadioButton(this);
-            radioButton.setText(radioButtonTitle);
-            //save the activity id in the tag property
-            //ensure that the order corresponds to the ENUM for Activity Ids
-            radioButton.setTag(activityId);
-
-            //set onclicklisteners on each radio button
-            radioButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View radioButton) {
-
-                    mActivityId = (Integer)radioButton.getTag();
-                    mStartButton.setEnabled(true);
-                }
-            });
-
-            //add the radio button to the Activity radio group
-            mActivityRadioGroup.addView(radioButton);
-            activityId++;
+            if(getIntent().getExtras().containsKey("username") && getIntent().getExtras().containsKey("activity_type")){
+                mActivityDetails.setText(getIntent().getExtras().getString("username") + " " + getIntent().getExtras().getString("activity_type"));
+            }
+            //if(getIntent().getExtras().containsKey("avatar_id"))
+            //if(getIntent().getExtras().containsKey("username"))
         }
+
 
         //**********************************************************************************************
         //  onClickListeners
@@ -170,6 +157,12 @@ public class TrackerActivity extends AppCompatActivity {
                 } else if (mStartButton.getText().equals(getResources().getString(R.string.stop))) {
 
                     stopRun();
+                    //TODO:  disable this until main functionality is done
+                    //save the total number of coins
+                    //saveCoins(mUserId, Integer.parseInt(mCoins.getText().toString()));
+
+                    //display number of coins earned
+                    displayResults();
 
                 } else if (mStartButton.getText().equals(getResources().getString(R.string.done))) {
 
@@ -226,9 +219,9 @@ public class TrackerActivity extends AppCompatActivity {
         mChronometer.start();
     }
 
-    private void displayResults(String message){
+    private void displayResults(){
 
-        mResults.setText(message);
+        mResults.setText("You earned " + mCoins.getText() + " coins!");
         playSound();
 
     }
@@ -264,17 +257,11 @@ public class TrackerActivity extends AppCompatActivity {
         //stop chronometer
         mChronometer.stop();
 
-        //TODO:  disable this until main functionality is done
-        //save the total number of coins
-        //saveCoins(mUserId, Integer.parseInt(mCoins.getText().toString()));
-
-        //display number of coins earned
-        displayResults("You earned " + mCoins.getText() + " coins!");
-
-
     }
 
     private void saveCoins(int userId, int numberOfCoins){
+
+        //TODO: either cache coin count or save to DB
         //get data from SharedPreferences
         //SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
@@ -528,6 +515,12 @@ public class TrackerActivity extends AppCompatActivity {
 
                 displayAlertDialog(getString(R.string.time_limit), getString(R.string.reached_time_limit_30_minutes));
                 stopRun();
+                //TODO:  disable this until main functionality is done
+                //save the total number of coins
+                //saveCoins(mUserId, Integer.parseInt(mCoins.getText().toString()));
+
+                //display number of coins earned
+                displayResults();
             }
 
         }
@@ -599,6 +592,9 @@ public class TrackerActivity extends AppCompatActivity {
             //save latest total number of coins
             mTotalCoins = totalCoins;
 
+            //update speed
+            float elapsedMinutes = (float)(SystemClock.elapsedRealtime() - mChronometer.getBase())/(1000 * 60);
+            mCoinsPerMinute.setText(String.format("%.2f", (float)mTotalCoins/elapsedMinutes));
 
         }
     }
@@ -635,10 +631,6 @@ public class TrackerActivity extends AppCompatActivity {
                 break;
 
         }
-
-        //TODO: delete
-        //DEBUG
-        // mStatsTextView.setText(stringBuilder);
 
         return totalDistance;
     }
