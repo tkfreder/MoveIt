@@ -189,7 +189,8 @@ public class TrackerActivity extends AppCompatActivity {
 
         //there are three main bind/unbind groupings: onCreate() and onDestroy(), onStart() and onStop(), and onResume() and onPause()
         //http://stackoverflow.com/questions/1992676/i-cant-get-rid-of-this-error-message-activity-app-name-has-leaked-servicecon
-        doBindService();
+        //TODO: not sure if we need this, let startrun and stoprun handle starting and stopping service
+        //doBindService();
 
         if (DEBUG) Log.d (LOG, "initialize(): COMPLETE");
 
@@ -200,7 +201,8 @@ public class TrackerActivity extends AppCompatActivity {
     protected void onDestroy() {
         if (DEBUG) Log.d(LOG, "onDestroy");
 
-        doUnbindService();
+        //TODO: not sure if we need this, let startrun and stoprun handle starting and starting service
+        //doUnbindService();
 
         super.onDestroy();
     }
@@ -209,10 +211,9 @@ public class TrackerActivity extends AppCompatActivity {
         mRequestedService = true;
 
         mStartButton.setText(getResources().getString(R.string.stop));
-        //explicitly start service
-        Bundle extras = new Bundle();
-        extras.putBoolean("RequestingServiceUpdate", true);
-        startService(new Intent(TrackerActivity.this, LocationService.class));
+
+        //bind to service
+        doBindService();
 
         //chronometer settings, set base time right before starting the chronometer
         mChronometer.setBase(SystemClock.elapsedRealtime());
@@ -396,6 +397,12 @@ public class TrackerActivity extends AppCompatActivity {
 
         if(!isBound()) {
             if (DEBUG) Log.d(LOG, "Binding Service");
+
+            //explicitly start service
+            Bundle extras = new Bundle();
+            extras.putBoolean("RequestingServiceUpdate", true);
+            startService(new Intent(TrackerActivity.this, LocationService.class));
+            
             bindService(new Intent(TrackerActivity.this, LocationService.class), mConnection, Context.BIND_AUTO_CREATE);
 
         }
@@ -412,6 +419,7 @@ public class TrackerActivity extends AppCompatActivity {
 
             //always stop service then unbind from it
             //http://stackoverflow.com/questions/3385554/do-i-need-to-call-both-unbindservice-and-stopservice-for-android-services
+            //TODO: not sure if necessary to call stopservice before unbind
             stopLocationService();
 
             //detach our existing connection.
@@ -594,7 +602,7 @@ public class TrackerActivity extends AppCompatActivity {
 
             //update speed
             float elapsedMinutes = (float)(SystemClock.elapsedRealtime() - mChronometer.getBase())/(1000 * 60);
-            mCoinsPerMinute.setText(String.format("%.2f", (float)mTotalCoins/elapsedMinutes));
+            mCoinsPerMinute.setText(String.format("%.1f", (float)mTotalCoins/elapsedMinutes));
 
         }
     }
