@@ -25,6 +25,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -83,6 +84,7 @@ public class TrackerActivity extends AppCompatActivity {
     private Button mStopButton;
     private TextView mActivityDetails;
     private static Chronometer mChronometer;
+    private ImageView mActivityIcon;
     private TextView mDistance;
     private TextView mCoins;
     private TextView mCoinsPerMinute;
@@ -127,6 +129,7 @@ public class TrackerActivity extends AppCompatActivity {
         mResults = (TextView)findViewById(R.id.results);
         mActivityDetails = (TextView)findViewById(R.id.activityDetails);
         mChronometer = (Chronometer)findViewById(R.id.chronometer);
+        mActivityIcon = (ImageView)findViewById(R.id.activityType_icon);
         mDistance = (TextView)findViewById(R.id.distance);
         mCoins = (TextView)findViewById(R.id.coins);
         mCoinsPerMinute = (TextView)findViewById(R.id.coinsPerMinute);
@@ -138,6 +141,8 @@ public class TrackerActivity extends AppCompatActivity {
                 mActivityDetails.setText(getIntent().getExtras().getString("username") +
                         " " + getIntent().getExtras().getString("activity_type") +
                         " " + new SimpleDateFormat("EEEE h:mm a").format(new Date()));
+
+                mActivityIcon.setImageResource(getResources().getIdentifier(getIntent().getExtras().getString("activity_type") + "_icon_small", "drawable", getPackageName()));
 
             }
             //if(getIntent().getExtras().containsKey("avatar_id"))
