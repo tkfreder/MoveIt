@@ -50,60 +50,11 @@
             android:layout_height="wrap_content"
             android:textSize="@dimen/abc_text_size_medium_material"/>
 
-        <RadioGroup
-            android:id="@+id/activity_radio_group"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
-        </RadioGroup>
+        <ListView android:id="@+id/activityType_listview"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:focusable="false"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <ImageButton
-                android:id="@+id/walkButton"
-                android:layout_height="100dp"
-                android:layout_width="100dp"
-                android:src="@drawable/run_icon_small"
-                android:tag="walking">
-
-            </ImageButton>
-            <ImageButton
-                android:id="@+id/scooterButton"
-                android:layout_height="100dp"
-                android:layout_width="100dp"
-                android:src="@drawable/scooter_icon_small"
-                android:tag="scootering">
-
-            </ImageButton>
-            <ImageButton
-                android:id="@+id/bikeButton"
-                android:layout_height="100dp"
-                android:layout_width="100dp"
-                android:src="@drawable/bike_icon_small"
-                android:tag="biking">
-
-            </ImageButton>
-            <ImageButton
-                android:id="@+id/hikeButton"
-                android:layout_height="100dp"
-                android:layout_width="100dp"
-                android:src="@drawable/hike_icon_small"
-                android:tag="hiking">
-
-            </ImageButton>
-
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/goButton"
-            android:text="Go!"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:enabled="false"/>
     </LinearLayout>
 
 </FrameLayout>

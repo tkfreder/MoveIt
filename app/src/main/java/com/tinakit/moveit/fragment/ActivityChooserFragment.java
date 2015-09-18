@@ -7,18 +7,24 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.support.v4.app.Fragment;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.TrackerActivity;
+import com.tinakit.moveit.adapter.ActivityTypeListAdapter;
 import com.tinakit.moveit.model.ActivityType;
 import com.tinakit.moveit.model.User;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -41,12 +47,9 @@ public class ActivityChooserFragment extends Fragment {
     //UI Widgets
     private TextView mUserName;
     private ImageView mAvatar;
-    private ImageButton walkButton;
-    private ImageButton scooterButton;
-    private ImageButton bikeButton;
-    private ImageButton hikeButton;
-    private RadioGroup mActivityRadioGroup;
-    private Button goButton;
+    private ListView mActivityTypeListView;
+    private List<ActivityType> mActivityTypeList = new ArrayList<ActivityType>();
+    private ActivityTypeListAdapter mActivityTypeListAdapter;
 
     //TODO: replace test data with intent bundle from login screen
     //Session variables
@@ -97,72 +100,20 @@ public class ActivityChooserFragment extends Fragment {
         mAvatar = (ImageView)view.findViewById(R.id.avatar);
         mAvatar.setImageResource(getResources().getIdentifier(mUser.getAvatarFileName() , "drawable", getActivity().getPackageName()));
 
-        walkButton = (ImageButton)view.findViewById(R.id.walkButton);
-        walkButton.setOnClickListener(ActivityTypeClicked);
-
-        scooterButton = (ImageButton)view.findViewById(R.id.scooterButton);
-        scooterButton.setOnClickListener(ActivityTypeClicked);
-
-        bikeButton = (ImageButton)view.findViewById(R.id.bikeButton);
-        bikeButton.setOnClickListener(ActivityTypeClicked);
-
-        hikeButton = (ImageButton)view.findViewById(R.id.hikeButton);
-        hikeButton.setOnClickListener(ActivityTypeClicked);
-
-        goButton = (Button)view.findViewById(R.id.goButton);
-        goButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                //TODO: pass activity details in intent bundle
-                Intent intent = new Intent(getActivity(), TrackerActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putString("activity_type", (String)v.getTag());
-                bundle.putString("username", "Lucy");
-                intent.putExtras(bundle);
-                startActivity(intent);
-                //startActivity(new Intent(getActivity(), TrackerActivity.class));
-            }
-        });
-
-        mActivityRadioGroup = (RadioGroup)view.findViewById(R.id.activity_radio_group);
-        //add radio buttons to radio group
+        mActivityTypeListView = (ListView)view.findViewById(R.id.activityType_listview);
+        mActivityTypeListAdapter = new ActivityTypeListAdapter(getActivity());
+        mActivityTypeListView.setAdapter(mActivityTypeListAdapter);
 
         for (ActivityType activityType : ActivityType.values()){
-            RadioButton radioButton = new RadioButton(getActivity());
-            radioButton.setText(activityType.getName());
-            radioButton.setButtonDrawable(getResources().getIdentifier(activityType.getName() + "_icon_small" , "drawable", getActivity().getPackageName()));
-            //save the activity id in the tag property
-            //ensure that the order corresponds to the ENUM for Activity Ids
-            radioButton.setTag(activityType.getActivityId());
-            //set onclicklisteners on each radio button
-            radioButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View radioButton) {
 
-                    //mActivityId = (Integer) radioButton.getTag();
-                    goButton.setTag(radioButton.getTag());
-                    goButton.setEnabled(true);
-                }
-            });
-
-            //add the radio button to the Activity radio group
-            mActivityRadioGroup.addView(radioButton);
+            mActivityTypeList.add(activityType);
         }
 
+        mActivityTypeListAdapter.setList(mActivityTypeList);
 
         // Inflate the layout for this fragment
         return view;
     }
-
-    private View.OnClickListener ActivityTypeClicked = new View.OnClickListener(){
-        public void onClick(View view){
-            goButton.setEnabled(true);
-
-            //set tag of button to the tag of the activity_type_button clicked
-            goButton.setTag((String)view.getTag());
-        }
-    };
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
