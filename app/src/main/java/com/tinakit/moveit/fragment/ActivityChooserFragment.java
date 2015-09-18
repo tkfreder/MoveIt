@@ -11,10 +11,13 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.support.v4.app.Fragment;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.TrackerActivity;
+import com.tinakit.moveit.model.ActivityType;
 import com.tinakit.moveit.model.User;
 
 /**
@@ -42,11 +45,12 @@ public class ActivityChooserFragment extends Fragment {
     private ImageButton scooterButton;
     private ImageButton bikeButton;
     private ImageButton hikeButton;
+    private RadioGroup mActivityRadioGroup;
     private Button goButton;
 
     //TODO: replace test data with intent bundle from login screen
-    //UserInfo
-    User mUser = new User("Lucy","password",false,40,"bunny");
+    //Session variables
+    private User mUser = new User("Lucy","password",false,40,"bunny");
 
 
     //TODO: replace image of map with current location using MAPV2
@@ -120,6 +124,32 @@ public class ActivityChooserFragment extends Fragment {
                 //startActivity(new Intent(getActivity(), TrackerActivity.class));
             }
         });
+
+        mActivityRadioGroup = (RadioGroup)view.findViewById(R.id.activity_radio_group);
+        //add radio buttons to radio group
+
+        for (ActivityType activityType : ActivityType.values()){
+            RadioButton radioButton = new RadioButton(getActivity());
+            radioButton.setText(activityType.getName());
+            radioButton.setButtonDrawable(getResources().getIdentifier(activityType.getName() + "_icon_small" , "drawable", getActivity().getPackageName()));
+            //save the activity id in the tag property
+            //ensure that the order corresponds to the ENUM for Activity Ids
+            radioButton.setTag(activityType.getActivityId());
+            //set onclicklisteners on each radio button
+            radioButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View radioButton) {
+
+                    //mActivityId = (Integer) radioButton.getTag();
+                    goButton.setTag(radioButton.getTag());
+                    goButton.setEnabled(true);
+                }
+            });
+
+            //add the radio button to the Activity radio group
+            mActivityRadioGroup.addView(radioButton);
+        }
+
 
         // Inflate the layout for this fragment
         return view;

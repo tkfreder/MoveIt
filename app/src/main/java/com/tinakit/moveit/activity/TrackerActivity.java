@@ -51,7 +51,7 @@ public class TrackerActivity extends AppCompatActivity {
     //DEBUG
     private static final String LOG = "MAIN_ACTIVITY";
     private static final boolean DEBUG = true;
-    private static final ActivityType mActivityType = ActivityType.WALKING;
+    private static final ActivityType mActivityType = ActivityType.RUNNING;
 
     //CONSTANTS
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
