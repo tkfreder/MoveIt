@@ -38,8 +38,10 @@ import com.tinakit.moveit.model.ActivityType;
 import com.tinakit.moveit.model.LocationTime;
 import com.tinakit.moveit.service.LocationService;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import com.tinakit.moveit.R;
@@ -129,11 +131,14 @@ public class TrackerActivity extends AppCompatActivity {
         mCoins = (TextView)findViewById(R.id.coins);
         mCoinsPerMinute = (TextView)findViewById(R.id.coinsPerMinute);
 
-        //TODO: get activity details from intent, to be displayed at the top of the screen
+        //TODO: get activity details from Preference Activity, to be displayed at the top of the screen
         if(getIntent() != null){
 
             if(getIntent().getExtras().containsKey("username") && getIntent().getExtras().containsKey("activity_type")){
-                mActivityDetails.setText(getIntent().getExtras().getString("username") + " " + getIntent().getExtras().getString("activity_type"));
+                mActivityDetails.setText(getIntent().getExtras().getString("username") +
+                        " " + getIntent().getExtras().getString("activity_type") +
+                        " " + new SimpleDateFormat("EEEE h:mm a").format(new Date()));
+
             }
             //if(getIntent().getExtras().containsKey("avatar_id"))
             //if(getIntent().getExtras().containsKey("username"))
@@ -402,7 +407,7 @@ public class TrackerActivity extends AppCompatActivity {
             Bundle extras = new Bundle();
             extras.putBoolean("RequestingServiceUpdate", true);
             startService(new Intent(TrackerActivity.this, LocationService.class));
-            
+
             bindService(new Intent(TrackerActivity.this, LocationService.class), mConnection, Context.BIND_AUTO_CREATE);
 
         }

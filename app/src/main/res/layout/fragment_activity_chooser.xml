@@ -5,21 +5,57 @@
              tools:context="com.tinakit.moveit.fragment.ActivityChooserFragment">
 
 
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/avatar"
+                android:layout_width="40dp"
+                android:layout_height="40dp"/>
+            <TextView
+                android:id="@+id/username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/abc_text_size_medium_material"/>
+
+        </LinearLayout>
+
+
+        <View
+            android:padding="20dp"
+            android:layout_width="fill_parent"
+            android:layout_height="2dp"
+            android:background="#c0c0c0"/>
+
+        <TextView
+            android:text="[start screen]"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="@dimen/abc_text_size_medium_material"/>
+
 
         <ImageView
             android:id="@+id/mapImage"
             android:layout_gravity="center_horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/gps_map"/>
+            android:src="@drawable/gps_map"
+            />
         <TextView
             android:text="@string/choose_activity_type"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/abc_text_size_medium_material"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -29,28 +65,32 @@
                 android:id="@+id/walkButton"
                 android:layout_height="100dp"
                 android:layout_width="100dp"
-                android:src="@drawable/run_icon_small">
+                android:src="@drawable/run_icon_small"
+                android:tag="walking">
 
             </ImageButton>
             <ImageButton
                 android:id="@+id/scooterButton"
                 android:layout_height="100dp"
                 android:layout_width="100dp"
-                android:src="@drawable/scooter_icon_small">
+                android:src="@drawable/scooter_icon_small"
+                android:tag="scootering">
 
             </ImageButton>
             <ImageButton
                 android:id="@+id/bikeButton"
                 android:layout_height="100dp"
                 android:layout_width="100dp"
-                android:src="@drawable/bike_icon_small">
+                android:src="@drawable/bike_icon_small"
+                android:tag="biking">
 
             </ImageButton>
             <ImageButton
                 android:id="@+id/hikeButton"
                 android:layout_height="100dp"
                 android:layout_width="100dp"
-                android:src="@drawable/hike_icon_small">
+                android:src="@drawable/hike_icon_small"
+                android:tag="hiking">
 
             </ImageButton>
 

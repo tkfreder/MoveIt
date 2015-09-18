@@ -10,9 +10,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.support.v4.app.Fragment;
+import android.widget.ImageView;
+import android.widget.TextView;
+
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.TrackerActivity;
-import com.tinakit.moveit.model.ActivityType;
+import com.tinakit.moveit.model.User;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -33,11 +36,18 @@ public class ActivityChooserFragment extends Fragment {
     private String mParam2;
 
     //UI Widgets
+    private TextView mUserName;
+    private ImageView mAvatar;
     private ImageButton walkButton;
     private ImageButton scooterButton;
     private ImageButton bikeButton;
     private ImageButton hikeButton;
     private Button goButton;
+
+    //TODO: replace test data with intent bundle from login screen
+    //UserInfo
+    User mUser = new User("Lucy","password",false,40,"bunny");
+
 
     //TODO: replace image of map with current location using MAPV2
     //http://android-er.blogspot.com/2012/12/get-googlemap-from-mapfragmentsupportma.html
@@ -74,20 +84,28 @@ public class ActivityChooserFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_activity_chooser, container, false);
 
+        //TODO: get user details from Intent bundle or SharedPreferences
+
         //wire up UI widgets
+        mUserName = (TextView)view.findViewById(R.id.username);
+        mUserName.setText(mUser.getUserName());
+
+        mAvatar = (ImageView)view.findViewById(R.id.avatar);
+        mAvatar.setImageResource(getResources().getIdentifier(mUser.getAvatarFileName() , "drawable", getActivity().getPackageName()));
+
         walkButton = (ImageButton)view.findViewById(R.id.walkButton);
-        scooterButton = (ImageButton)view.findViewById(R.id.scooterButton);
-        bikeButton = (ImageButton)view.findViewById(R.id.bikeButton);
-        hikeButton = (ImageButton)view.findViewById(R.id.hikeButton);
-        goButton = (Button)view.findViewById(R.id.goButton);
-
-
-        //onclick listener
         walkButton.setOnClickListener(ActivityTypeClicked);
+
+        scooterButton = (ImageButton)view.findViewById(R.id.scooterButton);
         scooterButton.setOnClickListener(ActivityTypeClicked);
+
+        bikeButton = (ImageButton)view.findViewById(R.id.bikeButton);
         bikeButton.setOnClickListener(ActivityTypeClicked);
+
+        hikeButton = (ImageButton)view.findViewById(R.id.hikeButton);
         hikeButton.setOnClickListener(ActivityTypeClicked);
 
+        goButton = (Button)view.findViewById(R.id.goButton);
         goButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -95,7 +113,7 @@ public class ActivityChooserFragment extends Fragment {
                 //TODO: pass activity details in intent bundle
                 Intent intent = new Intent(getActivity(), TrackerActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putString("activity_type", ActivityType.WALKING.getName());
+                bundle.putString("activity_type", (String)v.getTag());
                 bundle.putString("username", "Lucy");
                 intent.putExtras(bundle);
                 startActivity(intent);
@@ -110,6 +128,9 @@ public class ActivityChooserFragment extends Fragment {
     private View.OnClickListener ActivityTypeClicked = new View.OnClickListener(){
         public void onClick(View view){
             goButton.setEnabled(true);
+
+            //set tag of button to the tag of the activity_type_button clicked
+            goButton.setTag((String)view.getTag());
         }
     };
 
