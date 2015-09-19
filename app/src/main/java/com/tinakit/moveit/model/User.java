@@ -8,7 +8,7 @@ public class User {
     private String mUserName;
     private String mPassword;
     private boolean mIsAdmin;
-    private int mWeight;
+    private float mWeight;
     private String mAvatarFileName;
 
     public User(String userName, String password, boolean isAdmin, int weight, String avatarFileName){
@@ -44,11 +44,11 @@ public class User {
         mIsAdmin = isAdmin;
     }
 
-    public int getWeight() {
+    public float getWeight() {
         return mWeight;
     }
 
-    public void setWeight(int weight) {
+    public void setWeight(float weight) {
         mWeight = weight;
     }
 

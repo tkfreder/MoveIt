@@ -37,6 +37,7 @@ import com.tinakit.moveit.fragment.LoginFragment;
 import com.tinakit.moveit.fragment.RegisterUserFragment;
 import com.tinakit.moveit.model.ActivityType;
 import com.tinakit.moveit.model.LocationTime;
+import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.service.LocationService;
 
 import java.text.SimpleDateFormat;
@@ -46,6 +47,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.tinakit.moveit.R;
+import com.tinakit.moveit.utility.CalorieCalculator;
 
 public class TrackerActivity extends AppCompatActivity {
 
@@ -59,6 +61,7 @@ public class TrackerActivity extends AppCompatActivity {
     private static final float METER_MILE_CONVERSION = 0.00062137f;
     private static final float METER_FEET_CONVERSION = 3.28084f;
     private static final float FEET_COIN_CONVERSION = 0.5f; //2 feet = 1 coin
+    private static final float CALORIE_COIN_CONVERSION = 1f;
     protected static final String SHARED_PREFERENCES_COINS = "SHARED_PREFERENCES_COINS";
 
     //UNITS
@@ -87,12 +90,17 @@ public class TrackerActivity extends AppCompatActivity {
     private ImageView mActivityIcon;
     private TextView mDistance;
     private TextView mCoins;
-    private TextView mCoinsPerMinute;
+    private TextView mFeetPerMinute;
+    private ImageView mMapImage;
 
     //local cache
     private int mTotalCoins = 0;
     private int mActivityId = -1;
     private int mUserId;
+
+    //TODO: replace test data with intent bundle from login screen
+    //Session variables
+    private User mUser = new User("Lucy","password",false,40,"bunny");
 
     //SharedPreferences
     //private static final String SHARED_PREFERENCES_LOGIN = "SHARED_PREFERENCES_LOGIN";
@@ -132,7 +140,8 @@ public class TrackerActivity extends AppCompatActivity {
         mActivityIcon = (ImageView)findViewById(R.id.activityType_icon);
         mDistance = (TextView)findViewById(R.id.distance);
         mCoins = (TextView)findViewById(R.id.coins);
-        mCoinsPerMinute = (TextView)findViewById(R.id.coinsPerMinute);
+        mFeetPerMinute = (TextView)findViewById(R.id.feetPerMinute);
+        mMapImage = (ImageView)findViewById(R.id.map);
 
         //TODO: get activity details from Preference Activity, to be displayed at the top of the screen
         if(getIntent() != null){
@@ -144,6 +153,10 @@ public class TrackerActivity extends AppCompatActivity {
 
                 mActivityIcon.setImageResource(getResources().getIdentifier(getIntent().getExtras().getString("activity_type") + "_icon_small", "drawable", getPackageName()));
 
+            }
+
+            if(getIntent().getExtras().containsKey("activityId")){
+                mActivityId = getIntent().getExtras().getInt("activityId");
             }
             //if(getIntent().getExtras().containsKey("avatar_id"))
             //if(getIntent().getExtras().containsKey("username"))
@@ -233,6 +246,7 @@ public class TrackerActivity extends AppCompatActivity {
     private void displayResults(){
 
         mResults.setText("You earned " + mCoins.getText() + " coins!");
+        mMapImage.setVisibility(View.VISIBLE);
         playSound();
 
     }
@@ -594,8 +608,20 @@ public class TrackerActivity extends AppCompatActivity {
             float distanceFeet = getDistance(1);
             mDistance.setText(String.format("%d", (int)distanceFeet));
 
+            //update speed feet/minute
+            float elapsedMinutes = (float)(SystemClock.elapsedRealtime() - mChronometer.getBase())/(1000 * 60);
+            mFeetPerMinute.setText(String.format("%.1f", (float)distanceFeet/elapsedMinutes));
+
+            //get speed in miles per hour
+            float distanceMiles = getDistance(0);
+            float speed = distanceMiles / (elapsedMinutes * 60);
+
+            //get number of calories burned
+            int calorie = getCalorieByActivity(mUser.getWeight(), elapsedMinutes, speed);
+
             //number of coins earned
-            int totalCoins = (int) (distanceFeet * FEET_COIN_CONVERSION);
+            //int totalCoins = (int) (distanceFeet * FEET_COIN_CONVERSION);
+            int totalCoins = Math.round(calorie * CALORIE_COIN_CONVERSION);
 
             //compare previous totalCoins to current one
             int delta = totalCoins - mTotalCoins;
@@ -609,10 +635,6 @@ public class TrackerActivity extends AppCompatActivity {
 
             //save latest total number of coins
             mTotalCoins = totalCoins;
-
-            //update speed
-            float elapsedMinutes = (float)(SystemClock.elapsedRealtime() - mChronometer.getBase())/(1000 * 60);
-            mCoinsPerMinute.setText(String.format("%.1f", (float)mTotalCoins/elapsedMinutes));
 
         }
     }
@@ -651,6 +673,36 @@ public class TrackerActivity extends AppCompatActivity {
         }
 
         return totalDistance;
+    }
+
+    private int getCalorieByActivity(float weight, float minutes, float speed){
+
+        int calorie = 0;
+
+        switch (mActivityId){
+
+            case 1:
+                calorie = CalorieCalculator.getCalorieByRun(weight, minutes, speed);
+                break;
+
+            case 2:
+                calorie = CalorieCalculator.getCalorieByScooter(weight, minutes);
+                break;
+
+            case 3:
+                calorie = CalorieCalculator.getCalorieByBike(weight, minutes, speed);
+                break;
+
+            case 4:
+                calorie = CalorieCalculator.getCalorieByRun(weight, minutes, speed);
+                break;
+
+            default:
+                calorie = CalorieCalculator.getCalorieByRun(weight, minutes, speed);
+                break;
+        }
+
+        return calorie;
     }
 
     /**

@@ -87,6 +87,8 @@ public class ActivityTypeListAdapter extends BaseAdapter {
                 Bundle bundle = new Bundle();
                 TextView activityName = (TextView)v.findViewById(R.id.activityName);
                 bundle.putString("activity_type",activityName.getText().toString());
+                ActivityType activityType = (ActivityType)activityName.getTag();
+                bundle.putInt("activityId",activityType.getActivityId());
                 bundle.putString("username", "Lucy");
                 intent.putExtras(bundle);
                 mContext.startActivity(intent);
@@ -97,6 +99,7 @@ public class ActivityTypeListAdapter extends BaseAdapter {
 
         // Populate data from StockInfo data object
         holder.activityName.setText(activityType.getName());
+        holder.activityName.setTag(activityType);
         holder.activityIcon.setImageResource(mContext.getResources().getIdentifier(activityType.getName() + "_icon_small", "drawable", mContext.getPackageName()));
 
         // Return the completed view to render on screen
