@@ -7,16 +7,17 @@ import java.util.Date;
 /**
  * Created by Tina on 6/18/2015.
  */
-public class LocationTime {
+public class UnitSplitCalorie {
 
     private Date mTimeStamp;
     private Location mLocation;
+    private float mSpeed;
+    private float mCalories;
 
-    public LocationTime (Date timeStamp, Location location){
+    public UnitSplitCalorie(Date timeStamp, Location location){
 
         mTimeStamp = timeStamp;
         mLocation = location;
-
     }
 
     public Date getTimeStamp() {
@@ -33,5 +34,21 @@ public class LocationTime {
 
     public void setLocation(Location location) {
         mLocation = location;
+    }
+
+    public float getSpeed() {
+        return mSpeed;
+    }
+
+    public void setSpeed(float speed) {
+        mSpeed = speed;
+    }
+
+    public float getCalories() {
+        return mCalories;
+    }
+
+    public void setCalories(float calories) {
+        mCalories = calories;
     }
 }

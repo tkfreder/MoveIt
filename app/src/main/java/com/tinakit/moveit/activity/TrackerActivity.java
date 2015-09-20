@@ -15,7 +15,6 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.SystemClock;
-import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -26,8 +25,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.ImageView;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,7 +33,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.tinakit.moveit.fragment.LoginFragment;
 import com.tinakit.moveit.fragment.RegisterUserFragment;
 import com.tinakit.moveit.model.ActivityType;
-import com.tinakit.moveit.model.LocationTime;
+import com.tinakit.moveit.model.UnitSplitCalorie;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.service.LocationService;
 
@@ -48,6 +45,7 @@ import java.util.List;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.utility.CalorieCalculator;
+import com.tinakit.moveit.utility.UnitConverter;
 
 public class TrackerActivity extends AppCompatActivity {
 
@@ -73,7 +71,8 @@ public class TrackerActivity extends AppCompatActivity {
 
     //save all location points during location updates
     ArrayList<Location> mLocationList;
-    ArrayList<LocationTime> mLocationTimeList;
+    ArrayList<UnitSplitCalorie> mUnitSplitCalorieList;
+
 
     protected static boolean mRequestedService = false;
     long mTimeElapsed = 0; //in seconds
@@ -97,6 +96,7 @@ public class TrackerActivity extends AppCompatActivity {
     private int mTotalCoins = 0;
     private int mActivityId = -1;
     private int mUserId;
+    int mTotalCalories = 0;
 
     //TODO: replace test data with intent bundle from login screen
     //Session variables
@@ -355,7 +355,7 @@ public class TrackerActivity extends AppCompatActivity {
         //TODO: remove after mLocationTimeList is fully implemented
         //mLocationList = (ArrayList)mBoundService.getLocationList();
 
-        mLocationTimeList = (ArrayList)mBoundService.getLocationTimeList();
+        mUnitSplitCalorieList = (ArrayList)mBoundService.getUnitSplitCalorieList();
 
         //mTimeElapsed = mBoundService.getTimeElapsed();
 
@@ -366,13 +366,13 @@ public class TrackerActivity extends AppCompatActivity {
     private void removeOutliers(){
 
         //assume first and last data points are accurate
-        if (mLocationTimeList.size() >= 4)
+        if (mUnitSplitCalorieList.size() >= 4)
 
         //check for outliers for all other data
-        for (int i = 1; i < mLocationTimeList.size() - 2; i++){
+        for (int i = 1; i < mUnitSplitCalorieList.size() - 2; i++){
 
-            float distance = mLocationTimeList.get(i).getLocation().distanceTo(mLocationTimeList.get(i+1).getLocation());
-            float time = (mLocationTimeList.get(i+1).getTimeStamp().getTime() - mLocationTimeList.get(i).getTimeStamp().getTime())/1000;
+            float distance = mUnitSplitCalorieList.get(i).getLocation().distanceTo(mUnitSplitCalorieList.get(i+1).getLocation());
+            float time = (mUnitSplitCalorieList.get(i+1).getTimeStamp().getTime() - mUnitSplitCalorieList.get(i).getTimeStamp().getTime())/1000;
             float speed = distance/time;
 
             //compare against world records for this activity
@@ -381,11 +381,11 @@ public class TrackerActivity extends AppCompatActivity {
 
                 Log.i(LOG, "Removing location data: Distance: " + distance + ", Time: " + time + "\n");
                 //remove this datapoint
-                mLocationTimeList.remove(i+1);
+                mUnitSplitCalorieList.remove(i+1);
 
                 //if there are more than 3 datapoints left, re-evaluate the next speed based on the previous and following data points from the one that was removed,
                 //by decrementing.  For example if there are 5 datapoints and the 3rd one was removed, need to reevaluate the speed between datapoint 2 and datapoint 4.
-                if(mLocationTimeList.size() >= 4){
+                if(mUnitSplitCalorieList.size() >= 4){
                     i--;
                 }
             }
@@ -394,8 +394,8 @@ public class TrackerActivity extends AppCompatActivity {
         mLocationList = new ArrayList<>();
 
         //copy Location data into mLocationList
-        for (LocationTime locationTime : mLocationTimeList){
-            mLocationList.add(locationTime.getLocation());
+        for (UnitSplitCalorie unitSplitCalorie : mUnitSplitCalorieList){
+            mLocationList.add(unitSplitCalorie.getLocation());
 
         }
 
@@ -600,7 +600,7 @@ public class TrackerActivity extends AppCompatActivity {
 
         //TODO: replace references of mLocationList with mLocationTimeList
         if (DEBUG) Log.d(LOG, "displayCurrent: intervalCount" + mLocationList.size());
-        if (DEBUG) Log.d(LOG, "displayCurrent: intervalCount" + mLocationTimeList.size());
+        if (DEBUG) Log.d(LOG, "displayCurrent: intervalCount" + mUnitSplitCalorieList.size());
 
         if (mLocationList.size() > 1){
 
@@ -612,16 +612,13 @@ public class TrackerActivity extends AppCompatActivity {
             float elapsedMinutes = (float)(SystemClock.elapsedRealtime() - mChronometer.getBase())/(1000 * 60);
             mFeetPerMinute.setText(String.format("%.1f", (float)distanceFeet/elapsedMinutes));
 
-            //get speed in miles per hour
-            float distanceMiles = getDistance(0);
-            float speed = distanceMiles / (elapsedMinutes * 60);
 
-            //get number of calories burned
-            int calorie = getCalorieByActivity(mUser.getWeight(), elapsedMinutes, speed);
+            //update the UnitSplitCalorie list with calorie and speed values
+            refreshUnitSplitCalorie();
 
             //number of coins earned
             //int totalCoins = (int) (distanceFeet * FEET_COIN_CONVERSION);
-            int totalCoins = Math.round(calorie * CALORIE_COIN_CONVERSION);
+            int totalCoins = Math.round(mTotalCalories * CALORIE_COIN_CONVERSION);
 
             //compare previous totalCoins to current one
             int delta = totalCoins - mTotalCoins;
@@ -637,6 +634,27 @@ public class TrackerActivity extends AppCompatActivity {
             mTotalCoins = totalCoins;
 
         }
+    }
+
+
+    private void refreshUnitSplitCalorie(){
+
+        mTotalCalories = 0;
+
+            for ( int i = 0 ; i < mUnitSplitCalorieList.size() - 1; i++ ){
+
+                float minutesElapsed = (mUnitSplitCalorieList.get(i+1).getTimeStamp().getTime() - mUnitSplitCalorieList.get(i).getTimeStamp().getTime()) / (1000f * 60f) ;
+                float miles = UnitConverter.convertMetersToMiles(mUnitSplitCalorieList.get(i + 1).getLocation().distanceTo(mUnitSplitCalorieList.get(i).getLocation()));
+                float speed = miles / (minutesElapsed * 60f);
+                int calorie = getCalorieByActivity(mUser.getWeight(), minutesElapsed , speed);
+
+                //save calorie and speed in list
+                mUnitSplitCalorieList.get(i).setCalories(calorie);
+                mUnitSplitCalorieList.get(i).setSpeed(speed);
+
+                //add to total calories
+                mTotalCalories += calorie;
+            }
     }
 
 
