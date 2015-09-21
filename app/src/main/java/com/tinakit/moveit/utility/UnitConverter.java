@@ -10,4 +10,8 @@ public class UnitConverter {
         return meters * 0.00062137f;
     }
 
+    public static float convertMetersToFeet(float meters){
+        return meters * 3.28084f;
+    }
+
 }

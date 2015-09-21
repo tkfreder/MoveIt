@@ -8,12 +8,15 @@ public class CalorieCalculator {
     //weight in pounds
     //speed in miles per hour
 
-    public static int getCalorieByRun(float weight, float minutes, float speed){
+    public static float getCalorieByRun(float weight, float minutes, float speed){
 
-        return Math.round((0.0018f) * weight * minutes * (10.8f * speed + 1));
+        //1 mph
+
+
+        return (0.0018f) * weight * minutes * (10.8f * speed + 1);
     }
 
-    public static int getCalorieByBike(float weight, float minutes, float speed){
+    public static float getCalorieByBike(float weight, float minutes, float speed){
 
         float k = 0f;
 
@@ -21,11 +24,11 @@ public class CalorieCalculator {
             k = 0.0073f * weight * minutes * (speed - 10f);
         }
 
-        return Math.round((0.03f * weight * minutes) + k);
+        return (0.03f * weight * minutes) + k;
     }
 
-    public static int getCalorieByScooter(float weight, float minutes){
+    public static float getCalorieByScooter(float weight, float minutes){
 
-        return Math.round(weight * minutes * 0.0226f);
+        return weight * minutes * 0.0226f;
     }
 }

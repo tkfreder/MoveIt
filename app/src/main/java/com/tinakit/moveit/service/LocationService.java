@@ -80,7 +80,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     GoogleApiClient mGoogleApiClient;
     LocationRequest mLocationRequest;
     private static long UPDATE_INTERVAL = 10 * 1000; //10 seconds
-    private static long FASTEST_INTERVAL = 5 * 1000; //5 second
+    private static long FASTEST_INTERVAL = 10 * 1000; //5 second
     private static long DISPLACEMENT = 1; //meters //displacement takes precedent over interval/fastestInterval
     private static long STOP_SERVICE_TIME_LIMIT = 30 * 60 * 1000; // 30 minutes
     private static final long LOCATION_DATA_PERIOD = 30; //number of seconds for the cycle of updating MainActivity UI, careful this doesn't block UI
@@ -205,7 +205,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(UPDATE_INTERVAL);//get location updates every x seconds
         mLocationRequest.setFastestInterval(FASTEST_INTERVAL);//not to exceed location updates every x seconds
-        //mLocationRequest.setSmallestDisplacement(DISPLACEMENT);// to avoid unnecessary updates, but we want to know if runner has not moved
+        //mLocationRequest.setSmallestDisplacement(DISPLACEMENT);// to avoid unnecessary updates, but we want to know if runner has not moved so no need to set a minimum distance displacement
         // TODO:  build a warning system or tracker autoshutoff
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }

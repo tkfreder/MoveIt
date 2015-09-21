@@ -9,6 +9,8 @@ import java.util.Date;
  */
 public class UnitSplitCalorie {
 
+    //TODO:  create DB table Splits(userId, timeStart, timeEnd, activityId, weight, minutes, speed, calories)
+    //TODO: create DB table ActivityStats(activityId, userId, weight, minutes, speed, calories)
     private Date mTimeStamp;
     private Location mLocation;
     private float mSpeed;

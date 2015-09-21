@@ -58,8 +58,9 @@ public class TrackerActivity extends AppCompatActivity {
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
     private static final float METER_MILE_CONVERSION = 0.00062137f;
     private static final float METER_FEET_CONVERSION = 3.28084f;
-    private static final float FEET_COIN_CONVERSION = 0.5f; //2 feet = 1 coin
-    private static final float CALORIE_COIN_CONVERSION = 1f;
+    private static final float FEET_COIN_CONVERSION = 0.5f;
+     //2 feet = 1 coin
+    private static final float CALORIE_COIN_CONVERSION = 10f; //#coins equal to 1 calorie
     protected static final String SHARED_PREFERENCES_COINS = "SHARED_PREFERENCES_COINS";
 
     //UNITS
@@ -92,11 +93,16 @@ public class TrackerActivity extends AppCompatActivity {
     private TextView mFeetPerMinute;
     private ImageView mMapImage;
 
+    //TODO:debug
+    private TextView mFirstSplitTime;
+    private Date mStartTime;
+
+
     //local cache
-    private int mTotalCoins = 0;
+    private float mTotalCoins = 0f;
     private int mActivityId = -1;
     private int mUserId;
-    int mTotalCalories = 0;
+    float mTotalCalories = 0;
 
     //TODO: replace test data with intent bundle from login screen
     //Session variables
@@ -142,6 +148,9 @@ public class TrackerActivity extends AppCompatActivity {
         mCoins = (TextView)findViewById(R.id.coins);
         mFeetPerMinute = (TextView)findViewById(R.id.feetPerMinute);
         mMapImage = (ImageView)findViewById(R.id.map);
+
+        //TODO: debug
+        mFirstSplitTime = (TextView)findViewById(R.id.firstSplitTime);
 
         //TODO: get activity details from Preference Activity, to be displayed at the top of the screen
         if(getIntent() != null){
@@ -189,19 +198,8 @@ public class TrackerActivity extends AppCompatActivity {
 
                 } else if (mStartButton.getText().equals(getResources().getString(R.string.done))) {
 
-                    mStartButton.setText(getString(R.string.again));
+                    finish();
 
-
-                    displayRewards();
-
-                    //TODO: display history
-
-                } else if (mStartButton.getText().equals(getResources().getString(R.string.again))) {
-
-                    //clear data
-                    clearCacheAndUI();
-
-                    restartRun();
                 }
             }
         });
@@ -241,6 +239,10 @@ public class TrackerActivity extends AppCompatActivity {
         //chronometer settings, set base time right before starting the chronometer
         mChronometer.setBase(SystemClock.elapsedRealtime());
         mChronometer.start();
+
+        //TODO: debug
+        mStartTime = new Date();
+
     }
 
     private void displayResults(){
@@ -310,21 +312,6 @@ public class TrackerActivity extends AppCompatActivity {
             //save in SharedPreferences
             editor.putString(SHARED_PREFERENCES_COINS, commaDelimitedCoins);
             editor.commit();
-        }
-    }
-
-    private void restartRun(){
-
-        //call public method in LocationService
-        if(isBound()){
-            mRequestedService = true;
-
-            mStartButton.setText(getResources().getString(R.string.stop));
-
-            mBoundService.saveAndClearRunData();
-
-            mChronometer.setBase(SystemClock.elapsedRealtime());
-            mChronometer.start();
         }
     }
 
@@ -471,7 +458,7 @@ public class TrackerActivity extends AppCompatActivity {
             //TODO: not sure if this is correct
             //is there another way that the system will unbind besides the user clicking Stop button
             //displayAlertDialog(getString(R.string.lost_connection), getString(R.string.connection_lost_restart));
-            //stopLocationService();
+            stopLocationService();
         }
     };
 
@@ -585,17 +572,6 @@ public class TrackerActivity extends AppCompatActivity {
 
     }
 
-    private void clearCacheAndUI(){
-        mLocationList.clear();
-        mTimeElapsed = 0;
-
-        //clear any textfields
-        mCoins.setText("0");
-        mDistance.setText("0");
-        mResults.setText("");
-
-    }
-
     private void displayCurrent(){
 
         //TODO: replace references of mLocationList with mLocationTimeList
@@ -612,23 +588,23 @@ public class TrackerActivity extends AppCompatActivity {
             float elapsedMinutes = (float)(SystemClock.elapsedRealtime() - mChronometer.getBase())/(1000 * 60);
             mFeetPerMinute.setText(String.format("%.1f", (float)distanceFeet/elapsedMinutes));
 
-
             //update the UnitSplitCalorie list with calorie and speed values
             refreshUnitSplitCalorie();
 
             //number of coins earned
             //int totalCoins = (int) (distanceFeet * FEET_COIN_CONVERSION);
-            int totalCoins = Math.round(mTotalCalories * CALORIE_COIN_CONVERSION);
+            //int totalCoins = Math.round(mTotalCalories * CALORIE_COIN_CONVERSION);
+            float totalCoins =  mTotalCalories * CALORIE_COIN_CONVERSION;
 
             //compare previous totalCoins to current one
-            int delta = totalCoins - mTotalCoins;
+            float delta = totalCoins - mTotalCoins;
 
             if(delta > 0 ){
                 playSound();
             }
 
             //update coins
-            mCoins.setText(String.format("%d", totalCoins));
+            mCoins.setText(String.format("%.1f", totalCoins));
 
             //save latest total number of coins
             mTotalCoins = totalCoins;
@@ -639,14 +615,18 @@ public class TrackerActivity extends AppCompatActivity {
 
     private void refreshUnitSplitCalorie(){
 
-        mTotalCalories = 0;
+        //TODO: debug
+        mFirstSplitTime.setText(String.valueOf(mUnitSplitCalorieList.get(0).getTimeStamp().getTime() - mStartTime.getTime() / (1000f * 60f)));
+
+        mTotalCalories = 0f;
 
             for ( int i = 0 ; i < mUnitSplitCalorieList.size() - 1; i++ ){
 
                 float minutesElapsed = (mUnitSplitCalorieList.get(i+1).getTimeStamp().getTime() - mUnitSplitCalorieList.get(i).getTimeStamp().getTime()) / (1000f * 60f) ;
                 float miles = UnitConverter.convertMetersToMiles(mUnitSplitCalorieList.get(i + 1).getLocation().distanceTo(mUnitSplitCalorieList.get(i).getLocation()));
-                float speed = miles / (minutesElapsed * 60f);
-                int calorie = getCalorieByActivity(mUser.getWeight(), minutesElapsed , speed);
+                float hoursElapsed = minutesElapsed/60f;
+                float speed = miles / hoursElapsed;
+                float calorie = getCalorieByActivity(mUser.getWeight(), minutesElapsed , speed);
 
                 //save calorie and speed in list
                 mUnitSplitCalorieList.get(i).setCalories(calorie);
@@ -677,11 +657,11 @@ public class TrackerActivity extends AppCompatActivity {
         switch(units){
             case 0:
                 //convert meters to miles
-                totalDistance *= METER_MILE_CONVERSION;
+                totalDistance = UnitConverter.convertMetersToMiles(totalDistance);
                 break;
             case 1:
                 //convert to feet
-                totalDistance *= METER_FEET_CONVERSION;
+                totalDistance = UnitConverter.convertMetersToFeet(totalDistance);
                 break;
 
             default:
@@ -693,9 +673,9 @@ public class TrackerActivity extends AppCompatActivity {
         return totalDistance;
     }
 
-    private int getCalorieByActivity(float weight, float minutes, float speed){
+    private float getCalorieByActivity(float weight, float minutes, float speed){
 
-        int calorie = 0;
+        float calorie = 0f;
 
         switch (mActivityId){
 
