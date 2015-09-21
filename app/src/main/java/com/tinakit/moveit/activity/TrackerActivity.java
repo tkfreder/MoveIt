@@ -93,11 +93,6 @@ public class TrackerActivity extends AppCompatActivity {
     private TextView mFeetPerMinute;
     private ImageView mMapImage;
 
-    //TODO:debug
-    private TextView mFirstSplitTime;
-    private Date mStartTime;
-
-
     //local cache
     private float mTotalCoins = 0f;
     private int mActivityId = -1;
@@ -148,9 +143,6 @@ public class TrackerActivity extends AppCompatActivity {
         mCoins = (TextView)findViewById(R.id.coins);
         mFeetPerMinute = (TextView)findViewById(R.id.feetPerMinute);
         mMapImage = (ImageView)findViewById(R.id.map);
-
-        //TODO: debug
-        mFirstSplitTime = (TextView)findViewById(R.id.firstSplitTime);
 
         //TODO: get activity details from Preference Activity, to be displayed at the top of the screen
         if(getIntent() != null){
@@ -225,6 +217,7 @@ public class TrackerActivity extends AppCompatActivity {
         //TODO: not sure if we need this, let startrun and stoprun handle starting and starting service
         //doUnbindService();
 
+        stopRun();
         super.onDestroy();
     }
 
@@ -239,9 +232,6 @@ public class TrackerActivity extends AppCompatActivity {
         //chronometer settings, set base time right before starting the chronometer
         mChronometer.setBase(SystemClock.elapsedRealtime());
         mChronometer.start();
-
-        //TODO: debug
-        mStartTime = new Date();
 
     }
 
@@ -615,8 +605,7 @@ public class TrackerActivity extends AppCompatActivity {
 
     private void refreshUnitSplitCalorie(){
 
-        //TODO: debug
-        mFirstSplitTime.setText(String.valueOf(mUnitSplitCalorieList.get(0).getTimeStamp().getTime() - mStartTime.getTime() / (1000f * 60f)));
+        //TODO: how to handle the first split, first data point is captured up to 4 seconds after the run starts.
 
         mTotalCalories = 0f;
 
