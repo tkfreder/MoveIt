@@ -10,9 +10,6 @@ public class CalorieCalculator {
 
     public static float getCalorieByRun(float weight, float minutes, float speed){
 
-        //1 mph
-
-
         return (0.0018f) * weight * minutes * (10.8f * speed + 1);
     }
 

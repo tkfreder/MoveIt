@@ -30,6 +30,10 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.tinakit.moveit.fragment.LoginFragment;
 import com.tinakit.moveit.fragment.RegisterUserFragment;
 import com.tinakit.moveit.model.ActivityType;
@@ -42,12 +46,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.utility.CalorieCalculator;
 import com.tinakit.moveit.utility.UnitConverter;
 
-public class TrackerActivity extends AppCompatActivity {
+public class TrackerActivity extends AppCompatActivity  implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     //DEBUG
     private static final String LOG = "MAIN_ACTIVITY";
@@ -71,8 +78,8 @@ public class TrackerActivity extends AppCompatActivity {
     LocationService mBoundService;
 
     //save all location points during location updates
-    ArrayList<Location> mLocationList;
-    ArrayList<UnitSplitCalorie> mUnitSplitCalorieList;
+    private List<Location> mLocationList;
+    private List<UnitSplitCalorie> mUnitSplitCalorieList = new ArrayList<>();
 
 
     protected static boolean mRequestedService = false;
@@ -80,6 +87,25 @@ public class TrackerActivity extends AppCompatActivity {
 
     //state flags
     private boolean mIsStatView = false;
+
+    //LocationRequest settings
+    GoogleApiClient mGoogleApiClient;
+    LocationRequest mLocationRequest;
+    private static long UPDATE_INTERVAL = 10 * 1000; //10 seconds
+    private static long FASTEST_INTERVAL = 10 * 1000; //5 second
+    private static long DISPLACEMENT = 1; //meters //displacement takes precedent over interval/fastestInterval
+    private static long STOP_SERVICE_TIME_LIMIT = 30 * 60 * 1000 * 60; // 30 minutes in seconds
+    private static final long LOCATION_DATA_PERIOD = 30; //number of seconds for the cycle of updating MainActivity UI, careful this doesn't block UI
+    private static final long LOCATION_ACCURACY = 20; //within 20 meter accuracy
+    private boolean mIsTimeLimit = false;
+
+    public static final String GOOGLEAPI_CONNECTION_FAILURE = "x40241.tina.fredericks.a5.app.GOOGLEAPI_CONNECTION_FAILURE";
+    public static final String SERVICE_TIME_LIMIT = "x40241.tina.fredericks.a5.app.SERVICE_TIME_LIMIT";
+
+    //executor
+    private ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
+    private ScheduledFuture<?> sScheduledFuture;
+
 
     //UI widgets
     private TextView mResults;
@@ -129,8 +155,6 @@ public class TrackerActivity extends AppCompatActivity {
         //    Toast.makeText(this, "You need to install Google Play Services for this app to work.", Toast.LENGTH_LONG);
         //    finish();
         //}
-
-
 
 
         //wire up UI widgets
@@ -207,6 +231,128 @@ public class TrackerActivity extends AppCompatActivity {
 
         if (DEBUG) Log.d (LOG, "initialize(): COMPLETE");
 
+        //getRunData();
+
+    }
+
+    private void getRunData() {
+
+        //create instance of LocationRequest
+        createLocationRequest();
+
+        //create instance of Google Play Services API client
+        buildGoogleApiClient();
+
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        if (DEBUG) Log.d(LOG, "GoogleAPIClient Connection successful.");
+
+        //TODO:  this isn't always accurate so not sure if it should be used
+        //get the starting point
+        //updateCache(LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient));
+
+        //start getting location data after there is a connection
+        startLocationUpdates();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        //TODO: do something if connection suspended
+        //need to stop service, return back to Main and stop run
+    }
+
+    @Override
+    public void onConnectionFailed(com.google.android.gms.common.ConnectionResult connectionResult) {
+        //TODO: do something if connection failed
+        if (DEBUG) Log.d(LOG, "GoogleAPIClient Connection failed.");
+        GoogleApiConnectionFailure(GOOGLEAPI_CONNECTION_FAILURE + connectionResult.toString());
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        if (DEBUG) Log.d(LOG, "onLocationChanged");
+
+        if (DEBUG) Log.d(LOG, "Accuracy: " + location.getAccuracy());
+
+        //only track data when it has high level of accuracy
+        if (isAccurate(location)){
+            //update cache
+            updateCache(location);
+
+            refreshData();
+        }
+
+        if(getSecondsFromChronometer() > STOP_SERVICE_TIME_LIMIT && !mIsTimeLimit){
+            mIsTimeLimit = true;
+            reachedTimeLimit();
+            stopRun();
+        }
+
+    }
+
+    private boolean isAccurate(Location location){
+
+        if (location.getAccuracy() < LOCATION_ACCURACY)
+            return true;
+        else
+            return false;
+    }
+
+    //**********************************************************************************************
+    //  updateCache()   /* saves data to cache*/
+    //**********************************************************************************************
+
+    private void  updateCache(Location location) {
+        if (DEBUG) Log.d(LOG, "updateCache()");
+
+        //TODO:to be replaced by mLocationTimeList
+        //save current location
+        //mLocationList.add(location);
+
+        //save current location and timestamp
+        Date date = new Date();
+        float timeStamp = date.getTime();
+        mUnitSplitCalorieList.add(new UnitSplitCalorie(date, location));
+
+        //save time elapsed
+        //get time from Chronometer in MainActivity
+
+        //mTimeElapsed = TimeUnit.MILLISECONDS.toSeconds(mStopWatch.getTime());
+        mTimeElapsed = TrackerActivity.getSecondsFromChronometer();
+    }
+
+    //PERIODIC LOCATION UPDATES
+    protected void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(UPDATE_INTERVAL);//get location updates every x seconds
+        mLocationRequest.setFastestInterval(FASTEST_INTERVAL);//not to exceed location updates every x seconds
+        //mLocationRequest.setSmallestDisplacement(DISPLACEMENT);// to avoid unnecessary updates, but we want to know if runner has not moved so no need to set a minimum distance displacement
+        // TODO:  build a warning system or tracker autoshutoff
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+
+        mGoogleApiClient.connect();
+
+    }
+
+    //PERIODIC LOCATION UPDATES
+    protected void startLocationUpdates() {
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+    }
+
+    protected void stopLocationUpdates() {
+        LocationServices.FusedLocationApi.removeLocationUpdates(
+                mGoogleApiClient, this);
     }
 
 
@@ -217,17 +363,32 @@ public class TrackerActivity extends AppCompatActivity {
         //TODO: not sure if we need this, let startrun and stoprun handle starting and starting service
         //doUnbindService();
 
-        stopRun();
         super.onDestroy();
     }
 
     private void startRun(){
         mRequestedService = true;
 
+        getRunData();
+        /*
+        //start sending updates to MainActivity
+        sScheduledFuture = executor.scheduleWithFixedDelay(new Runnable(){
+            public void run(){
+                if (mUnitSplitCalorieList.size() > 1 ) {
+                    if (DEBUG) Log.d(LOG, "SERVICE_HAS_DATA: # of locations:" + mUnitSplitCalorieList.size());
+
+                    refreshData();
+                }
+            }}, 1, LOCATION_DATA_PERIOD, TimeUnit.SECONDS);
+
+        */
+
         mStartButton.setText(getResources().getString(R.string.stop));
 
+
+        //TODO: delete
         //bind to service
-        doBindService();
+        //doBindService();
 
         //chronometer settings, set base time right before starting the chronometer
         mChronometer.setBase(SystemClock.elapsedRealtime());
@@ -263,8 +424,11 @@ public class TrackerActivity extends AppCompatActivity {
 
     private void stopRun(){
 
+        //TODO:  I believe explicitly stopping service will cause unbinding
         //unbind service
-        doUnbindService();
+        //doUnbindService();
+
+        stopLocationService();
 
         //get latest data
         getData();
@@ -307,7 +471,12 @@ public class TrackerActivity extends AppCompatActivity {
 
     private void stopLocationService(){
         mRequestedService = false;
-        stopService(new Intent(TrackerActivity.this, LocationService.class));
+        //stopService(new Intent(TrackerActivity.this, LocationService.class));
+
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected())
+            stopLocationUpdates();
+        //if (!executor.isTerminated())
+        //    sScheduledFuture.cancel(true);
 
     }
 
@@ -322,9 +491,10 @@ public class TrackerActivity extends AppCompatActivity {
         if (DEBUG) Log.d(LOG, "onStart");
         super.onStart();
 
+        //TODO: delete
         // Register to receive Intents with actions named DATA_SERVICE_INTENT.
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-                mMessageReceiver, new IntentFilter(LocationService.LOCATION_SERVICE_INTENT));
+        //LocalBroadcastManager.getInstance(this).registerReceiver(
+        //        mMessageReceiver, new IntentFilter(LocationService.LOCATION_SERVICE_INTENT));
     }
 
     private void getData(){
@@ -332,7 +502,7 @@ public class TrackerActivity extends AppCompatActivity {
         //TODO: remove after mLocationTimeList is fully implemented
         //mLocationList = (ArrayList)mBoundService.getLocationList();
 
-        mUnitSplitCalorieList = (ArrayList)mBoundService.getUnitSplitCalorieList();
+        //mUnitSplitCalorieList = (ArrayList)mBoundService.getUnitSplitCalorieList();
 
         //mTimeElapsed = mBoundService.getTimeElapsed();
 
@@ -368,6 +538,7 @@ public class TrackerActivity extends AppCompatActivity {
             }
         }
 
+        /*
         mLocationList = new ArrayList<>();
 
         //copy Location data into mLocationList
@@ -375,6 +546,7 @@ public class TrackerActivity extends AppCompatActivity {
             mLocationList.add(unitSplitCalorie.getLocation());
 
         }
+        */
 
     }
 
@@ -421,7 +593,7 @@ public class TrackerActivity extends AppCompatActivity {
             //always stop service then unbind from it
             //http://stackoverflow.com/questions/3385554/do-i-need-to-call-both-unbindservice-and-stopservice-for-android-services
             //TODO: not sure if necessary to call stopservice before unbind
-            stopLocationService();
+            //stopLocationService();
 
             //detach our existing connection.
             unbindService(mConnection);
@@ -535,6 +707,36 @@ public class TrackerActivity extends AppCompatActivity {
         }
     };
 
+    private void refreshData(){
+
+        //get data from Location service
+        getData();
+
+        //remove outliers from LocationTimeList, save location data in mLocationList
+        removeOutliers();
+
+        displayCurrent();
+    }
+
+    private void GoogleApiConnectionFailure(String message){
+
+        String connectionResult = message.substring(LocationService.GOOGLEAPI_CONNECTION_FAILURE.length() - 1, (message.length() - 1));
+        String errorMessage = "Google Play Services connection failure: " + connectionResult + ". Try again.";
+        Toast.makeText(TrackerActivity.this, errorMessage, Toast.LENGTH_LONG);
+    }
+
+    private void reachedTimeLimit(){
+
+        displayAlertDialog(getString(R.string.time_limit), getString(R.string.reached_time_limit_30_minutes));
+        stopRun();
+        //TODO:  disable this until main functionality is done
+        //save the total number of coins
+        //saveCoins(mUserId, Integer.parseInt(mCoins.getText().toString()));
+
+        //display number of coins earned
+        displayResults();
+    }
+
     private void displayAlertDialog(String title, String message){
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                 TrackerActivity.this);
@@ -565,10 +767,10 @@ public class TrackerActivity extends AppCompatActivity {
     private void displayCurrent(){
 
         //TODO: replace references of mLocationList with mLocationTimeList
-        if (DEBUG) Log.d(LOG, "displayCurrent: intervalCount" + mLocationList.size());
+        //if (DEBUG) Log.d(LOG, "displayCurrent: intervalCount" + mLocationList.size());
         if (DEBUG) Log.d(LOG, "displayCurrent: intervalCount" + mUnitSplitCalorieList.size());
 
-        if (mLocationList.size() > 1){
+        if (mUnitSplitCalorieList.size() > 1){
 
             //update distance textview
             float distanceFeet = getDistance(1);
@@ -635,8 +837,8 @@ public class TrackerActivity extends AppCompatActivity {
         //DEBUG
         //StringBuilder stringBuilder = new StringBuilder();
 
-        for (int i = 0 ; i < mLocationList.size() - 1; i++){
-            Location.distanceBetween(mLocationList.get(i).getLatitude(),mLocationList.get(i).getLongitude(),mLocationList.get(i+1).getLatitude(),mLocationList.get(i + 1).getLongitude(), intervalDistance);
+        for (int i = 0 ; i < mUnitSplitCalorieList.size() - 1; i++){
+            Location.distanceBetween(mUnitSplitCalorieList.get(i).getLocation().getLatitude(),mUnitSplitCalorieList.get(i).getLocation().getLongitude(),mUnitSplitCalorieList.get(i+1).getLocation().getLatitude(),mUnitSplitCalorieList.get(i + 1).getLocation().getLongitude(), intervalDistance);
             totalDistance += Math.abs(intervalDistance[0]);
             //DEBUG
             //stringBuilder.append("\n" + i + ": " + intervalDistance[0] + " meters");

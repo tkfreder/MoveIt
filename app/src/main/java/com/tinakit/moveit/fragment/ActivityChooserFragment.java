@@ -53,7 +53,7 @@ public class ActivityChooserFragment extends Fragment {
 
     //TODO: replace test data with intent bundle from login screen
     //Session variables
-    private User mUser = new User("Lucy","password",false,40,"bunny");
+    private User mUser = new User("Lucy","password",false,40,"tiger");
 
 
     //TODO: replace image of map with current location using MAPV2
