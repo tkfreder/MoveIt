@@ -75,8 +75,6 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
     private static final int FEET = 1;
     private static final int METERS = 2;
 
-    LocationService mBoundService;
-
     //save all location points during location updates
     private List<Location> mLocationList;
     private List<UnitSplitCalorie> mUnitSplitCalorieList = new ArrayList<>();
@@ -223,16 +221,7 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
 
     private void initialize(){
         if (DEBUG) Log.d (LOG, "initialize(): STARTING");
-
-        //there are three main bind/unbind groupings: onCreate() and onDestroy(), onStart() and onStop(), and onResume() and onPause()
-        //http://stackoverflow.com/questions/1992676/i-cant-get-rid-of-this-error-message-activity-app-name-has-leaked-servicecon
-        //TODO: not sure if we need this, let startrun and stoprun handle starting and stopping service
-        //doBindService();
-
         if (DEBUG) Log.d (LOG, "initialize(): COMPLETE");
-
-        //getRunData();
-
     }
 
     private void getRunData() {
@@ -359,10 +348,6 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
     @Override
     protected void onDestroy() {
         if (DEBUG) Log.d(LOG, "onDestroy");
-
-        //TODO: not sure if we need this, let startrun and stoprun handle starting and starting service
-        //doUnbindService();
-
         super.onDestroy();
     }
 
@@ -384,11 +369,6 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
         */
 
         mStartButton.setText(getResources().getString(R.string.stop));
-
-
-        //TODO: delete
-        //bind to service
-        //doBindService();
 
         //chronometer settings, set base time right before starting the chronometer
         mChronometer.setBase(SystemClock.elapsedRealtime());
@@ -423,10 +403,6 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
     }
 
     private void stopRun(){
-
-        //TODO:  I believe explicitly stopping service will cause unbinding
-        //unbind service
-        //doUnbindService();
 
         stopLocationService();
 
@@ -499,15 +475,7 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
 
     private void getData(){
 
-        //TODO: remove after mLocationTimeList is fully implemented
-        //mLocationList = (ArrayList)mBoundService.getLocationList();
-
-        //mUnitSplitCalorieList = (ArrayList)mBoundService.getUnitSplitCalorieList();
-
-        //mTimeElapsed = mBoundService.getTimeElapsed();
-
         mTimeElapsed = getSecondsFromChronometer();
-
     }
 
     private void removeOutliers(){
@@ -562,78 +530,6 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
     }
 
     //**********************************************************************************************
-    //  doBindService()
-    //**********************************************************************************************
-
-    void doBindService() {
-        if (DEBUG) Log.d(LOG, "doBindService()");
-
-        if(!isBound()) {
-            if (DEBUG) Log.d(LOG, "Binding Service");
-
-            //explicitly start service
-            Bundle extras = new Bundle();
-            extras.putBoolean("RequestingServiceUpdate", true);
-            startService(new Intent(TrackerActivity.this, LocationService.class));
-
-            bindService(new Intent(TrackerActivity.this, LocationService.class), mConnection, Context.BIND_AUTO_CREATE);
-
-        }
-    }
-
-    //**********************************************************************************************
-    //  doUnBindService()
-    //**********************************************************************************************
-    void doUnbindService() {
-        if (DEBUG) Log.d(LOG, "doUnbindService()");
-
-        if (isBound()) {
-            if (DEBUG) Log.d(LOG, "Unbinding Service");
-
-            //always stop service then unbind from it
-            //http://stackoverflow.com/questions/3385554/do-i-need-to-call-both-unbindservice-and-stopservice-for-android-services
-            //TODO: not sure if necessary to call stopservice before unbind
-            //stopLocationService();
-
-            //detach our existing connection.
-            unbindService(mConnection);
-        }
-    }
-
-    //**********************************************************************************************
-    //  ServiceConnection
-    //**********************************************************************************************
-
-    private ServiceConnection mConnection = new ServiceConnection(){
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            if (DEBUG) Log.d(LOG, "onServiceConnected - Bound");
-            mBoundService = ((LocationService.LocalBinder)service).getService();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            if (DEBUG) Log.d(LOG, "onServiceDisconnected - Unbound");
-            mBoundService = null;
-
-
-            //TODO: not sure if this is correct
-            //is there another way that the system will unbind besides the user clicking Stop button
-            //displayAlertDialog(getString(R.string.lost_connection), getString(R.string.connection_lost_restart));
-            stopLocationService();
-        }
-    };
-
-    //**********************************************************************************************
-    //  isBound()  returns true if service is connected, otherwise return false
-    //**********************************************************************************************
-
-    private boolean isBound(){
-        return(mBoundService != null);
-    }
-
-
-    //**********************************************************************************************
     //  onPause() - Activity is partially obscured by another app but still partially visible and not the activity in focus
     //**********************************************************************************************
 
@@ -657,55 +553,6 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
 
         super.onResume();
     }
-
-    //**********************************************************************************************
-    //  BroadcastReceiver mMessageReceiver
-    //**********************************************************************************************
-
-    // Handler for received Intents. This will be called whenever an Intent
-    // with an action named DATA_SERVICE_INTENT is broadcasted.
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String message = intent.getStringExtra("message");
-
-            if (DEBUG) Log.d(LOG, "BroadcastReceiver - onReceive(): message: " + message);
-
-
-            //let Service drive the update in the MainActivity UI
-            //Service will send a message periodically until service is stopped
-            if(mRequestedService && message.equals(LocationService.SERVICE_HAS_DATA)){
-                if(isBound()){
-
-                    //get data from Location service
-                    getData();
-
-                    //remove outliers from LocationTimeList, save location data in mLocationList
-                    removeOutliers();
-
-                    displayCurrent();
-                }
-            }
-            else if(message.contains(LocationService.GOOGLEAPI_CONNECTION_FAILURE)){
-                String connectionResult = message.substring(LocationService.GOOGLEAPI_CONNECTION_FAILURE.length() - 1, (message.length() - 1));
-                String errorMessage = "Google Play Services connection failure: " + connectionResult + ". Try again.";
-                        Toast.makeText(TrackerActivity.this, errorMessage, Toast.LENGTH_LONG);
-
-            }
-            else if(message.equals(LocationService.SERVICE_TIME_LIMIT)){
-
-                displayAlertDialog(getString(R.string.time_limit), getString(R.string.reached_time_limit_30_minutes));
-                stopRun();
-                //TODO:  disable this until main functionality is done
-                //save the total number of coins
-                //saveCoins(mUserId, Integer.parseInt(mCoins.getText().toString()));
-
-                //display number of coins earned
-                displayResults();
-            }
-
-        }
-    };
 
     private void refreshData(){
 
