@@ -186,9 +186,9 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
         }
 
 
-        //**********************************************************************************************
-        //  onClickListeners
-        //**********************************************************************************************
+    //**********************************************************************************************
+    //  onClickListeners
+    //**********************************************************************************************
 
 
         mStartButton.setOnClickListener(new View.OnClickListener() {
@@ -233,6 +233,10 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
         buildGoogleApiClient();
 
     }
+
+    //**********************************************************************************************
+    //  Location API overridden methods
+    //**********************************************************************************************
 
     @Override
     public void onConnected(Bundle connectionHint) {
@@ -282,35 +286,16 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
 
     }
 
+    //**********************************************************************************************
+    //  Location helper methods
+    //**********************************************************************************************
+
     private boolean isAccurate(Location location){
 
         if (location.getAccuracy() < LOCATION_ACCURACY)
             return true;
         else
             return false;
-    }
-
-    //**********************************************************************************************
-    //  updateCache()   /* saves data to cache*/
-    //**********************************************************************************************
-
-    private void  updateCache(Location location) {
-        if (DEBUG) Log.d(LOG, "updateCache()");
-
-        //TODO:to be replaced by mLocationTimeList
-        //save current location
-        //mLocationList.add(location);
-
-        //save current location and timestamp
-        Date date = new Date();
-        float timeStamp = date.getTime();
-        mUnitSplitCalorieList.add(new UnitSplitCalorie(date, location));
-
-        //save time elapsed
-        //get time from Chronometer in MainActivity
-
-        //mTimeElapsed = TimeUnit.MILLISECONDS.toSeconds(mStopWatch.getTime());
-        mTimeElapsed = TrackerActivity.getSecondsFromChronometer();
     }
 
     //PERIODIC LOCATION UPDATES
@@ -344,12 +329,9 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
                 mGoogleApiClient, this);
     }
 
-
-    @Override
-    protected void onDestroy() {
-        if (DEBUG) Log.d(LOG, "onDestroy");
-        super.onDestroy();
-    }
+    //**********************************************************************************************
+    //  Control methods
+    //**********************************************************************************************
 
     private void startRun(){
         mRequestedService = true;
@@ -376,11 +358,18 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
 
     }
 
-    private void displayResults(){
+    private void stopRun(){
 
-        mResults.setText("You earned " + mCoins.getText() + " coins!");
-        mMapImage.setVisibility(View.VISIBLE);
-        playSound();
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected())
+            stopLocationUpdates();
+
+        //get latest data
+        getData();
+
+        mStartButton.setText(getString(R.string.done));
+
+        //stop chronometer
+        mChronometer.stop();
 
     }
 
@@ -402,17 +391,40 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
         mp.start();
     }
 
-    private void stopRun(){
+    //**********************************************************************************************
+    //  Data methods
+    //**********************************************************************************************
 
-        stopLocationService();
+    //**********************************************************************************************
+    //  updateCache()   /* saves data to cache*/
+    //**********************************************************************************************
 
-        //get latest data
-        getData();
+    private void  updateCache(Location location) {
+        if (DEBUG) Log.d(LOG, "updateCache()");
 
-        mStartButton.setText(getString(R.string.done));
+        //TODO:to be replaced by mLocationTimeList
+        //save current location
+        //mLocationList.add(location);
 
-        //stop chronometer
-        mChronometer.stop();
+        //save current location and timestamp
+        Date date = new Date();
+        float timeStamp = date.getTime();
+        mUnitSplitCalorieList.add(new UnitSplitCalorie(date, location));
+
+        //save time elapsed
+        //get time from Chronometer
+        mTimeElapsed = getSecondsFromChronometer();
+    }
+
+
+
+
+
+    private void displayResults(){
+
+        mResults.setText("You earned " + mCoins.getText() + " coins!");
+        mMapImage.setVisibility(View.VISIBLE);
+        playSound();
 
     }
 
@@ -445,18 +457,6 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
         }
     }
 
-    private void stopLocationService(){
-        mRequestedService = false;
-        //stopService(new Intent(TrackerActivity.this, LocationService.class));
-
-        if (mGoogleApiClient != null && mGoogleApiClient.isConnected())
-            stopLocationUpdates();
-        //if (!executor.isTerminated())
-        //    sScheduledFuture.cancel(true);
-
-    }
-
-
 
     //**********************************************************************************************
     //  onStart()
@@ -467,10 +467,6 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
         if (DEBUG) Log.d(LOG, "onStart");
         super.onStart();
 
-        //TODO: delete
-        // Register to receive Intents with actions named DATA_SERVICE_INTENT.
-        //LocalBroadcastManager.getInstance(this).registerReceiver(
-        //        mMessageReceiver, new IntentFilter(LocationService.LOCATION_SERVICE_INTENT));
     }
 
     private void getData(){
@@ -564,6 +560,21 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
 
         displayCurrent();
     }
+
+    //**********************************************************************************************
+    //  onDestroy()
+    //**********************************************************************************************
+
+    @Override
+    protected void onDestroy() {
+        if (DEBUG) Log.d(LOG, "onDestroy");
+        super.onDestroy();
+    }
+
+    //**********************************************************************************************
+    //  Message methods
+    //**********************************************************************************************
+
 
     private void GoogleApiConnectionFailure(String message){
 
