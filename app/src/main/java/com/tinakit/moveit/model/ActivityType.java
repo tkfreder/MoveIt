@@ -1,5 +1,7 @@
 package com.tinakit.moveit.model;
 
+import java.util.ArrayList;
+
 /**
  * Created by Tina on 9/15/2015.
  */
@@ -32,6 +34,19 @@ public enum ActivityType {
     }
     public float getMaxSpeed(){
         return mMaxSpeed;
+    }
+
+    public static int getIndexById(int activityId){
+
+        for (int i = 0; i < ActivityType.values().length; i++ ){
+
+            if (ActivityType.values()[i].getActivityId() == activityId){
+                return i;
+            }
+
+        }
+
+        return -1;
     }
 
 }

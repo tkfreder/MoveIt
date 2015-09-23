@@ -107,7 +107,7 @@ public class ActivityDetailListAdapter extends BaseAdapter {
         ActivityDetail activityDetail = mActivityDetailList.get(position);
 
         // Populate data from ActivityDetail data object
-        holder.activityId.setText(ActivityType.values()[activityDetail.getActivityId() - 1].getName());
+        holder.activityId.setText(ActivityType.values()[ActivityType.getIndexById(activityDetail.getActivityId())].getName());
 
         //display day of the week for activities occurred in the last 7 days
 
