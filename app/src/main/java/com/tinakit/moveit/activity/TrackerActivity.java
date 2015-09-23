@@ -120,7 +120,7 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
     private int mActivityId = -1;
     private int mUserId;
     float mTotalCalories = 0;
-    protected static ArrayList<ActivityDetail> mActivityDetailList = new ArrayList<>();
+    public static ArrayList<ActivityDetail> mActivityDetailList = new ArrayList<>();
 
 
     //TODO: replace test data with intent bundle from login screen
@@ -166,9 +166,10 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
         mFeetPerMinute = (TextView)findViewById(R.id.feetPerMinute);
         mMapImage = (ImageView)findViewById(R.id.map);
 
-        mActivityDetailListView = (ListView)findViewById(R.id.activityDetailListView);
-        mActivityDetailListAdapter = new ActivityDetailListAdapter(this);
-        mActivityDetailListView.setAdapter(mActivityDetailListAdapter);
+        //TODO: to delete
+        //mActivityDetailListView = (ListView)findViewById(R.id.activityDetailListView);
+        //mActivityDetailListAdapter = new ActivityDetailListAdapter(this);
+        //mActivityDetailListView.setAdapter(mActivityDetailListAdapter);
 
         //TODO: get activity details from Preference Activity, to be displayed at the top of the screen
         if(getIntent() != null){
@@ -217,6 +218,8 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
                 } else if (mStartButton.getText().equals(getResources().getString(R.string.done))) {
 
                     finish();
+                    Intent intent = new Intent(getApplicationContext(), ActivityHistory.class);
+                    startActivity(intent);
 
                 }
             }
@@ -383,9 +386,10 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
             return;
         }
 
+        //TODO: to delete
         //refresh listview
-        mActivityDetailListAdapter.setList(mActivityDetailList);
-        mActivityDetailListAdapter.notifyDataSetChanged();
+        //mActivityDetailListAdapter.setList(mActivityDetailList);
+        //mActivityDetailListAdapter.notifyDataSetChanged();
 
     }
 

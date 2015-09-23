@@ -42,6 +42,10 @@
             android:label="@string/title_activity_fused_location_api" >
         </activity>
         <activity
+            android:name=".activity.ActivityHistory"
+            android:label="@string/activity_history" >
+        </activity>
+        <activity
             android:name=".activity.ActivityChooser"
             android:label="@string/title_activity_activity_chooser" >
             <intent-filter>

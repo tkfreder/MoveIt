@@ -90,5 +90,6 @@
     <string name="choose_activity_type">Choose an activity type:</string>
     <string name="title_activity_activity_chooser">ActivityChooser</string>
     <string name="feet_per_minute">Feet/Minute</string>
+    <string name="activity_history">ActivityHistory</string>
 
 </resources>
