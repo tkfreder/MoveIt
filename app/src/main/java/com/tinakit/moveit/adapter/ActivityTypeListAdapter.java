@@ -97,7 +97,7 @@ public class ActivityTypeListAdapter extends BaseAdapter {
         //get a reference to the data
         ActivityType activityType = mActivityList.get(position);
 
-        // Populate data from StockInfo data object
+        // Populate data from ActivityType data object
         holder.activityName.setText(activityType.getName());
         holder.activityName.setTag(activityType);
         holder.activityIcon.setImageResource(mContext.getResources().getIdentifier(activityType.getName() + "_icon_small", "drawable", mContext.getPackageName()));

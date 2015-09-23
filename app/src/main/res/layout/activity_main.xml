@@ -204,5 +204,11 @@
         android:layout_gravity="center"
         android:visibility="gone"/>
 
+    <ListView
+        android:id="@+id/activityDetailListView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </ListView>
+
 
 </LinearLayout>

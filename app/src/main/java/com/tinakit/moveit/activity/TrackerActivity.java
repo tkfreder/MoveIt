@@ -1,21 +1,14 @@
 package com.tinakit.moveit.activity;
 
 import android.app.AlertDialog;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.location.Location;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.os.SystemClock;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -25,6 +18,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +28,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.tinakit.moveit.adapter.ActivityDetailListAdapter;
+import com.tinakit.moveit.adapter.ActivityTypeListAdapter;
 import com.tinakit.moveit.fragment.LoginFragment;
 import com.tinakit.moveit.fragment.RegisterUserFragment;
 import com.tinakit.moveit.model.ActivityType;
@@ -48,10 +44,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.utility.CalorieCalculator;
+import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.utility.UnitConverter;
 
 public class TrackerActivity extends AppCompatActivity  implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
@@ -94,7 +90,7 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
     private static long DISPLACEMENT = 1; //meters //displacement takes precedent over interval/fastestInterval
     private static long STOP_SERVICE_TIME_LIMIT = 30 * 60 * 1000 * 60; // 30 minutes in seconds
     private static final long LOCATION_DATA_PERIOD = 30; //number of seconds for the cycle of updating MainActivity UI, careful this doesn't block UI
-    private static final long LOCATION_ACCURACY = 20; //within 20 meter accuracy
+    private static final long LOCATION_ACCURACY = 50; //within # meter accuracy
     private boolean mIsTimeLimit = false;
 
     public static final String GOOGLEAPI_CONNECTION_FAILURE = "x40241.tina.fredericks.a5.app.GOOGLEAPI_CONNECTION_FAILURE";
@@ -116,12 +112,16 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
     private TextView mCoins;
     private TextView mFeetPerMinute;
     private ImageView mMapImage;
+    private ListView mActivityDetailListView;
+    private ActivityDetailListAdapter mActivityDetailListAdapter;
 
     //local cache
     private float mTotalCoins = 0f;
     private int mActivityId = -1;
     private int mUserId;
     float mTotalCalories = 0;
+    protected static ArrayList<ActivityDetail> mActivityDetailList = new ArrayList<>();
+
 
     //TODO: replace test data with intent bundle from login screen
     //Session variables
@@ -139,7 +139,7 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
         super.onCreate(savedInstanceState);
 
         //fix the orientation to portrait
-        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        this.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_main);
 
         //TODO: this came from Login screen, removing Login for now
@@ -165,6 +165,10 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
         mCoins = (TextView)findViewById(R.id.coins);
         mFeetPerMinute = (TextView)findViewById(R.id.feetPerMinute);
         mMapImage = (ImageView)findViewById(R.id.map);
+
+        mActivityDetailListView = (ListView)findViewById(R.id.activityDetailListView);
+        mActivityDetailListAdapter = new ActivityDetailListAdapter(this);
+        mActivityDetailListView.setAdapter(mActivityDetailListAdapter);
 
         //TODO: get activity details from Preference Activity, to be displayed at the top of the screen
         if(getIntent() != null){
@@ -363,13 +367,25 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected())
             stopLocationUpdates();
 
-        //get latest data
-        getData();
-
         mStartButton.setText(getString(R.string.done));
 
         //stop chronometer
         mChronometer.stop();
+
+        //save elapsed time
+        mTimeElapsed = getSecondsFromChronometer();
+
+        //save route data
+        if (mUnitSplitCalorieList.size() > 1)
+            saveActivityDetail();
+        else{
+            Toast.makeText(this, "Not enough route information. Restart your activity.", Toast.LENGTH_LONG);
+            return;
+        }
+
+        //refresh listview
+        mActivityDetailListAdapter.setList(mActivityDetailList);
+        mActivityDetailListAdapter.notifyDataSetChanged();
 
     }
 
@@ -394,6 +410,12 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
     //**********************************************************************************************
     //  Data methods
     //**********************************************************************************************
+
+    private void saveActivityDetail(){
+
+        mActivityDetailList.add(new ActivityDetail(mActivityId, mUnitSplitCalorieList.get(0).getTimeStamp(), mUnitSplitCalorieList.get(mUnitSplitCalorieList.size() - 1).getTimeStamp(), (mTimeElapsed / 60f), mTotalCoins));
+
+    }
 
     //**********************************************************************************************
     //  updateCache()   /* saves data to cache*/
@@ -423,7 +445,9 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
     private void displayResults(){
 
         mResults.setText("You earned " + mCoins.getText() + " coins!");
-        mMapImage.setVisibility(View.VISIBLE);
+
+        //TODO: placeholder for real map
+        //mMapImage.setVisibility(View.VISIBLE);
         playSound();
 
     }
@@ -467,11 +491,6 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
         if (DEBUG) Log.d(LOG, "onStart");
         super.onStart();
 
-    }
-
-    private void getData(){
-
-        mTimeElapsed = getSecondsFromChronometer();
     }
 
     private void removeOutliers(){
@@ -552,8 +571,9 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
 
     private void refreshData(){
 
-        //get data from Location service
-        getData();
+
+        mTimeElapsed = getSecondsFromChronometer();
+
 
         //remove outliers from LocationTimeList, save location data in mLocationList
         removeOutliers();
