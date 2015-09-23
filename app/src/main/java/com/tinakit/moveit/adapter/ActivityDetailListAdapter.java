@@ -28,7 +28,6 @@ public class ActivityDetailListAdapter extends BaseAdapter {
 
     private Context mContext;
     private List<ActivityDetail> mActivityDetailList;
-    LayoutInflater mInflater;
 
 
     public ActivityDetailListAdapter (Context context){

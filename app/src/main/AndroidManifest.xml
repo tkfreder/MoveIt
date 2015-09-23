@@ -46,13 +46,18 @@
             android:label="@string/activity_history" >
         </activity>
         <activity
-            android:name=".activity.ActivityChooser"
-            android:label="@string/title_activity_activity_chooser" >
+            android:name=".activity.RewardView"
+            android:label="@string/reward_view" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".activity.ActivityChooser"
+            android:label="@string/title_activity_activity_chooser" >
+
         </activity>
     </application>
 

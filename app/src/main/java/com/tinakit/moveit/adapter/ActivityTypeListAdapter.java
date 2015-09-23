@@ -27,8 +27,6 @@ public class ActivityTypeListAdapter extends BaseAdapter {
 
     private Context mContext;
     private List<ActivityType> mActivityList;
-    LayoutInflater mInflater;
-
 
     public ActivityTypeListAdapter (Context context){
         mContext = context;

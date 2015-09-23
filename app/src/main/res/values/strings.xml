@@ -91,5 +91,6 @@
     <string name="title_activity_activity_chooser">ActivityChooser</string>
     <string name="feet_per_minute">Feet/Minute</string>
     <string name="activity_history">ActivityHistory</string>
+    <string name="reward_view">Reward View</string>
 
 </resources>
