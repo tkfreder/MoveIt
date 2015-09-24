@@ -2,7 +2,8 @@
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
-             tools:context="com.tinakit.moveit.fragment.ActivityChooserFragment">
+             tools:context="com.tinakit.moveit.fragment.ActivityChooserFragment"
+             android:padding="@dimen/activity_vertical_margin">
 
 
 
@@ -42,7 +43,6 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:textSize="@dimen/abc_text_size_medium_material"/>
-
 
         <TextView
             android:text="@string/choose_activity_type"

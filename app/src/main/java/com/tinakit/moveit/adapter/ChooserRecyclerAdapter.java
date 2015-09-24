@@ -16,6 +16,7 @@ import com.tinakit.moveit.activity.TrackerActivity;
 import com.tinakit.moveit.model.ActivityType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -23,16 +24,11 @@ import java.util.List;
  */
 public class ChooserRecyclerAdapter extends RecyclerView.Adapter<ChooserRecyclerAdapter.CustomViewHolder> {
 
-    private List<ActivityType> mActivityTypeList = new ArrayList<>();
+    private List<ActivityType> mActivityTypeList = new ArrayList<>(Arrays.asList(ActivityType.values()));
     private Context mContext;
 
     public ChooserRecyclerAdapter(Context context) {
         mContext = context;
-
-        for (ActivityType activityType : ActivityType.values()){
-
-            mActivityTypeList.add(activityType);
-        }
     }
 
     @Override
