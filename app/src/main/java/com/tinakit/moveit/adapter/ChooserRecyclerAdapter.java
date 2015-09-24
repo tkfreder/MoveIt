@@ -1,14 +1,18 @@
 package com.tinakit.moveit.adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.tinakit.moveit.R;
+import com.tinakit.moveit.activity.TrackerActivity;
 import com.tinakit.moveit.model.ActivityType;
 
 import java.util.ArrayList;
@@ -49,11 +53,36 @@ public class ChooserRecyclerAdapter extends RecyclerView.Adapter<ChooserRecycler
         customViewHolder.activityName.setTag(activityType);
         customViewHolder.activityIcon.setImageResource(mContext.getResources().getIdentifier(activityType.getName() + "_icon_small", "drawable", mContext.getPackageName()));
 
+        View.OnClickListener clickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                CustomViewHolder holder = (CustomViewHolder) view.getTag();
+                int position = holder.getAdapterPosition();
+
+                ActivityType activityType = mActivityTypeList.get(position);
+
+                Intent intent = new Intent(mContext, TrackerActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("activity_type",activityType.getName());
+                bundle.putInt("activityId",activityType.getActivityId());
+                bundle.putString("username", "Lucy");
+                intent.putExtras(bundle);
+                mContext.startActivity(intent);
+            }
+        };
+
+        //Handle click event on both title and image click
+        customViewHolder.activityName.setOnClickListener(clickListener);
+        customViewHolder.activityIcon.setOnClickListener(clickListener);
+
+        customViewHolder.activityName.setTag(customViewHolder);
+        customViewHolder.activityIcon.setTag(customViewHolder);
+
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return (null != mActivityTypeList ? mActivityTypeList.size() : 0);
     }
 
     public class CustomViewHolder extends RecyclerView.ViewHolder {

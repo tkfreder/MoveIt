@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,10 +50,6 @@ public class ActivityChooserFragment extends Fragment {
     //UI Widgets
     private TextView mUserName;
     private ImageView mAvatar;
-    private ListView mActivityTypeListView;
-    private List<ActivityType> mActivityTypeList = new ArrayList<ActivityType>();
-    private ActivityTypeListAdapter mActivityTypeListAdapter;
-
     private RecyclerView mRecyclerView;
     private ChooserRecyclerAdapter mChooserRecyclerAdapter;
 
@@ -105,16 +102,12 @@ public class ActivityChooserFragment extends Fragment {
         mAvatar = (ImageView)view.findViewById(R.id.avatar);
         mAvatar.setImageResource(getResources().getIdentifier(mUser.getAvatarFileName() , "drawable", getActivity().getPackageName()));
 
-        mActivityTypeListView = (ListView)view.findViewById(R.id.activityType_listview);
-        mActivityTypeListAdapter = new ActivityTypeListAdapter(getActivity());
-        mActivityTypeListView.setAdapter(mActivityTypeListAdapter);
-
-        for (ActivityType activityType : ActivityType.values()){
-
-            mActivityTypeList.add(activityType);
-        }
-
-        mActivityTypeListAdapter.setList(mActivityTypeList);
+        //RecyclerView
+        // Initialize recycler view
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mChooserRecyclerAdapter = new ChooserRecyclerAdapter(getActivity());
+        mRecyclerView.setAdapter(mChooserRecyclerAdapter);
 
         // Inflate the layout for this fragment
         return view;
