@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.TrackerActivity;
 import com.tinakit.moveit.adapter.ActivityTypeListAdapter;
+import com.tinakit.moveit.adapter.ChooserRecyclerAdapter;
 import com.tinakit.moveit.model.ActivityType;
 import com.tinakit.moveit.model.User;
 
@@ -50,6 +52,9 @@ public class ActivityChooserFragment extends Fragment {
     private ListView mActivityTypeListView;
     private List<ActivityType> mActivityTypeList = new ArrayList<ActivityType>();
     private ActivityTypeListAdapter mActivityTypeListAdapter;
+
+    private RecyclerView mRecyclerView;
+    private ChooserRecyclerAdapter mChooserRecyclerAdapter;
 
     //TODO: replace test data with intent bundle from login screen
     //Session variables
