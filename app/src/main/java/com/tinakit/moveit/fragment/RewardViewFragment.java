@@ -21,11 +21,10 @@ import java.util.ArrayList;
  */
 public class RewardViewFragment extends Fragment {
 
-    private ArrayList<Reward> mRewardList;
     private RewardListAdapter mRewardListAdapter;
 
     //TODO: dummy data
-    int mTotalCoins = 60;
+    int mTotalCoins = 0;
     int mUserId = 1;
 
     //UI Widgets
@@ -36,8 +35,6 @@ public class RewardViewFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_reward_view, container, false);
 
-
-
         mRewardListView = (ListView)view.findViewById(R.id.rewardListView);
         mRewardListAdapter = new RewardListAdapter(getActivity(), mTotalCoins, mUserId );
         mRewardListView.setAdapter(mRewardListAdapter);
@@ -47,9 +44,12 @@ public class RewardViewFragment extends Fragment {
         //get Reward data for this user
         mRewardListAdapter.setList(getRewardList());
 
-        //TODO: temp
+        //get total coins out of intent
         mTotalCoins_textview = (TextView)view.findViewById(R.id.coinTotal);
-        mTotalCoins_textview.setText(String.valueOf(mTotalCoins));
+        if(getActivity().getIntent() != null && getActivity().getIntent().getExtras().containsKey("total_coins")) {
+            mTotalCoins = getActivity().getIntent().getExtras().getInt("total_coins");
+            mTotalCoins_textview.setText(String.valueOf(mTotalCoins));
+        }
 
     return view;
     }

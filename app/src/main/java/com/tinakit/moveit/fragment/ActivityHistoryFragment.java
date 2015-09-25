@@ -1,5 +1,6 @@
 package com.tinakit.moveit.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -7,11 +8,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.tinakit.moveit.R;
+import com.tinakit.moveit.activity.RewardView;
 import com.tinakit.moveit.activity.TrackerActivity;
 import com.tinakit.moveit.adapter.ActivityDetailListAdapter;
 import com.tinakit.moveit.adapter.ActivityDetailRecyclerAdapter;
@@ -26,39 +29,21 @@ import java.util.ArrayList;
 public class ActivityHistoryFragment extends Fragment {
 
     //UI Widgets
-    //private ListView mActivityDetailListView;
     private TextView mTotalCoins_textview;
+    private RecyclerView mRecyclerView;
+    private Button mRewardButton;
 
-    //TODO: delete
-    //private ActivityDetailListAdapter mActivityDetailListAdapter;
-    //private ArrayList<ActivityDetail> mActivityDetailList = new ArrayList<>();
 
     private ArrayList<ActivityDetail> mActivityDetailList = new ArrayList<>();
-
-    private RecyclerView mRecyclerView;
     private ActivityDetailRecyclerAdapter mActivityDetailRecyclerAdapter;
-
-
-
+    private int mTotalCoins = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_activity_history, container, false);
 
-        //TODO: delete
-        /*
-        mActivityDetailListView = (ListView)view.findViewById(R.id.activityDetailListView);
-        mActivityDetailListAdapter = new ActivityDetailListAdapter(getActivity());
-        mActivityDetailListView.setAdapter(mActivityDetailListAdapter);
-
-        //get list data
-        mActivityDetailList = TrackerActivity.mActivityDetailList;
-
-        //set data to list adapter
-        mActivityDetailListAdapter.setList(mActivityDetailList);
-        */
-
+        //get data from TrackerActivity
         mActivityDetailList = TrackerActivity.mActivityDetailList;
 
         //RecyclerView
@@ -70,10 +55,22 @@ public class ActivityHistoryFragment extends Fragment {
 
         //display coin total
         mTotalCoins_textview = (TextView)view.findViewById(R.id.coinTotal);
-        mTotalCoins_textview.setText(String.valueOf(getCoinTotal()));
+        mTotalCoins = getCoinTotal();
+        mTotalCoins_textview.setText(String.valueOf(mTotalCoins));
 
-        //mActivityDetailListAdapter.notifyDataSetChanged();
+        //button
+        mRewardButton = (Button)view.findViewById(R.id.rewardButton);
+        mRewardButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
+                Intent intent = new Intent(getActivity(), RewardView.class);
+                Bundle bundle = new Bundle();
+                bundle.putInt("total_coins", mTotalCoins);
+                intent.putExtras(bundle);
+                startActivity(intent);
+            }
+        });
 
         return view;
     }
