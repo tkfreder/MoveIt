@@ -25,18 +25,20 @@
 
         </LinearLayout>
 
-        <android.support.v7.widget.RecyclerView
-            xmlns:tools="http://schemas.android.com/tools"
-            android:id="@+id/recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true" />
-
         <Button
             android:id="@+id/rewardButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Go to Rewards"/>
+
+        <android.support.v7.widget.RecyclerView
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" />
+
+
     </LinearLayout>
 
 </FrameLayout>

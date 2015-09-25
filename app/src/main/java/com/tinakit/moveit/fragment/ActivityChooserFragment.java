@@ -21,7 +21,6 @@ import android.widget.TextView;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.TrackerActivity;
-import com.tinakit.moveit.adapter.ActivityTypeListAdapter;
 import com.tinakit.moveit.adapter.ChooserRecyclerAdapter;
 import com.tinakit.moveit.model.ActivityType;
 import com.tinakit.moveit.model.User;

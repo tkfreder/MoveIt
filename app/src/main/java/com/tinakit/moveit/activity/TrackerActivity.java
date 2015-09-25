@@ -28,8 +28,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.tinakit.moveit.adapter.ActivityDetailListAdapter;
-import com.tinakit.moveit.adapter.ActivityTypeListAdapter;
 import com.tinakit.moveit.fragment.LoginFragment;
 import com.tinakit.moveit.fragment.RegisterUserFragment;
 import com.tinakit.moveit.model.ActivityType;
@@ -112,8 +110,6 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
     private TextView mCoins;
     private TextView mFeetPerMinute;
     private ImageView mMapImage;
-    private ListView mActivityDetailListView;
-    private ActivityDetailListAdapter mActivityDetailListAdapter;
 
     //local cache
     private float mTotalCoins = 0f;
@@ -660,7 +656,7 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
 
             //update speed feet/minute
             float elapsedMinutes = (float)(SystemClock.elapsedRealtime() - mChronometer.getBase())/(1000 * 60);
-            mFeetPerMinute.setText(String.format("%.1f", (float)distanceFeet/elapsedMinutes));
+            mFeetPerMinute.setText(String.format("%.0f", (float)distanceFeet/elapsedMinutes));
 
             //update the UnitSplitCalorie list with calorie and speed values
             refreshUnitSplitCalorie();
@@ -678,7 +674,7 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
             }
 
             //update coins
-            mCoins.setText(String.format("%.1f", totalCoins));
+            mCoins.setText(String.format("%d", Math.round(totalCoins)));
 
             //save latest total number of coins
             mTotalCoins = totalCoins;

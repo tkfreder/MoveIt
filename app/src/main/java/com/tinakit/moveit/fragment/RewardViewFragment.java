@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.TrackerActivity;
-import com.tinakit.moveit.adapter.ActivityDetailListAdapter;
 import com.tinakit.moveit.adapter.RewardListAdapter;
 import com.tinakit.moveit.model.Reward;
 
@@ -35,6 +34,15 @@ public class RewardViewFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_reward_view, container, false);
 
+
+
+        //get total coins out of intent
+        mTotalCoins_textview = (TextView)view.findViewById(R.id.coinTotal);
+        if(getActivity().getIntent() != null && getActivity().getIntent().getExtras().containsKey("total_coins")) {
+            mTotalCoins = getActivity().getIntent().getExtras().getInt("total_coins");
+            mTotalCoins_textview.setText(String.valueOf(mTotalCoins));
+        }
+
         mRewardListView = (ListView)view.findViewById(R.id.rewardListView);
         mRewardListAdapter = new RewardListAdapter(getActivity(), mTotalCoins, mUserId );
         mRewardListView.setAdapter(mRewardListAdapter);
@@ -44,13 +52,6 @@ public class RewardViewFragment extends Fragment {
         //get Reward data for this user
         mRewardListAdapter.setList(getRewardList());
 
-        //get total coins out of intent
-        mTotalCoins_textview = (TextView)view.findViewById(R.id.coinTotal);
-        if(getActivity().getIntent() != null && getActivity().getIntent().getExtras().containsKey("total_coins")) {
-            mTotalCoins = getActivity().getIntent().getExtras().getInt("total_coins");
-            mTotalCoins_textview.setText(String.valueOf(mTotalCoins));
-        }
-
     return view;
     }
 
@@ -58,12 +59,12 @@ public class RewardViewFragment extends Fragment {
 
         ArrayList<Reward> rewardList = new ArrayList<>();
 
-        rewardList.add(new Reward("popsicle", 25, "popsicle dinner dessert"));
-        rewardList.add(new Reward("park playdate", 50, "bring a friend to the park of your choice"));
-        rewardList.add(new Reward("movie buddy", 75, "invite friend for movie night"));
-        rewardList.add(new Reward("Jumpin' Jammin'", 100, "invite friend to Jumpin' Jammin'"));
-        rewardList.add(new Reward("Pizza Party for 5", 150, "invite 4 friends for Pizza Party"));
-        rewardList.add(new Reward("Family Roadtrip", 500, "family votes on a road trip"));
+        rewardList.add(new Reward("popsicle", 1, "popsicle dinner dessert"));
+        rewardList.add(new Reward("park playdate", 2, "bring a friend to the park of your choice"));
+        rewardList.add(new Reward("movie buddy", 5, "invite friend for movie night"));
+        rewardList.add(new Reward("Jumpin' Jammin'", 10, "invite friend to Jumpin' Jammin'"));
+        rewardList.add(new Reward("Pizza Party for 5", 12, "invite 4 friends for Pizza Party"));
+        rewardList.add(new Reward("Family Roadtrip", 20, "family votes on a road trip"));
 
         return rewardList;
     }

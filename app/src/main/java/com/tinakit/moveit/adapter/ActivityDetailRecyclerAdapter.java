@@ -64,7 +64,7 @@ public class ActivityDetailRecyclerAdapter extends RecyclerView.Adapter<Activity
         customViewHolder.time.setText(new SimpleDateFormat("h:mm a").format(activityDetail.getStartDate().getTime()));
         customViewHolder.minutes.setText(String.format("%d", (long)activityDetail.getMinutesElapsed()) +
                 ":" + String.format("%.0f", (activityDetail.getMinutesElapsed() % 1) * 60) + " min");
-        customViewHolder.coins.setText(String.format("%.1f", activityDetail.getCoinsEarned()) + " coins");
+        customViewHolder.coins.setText(String.format("%.0f", activityDetail.getCoinsEarned()) + " coins");
     }
 
     @Override
