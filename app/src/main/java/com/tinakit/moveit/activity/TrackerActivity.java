@@ -830,17 +830,6 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
 
-        switch (item.getItemId()) {
-            case R.id.action_rewards:
-                displayRewards();
-                return true;
-            case R.id.action_settings:
-                //TODO:  openSettings();
-                return true;
-
-            default:
-        }
-
         return super.onOptionsItemSelected(item);
 
     }
