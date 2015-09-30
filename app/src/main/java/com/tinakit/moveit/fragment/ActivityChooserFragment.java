@@ -1,7 +1,6 @@
 package com.tinakit.moveit.fragment;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,25 +8,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.ImageButton;
 import android.support.v4.app.Fragment;
 import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.tinakit.moveit.R;
-import com.tinakit.moveit.activity.TrackerActivity;
 import com.tinakit.moveit.adapter.ChooserRecyclerAdapter;
 import com.tinakit.moveit.db.FitnessDBHelper;
-import com.tinakit.moveit.model.ActivityType;
 import com.tinakit.moveit.model.User;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -97,6 +85,10 @@ public class ActivityChooserFragment extends Fragment {
 
         //wire up UI widgets
         mUserName = (TextView)view.findViewById(R.id.username);
+
+        //TODO: to delete
+        //delete database
+        getActivity().deleteDatabase("fitnessDatabase");
 
         //TODO: to delete
         //insert User in DB

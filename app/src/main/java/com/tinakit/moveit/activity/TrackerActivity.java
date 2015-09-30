@@ -18,7 +18,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,7 +29,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.tinakit.moveit.fragment.LoginFragment;
 import com.tinakit.moveit.fragment.RegisterUserFragment;
-import com.tinakit.moveit.model.ActivityType;
+import com.tinakit.moveit.model.ActivityType2;
 import com.tinakit.moveit.model.UnitSplitCalorie;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.service.LocationService;
@@ -45,7 +44,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.utility.CalorieCalculator;
-import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.utility.UnitConverter;
 
@@ -54,7 +52,7 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
     //DEBUG
     private static final String LOG = "MAIN_ACTIVITY";
     private static final boolean DEBUG = true;
-    private static final ActivityType mActivityType = ActivityType.RUNNING;
+    private static final ActivityType2 mActivityType = ActivityType2.RUNNING;
 
     //CONSTANTS
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;

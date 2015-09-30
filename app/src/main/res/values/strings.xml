@@ -18,13 +18,14 @@
     <string name="connection_lost_restart">Connection lost.  Please restart your run.</string>
     <string name="done">Done</string>
 
-    <!-- list of activities -->
+    <!-- list of activities - referenced by DB Table: ActivityType.activityTypeId -->
     <string-array
-        name="string_array_activities">
-        <item>Walking</item>
-        <item>Biking</item>
-        <item>Scootering</item>
-        <item>Running</item>
+        name="string_array_activity_types">
+        <item>1,walk</item>
+        <item>2,run</item>
+        <item>3,scooter</item>
+        <item>4,bike</item>
+        <item>5,hike</item>
     </string-array>
 
     <!-- usernames //TODO: to implement a secure login method-->

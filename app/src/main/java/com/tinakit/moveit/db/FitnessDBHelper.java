@@ -10,9 +10,12 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import android.view.View;
 
+import com.tinakit.moveit.model.ActivityType;
 import com.tinakit.moveit.model.User;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Tina on 9/28/2015.
@@ -57,9 +60,12 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     //ACTIVITY TYPE TABLE
     private static final String TABLE_ACTIVITY_TYPE = "ActivityType";
     private static final String KEY_ACTIVITY_TYPE_ID = "_id";
-    private static final String KEY_ACTIVITY_TYPE_NAME = "activityName";
     private static final String KEY_ACTIVITY_TYPE_MAXSPEED = "maxSpeed";
+    private static final String KEY_ACTIVITY_TYPE_MAXSPEED_NOTES = "maxSpeedNotes";
     private static final String KEY_ACTIVITY_TYPE_PRIORITY =  "priority";
+    private static final String KEY_ACTIVITY_TYPE_ICON_FILENAME =  "iconFileName";
+    private static final String KEY_ACTIVITY_TYPE_IS_ENABLED =  "isEnabled";
+
 
     //
     private static volatile FitnessDBHelper sInstance;
@@ -126,16 +132,17 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         String CREATE_ACTIVITY_TYPE_TABLE = "CREATE TABLE " + TABLE_ACTIVITY_TYPE +
                 "(" +
                 KEY_ACTIVITY_TYPE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // Define a primary key
-                KEY_ACTIVITY_TYPE_NAME  + " TEXT, " +
                 KEY_ACTIVITY_TYPE_MAXSPEED  + " REAL, " +
-                KEY_ACTIVITY_TYPE_PRIORITY  + " INTEGER" +
+                KEY_ACTIVITY_TYPE_MAXSPEED_NOTES  + " TEXT, " +
+                KEY_ACTIVITY_TYPE_PRIORITY  + " INTEGER," +
+                KEY_ACTIVITY_TYPE_ICON_FILENAME  + " TEXT," +
+                KEY_ACTIVITY_TYPE_IS_ENABLED  + " NUMERIC" +
                 ")";
 
         String CREATE_ACTIVITIES_TABLE = "CREATE TABLE " + TABLE_ACTIVITIES +
                 "(" +
                 KEY_ACTIVITY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // Define a primary key
                 KEY_ACTIVITY_ACTIVITY_TYPE_ID_FK + " INTEGER REFERENCES " + TABLE_ACTIVITY_TYPE + "," + // Define a foreign key
-                //"FOREIGN KEY (" + KEY_ACTIVITY_ACTIVITY_TYPE_ID_FK + " ) REFERENCES " + TABLE_ACTIVITY_TYPE + "(" + KEY_ACTIVITY_TYPE_ID + "), " +
                 KEY_ACTIVITY_START_DATE  + " NUMERIC, " +
                 KEY_ACTIVITY_END_DATE  + " NUMERIC, " +
                 KEY_ACTIVITY_POINTS_EARNED  + " REAL" +
@@ -146,8 +153,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 KEY_LOCATION_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // Define a primary key
                 KEY_LOCATION_USER_ID_FK + " INTEGER REFERENCES " + TABLE_USERS + "," + // Define a foreign key
                 KEY_LOCATION_ACTIVITY_ID_FK + " INTEGER REFERENCES " + TABLE_ACTIVITIES + "," + // Define a foreign key
-                //"FOREIGN KEY (" + KEY_LOCATION_USER_ID_FK + " ) REFERENCES " + TABLE_USERS + "(" + KEY_USER_ID + "), " +
-                //"FOREIGN KEY (" + KEY_LOCATION_ACTIVITY_ID_FK + " ) REFERENCES " + TABLE_ACTIVITIES + "(" + KEY_ACTIVITY_ID + "), " +
                 KEY_LOCATION_LATITUDE  + " REAL, " +
                 KEY_LOCATION_LONGITUDE  + " REAL, " +
                 KEY_LOCATION_ALTITUDE  + " REAL, " +
@@ -160,6 +165,13 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_ACTIVITIES_TABLE);
         db.execSQL(CREATE_LOCATION_TABLE);
 
+        //populate ActivityType table
+        db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 4.6, '1995 world record, walking speed meters/second', 1,'walk',1);");
+        db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 12.4, '2009 world record, running speed meters/second', 2,'run', 1);");
+        db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 5.0, 'estimate based on 20 km/h, world record does not exist', 3,'scooter', 1);");
+        db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 74.7,'1985 world record, cycling speed meters/second',4,'bike', 1);");
+        db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 4.6,'1995 world record, walking speed meters/second', 5,'hike', 1);");
+
     }
 
     @Override
@@ -168,10 +180,11 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
         if (oldVersion != newVersion) {
             // Simplest implementation is to drop all old tables and recreate them
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_LOCATIONS);
+
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACTIVITIES);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACTIVITY_TYPE);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACTIVITIES);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_LOCATIONS);
             onCreate(db);
         }
     }
@@ -275,6 +288,58 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             return true;
         else
             return false;
+    }
+
+    /***********************************************************************************************
+     ACTTIVITY TYPE Operations
+     ***********************************************************************************************
+     */
+
+    public List<ActivityType> getActivityTypes(){
+
+        // Create and/or open the database for writing
+        SQLiteDatabase db = getReadableDatabase();
+
+        //initialize ActivityType list
+        List<ActivityType> activityTypeList = new ArrayList<>();
+
+        try {
+
+            Cursor cursor = db.query(TABLE_ACTIVITY_TYPE,
+                    new String[]{KEY_ACTIVITY_TYPE_ID, KEY_ACTIVITY_TYPE_MAXSPEED,KEY_ACTIVITY_TYPE_ICON_FILENAME},
+                    KEY_ACTIVITY_TYPE_IS_ENABLED + " = ?",
+                    new String[]{"1"}, null, null, KEY_ACTIVITY_TYPE_PRIORITY);
+
+            try{
+
+                if (cursor.moveToFirst())
+                {
+                    do{
+                        ActivityType activityType = new ActivityType();
+                        activityType.setActivityTypeId(cursor.getInt(cursor.getColumnIndex(KEY_ACTIVITY_TYPE_ID)));
+                        activityType.setMaxSpeed(cursor.getFloat(cursor.getColumnIndex(KEY_ACTIVITY_TYPE_MAXSPEED)));
+                        activityType.setIconFileName(cursor.getString(cursor.getColumnIndex(KEY_ACTIVITY_TYPE_ICON_FILENAME)));
+                        activityTypeList.add(activityType);
+
+                    } while(cursor.moveToNext());}
+
+                }catch(Exception exception) {
+
+                    exception.printStackTrace();
+
+                } finally{
+
+                if (cursor != null && !cursor.isClosed())
+                {
+                    cursor.close();
+                }
+            }
+
+        } catch (Exception e) {
+            Log.d(LOGTAG, "Error during getActivityTypes()");
+        }
+
+        return activityTypeList;
     }
 
     public void deleteAll() {
