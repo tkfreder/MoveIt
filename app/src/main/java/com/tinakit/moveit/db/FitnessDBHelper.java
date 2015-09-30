@@ -203,43 +203,41 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         }
     }
 
-    public User getUser(int userId)
+    public User getUser(String userName)
     {
         // Create and/or open the database for writing
         SQLiteDatabase db = getReadableDatabase();
 
         User user = new User();
 
-        // It's a good idea to wrap our insert in a transaction. This helps with performance and ensures
-        // consistency of the database.
-        db.beginTransaction();
         try {
 
             Cursor cursor = db.query(TABLE_USERS,
                     new String[]{KEY_USER_ID, KEY_USER_NAME, KEY_USER_IS_ADMIN, KEY_USER_WEIGHT, KEY_USER_AVATAR_FILENAME},
-                    KEY_USER_ID + " = ?", new String[]{String.valueOf(userId)}, null, null, null);
+                    KEY_USER_NAME + " = ?", new String[]{userName}, null, null, null);
 
-             if (cursor.moveToFirst())
-            {
-                user.setUserId(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)));
-                user.setUserName(cursor.getString(cursor.getColumnIndex(KEY_USER_NAME)));
-                user.setIsAdmin(cursor.getInt(cursor.getColumnIndex(KEY_USER_IS_ADMIN)) > 0 ? true : false);
-                user.setWeight(cursor.getFloat(cursor.getColumnIndex(KEY_USER_WEIGHT)));
-                user.setAvatarFileName(cursor.getString(cursor.getColumnIndex(KEY_USER_AVATAR_FILENAME)));
+            try{
+
+                if (cursor.moveToFirst())
+                {
+                    user.setUserId(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)));
+                    user.setUserName(cursor.getString(cursor.getColumnIndex(KEY_USER_NAME)));
+                    user.setIsAdmin(cursor.getInt(cursor.getColumnIndex(KEY_USER_IS_ADMIN)) > 0 ? true : false);
+                    user.setWeight(cursor.getFloat(cursor.getColumnIndex(KEY_USER_WEIGHT)));
+                    user.setAvatarFileName(cursor.getString(cursor.getColumnIndex(KEY_USER_AVATAR_FILENAME)));
+                }
+
+            } finally{
+
+                if (cursor != null && !cursor.isClosed())
+                {
+                    cursor.close();
+                }
             }
 
-            if (cursor != null && !cursor.isClosed())
-            {
-                cursor.close();
-            }
-
-            db.setTransactionSuccessful();
         } catch (Exception e) {
             Log.d(LOGTAG, "Error while trying to get user to database");
-        } finally {
-            db.endTransaction();
         }
-
 
         return user;
     }

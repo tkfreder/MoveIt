@@ -56,7 +56,7 @@ public class ActivityChooserFragment extends Fragment {
     //TODO: replace test data with intent bundle from login screen
     //Session variables
     //private User mUser = new User("Lucy","password",false,40,"tiger");
-
+    private User mUser;
 
     //TODO: replace image of map with current location using MAPV2
     //http://android-er.blogspot.com/2012/12/get-googlemap-from-mapfragmentsupportma.html
@@ -115,9 +115,10 @@ public class ActivityChooserFragment extends Fragment {
             databaseHelper.addUser(sampleUser);
 
         //get user from DB
+        mUser = databaseHelper.getUser(sampleUser.getUserName());
 
         //display username
-        mUserName.setText(sampleUser.getUserName());
+        mUserName.setText(mUser.getUserName());
 
         mAvatar = (ImageView)view.findViewById(R.id.avatar);
         mAvatar.setImageResource(getResources().getIdentifier(sampleUser.getAvatarFileName() , "drawable", getActivity().getPackageName()));
