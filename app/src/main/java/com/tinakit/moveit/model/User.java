@@ -5,19 +5,20 @@ package com.tinakit.moveit.model;
  */
 public class User {
 
+    private long mUserId;
     private String mUserName;
-    private String mPassword;
-    private boolean mIsAdmin;
+    private int mIsAdmin;
     private float mWeight;
     private String mAvatarFileName;
 
-    public User(String userName, String password, boolean isAdmin, int weight, String avatarFileName){
+    public User(){}
 
-        mUserName = userName;
-        mPassword = password;
-        mIsAdmin = isAdmin;
-        mWeight = weight;
-        mAvatarFileName = avatarFileName;
+    public long getUserId() {
+        return mUserId;
+    }
+
+    public void setUserId(long userId) {
+        mUserId = userId;
     }
 
     public String getUserName() {
@@ -28,20 +29,12 @@ public class User {
         mUserName = userName;
     }
 
-    public String getPassword() {
-        return mPassword;
-    }
-
-    public void setPassword(String password) {
-        mPassword = password;
-    }
-
     public boolean isAdmin() {
-        return mIsAdmin;
+        return mIsAdmin == 1 ? true : false;
     }
 
     public void setIsAdmin(boolean isAdmin) {
-        mIsAdmin = isAdmin;
+        mIsAdmin = isAdmin ? 1 : 0;
     }
 
     public float getWeight() {

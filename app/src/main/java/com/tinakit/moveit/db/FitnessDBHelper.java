@@ -2,11 +2,17 @@ package com.tinakit.moveit.db;
 
 //reference: https://github.com/codepath/android_guides/wiki/Local-Databases-with-SQLiteOpenHelper
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import android.view.View;
+
+import com.tinakit.moveit.model.User;
+
+import java.sql.SQLException;
 
 /**
  * Created by Tina on 9/28/2015.
@@ -35,8 +41,10 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     //USERS TABLE
     private static final String TABLE_USERS = "Users";
     private static final String KEY_USER_ID = "_id";
+    private static final String KEY_USER_NAME = "userName";
     private static final String KEY_USER_IS_ADMIN = "isAdmin";
     private static final String KEY_USER_WEIGHT = "weight";
+    private static final String KEY_USER_AVATAR_FILENAME = "avatarFileName";
 
     //ACTIVITIES TABLE
     private static final String TABLE_ACTIVITIES = "Activities";
@@ -121,8 +129,10 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         String CREATE_USERS_TABLE = "CREATE TABLE " + TABLE_USERS +
                 "(" +
                 KEY_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // Define a primary key
+                KEY_USER_NAME + " TEXT, " +
                 KEY_USER_IS_ADMIN  + " NUMERIC, " +
-                KEY_USER_WEIGHT  + " REAL" +
+                KEY_USER_WEIGHT  + " REAL, " +
+                KEY_USER_AVATAR_FILENAME + " TEXT " +
                 ")";
 
         String CREATE_ACTIVITIES_TABLE = "CREATE TABLE " + TABLE_ACTIVITIES +
@@ -162,8 +172,127 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         }
     }
 
+    /***********************************************************************************************
+        USERS Operations
+     ***********************************************************************************************
+     */
+
+    // Insert a User into the database
+    public void addUser(User user) {
+        // Create and/or open the database for writing
+        SQLiteDatabase db = getWritableDatabase();
+
+        // It's a good idea to wrap our insert in a transaction. This helps with performance and ensures
+        // consistency of the database.
+        db.beginTransaction();
+        try {
+
+            ContentValues values = new ContentValues();
+            values.put(KEY_USER_NAME, user.getUserName());
+            values.put(KEY_USER_IS_ADMIN, user.isAdmin());
+            values.put(KEY_USER_WEIGHT, user.getWeight());
+            values.put(KEY_USER_AVATAR_FILENAME, user.getAvatarFileName());
+
+            // Notice how we haven't specified the primary key. SQLite auto increments the primary key column.
+            db.insertOrThrow(TABLE_USERS, null, values);
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            Log.d(LOGTAG, "Error while trying to add user to database");
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    public User getUser(int userId)
+    {
+        // Create and/or open the database for writing
+        SQLiteDatabase db = getReadableDatabase();
+
+        User user = new User();
+
+        // It's a good idea to wrap our insert in a transaction. This helps with performance and ensures
+        // consistency of the database.
+        db.beginTransaction();
+        try {
+
+            Cursor cursor = db.query(TABLE_USERS,
+                    new String[]{KEY_USER_ID, KEY_USER_NAME, KEY_USER_IS_ADMIN, KEY_USER_WEIGHT, KEY_USER_AVATAR_FILENAME},
+                    KEY_USER_ID + " = ?", new String[]{String.valueOf(userId)}, null, null, null);
+
+             if (cursor.moveToFirst())
+            {
+                user.setUserId(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)));
+                user.setUserName(cursor.getString(cursor.getColumnIndex(KEY_USER_NAME)));
+                user.setIsAdmin(cursor.getInt(cursor.getColumnIndex(KEY_USER_IS_ADMIN)) > 0 ? true : false);
+                user.setWeight(cursor.getFloat(cursor.getColumnIndex(KEY_USER_WEIGHT)));
+                user.setAvatarFileName(cursor.getString(cursor.getColumnIndex(KEY_USER_AVATAR_FILENAME)));
+            }
+
+            if (cursor != null && !cursor.isClosed())
+            {
+                cursor.close();
+            }
+
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            Log.d(LOGTAG, "Error while trying to get user to database");
+        } finally {
+            db.endTransaction();
+        }
 
 
+        return user;
+    }
+
+    public boolean hasUser(User user) {
+        // The database connection is cached so it's not expensive to call getWriteableDatabase() multiple times.
+        SQLiteDatabase db = getWritableDatabase();
+
+        long userId = -1;
+
+        try{
+            Cursor cursor = db.query(TABLE_USERS,
+                    new String[]{KEY_USER_ID},
+                    KEY_USER_NAME + " = ?", new String[]{user.getUserName()}, null, null, null);
+
+            try {
+                if (cursor.moveToFirst()) {
+                    userId = cursor.getLong(cursor.getColumnIndex(KEY_USER_ID));
+                }
+            } finally {
+                if (cursor != null && !cursor.isClosed()) {
+                    cursor.close();
+                }
+            }
+
+        }catch (Exception exception){
+            exception.printStackTrace();
+        }
+
+        if (userId != -1)
+            return true;
+        else
+            return false;
+    }
+
+    public void deleteAll() {
+        Log.d(LOGTAG, "***deleteAll***");
+
+        SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction();
+        try {
+            // Order of deletions is important when foreign key relationships exist.
+            db.delete(TABLE_LOCATIONS, null, null);
+            db.delete(TABLE_USERS, null, null);
+            db.delete(TABLE_ACTIVITIES, null, null);
+            db.delete(TABLE_ACTIVITY_TYPE, null, null);
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            Log.d(LOGTAG, "Error while trying to delete all posts and users");
+        } finally {
+            db.endTransaction();
+        }
+    }
 
 
 }

@@ -22,6 +22,7 @@ import android.widget.TextView;
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.TrackerActivity;
 import com.tinakit.moveit.adapter.ChooserRecyclerAdapter;
+import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.ActivityType;
 import com.tinakit.moveit.model.User;
 
@@ -54,7 +55,7 @@ public class ActivityChooserFragment extends Fragment {
 
     //TODO: replace test data with intent bundle from login screen
     //Session variables
-    private User mUser = new User("Lucy","password",false,40,"tiger");
+    //private User mUser = new User("Lucy","password",false,40,"tiger");
 
 
     //TODO: replace image of map with current location using MAPV2
@@ -96,10 +97,30 @@ public class ActivityChooserFragment extends Fragment {
 
         //wire up UI widgets
         mUserName = (TextView)view.findViewById(R.id.username);
-        mUserName.setText(mUser.getUserName());
+
+        //TODO: to delete
+        //insert User in DB
+        // Create sample data
+        User sampleUser = new User();
+        sampleUser.setUserName("Lucy");
+        sampleUser.setIsAdmin(false);
+        sampleUser.setWeight(40);
+        sampleUser.setAvatarFileName("tiger");
+
+        // Get singleton instance of database
+        FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(getActivity());
+
+        // Add sample user to the database if the user doesn't exist already
+        if (!databaseHelper.hasUser(sampleUser))
+            databaseHelper.addUser(sampleUser);
+
+        //get user from DB
+
+        //display username
+        mUserName.setText(sampleUser.getUserName());
 
         mAvatar = (ImageView)view.findViewById(R.id.avatar);
-        mAvatar.setImageResource(getResources().getIdentifier(mUser.getAvatarFileName() , "drawable", getActivity().getPackageName()));
+        mAvatar.setImageResource(getResources().getIdentifier(sampleUser.getAvatarFileName() , "drawable", getActivity().getPackageName()));
 
         //RecyclerView
         // Initialize recycler view
