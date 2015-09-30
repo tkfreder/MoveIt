@@ -45,6 +45,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.utility.CalorieCalculator;
+import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.utility.UnitConverter;
 
@@ -121,7 +122,13 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
 
     //TODO: replace test data with intent bundle from login screen
     //Session variables
-    private User mUser = new User("Lucy","password",false,40,"bunny");
+    //private User mUser = new User("Lucy","password",false,40,"bunny");
+    private User mUser;
+
+    //mUser.setUserName("Lucy");
+    //mUser.setIsAdmin(false);
+    //mUser.setWeight(40);
+    //mUser.setAvatarFileName("tiger");
 
     //SharedPreferences
     //private static final String SHARED_PREFERENCES_LOGIN = "SHARED_PREFERENCES_LOGIN";
@@ -161,6 +168,13 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
         mCoins = (TextView)findViewById(R.id.coins);
         mFeetPerMinute = (TextView)findViewById(R.id.feetPerMinute);
         mMapImage = (ImageView)findViewById(R.id.map);
+
+        //TODO: replace this with DB call
+        mUser = new User();
+        mUser.setUserName("Lucy");
+        mUser.setIsAdmin(false);
+        mUser.setWeight(40);
+        mUser.setAvatarFileName("tiger");
 
         //TODO: to delete
         //mActivityDetailListView = (ListView)findViewById(R.id.activityDetailListView);

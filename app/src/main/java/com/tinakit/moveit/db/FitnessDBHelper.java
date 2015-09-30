@@ -114,18 +114,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         Log.d(LOGTAG, "***onCreate***");
 
-        String CREATE_LOCATION_TABLE = "CREATE TABLE " + TABLE_LOCATIONS +
-                "(" +
-                KEY_LOCATION_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // Define a primary key
-                "FOREIGN KEY (" + KEY_LOCATION_USER_ID_FK + " ) REFERENCES " + TABLE_USERS + "(" + KEY_USER_ID + "), " +
-                "FOREIGN KEY (" + KEY_LOCATION_ACTIVITY_ID_FK + " ) REFERENCES " + TABLE_ACTIVITIES + "(" + KEY_ACTIVITY_ID + "), " +
-                KEY_LOCATION_LATITUDE  + " REAL, " +
-                KEY_LOCATION_LONGITUDE  + " REAL, " +
-                KEY_LOCATION_ALTITUDE  + " REAL, " +
-                KEY_LOCATION_ACCURACY  + " REAL, " +
-                KEY_LOCATION_CREATED_DATE + " NUMERIC" +
-                ")";
-
         String CREATE_USERS_TABLE = "CREATE TABLE " + TABLE_USERS +
                 "(" +
                 KEY_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // Define a primary key
@@ -133,15 +121,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 KEY_USER_IS_ADMIN  + " NUMERIC, " +
                 KEY_USER_WEIGHT  + " REAL, " +
                 KEY_USER_AVATAR_FILENAME + " TEXT " +
-                ")";
-
-        String CREATE_ACTIVITIES_TABLE = "CREATE TABLE " + TABLE_ACTIVITIES +
-                "(" +
-                KEY_ACTIVITY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // Define a primary key
-                "FOREIGN KEY (" + KEY_ACTIVITY_ACTIVITY_TYPE_ID_FK + " ) REFERENCES " + TABLE_ACTIVITY_TYPE + "(" + KEY_ACTIVITY_TYPE_ID + "), " +
-                KEY_ACTIVITY_START_DATE  + " NUMERIC, " +
-                KEY_ACTIVITY_END_DATE  + " NUMERIC, " +
-                KEY_ACTIVITY_POINTS_EARNED  + " REAL" +
                 ")";
 
         String CREATE_ACTIVITY_TYPE_TABLE = "CREATE TABLE " + TABLE_ACTIVITY_TYPE +
@@ -152,10 +131,35 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 KEY_ACTIVITY_TYPE_PRIORITY  + " INTEGER" +
                 ")";
 
-        db.execSQL(CREATE_LOCATION_TABLE);
+        String CREATE_ACTIVITIES_TABLE = "CREATE TABLE " + TABLE_ACTIVITIES +
+                "(" +
+                KEY_ACTIVITY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // Define a primary key
+                KEY_ACTIVITY_ACTIVITY_TYPE_ID_FK + " INTEGER REFERENCES " + TABLE_ACTIVITY_TYPE + "," + // Define a foreign key
+                //"FOREIGN KEY (" + KEY_ACTIVITY_ACTIVITY_TYPE_ID_FK + " ) REFERENCES " + TABLE_ACTIVITY_TYPE + "(" + KEY_ACTIVITY_TYPE_ID + "), " +
+                KEY_ACTIVITY_START_DATE  + " NUMERIC, " +
+                KEY_ACTIVITY_END_DATE  + " NUMERIC, " +
+                KEY_ACTIVITY_POINTS_EARNED  + " REAL" +
+                ")";
+
+        String CREATE_LOCATION_TABLE = "CREATE TABLE " + TABLE_LOCATIONS +
+                "(" +
+                KEY_LOCATION_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // Define a primary key
+                KEY_LOCATION_USER_ID_FK + " INTEGER REFERENCES " + TABLE_USERS + "," + // Define a foreign key
+                KEY_LOCATION_ACTIVITY_ID_FK + " INTEGER REFERENCES " + TABLE_ACTIVITIES + "," + // Define a foreign key
+                //"FOREIGN KEY (" + KEY_LOCATION_USER_ID_FK + " ) REFERENCES " + TABLE_USERS + "(" + KEY_USER_ID + "), " +
+                //"FOREIGN KEY (" + KEY_LOCATION_ACTIVITY_ID_FK + " ) REFERENCES " + TABLE_ACTIVITIES + "(" + KEY_ACTIVITY_ID + "), " +
+                KEY_LOCATION_LATITUDE  + " REAL, " +
+                KEY_LOCATION_LONGITUDE  + " REAL, " +
+                KEY_LOCATION_ALTITUDE  + " REAL, " +
+                KEY_LOCATION_ACCURACY  + " REAL, " +
+                KEY_LOCATION_CREATED_DATE + " NUMERIC" +
+                ")";
+
         db.execSQL(CREATE_USERS_TABLE);
-        db.execSQL(CREATE_ACTIVITIES_TABLE);
         db.execSQL(CREATE_ACTIVITY_TYPE_TABLE);
+        db.execSQL(CREATE_ACTIVITIES_TABLE);
+        db.execSQL(CREATE_LOCATION_TABLE);
+
     }
 
     @Override
@@ -243,8 +247,8 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     }
 
     public boolean hasUser(User user) {
-        // The database connection is cached so it's not expensive to call getWriteableDatabase() multiple times.
-        SQLiteDatabase db = getWritableDatabase();
+
+        SQLiteDatabase db = getReadableDatabase();
 
         long userId = -1;
 
