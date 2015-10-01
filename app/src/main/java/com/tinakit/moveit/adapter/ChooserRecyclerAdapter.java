@@ -67,7 +67,7 @@ public class ChooserRecyclerAdapter extends RecyclerView.Adapter<ChooserRecycler
                 Intent intent = new Intent(mContext, TrackerActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putString("activity_type",activityType.getActivityName());
-                bundle.putInt("activityId",activityType.getActivityTypeId());
+                bundle.putInt("activityTypeId",activityType.getActivityTypeId());
                 bundle.putString("username", "Lucy");
                 intent.putExtras(bundle);
                 mContext.startActivity(intent);

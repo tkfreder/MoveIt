@@ -7,6 +7,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.location.Location;
 import android.util.Log;
 import android.view.View;
 
@@ -15,6 +16,7 @@ import com.tinakit.moveit.model.User;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -33,13 +35,12 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     //LOCATIONS TABLE
     private static final String TABLE_LOCATIONS = "Locations";
     private static final String KEY_LOCATION_ID = "_id";
-    private static final String KEY_LOCATION_USER_ID_FK = "userId";
     private static final String KEY_LOCATION_ACTIVITY_ID_FK = "activityId";
     private static final String KEY_LOCATION_LATITUDE = "latitude";
     private static final String KEY_LOCATION_LONGITUDE = "longitude";
-    public static final String  KEY_LOCATION_ALTITUDE = "altitude";
+    private static final String  KEY_LOCATION_ALTITUDE = "altitude";
     private static final String KEY_LOCATION_ACCURACY = "accuracy";
-    public static final String  KEY_LOCATION_CREATED_DATE = "createdDate";
+    private static final String  KEY_LOCATION_CREATED_DATE = "createdDate";
 
     //USERS TABLE
     private static final String TABLE_USERS = "Users";
@@ -52,10 +53,14 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     //ACTIVITIES TABLE
     private static final String TABLE_ACTIVITIES = "Activities";
     private static final String KEY_ACTIVITY_ID = "_id";
+    private static final String KEY_ACTIVITY_USER_ID_FK = "userId";
     private static final String KEY_ACTIVITY_ACTIVITY_TYPE_ID_FK = "activityTypeId";
     private static final String KEY_ACTIVITY_START_DATE = "start";
     private static final String KEY_ACTIVITY_END_DATE =  "end";
+    private static final String KEY_ACTIVITY_DISTANCE_FEET = "distanceInFeet";
+    private static final String KEY_ACTIVITY_CALORIES = "calories";
     private static final String KEY_ACTIVITY_POINTS_EARNED = "pointsEarned";
+
 
     //ACTIVITY TYPE TABLE
     private static final String TABLE_ACTIVITY_TYPE = "ActivityType";
@@ -66,9 +71,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     private static final String KEY_ACTIVITY_TYPE_ICON_FILENAME =  "iconFileName";
     private static final String KEY_ACTIVITY_TYPE_IS_ENABLED =  "isEnabled";
 
-
-    //
-    private static volatile FitnessDBHelper sInstance;
     private static Context mContext;
 
     /**
@@ -86,17 +88,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         // don't accidentally leak an Activity's context.
         // See this article for more information: http://bit.ly/6LRzfx
 
-
-        /*
-        if (sInstance == null) {
-            synchronized(FitnessDBHelper.class){
-                if (sInstance == null){
-                    sInstance = new FitnessDBHelper(context.getApplicationContext());
-                }
-            }
-        }
-        return sInstance;
-        */
         mContext = context;
         return Holder.INSTANCE;
     }
@@ -142,16 +133,18 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         String CREATE_ACTIVITIES_TABLE = "CREATE TABLE " + TABLE_ACTIVITIES +
                 "(" +
                 KEY_ACTIVITY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // Define a primary key
+                KEY_ACTIVITY_USER_ID_FK + " INTEGER REFERENCES " + TABLE_USERS + "," + // Define a foreign key
                 KEY_ACTIVITY_ACTIVITY_TYPE_ID_FK + " INTEGER REFERENCES " + TABLE_ACTIVITY_TYPE + "," + // Define a foreign key
                 KEY_ACTIVITY_START_DATE  + " NUMERIC, " +
                 KEY_ACTIVITY_END_DATE  + " NUMERIC, " +
+                KEY_ACTIVITY_DISTANCE_FEET  + " REAL, " +
+                KEY_ACTIVITY_CALORIES  + " REAL, " +
                 KEY_ACTIVITY_POINTS_EARNED  + " REAL" +
                 ")";
 
         String CREATE_LOCATION_TABLE = "CREATE TABLE " + TABLE_LOCATIONS +
                 "(" +
                 KEY_LOCATION_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // Define a primary key
-                KEY_LOCATION_USER_ID_FK + " INTEGER REFERENCES " + TABLE_USERS + "," + // Define a foreign key
                 KEY_LOCATION_ACTIVITY_ID_FK + " INTEGER REFERENCES " + TABLE_ACTIVITIES + "," + // Define a foreign key
                 KEY_LOCATION_LATITUDE  + " REAL, " +
                 KEY_LOCATION_LONGITUDE  + " REAL, " +
@@ -214,7 +207,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             db.insertOrThrow(TABLE_USERS, null, values);
             db.setTransactionSuccessful();
         } catch (Exception e) {
-            Log.d(LOGTAG, "Error while trying to add user to database");
+            Log.d(LOGTAG, "Error during addUser()");
         } finally {
             db.endTransaction();
         }
@@ -291,6 +284,40 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     }
 
     /***********************************************************************************************
+     ACTTIVITY Operations
+     ***********************************************************************************************
+     */
+
+    public void insertActivity(int userId, int activityId, long startDate, long endDate, float distanceInFeet, float calories, float points){
+
+        // Create and/or open the database for writing
+        SQLiteDatabase db = getWritableDatabase();
+
+        // It's a good idea to wrap our insert in a transaction. This helps with performance and ensures
+        // consistency of the database.
+        db.beginTransaction();
+        try {
+
+            ContentValues values = new ContentValues();
+            values.put(KEY_ACTIVITY_USER_ID_FK, userId);
+            values.put(KEY_ACTIVITY_ACTIVITY_TYPE_ID_FK, activityId);
+            values.put(KEY_ACTIVITY_START_DATE, startDate);
+            values.put(KEY_ACTIVITY_END_DATE, endDate);
+            values.put(KEY_ACTIVITY_DISTANCE_FEET, distanceInFeet);
+            values.put(KEY_ACTIVITY_CALORIES, calories);
+            values.put(KEY_ACTIVITY_POINTS_EARNED, points);
+
+            // Notice how we haven't specified the primary key. SQLite auto increments the primary key column.
+            db.insertOrThrow(TABLE_ACTIVITIES, null, values);
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            Log.d(LOGTAG, "Error during insertActivity()");
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+     /***********************************************************************************************
      ACTTIVITY TYPE Operations
      ***********************************************************************************************
      */
@@ -341,6 +368,8 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
         return activityTypeList;
     }
+
+
 
     public void deleteAll() {
         Log.d(LOGTAG, "***deleteAll***");

@@ -8,20 +8,15 @@ import java.util.Date;
 public class ActivityDetail {
 
     private int mActivityId;
+    private int mUserId;
+    private int mActivityTypeId;
     private Date mStartDate;
     private Date mEndDate;
-    private float mMinutesElapsed;
-    private float mCoinsEarned;
-    private int mRouteId;
+    private float mDistanceInFeet;
+    private float mCalories;
+    private float mPointsEarned;
 
-    public ActivityDetail(int activityId, Date startDate, Date endDate, float minutesElapsed, float coinsEarned){
-
-        mActivityId = activityId;
-        mStartDate = startDate;
-        mEndDate = endDate;
-        mMinutesElapsed = minutesElapsed;
-        mCoinsEarned = coinsEarned;
-    }
+    public ActivityDetail(){}
 
     public int getActivityId() {
         return mActivityId;
@@ -29,6 +24,22 @@ public class ActivityDetail {
 
     public void setActivityId(int activityId) {
         mActivityId = activityId;
+    }
+
+    public int getUserId() {
+        return mUserId;
+    }
+
+    public void setUserId(int userId) {
+        mUserId = userId;
+    }
+
+    public int getActivityTypeId() {
+        return mActivityTypeId;
+    }
+
+    public void setActivityTypeId(int activityTypeId) {
+        mActivityTypeId = activityTypeId;
     }
 
     public Date getStartDate() {
@@ -47,27 +58,27 @@ public class ActivityDetail {
         mEndDate = endDate;
     }
 
-    public int getRouteId() {
-        return mRouteId;
+    public float getDistanceInFeet() {
+        return mDistanceInFeet;
     }
 
-    public void setRouteId(int routeId) {
-        mRouteId = routeId;
+    public void setDistanceInFeet(float distanceInFeet) {
+        mDistanceInFeet = distanceInFeet;
     }
 
-    public float getMinutesElapsed() {
-        return mMinutesElapsed;
+    public float getCalories() {
+        return mCalories;
     }
 
-    public void setMinutesElapsed(int minutesElapsed) {
-        mMinutesElapsed = minutesElapsed;
+    public void setCalories(float calories) {
+        mCalories = calories;
     }
 
-    public float getCoinsEarned() {
-        return mCoinsEarned;
+    public float getPointsEarned() {
+        return mPointsEarned;
     }
 
-    public void setCoinsEarned(int coinsEarned) {
-        mCoinsEarned = coinsEarned;
+    public void setPointsEarned(float pointsEarned) {
+        mPointsEarned = pointsEarned;
     }
 }

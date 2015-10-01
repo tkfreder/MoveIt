@@ -15,6 +15,8 @@ public class UnitSplitCalorie {
     private Location mLocation;
     private float mSpeed;
     private float mCalories;
+    private float mAccuracy;
+    private int mActivityId;
 
     public UnitSplitCalorie(Date timeStamp, Location location){
 
@@ -52,5 +54,21 @@ public class UnitSplitCalorie {
 
     public void setCalories(float calories) {
         mCalories = calories;
+    }
+
+    public float getAccuracy() {
+        return mAccuracy;
+    }
+
+    public void setAccuracy(float accuracy) {
+        mAccuracy = accuracy;
+    }
+
+    public int getActivityId() {
+        return mActivityId;
+    }
+
+    public void setActivityId(int activityId) {
+        mActivityId = activityId;
     }
 }

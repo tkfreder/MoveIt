@@ -27,6 +27,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.fragment.LoginFragment;
 import com.tinakit.moveit.fragment.RegisterUserFragment;
 import com.tinakit.moveit.model.ActivityType2;
@@ -103,9 +104,11 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
 
     //local cache
     private float mTotalCoins = 0f;
-    private int mActivityId = -1;
+    private int mActivityTypeId = -1;
     private int mUserId;
-    float mTotalCalories = 0;
+    private float mTotalCalories = 0;
+    private Date mStartDate;
+    private Date mEndDate;
     public static ArrayList<ActivityDetail> mActivityDetailList = new ArrayList<>();
 
 
@@ -158,8 +161,9 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
         mFeetPerMinute = (TextView)findViewById(R.id.feetPerMinute);
         mMapImage = (ImageView)findViewById(R.id.map);
 
-        //TODO: replace this with DB call
+        //TODO: replace this with DB call or Application Preferences
         mUser = new User();
+        mUser.setUserId(1);
         mUser.setUserName("Lucy");
         mUser.setIsAdmin(false);
         mUser.setWeight(40);
@@ -182,8 +186,8 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
 
             }
 
-            if(getIntent().getExtras().containsKey("activityId")){
-                mActivityId = getIntent().getExtras().getInt("activityId");
+            if(getIntent().getExtras().containsKey("activityTypeId")){
+                mActivityTypeId = getIntent().getExtras().getInt("activityTypeId");
             }
             //if(getIntent().getExtras().containsKey("avatar_id"))
             //if(getIntent().getExtras().containsKey("username"))
@@ -202,14 +206,25 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
                 if (mStartButton.getText().equals(getResources().getString(R.string.go))) {
                     // Perform action on click
 
+                    //get timestamp of start
+                    mStartDate = new Date();
+
                     startRun();
 
                 } else if (mStartButton.getText().equals(getResources().getString(R.string.stop))) {
+
+                    //get timestamp of end
+                    mEndDate = new Date();
 
                     stopRun();
                     //TODO:  disable this until main functionality is done
                     //save the total number of coins
                     //saveCoins(mUserId, Integer.parseInt(mCoins.getText().toString()));
+
+                    //TODO: save Activity data in DB
+                    // Get singleton instance of database
+                    FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(getApplicationContext());
+                    databaseHelper.insertActivity(mUser.getUserId(), mActivityTypeId, mStartDate.getTime(), mEndDate.getTime(), getDistance(1), mTotalCalories, mTotalCoins);
 
                     //display number of coins earned
                     displayResults();
@@ -737,7 +752,7 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
 
         float calorie = 0f;
 
-        switch (mActivityId){
+        switch (mActivityTypeId){
 
             case 1:
                 calorie = CalorieCalculator.getCalorieByRun(weight, minutes, speed);

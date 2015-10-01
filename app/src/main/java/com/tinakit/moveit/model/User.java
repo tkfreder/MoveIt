@@ -5,7 +5,7 @@ package com.tinakit.moveit.model;
  */
 public class User {
 
-    private long mUserId;
+    private int mUserId;
     private String mUserName;
     private int mIsAdmin;
     private float mWeight;
@@ -13,11 +13,11 @@ public class User {
 
     public User(){}
 
-    public long getUserId() {
+    public int getUserId() {
         return mUserId;
     }
 
-    public void setUserId(long userId) {
+    public void setUserId(int userId) {
         mUserId = userId;
     }
 
