@@ -15,8 +15,10 @@ import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.TrackerActivity;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.ActivityType;
+import com.tinakit.moveit.utility.Collections;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,41 +35,7 @@ public class ChooserRecyclerAdapter extends RecyclerView.Adapter<ChooserRecycler
     public ChooserRecyclerAdapter(Context context) {
 
         mContext = context;
-
-        // Get singleton instance of database
-        FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(mContext);
-
-        // Get Activity Types
-        List<ActivityType> activityTypeList = databaseHelper.getActivityTypes();
-
-        //get data from string resource
-        Resources res = mContext.getResources();
-        String[] activityTypeNames = res.getStringArray(R.array.string_array_activity_types);
-
-        //save this in a HashMap for easy lookkup
-        Map<Integer,String> activityTypeMap = new HashMap<>();
-
-        for (String s : activityTypeNames){
-
-            String strArray[] = s.split(",");
-            activityTypeMap.put(Integer.parseInt(strArray[0]), strArray[1]);
-        }
-
-        //if results are returned from getActivityTypes(), build the ActivityType array for the dropdown
-        if (activityTypeList.size() > 0){
-
-            for (ActivityType activityType : activityTypeList){
-
-                ActivityType at = activityType;
-
-                //set the name from the resource string array, based on the ActivityTypeId
-                at.setActivityName(activityTypeMap.get(at.getActivityTypeId()));
-
-                //add this activityType to the list
-                mActivityTypeList.add(at);
-            }
-
-        }
+        mActivityTypeList = Collections.getActivityTypes(mContext);
     }
 
     @Override

@@ -1,23 +1,21 @@
 package com.tinakit.moveit.adapter;
 
 import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.model.ActivityDetail;
-import com.tinakit.moveit.model.ActivityType;
+import com.tinakit.moveit.utility.Collections;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Tina on 9/24/2015.
@@ -45,8 +43,11 @@ public class ActivityDetailRecyclerAdapter extends RecyclerView.Adapter<Activity
 
         ActivityDetail activityDetail = mActivityDetailList.get(i);
 
+        //get hashmap of <ActivityId, ActivityName>
+        Map<Integer,String> activityMap = Collections.getActivityTypeMap(mContext);
+
         // Populate data from ActivityDetail data object
-        customViewHolder.activityId.setText(ActivityType.values()[ActivityType.getIndexById(activityDetail.getActivityId())].getName());
+        customViewHolder.activityId.setText(activityMap.get(activityDetail.getActivityId()));
 
         //display day of the week for activities occurred in the last 7 days
 

@@ -39,8 +39,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.utility.CalorieCalculator;
@@ -86,17 +84,10 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
     private static long FASTEST_INTERVAL = 10 * 1000; //5 second
     private static long DISPLACEMENT = 1; //meters //displacement takes precedent over interval/fastestInterval
     private static long STOP_SERVICE_TIME_LIMIT = 30 * 60 * 1000 * 60; // 30 minutes in seconds
-    private static final long LOCATION_DATA_PERIOD = 30; //number of seconds for the cycle of updating MainActivity UI, careful this doesn't block UI
     private static final long LOCATION_ACCURACY = 50; //within # meter accuracy
     private boolean mIsTimeLimit = false;
 
     public static final String GOOGLEAPI_CONNECTION_FAILURE = "x40241.tina.fredericks.a5.app.GOOGLEAPI_CONNECTION_FAILURE";
-    public static final String SERVICE_TIME_LIMIT = "x40241.tina.fredericks.a5.app.SERVICE_TIME_LIMIT";
-
-    //executor
-    private ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
-    private ScheduledFuture<?> sScheduledFuture;
-
 
     //UI widgets
     private TextView mResults;
@@ -352,18 +343,6 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
         mRequestedService = true;
 
         getRunData();
-        /*
-        //start sending updates to MainActivity
-        sScheduledFuture = executor.scheduleWithFixedDelay(new Runnable(){
-            public void run(){
-                if (mUnitSplitCalorieList.size() > 1 ) {
-                    if (DEBUG) Log.d(LOG, "SERVICE_HAS_DATA: # of locations:" + mUnitSplitCalorieList.size());
-
-                    refreshData();
-                }
-            }}, 1, LOCATION_DATA_PERIOD, TimeUnit.SECONDS);
-
-        */
 
         mStartButton.setText(getResources().getString(R.string.stop));
 
