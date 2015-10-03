@@ -18,9 +18,12 @@ import com.tinakit.moveit.activity.RewardView;
 import com.tinakit.moveit.activity.TrackerActivity;
 import com.tinakit.moveit.adapter.ActivityDetailRecyclerAdapter;
 import com.tinakit.moveit.adapter.ChooserRecyclerAdapter;
+import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.ActivityDetail;
+import com.tinakit.moveit.model.User;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Tina on 9/22/2015.
@@ -33,17 +36,27 @@ public class ActivityHistoryFragment extends Fragment {
     private Button mRewardButton;
 
 
-    private ArrayList<ActivityDetail> mActivityDetailList = new ArrayList<>();
+    private List<ActivityDetail> mActivityDetailList;
     private ActivityDetailRecyclerAdapter mActivityDetailRecyclerAdapter;
     private int mTotalCoins = 0;
+    private User mUser;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_activity_history, container, false);
 
-        //get data from TrackerActivity
-        mActivityDetailList = TrackerActivity.mActivityDetailList;
+        //TODO: replace this with DB call or Application Preferences
+        mUser = new User();
+        mUser.setUserId(1);
+        mUser.setUserName("Lucy");
+        mUser.setIsAdmin(false);
+        mUser.setWeight(40);
+        mUser.setAvatarFileName("tiger");
+
+        //TODO:  get Activity Detail history from DB
+        FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(getActivity());
+        mActivityDetailList = databaseHelper.getActivityDetailList(mUser.getUserId());
 
         //RecyclerView
         // Initialize recycler view
@@ -80,7 +93,7 @@ public class ActivityHistoryFragment extends Fragment {
 
         for (ActivityDetail activityDetail : mActivityDetailList){
 
-            totalCoins += activityDetail.getCoinsEarned();
+            totalCoins += activityDetail.getPointsEarned();
         }
 
         return Math.round(totalCoins);

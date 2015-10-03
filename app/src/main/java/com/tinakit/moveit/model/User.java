@@ -10,6 +10,7 @@ public class User {
     private int mIsAdmin;
     private float mWeight;
     private String mAvatarFileName;
+    private int mPoints;
 
     public User(){}
 
@@ -51,5 +52,13 @@ public class User {
 
     public void setAvatarFileName(String avatarFileName) {
         mAvatarFileName = avatarFileName;
+    }
+
+    public int getPoints() {
+        return mPoints;
+    }
+
+    public void setPoints(int points) {
+        mPoints = points;
     }
 }

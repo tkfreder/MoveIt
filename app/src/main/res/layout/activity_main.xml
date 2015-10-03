@@ -23,7 +23,7 @@
             android:layout_gravity="center"/>
 
         <TextView
-            android:id="@+id/activityDetails"
+            android:id="@+id/activityHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"

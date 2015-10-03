@@ -94,7 +94,7 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
     private TextView mResults;
     private Button mStartButton;
     private Button mStopButton;
-    private TextView mActivityDetails;
+    private TextView mActivityHeader;
     private static Chronometer mChronometer;
     private ImageView mActivityIcon;
     private TextView mDistance;
@@ -110,17 +110,7 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
     private Date mStartDate;
     private Date mEndDate;
     public static ArrayList<ActivityDetail> mActivityDetailList = new ArrayList<>();
-
-
-    //TODO: replace test data with intent bundle from login screen
-    //Session variables
-    //private User mUser = new User("Lucy","password",false,40,"bunny");
     private User mUser;
-
-    //mUser.setUserName("Lucy");
-    //mUser.setIsAdmin(false);
-    //mUser.setWeight(40);
-    //mUser.setAvatarFileName("tiger");
 
     //SharedPreferences
     //private static final String SHARED_PREFERENCES_LOGIN = "SHARED_PREFERENCES_LOGIN";
@@ -153,7 +143,7 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
         //wire up UI widgets
         mStartButton = (Button)findViewById(R.id.startButton);
         mResults = (TextView)findViewById(R.id.results);
-        mActivityDetails = (TextView)findViewById(R.id.activityDetails);
+        mActivityHeader = (TextView)findViewById(R.id.activityHeader);
         mChronometer = (Chronometer)findViewById(R.id.chronometer);
         mActivityIcon = (ImageView)findViewById(R.id.activityType_icon);
         mDistance = (TextView)findViewById(R.id.distance);
@@ -169,16 +159,11 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
         mUser.setWeight(40);
         mUser.setAvatarFileName("tiger");
 
-        //TODO: to delete
-        //mActivityDetailListView = (ListView)findViewById(R.id.activityDetailListView);
-        //mActivityDetailListAdapter = new ActivityDetailListAdapter(this);
-        //mActivityDetailListView.setAdapter(mActivityDetailListAdapter);
-
         //TODO: get activity details from Preference Activity, to be displayed at the top of the screen
         if(getIntent() != null){
 
             if(getIntent().getExtras().containsKey("username") && getIntent().getExtras().containsKey("activity_type")){
-                mActivityDetails.setText(getIntent().getExtras().getString("username") +
+                mActivityHeader.setText(getIntent().getExtras().getString("username") +
                         " " + getIntent().getExtras().getString("activity_type") +
                         " " + new SimpleDateFormat("EEEE h:mm a").format(new Date()));
 
@@ -217,21 +202,25 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
                     mEndDate = new Date();
 
                     stopRun();
-                    //TODO:  disable this until main functionality is done
-                    //save the total number of coins
-                    //saveCoins(mUserId, Integer.parseInt(mCoins.getText().toString()));
 
-                    //TODO: save Activity data in DB
-                    // Get singleton instance of database
-                    FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(getApplicationContext());
-                    databaseHelper.insertActivity(mUser.getUserId(), mActivityTypeId, mStartDate.getTime(), mEndDate.getTime(), getDistance(1), mTotalCalories, mTotalCoins);
+                    //save Activity Detail data
+                    if (mUnitSplitCalorieList.size() > 1){
+
+                        saveToDB();
+                    }
+                    else{
+                        Toast.makeText(getApplicationContext(), "Not enough route information. Restart your activity.", Toast.LENGTH_LONG);
+                    }
 
                     //display number of coins earned
                     displayResults();
 
                 } else if (mStartButton.getText().equals(getResources().getString(R.string.done))) {
 
+                    //destroy current activity
                     finish();
+
+                    //display Activity history screen
                     Intent intent = new Intent(getApplicationContext(), ActivityHistory.class);
                     startActivity(intent);
 
@@ -380,19 +369,6 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
         //save elapsed time
         mTimeElapsed = getSecondsFromChronometer();
 
-        //save route data
-        if (mUnitSplitCalorieList.size() > 1)
-            saveActivityDetail();
-        else{
-            Toast.makeText(this, "Not enough route information. Restart your activity.", Toast.LENGTH_LONG);
-            return;
-        }
-
-        //TODO: to delete
-        //refresh listview
-        //mActivityDetailListAdapter.setList(mActivityDetailList);
-        //mActivityDetailListAdapter.notifyDataSetChanged();
-
     }
 
     private void playSound(){
@@ -417,9 +393,15 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
     //  Data methods
     //**********************************************************************************************
 
-    private void saveActivityDetail(){
+    private void saveToDB(){
 
-        mActivityDetailList.add(new ActivityDetail(mActivityId, mUnitSplitCalorieList.get(0).getTimeStamp(), mUnitSplitCalorieList.get(mUnitSplitCalorieList.size() - 1).getTimeStamp(), (mTimeElapsed / 60f), mTotalCoins));
+        // Get singleton instance of database
+        FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(getApplicationContext());
+
+        //save Activity Detail (overall stats)
+        databaseHelper.insertActivity(mUser.getUserId(), mActivityTypeId, mStartDate, mEndDate, getDistance(1), mTotalCalories, mTotalCoins);
+
+        //TODO: save unit split location data
 
     }
 
@@ -443,9 +425,6 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
         //get time from Chronometer
         mTimeElapsed = getSecondsFromChronometer();
     }
-
-
-
 
 
     private void displayResults(){

@@ -13,12 +13,11 @@ import android.widget.TextView;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.RewardView;
+import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.ActivityType;
 import com.tinakit.moveit.model.Reward;
+import com.tinakit.moveit.model.RewardStatusType;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -29,14 +28,20 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
     private Context mContext;
     //TODO: make private after building DB
     public static List<Reward> mRewardList;
+    FitnessDBHelper mDatabaseHelper;
     private int mTotalPoints;
     private int mUserId;
 
-    public RewardRecyclerAdapter(Context context, List<Reward> rewardList, int totalPoints, int userId) {
+    public RewardRecyclerAdapter(Context context, int totalPoints, int userId) {
         mContext = context;
-        mRewardList = rewardList;
         mTotalPoints = totalPoints;
         mUserId = userId;
+
+        // Get singleton instance of database
+        mDatabaseHelper = FitnessDBHelper.getInstance(context);
+
+        // Get Activity Types
+        mRewardList = mDatabaseHelper.getUserRewards(userId);
     }
 
     @Override
@@ -67,18 +72,25 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
                 if (button.getText().equals("Get It")){
                     Reward reward = (Reward)v.getTag();
                     mTotalPoints -= reward.getPoints();
-                    //TODO: and update the points on the DB
-                    mRewardList.get(v.getVerticalScrollbarPosition()).setUserStatus(1);
-                    //TODO: and update the reward user status on the DB
+
+                    //update user's points
+                    mDatabaseHelper.setUserPoints(mUserId, mTotalPoints);
+
+                    //update the reward status
+                    mDatabaseHelper.setRewardStatus(mUserId, reward.getRewardId(), RewardStatusType.valueOf("PENDING").ordinal());
 
                 }
                 else if (button.getText().equals("Cancel")){
 
                     Reward reward = (Reward)v.getTag();
                     mTotalPoints += reward.getPoints();
-                    //TODO: and update the points on the DB
-                    mRewardList.get(v.getVerticalScrollbarPosition()).setUserStatus(0);
-                    //TODO: and update the reward user status on the DB
+
+                    //update user's points
+                    mDatabaseHelper.setUserPoints(mUserId, mTotalPoints);
+
+                    //update the reward status
+                    mDatabaseHelper.setRewardStatus(mUserId, reward.getRewardId(), RewardStatusType.valueOf("AVAILABLE").ordinal());
+
                 }
 
                 //TODO: is there another way to refresh the screen, ie notifydatasethaschanged?

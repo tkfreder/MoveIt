@@ -50,22 +50,29 @@ public class ActivityDetailRecyclerAdapter extends RecyclerView.Adapter<Activity
         customViewHolder.activityId.setText(activityMap.get(activityDetail.getActivityId()));
 
         //display day of the week for activities occurred in the last 7 days
-
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, -7);
         Date weekAgo = calendar.getTime();
-        if (activityDetail.getStartDate().after(weekAgo)){
-            customViewHolder.day.setText(new SimpleDateFormat("EEEE").format(activityDetail.getStartDate()));
+
+        Date startDate = activityDetail.getStartDate();
+        Date endDate = activityDetail.getEndDate();
+
+        if (startDate.after(weekAgo)){
+            customViewHolder.day.setText(new SimpleDateFormat("EEEE").format(startDate));
         }
         //otherwise, display the date of the activity
         else {
-            customViewHolder.day.setText(new SimpleDateFormat("MM.dd.yy").format(activityDetail.getStartDate()));
+            customViewHolder.day.setText(new SimpleDateFormat("MM.dd.yy").format(startDate));
         }
 
-        customViewHolder.time.setText(new SimpleDateFormat("h:mm a").format(activityDetail.getStartDate().getTime()));
-        customViewHolder.minutes.setText(String.format("%d", (long)activityDetail.getMinutesElapsed()) +
-                ":" + String.format("%.0f", (activityDetail.getMinutesElapsed() % 1) * 60) + " min");
-        customViewHolder.coins.setText(String.format("%.0f", activityDetail.getCoinsEarned()) + " coins");
+        customViewHolder.time.setText(new SimpleDateFormat("h:mm a").format(startDate.getTime()));
+
+        int secondsElapsed = (int)(endDate.getTime() - startDate.getTime())/1000;
+        int minutesElapsed = (int)secondsElapsed/60;
+
+        //TODO: implement leading zeros
+        customViewHolder.minutes.setText(String.valueOf(minutesElapsed) + ":" + String.format("%02d", secondsElapsed % 60) + " min");
+        customViewHolder.coins.setText(String.format("%.0f", activityDetail.getPointsEarned()) + " coins");
     }
 
     @Override

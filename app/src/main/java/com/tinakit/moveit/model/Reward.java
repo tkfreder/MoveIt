@@ -5,19 +5,21 @@ package com.tinakit.moveit.model;
  */
 public class Reward {
 
+    private int mRewardId;
     private String mName;
     private int mPoints;
     private String mDescription;
     private boolean mEnabled;
     private int mUserStatus;
 
-    public Reward (String name, int points, String description){
+    public Reward (){}
 
-        mName = name;
-        mPoints = points;
-        mDescription = description;
-        mEnabled = true;
-        mUserStatus = 0;// 0 = available, 1 = requested reward and pending approval, 2 = requested and declined
+    public int getRewardId() {
+        return mRewardId;
+    }
+
+    public void setRewardId(int rewardId) {
+        mRewardId = rewardId;
     }
 
     public String getName() {

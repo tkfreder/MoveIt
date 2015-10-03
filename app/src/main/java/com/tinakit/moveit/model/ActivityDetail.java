@@ -10,8 +10,8 @@ public class ActivityDetail {
     private int mActivityId;
     private int mUserId;
     private int mActivityTypeId;
-    private Date mStartDate;
-    private Date mEndDate;
+    private Date mStartDate;  //"YYYY-MM-DD HH:MM:SS.SSS"
+    private Date mEndDate;  //"YYYY-MM-DD HH:MM:SS.SSS"
     private float mDistanceInFeet;
     private float mCalories;
     private float mPointsEarned;

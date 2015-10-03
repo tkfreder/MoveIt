@@ -60,13 +60,11 @@ public class RewardViewFragment extends Fragment {
             }
         }
 
-
-
         //RecyclerView
         // Initialize recycler view
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRewardRecyclerAdapter = new RewardRecyclerAdapter(getActivity(), mRewardList, mTotalCoins, mUserId);
+        mRewardRecyclerAdapter = new RewardRecyclerAdapter(getActivity(), mTotalCoins, mUserId);
         mRecyclerView.setAdapter(mRewardRecyclerAdapter);
 
         return view;
@@ -76,12 +74,7 @@ public class RewardViewFragment extends Fragment {
 
         ArrayList<Reward> rewardList = new ArrayList<>();
 
-        rewardList.add(new Reward("popsicle", 1, "popsicle dinner dessert"));
-        rewardList.add(new Reward("park playdate", 2, "bring a friend to the park of your choice"));
-        rewardList.add(new Reward("movie buddy", 5, "invite friend for movie night"));
-        rewardList.add(new Reward("Jumpin' Jammin'", 10, "invite friend to Jumpin' Jammin'"));
-        rewardList.add(new Reward("Pizza Party for 5", 12, "invite 4 friends for Pizza Party"));
-        rewardList.add(new Reward("Family Roadtrip", 20, "family votes on a road trip"));
+
 
         return rewardList;
     }
