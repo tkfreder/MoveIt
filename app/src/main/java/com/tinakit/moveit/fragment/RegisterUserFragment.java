@@ -3,7 +3,6 @@ package com.tinakit.moveit.fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
@@ -20,8 +19,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tinakit.moveit.R;
+import com.tinakit.moveit.activity.Login;
 import com.tinakit.moveit.utility.Dialog;
-import com.tinakit.moveit.fragment.LoginFragment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -119,7 +118,7 @@ public class RegisterUserFragment extends Fragment {
                     Toast.makeText(getActivity(), "This username exists already.  Enter a different username.", Toast.LENGTH_SHORT);
                 else{
                     getActivity().finish();
-                    LoginFragment.displayNewScreen(getActivity(), mUserId);
+                    //Login.displayNewScreen(getActivity(), mUserId);
                 }
             }
 
@@ -130,7 +129,7 @@ public class RegisterUserFragment extends Fragment {
 
     public int getNumberOfUsers(){
         //SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
-        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(LoginFragment.SHARED_PREFERENCES_MOVEIT, Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(Login.SHARED_PREFERENCES_MOVEIT, Context.MODE_PRIVATE);
         String commaDelimitedUsernames = sharedPreferences.getString(RegisterUserFragment.SHARED_PREFERENCES_USERNAMES, "");
         List<String> usernameList = new ArrayList<String>(Arrays.asList(commaDelimitedUsernames.split(",")));
 
@@ -169,7 +168,7 @@ public class RegisterUserFragment extends Fragment {
 
         //get data from SharedPreferences
         //SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
-        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(LoginFragment.SHARED_PREFERENCES_MOVEIT, Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(Login.SHARED_PREFERENCES_MOVEIT, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         //check if username already exists

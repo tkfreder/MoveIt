@@ -21,8 +21,7 @@ import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import com.tinakit.moveit.R;
-import com.tinakit.moveit.fragment.LoginFragment;
-import com.tinakit.moveit.fragment.UserSummaryFragment;
+import com.tinakit.moveit.activity.Login;
 import com.tinakit.moveit.model.StatInfo;
 
 import java.util.List;
@@ -119,10 +118,10 @@ public class StatListAdapter extends BaseAdapter {
                 //TextView idTextView = viewHolder.userId;
                 //TextView coinTextView = viewHolder.coinCount;
 
-                SharedPreferences sharedPreferences = mContext.getSharedPreferences(LoginFragment.SHARED_PREFERENCES_MOVEIT, 0);
+                SharedPreferences sharedPreferences = mContext.getSharedPreferences(Login.SHARED_PREFERENCES_MOVEIT, 0);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 String userId = String.valueOf(view.getTag());
-                editor.putInt(UserSummaryFragment.USER_COIN_TOTAL + userId, Integer.parseInt(coinEditText.getText().toString()));
+                //editor.putInt(UserSummaryFragment.USER_COIN_TOTAL + userId, Integer.parseInt(coinEditText.getText().toString()));
                 editor.commit();
 
                 //remove focus from coin edittext box

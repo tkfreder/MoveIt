@@ -53,18 +53,20 @@ public class Login extends AppCompatActivity{
                 //validateLogin returns user index
                 //TODO: for now use user index as UserId
                 int userId = -1;
-                userId = validateLogin(mUserNameEditText.getText().toString(), mPasswordEditText.getText().toString());
+                //userId = validateLogin(mUserNameEditText.getText().toString(), mPasswordEditText.getText().toString());
 
-                if(userId != -1){
+                if (userId != -1) {
 
                     //save userId in Preferences
-                    saveUserIdInPreferences(getActivity(), userId);
+                    //saveUserIdInPreferences(getActivity(), userId);
 
                     //display new screen based on whether user is parent or child
-                    displayNewScreen(getActivity(), userId);
-                }else{
-                    Dialog.displayAlertDialog(getActivity(), "Alert", "Your username/password is incorrect. Try again.", "OK");
+                    //displayNewScreen(getActivity(), userId);
+                } else {
+                    Dialog.displayAlertDialog(getApplicationContext(), "Alert", "Your username/password is incorrect. Try again.", "OK");
                 }
+            }
+        });
 
     }
 }

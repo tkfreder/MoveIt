@@ -28,7 +28,6 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.tinakit.moveit.db.FitnessDBHelper;
-import com.tinakit.moveit.fragment.LoginFragment;
 import com.tinakit.moveit.fragment.RegisterUserFragment;
 import com.tinakit.moveit.model.ActivityType2;
 import com.tinakit.moveit.model.UnitSplitCalorie;
@@ -443,7 +442,7 @@ public class ActivityTracker extends AppCompatActivity  implements GoogleApiClie
         //get data from SharedPreferences
         //SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
-        SharedPreferences sharedPreferences = getSharedPreferences(LoginFragment.SHARED_PREFERENCES_MOVEIT, Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(Login.SHARED_PREFERENCES_MOVEIT, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         String commaDelimitedCoins = sharedPreferences.getString(RegisterUserFragment.SHARED_PREFERENCES_COINS, "");
         List<String> coinList = new ArrayList<String>(Arrays.asList(commaDelimitedCoins.split(",")));
@@ -809,18 +808,30 @@ public class ActivityTracker extends AppCompatActivity  implements GoogleApiClie
         return true;
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
 
+        switch (item.getItemId()) {
+            case R.id.action_rewards:
+                EditRewards();
+                return true;
+            case R.id.action_settings:
+                //TODO:  openSettings();
+                return true;
+
+            default:
+        }
+
         return super.onOptionsItemSelected(item);
 
     }
 
-    private void displayRewards(){
-        Intent intent = new Intent(this, ViewRewards.class);
+    private void EditRewards(){
+        Intent intent = new Intent(this, EditReward.class);
         startActivity(intent);
     }
 }

@@ -12,7 +12,6 @@ import android.widget.TextView;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.adapter.StatListAdapter;
-import com.tinakit.moveit.fragment.LoginFragment;
 import com.tinakit.moveit.fragment.RegisterUserFragment;
 import com.tinakit.moveit.model.StatInfo;
 
@@ -23,7 +22,7 @@ import java.util.List;
 /**
  * Created by Tina on 7/2/2015.
  */
-public class UserSummaryActivity extends AppCompatActivity {
+public class UserSummary extends AppCompatActivity {
 
     private ListView mStatListView;
     private StatListAdapter mStatListAdapter;
@@ -87,7 +86,7 @@ public class UserSummaryActivity extends AppCompatActivity {
 
         //get usernames from SharedPreferences
         //SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
-        SharedPreferences sharedPreferences = getSharedPreferences(LoginFragment.SHARED_PREFERENCES_MOVEIT, Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(Login.SHARED_PREFERENCES_MOVEIT, Context.MODE_PRIVATE);
 
         //get coin totals
         String commaDelimitedCoins = sharedPreferences.getString(RegisterUserFragment.SHARED_PREFERENCES_COINS, "");

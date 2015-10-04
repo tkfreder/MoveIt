@@ -63,6 +63,7 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
         customViewHolder.points.setText(String.valueOf(numPoints));
         customViewHolder.name.setText(reward.getName());
         customViewHolder.description.setText(" " + reward.getDescription());
+        customViewHolder.itemView.setTag(reward);
 
         customViewHolder.statusButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -154,6 +155,8 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
             this.description = (TextView) view.findViewById(R.id.description);
             this.statusButton = (Button) view.findViewById(R.id.statusButton);
             this.status = (TextView) view.findViewById(R.id.status);
+
+
         }
     }
 

@@ -231,7 +231,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Lucy', 0, 40, 'tiger', 0);");
 
         //TODO: DUMMY DATA
-        //TODO:  when adding User, ensure that RewardStatus gets populated with available rewards for that user
+        //TODO:  when adding User or Reward, ensure that RewardStatus gets populated with available rewards for that user
         //populate RewardStatus table
         db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (1, 1, 1, 0);");
         db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (2, 2, 1, 0);");
@@ -442,6 +442,177 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
         return activityDetailList;
     }
+
+    /***********************************************************************************************
+     REWARD Operations
+     ***********************************************************************************************
+     */
+
+    public void insertReward(String rewardName, int points){
+
+        // Create and/or open the database for writing
+        SQLiteDatabase db = getWritableDatabase();
+
+        // It's a good idea to wrap our insert in a transaction. This helps with performance and ensures
+        // consistency of the database.
+        db.beginTransaction();
+        try {
+
+            ContentValues values = new ContentValues();
+            values.put(KEY_REWARD_NAME, rewardName);
+            values.put(KEY_REWARD_POINTS, points);
+            values.put(KEY_REWARD_IS_ENABLED, 1);
+
+            // Notice how we haven't specified the primary key. SQLite auto increments the primary key column.
+            db.insertOrThrow(TABLE_REWARDS, null, values);
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            Log.d(LOGTAG, "Error during insertReward()");
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    public Reward getReward(int rewardId){
+
+        // Create and/or open the database for writing
+        SQLiteDatabase db = getReadableDatabase();
+
+        //initialize Reward object
+        Reward reward = new Reward();
+
+        try {
+
+            Cursor cursor = db.query(TABLE_REWARDS,
+                    new String[]{KEY_REWARD_ID,KEY_REWARD_NAME,KEY_REWARD_POINTS},
+                    KEY_REWARD_ID + " = ?",
+                    new String[]{String.valueOf(rewardId)}, null, null, null);
+
+            try{
+
+                if (cursor.moveToFirst()) {
+                    reward.setRewardId(cursor.getInt(cursor.getColumnIndex(KEY_REWARD_ID)));
+                    reward.setName(cursor.getString(cursor.getColumnIndex(KEY_REWARD_NAME)));
+                    reward.setPoints(cursor.getInt(cursor.getColumnIndex(KEY_REWARD_POINTS)));
+                }
+
+            }catch(Exception exception) {
+
+                exception.printStackTrace();
+
+            } finally{
+
+                if (cursor != null && !cursor.isClosed())
+                {
+                    cursor.close();
+                }
+            }
+
+        } catch (Exception e) {
+            Log.d(LOGTAG, "Error during getActivityTypes()");
+        }
+
+        return reward;
+    }
+
+    public List<Reward> getAllRewards(){
+
+        // Create and/or open the database for writing
+        SQLiteDatabase db = getReadableDatabase();
+
+        //initialize Reward array
+        List<Reward> rewardList = new ArrayList<>();
+
+        try {
+
+            Cursor cursor = db.query(TABLE_REWARDS,
+                    new String[]{KEY_REWARD_ID,KEY_REWARD_NAME,KEY_REWARD_POINTS},
+                    KEY_REWARD_IS_ENABLED + " = ?",
+                    new String[]{String.valueOf(1)}, null, null, null);
+
+            try{
+
+                if (cursor.moveToFirst()) {
+
+                    do{
+                        Reward reward = new Reward();
+                        reward.setRewardId(cursor.getInt(cursor.getColumnIndex(KEY_REWARD_ID)));
+                        reward.setName(cursor.getString(cursor.getColumnIndex(KEY_REWARD_NAME)));
+                        reward.setPoints(cursor.getInt(cursor.getColumnIndex(KEY_REWARD_POINTS)));
+                        rewardList.add(reward);
+                    }while (cursor.moveToNext());
+
+                }
+
+            }catch(Exception exception) {
+
+                exception.printStackTrace();
+
+            } finally{
+
+                if (cursor != null && !cursor.isClosed())
+                {
+                    cursor.close();
+                }
+            }
+
+        } catch (Exception e) {
+            Log.d(LOGTAG, "Error during getActivityTypes()");
+        }
+
+        return rewardList;
+    }
+
+    public int updateReward(int rewardId, String rewardName, int points, int isEnabled){
+
+        // Create and/or open the database for writing
+        SQLiteDatabase db = getWritableDatabase();
+
+        int rowsAffected = 0;
+
+        // It's a good idea to wrap the update in a transaction. This helps with performance and ensures
+        // consistency of the database.
+        db.beginTransaction();
+        try {
+
+            ContentValues values = new ContentValues();
+            values.put(KEY_REWARD_NAME, rewardName);
+            values.put(KEY_REWARD_POINTS, points);
+            values.put(KEY_REWARD_IS_ENABLED, 1);
+
+            rowsAffected = db.update(TABLE_REWARDS, values, KEY_REWARD_ID + "= ? ", new String[]{String.valueOf(rewardId)});
+
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            Log.d(LOGTAG, "Error during updateReward()");
+        } finally {
+            db.endTransaction();
+        }
+
+        return rowsAffected;
+    }
+
+    public boolean deleteReward(int rewardId){
+
+        // Create and/or open the database for writing
+        SQLiteDatabase db = getWritableDatabase();
+
+        // It's a good idea to wrap the delete in a transaction. This helps with performance and ensures
+        // consistency of the database.
+        db.beginTransaction();
+        try {
+
+            return db.delete(TABLE_REWARDS, KEY_REWARD_ID + "= ? ", new String[]{String.valueOf(rewardId)}) > 0;
+
+        } catch (Exception e) {
+            Log.d(LOGTAG, "Error during deleteReward()");
+        } finally {
+            db.endTransaction();
+        }
+
+        return false;
+    }
+
 
     /***********************************************************************************************
      REWARDSTATUS Operations

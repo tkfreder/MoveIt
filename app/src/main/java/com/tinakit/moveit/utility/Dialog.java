@@ -21,4 +21,5 @@ public class Dialog {
         alert.setPositiveButton(positiveButtonLabel, null);
         alert.show();
     }
+
 }

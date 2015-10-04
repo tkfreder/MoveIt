@@ -10,7 +10,7 @@ import com.tinakit.moveit.R;
 /**
  * Created by Tina on 7/2/2015.
  */
-public abstract class SingleFragmentActivity extends FragmentActivity {
+public abstract class SingleFragment extends FragmentActivity {
     protected abstract Fragment createFragment();
 
     @Override
