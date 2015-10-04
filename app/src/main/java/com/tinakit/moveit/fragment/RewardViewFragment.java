@@ -47,17 +47,6 @@ public class RewardViewFragment extends Fragment {
                 mTotalCoins = getActivity().getIntent().getExtras().getInt("total_coins");
                 mTotalCoins_textview.setText(String.valueOf(mTotalCoins));
             }
-            //TODO: to delete
-            if (getActivity().getIntent().getExtras().containsKey("reward_list")){
-
-                mRewardList = RewardRecyclerAdapter.mRewardList;
-
-            } else{
-
-                //TODO: get this data from the database, for now using local method to populate dummy data
-                //get Reward data for this user
-                mRewardList = getRewardList();
-            }
         }
 
         //RecyclerView
@@ -70,13 +59,5 @@ public class RewardViewFragment extends Fragment {
         return view;
     }
 
-    private ArrayList<Reward> getRewardList(){
-
-        ArrayList<Reward> rewardList = new ArrayList<>();
-
-
-
-        return rewardList;
-    }
 }
 

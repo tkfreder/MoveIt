@@ -5,16 +5,10 @@ package com.tinakit.moveit.model;
  */
 public enum RewardStatusType {
 
-    AVAILABLE (1), //user can redeem this reward if they have enough points
-    PENDING(2), //user has requested this reward, waiting for admin to fulfill the request
-    DENIED (3), //admin has denied request for this reward
-    UNAVAILABLE (4); //this reward is not available for this user
+    AVAILABLE, //user can redeem this reward if they have enough points
+    PENDING, //user has requested this reward, waiting for admin to fulfill the request
+    DENIED, //admin has denied request for this reward
+    UNAVAILABLE; //this reward is not available for this user
 
-    private final int mRewardStatusId;
-
-    RewardStatusType(int rewardStatusId){
-
-        mRewardStatusId = rewardStatusId;
-    }
 
 }

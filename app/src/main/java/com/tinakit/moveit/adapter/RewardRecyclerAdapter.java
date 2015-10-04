@@ -77,7 +77,7 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
                     mDatabaseHelper.setUserPoints(mUserId, mTotalPoints);
 
                     //update the reward status
-                    mDatabaseHelper.setRewardStatus(mUserId, reward.getRewardId(), RewardStatusType.valueOf("PENDING").ordinal());
+                    mDatabaseHelper.setRewardStatus(mUserId, reward.getRewardId(), RewardStatusType.PENDING);
 
                 }
                 else if (button.getText().equals("Cancel")){
@@ -89,7 +89,7 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
                     mDatabaseHelper.setUserPoints(mUserId, mTotalPoints);
 
                     //update the reward status
-                    mDatabaseHelper.setRewardStatus(mUserId, reward.getRewardId(), RewardStatusType.valueOf("AVAILABLE").ordinal());
+                    mDatabaseHelper.setRewardStatus(mUserId, reward.getRewardId(), RewardStatusType.AVAILABLE);
 
                 }
 
@@ -112,19 +112,20 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
         });
 
         //if user has enough points, enable this button
-        if (reward.getPoints() <= mTotalPoints && reward.getUserStatus() == 0) {
+        if (reward.getPoints() <= mTotalPoints && reward.getRewardStatusType() == RewardStatusType.AVAILABLE) {
             customViewHolder.statusButton.setText("Get It");
             customViewHolder.statusButton.setTag(reward);
             customViewHolder.statusButton.setVisibility(View.VISIBLE);
 
 
-        } else if (reward.getUserStatus() == 1) {
+        } else if (reward.getRewardStatusType() == RewardStatusType.PENDING) {
 
             customViewHolder.statusButton.setText("Cancel");
             customViewHolder.statusButton.setTag(reward);
             customViewHolder.statusButton.setVisibility(View.VISIBLE);
             customViewHolder.status.setText("waiting for Mommy to say yes");
-        } else if (reward.getUserStatus() == 2) {
+
+        } else if (reward.getRewardStatusType() == RewardStatusType.DENIED) {
 
             customViewHolder.statusButton.setEnabled(false);
             customViewHolder.statusButton.setTag(reward);

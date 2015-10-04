@@ -10,7 +10,7 @@ public class Reward {
     private int mPoints;
     private String mDescription;
     private boolean mEnabled;
-    private int mUserStatus;
+    private RewardStatusType mRewardStatusType;
 
     public Reward (){}
 
@@ -54,11 +54,11 @@ public class Reward {
         mEnabled = enabled;
     }
 
-    public int getUserStatus() {
-        return mUserStatus;
+    public RewardStatusType getRewardStatusType() {
+        return mRewardStatusType;
     }
 
-    public void setUserStatus(int userStatus) {
-        mUserStatus = userStatus;
+    public void setRewardStatusType(RewardStatusType rewardStatusType) {
+        mRewardStatusType = rewardStatusType;
     }
 }
