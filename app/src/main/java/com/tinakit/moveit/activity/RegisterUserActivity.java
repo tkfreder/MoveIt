@@ -2,7 +2,6 @@ package com.tinakit.moveit.activity;
 
 import android.support.v4.app.Fragment;
 
-import com.tinakit.moveit.fragment.LoginFragment;
 import com.tinakit.moveit.fragment.RegisterUserFragment;
 
 /**

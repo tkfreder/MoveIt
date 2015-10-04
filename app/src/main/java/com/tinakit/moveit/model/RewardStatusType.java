@@ -9,6 +9,5 @@ public enum RewardStatusType {
     PENDING, //user has requested this reward, waiting for admin to fulfill the request
     DENIED, //admin has denied request for this reward
     UNAVAILABLE; //this reward is not available for this user
-
-
 }
+

@@ -46,7 +46,7 @@ import com.tinakit.moveit.utility.CalorieCalculator;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.utility.UnitConverter;
 
-public class TrackerActivity extends AppCompatActivity  implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class ActivityTracker extends AppCompatActivity  implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     //DEBUG
     private static final String LOG = "MAIN_ACTIVITY";
@@ -585,7 +585,7 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
 
         String connectionResult = message.substring(LocationService.GOOGLEAPI_CONNECTION_FAILURE.length() - 1, (message.length() - 1));
         String errorMessage = "Google Play Services connection failure: " + connectionResult + ". Try again.";
-        Toast.makeText(TrackerActivity.this, errorMessage, Toast.LENGTH_LONG);
+        Toast.makeText(ActivityTracker.this, errorMessage, Toast.LENGTH_LONG);
     }
 
     private void reachedTimeLimit(){
@@ -602,7 +602,7 @@ public class TrackerActivity extends AppCompatActivity  implements GoogleApiClie
 
     private void displayAlertDialog(String title, String message){
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                TrackerActivity.this);
+                ActivityTracker.this);
 
         // set title
         alertDialogBuilder.setTitle(title);

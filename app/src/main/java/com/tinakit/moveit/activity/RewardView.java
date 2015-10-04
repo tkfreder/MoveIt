@@ -1,16 +1,58 @@
 package com.tinakit.moveit.activity;
 
-import android.support.v4.app.Fragment;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.widget.TextView;
 
-import com.tinakit.moveit.fragment.ActivityHistoryFragment;
-import com.tinakit.moveit.fragment.RewardViewFragment;
+import com.tinakit.moveit.R;
+import com.tinakit.moveit.adapter.RewardRecyclerAdapter;
+import com.tinakit.moveit.model.Reward;
+
+import java.util.List;
 
 /**
  * Created by Tina on 9/23/2015.
  */
-public class RewardView extends SingleFragmentActivity {
+public class RewardView extends AppCompatActivity {
+
+    private RecyclerView mRecyclerView;
+
+    //TODO: dummy data
+    int mTotalCoins = 0;
+    int mUserId = 1;
+
+    //UI Widgets
+    private TextView mTotalCoins_textview;
+
+    //RecyclerView
+    private RewardRecyclerAdapter mRewardRecyclerAdapter;
+
     @Override
-    protected Fragment createFragment(){
-        return new RewardViewFragment();
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        //fix the orientation to portrait
+        this.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        setContentView(R.layout.reward_view);
+
+        //get total coins out of intent
+        mTotalCoins_textview = (TextView)findViewById(R.id.coinTotal);
+        if(getIntent() != null) {
+
+            if  (getIntent().getExtras().containsKey("total_coins")) {
+                mTotalCoins = getIntent().getExtras().getInt("total_coins");
+                mTotalCoins_textview.setText(String.valueOf(mTotalCoins));
+            }
+        }
+
+        //RecyclerView
+        // Initialize recycler view
+        mRecyclerView = (RecyclerView)findViewById(R.id.recycler_view);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRewardRecyclerAdapter = new RewardRecyclerAdapter(this, mTotalCoins, mUserId);
+        mRecyclerView.setAdapter(mRewardRecyclerAdapter);
     }
 }

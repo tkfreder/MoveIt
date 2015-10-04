@@ -2,7 +2,6 @@ package com.tinakit.moveit.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,16 +11,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.tinakit.moveit.R;
-import com.tinakit.moveit.activity.TrackerActivity;
-import com.tinakit.moveit.db.FitnessDBHelper;
+import com.tinakit.moveit.activity.ActivityTracker;
 import com.tinakit.moveit.model.ActivityType;
 import com.tinakit.moveit.utility.Collections;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Tina on 9/24/2015.
@@ -64,7 +59,7 @@ public class ChooserRecyclerAdapter extends RecyclerView.Adapter<ChooserRecycler
 
                 ActivityType activityType = mActivityTypeList.get(position);
 
-                Intent intent = new Intent(mContext, TrackerActivity.class);
+                Intent intent = new Intent(mContext, ActivityTracker.class);
                 Bundle bundle = new Bundle();
                 bundle.putString("activity_type",activityType.getActivityName());
                 bundle.putInt("activityTypeId",activityType.getActivityTypeId());

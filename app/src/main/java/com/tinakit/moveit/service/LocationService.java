@@ -17,7 +17,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.tinakit.moveit.activity.TrackerActivity;
+import com.tinakit.moveit.activity.ActivityTracker;
 import com.tinakit.moveit.model.UnitSplitCalorie;
 
 import org.apache.commons.lang3.time.StopWatch;
@@ -292,7 +292,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
 
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, TrackerActivity.class), 0);
+                new Intent(this, ActivityTracker.class), 0);
 
         Notification notification = new Notification.Builder(this)
                 .setContentIntent(contentIntent)
@@ -390,7 +390,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         //get time from Chronometer in MainActivity
 
         //mTimeElapsed = TimeUnit.MILLISECONDS.toSeconds(mStopWatch.getTime());
-        mTimeElapsed = TrackerActivity.getSecondsFromChronometer();    }
+        mTimeElapsed = ActivityTracker.getSecondsFromChronometer();    }
 
 
 
