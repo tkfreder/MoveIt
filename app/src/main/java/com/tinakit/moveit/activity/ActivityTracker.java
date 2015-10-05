@@ -126,6 +126,19 @@ public class ActivityTracker extends AppCompatActivity  implements GoogleApiClie
         this.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_main);
 
+        //TODO: replace this with DB call or Application Preferences
+        mUser = new User();
+        mUser.setUserId(1);
+        mUser.setUserName("Lucy");
+        mUser.setIsAdmin(false);
+        mUser.setWeight(40);
+        mUser.setAvatarFileName("tiger");
+
+        //display admin menu, if user is admin
+        if(mUser.isAdmin()){
+            findViewById(R.id.action_rewards).setVisibility(View.VISIBLE);
+        }
+
         //TODO: this came from Login screen, removing Login for now
         //get userId out of the intent
         /*
@@ -150,13 +163,7 @@ public class ActivityTracker extends AppCompatActivity  implements GoogleApiClie
         mFeetPerMinute = (TextView)findViewById(R.id.feetPerMinute);
         mMapImage = (ImageView)findViewById(R.id.map);
 
-        //TODO: replace this with DB call or Application Preferences
-        mUser = new User();
-        mUser.setUserId(1);
-        mUser.setUserName("Lucy");
-        mUser.setIsAdmin(false);
-        mUser.setWeight(40);
-        mUser.setAvatarFileName("tiger");
+
 
         //TODO: get activity details from Preference Activity, to be displayed at the top of the screen
         if(getIntent() != null){
