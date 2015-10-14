@@ -5,10 +5,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.location.Location;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -18,6 +20,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,6 +30,13 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.fragment.RegisterUserFragment;
 import com.tinakit.moveit.model.ActivityType2;
@@ -45,7 +55,8 @@ import com.tinakit.moveit.utility.CalorieCalculator;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.utility.UnitConverter;
 
-public class ActivityTracker extends AppCompatActivity  implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class ActivityTracker extends AppCompatActivity
+        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, OnMapReadyCallback {
 
     //DEBUG
     private static final String LOG = "MAIN_ACTIVITY";
@@ -99,7 +110,6 @@ public class ActivityTracker extends AppCompatActivity  implements GoogleApiClie
     private TextView mDistance;
     private TextView mCoins;
     private TextView mFeetPerMinute;
-    private ImageView mMapImage;
 
     //local cache
     private float mTotalCoins = 0f;
@@ -111,10 +121,64 @@ public class ActivityTracker extends AppCompatActivity  implements GoogleApiClie
     public static ArrayList<ActivityDetail> mActivityDetailList = new ArrayList<>();
     private User mUser;
 
+    private static final LatLng MELBOURNE = new LatLng(-37.81319, 144.96298);
+    private static final LatLng SYDNEY = new LatLng(-33.87365, 151.20689);
+    private static final LatLng ADELAIDE = new LatLng(-34.92873, 138.59995);
+    private static final LatLng PERTH = new LatLng(-31.95285, 115.85734);
+
+    private static final LatLng LHR = new LatLng(51.471547, -0.460052);
+    private static final LatLng LAX = new LatLng(33.936524, -118.377686);
+    private static final LatLng JFK = new LatLng(40.641051, -73.777485);
+    private static final LatLng AKL = new LatLng(-37.006254, 174.783018);
+
+    private static final float ZOOM_STREET_ROUTE = 16.0f;
+
     //SharedPreferences
     //private static final String SHARED_PREFERENCES_LOGIN = "SHARED_PREFERENCES_LOGIN";
     //SharedPreferences mSharedPreferences = getSharedPreferences(SHARED_PREFERENCES_LOGIN, 0);
 
+    @Override
+    public void onMapReady(GoogleMap map) {
+
+        // Override the default content description on the view, for accessibility mode.
+        // Ideally this string would be localised.
+        map.setContentDescription("Google Map with polylines.");
+
+        // A simple polyline with the default options from Melbourne-Adelaide-Perth.
+        map.addPolyline((new PolylineOptions())
+                .add(MELBOURNE, ADELAIDE, PERTH));
+
+        // A geodesic polyline that goes around the world.
+        map.addPolyline((new PolylineOptions())
+                .add(LHR, AKL, LAX, JFK, LHR)
+                .width(5)
+                .color(Color.BLUE)
+                .geodesic(true));
+
+        /*
+        // Rectangle centered at Sydney.  This polyline will be mutable.
+        int radius = 5;
+        PolylineOptions options = new PolylineOptions()
+                .add(new LatLng(SYDNEY.latitude + radius, SYDNEY.longitude + radius))
+                .add(new LatLng(SYDNEY.latitude + radius, SYDNEY.longitude - radius))
+                .add(new LatLng(SYDNEY.latitude - radius, SYDNEY.longitude - radius))
+                .add(new LatLng(SYDNEY.latitude - radius, SYDNEY.longitude + radius))
+                .add(new LatLng(SYDNEY.latitude + radius, SYDNEY.longitude + radius));
+
+
+        int color = Color.HSVToColor(mAlphaBar.getProgress(), new float[] {mColorBar.getProgress(), 1, 1});
+        mMutablePolyline = map.addPolyline(options
+                .color(color)
+                .width(mWidthBar.getProgress()));
+
+        mColorBar.setOnSeekBarChangeListener(this);
+        mAlphaBar.setOnSeekBarChangeListener(this);
+        mWidthBar.setOnSeekBarChangeListener(this);
+        */
+
+        // Move the map so that it is centered on the mutable polyline.
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(SYDNEY, ZOOM_STREET_ROUTE));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,7 +225,10 @@ public class ActivityTracker extends AppCompatActivity  implements GoogleApiClie
         mDistance = (TextView)findViewById(R.id.distance);
         mCoins = (TextView)findViewById(R.id.coins);
         mFeetPerMinute = (TextView)findViewById(R.id.feetPerMinute);
-        mMapImage = (ImageView)findViewById(R.id.map);
+
+        SupportMapFragment mapFragment =
+                (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
 
 
 

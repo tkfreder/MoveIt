@@ -196,13 +196,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"/>
-    <ImageView
+
+    <fragment
         android:id="@+id/map"
-        android:layout_width="200dp"
+        android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:src="@drawable/gps_map"
-        android:layout_gravity="center"
-        android:visibility="gone"/>
+        class="com.google.android.gms.maps.SupportMapFragment"/>
 
     <ListView
         android:id="@+id/activityDetailListView"
