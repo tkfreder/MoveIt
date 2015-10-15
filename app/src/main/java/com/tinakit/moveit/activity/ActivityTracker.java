@@ -464,9 +464,18 @@ public class ActivityTracker extends AppCompatActivity
         FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(getApplicationContext());
 
         //save Activity Detail (overall stats)
-        databaseHelper.insertActivity(mUser.getUserId(), mActivityTypeId, mStartDate, mEndDate, getDistance(1), mTotalCalories, mTotalCoins);
+        long activityId = databaseHelper.insertActivity(mUser.getUserId(), mActivityTypeId, mStartDate, mEndDate, getDistance(1), mTotalCalories, mTotalCoins);
 
-        //TODO: save unit split location data
+        if (activityId != -1){
+
+            //TODO: save unit split location data
+            ArrayList<LatLng> locationList = new ArrayList<>();
+            for ( int i = 0 ; i < mUnitSplitCalorieList.size(); i++) {
+
+                databaseHelper.insertActivityLocationData(activityId, mStartDate, mUnitSplitCalorieList.get(i).getLocation().getLatitude(), mUnitSplitCalorieList.get(i).getLocation().getLongitude(), mUnitSplitCalorieList.get(i).getLocation().getAltitude(), mUnitSplitCalorieList.get(i).getLocation().getAccuracy());
+
+            }
+        }
 
     }
 
@@ -496,10 +505,10 @@ public class ActivityTracker extends AppCompatActivity
 
         mResults.setText("You earned " + mCoins.getText() + " coins!");
 
+
         displayMap();
 
-        //TODO: placeholder for real map
-        //mMapImage.setVisibility(View.VISIBLE);
+        //TODO:  why does sound get truncated?
         playSound();
 
     }
@@ -758,6 +767,14 @@ public class ActivityTracker extends AppCompatActivity
             }
     }
 
+    private void saveLocationDataToDatabase(){
+
+        ArrayList<LatLng> locationList = new ArrayList<>();
+        for ( int i = 0 ; i < mUnitSplitCalorieList.size(); i++) {
+            locationList.add(new LatLng(mUnitSplitCalorieList.get(i).getLocation().getLatitude(), mUnitSplitCalorieList.get(i).getLocation().getLongitude()));
+        }
+    }
+
     private void displayMap(){
 
         if (mGoogleMap != null){
@@ -774,7 +791,7 @@ public class ActivityTracker extends AppCompatActivity
             }
 
 
-            mGoogleMap.addPolyline((new PolylineOptions().addAll(locationList).color(Color.RED)));
+            mGoogleMap.addPolyline((new PolylineOptions().addAll(locationList).color(Color.BLUE)));
             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(HOME1, ZOOM_STREET_ROUTE));
 
             //render markers

@@ -69,6 +69,15 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     private static final String KEY_ACTIVITY_CALORIES = "calories";
     private static final String KEY_ACTIVITY_POINTS_EARNED = "pointsEarned";
 
+    //ACTIVITY_LOCATION_DATA TABLE
+    private static final String TABLE_ACTIVITY_LOCATION_DATA = "ActivityLocationData";
+    private static final String KEY_ACTIVITY_LOCATION_DATA_ID = "_id";
+    private static final String KEY_ACTIVITY_ID_FK = "activityId";
+    private static final String KEY_ACTIVITY_LOCATION_DATA_TIMESTAMP = "timeStamp";
+    private static final String KEY_ACTIVITY_LOCATION_DATA_LATITUDE = "latitude";
+    private static final String KEY_ACTIVITY_LOCATION_DATA_LONGITUDE = "longitude";
+    private static final String KEY_ACTIVITY_LOCATION_DATA_ALTITUDE = "altitude";
+    private static final String KEY_ACTIVITY_LOCATION_DATA_ACCURACY = "accuracy";
 
     //ACTIVITY TYPE TABLE
     private static final String TABLE_ACTIVITY_TYPE = "ActivityType";
@@ -169,6 +178,17 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 KEY_ACTIVITY_POINTS_EARNED  + " REAL" +
                 ")";
 
+        String CREATE_ACTIVITY_LOCATION_DATA_TABLE = "CREATE TABLE " + TABLE_ACTIVITY_LOCATION_DATA +
+                "(" +
+                KEY_ACTIVITY_LOCATION_DATA_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // Define a primary key
+                KEY_ACTIVITY_ID_FK + " INTEGER REFERENCES " + TABLE_ACTIVITIES + "," + // Define a foreign key
+                KEY_ACTIVITY_LOCATION_DATA_TIMESTAMP  + " TEXT, " +
+                KEY_ACTIVITY_LOCATION_DATA_LATITUDE  + " REAL, " +
+                KEY_ACTIVITY_LOCATION_DATA_LONGITUDE  + " REAL, " +
+                KEY_ACTIVITY_LOCATION_DATA_ALTITUDE  + " REAL, " +
+                KEY_ACTIVITY_LOCATION_DATA_ACCURACY  + " REAL " +
+                ")";
+
         String CREATE_LOCATION_TABLE = "CREATE TABLE " + TABLE_LOCATIONS +
                 "(" +
                 KEY_LOCATION_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // Define a primary key
@@ -207,6 +227,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_USERS_TABLE);
         db.execSQL(CREATE_ACTIVITY_TYPE_TABLE);
         db.execSQL(CREATE_ACTIVITIES_TABLE);
+        db.execSQL(CREATE_ACTIVITY_LOCATION_DATA_TABLE);
         db.execSQL(CREATE_LOCATION_TABLE);
         db.execSQL(CREATE_REWARDS_TABLE);
         db.execSQL(CREATE_REWARDUSER_TABLE);
@@ -239,7 +260,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (4, 4, 1, 0);");
         db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (5, 5, 1, 0);");
 
-
     }
 
     @Override
@@ -252,8 +272,13 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACTIVITY_TYPE);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACTIVITIES);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACTIVITY_LOCATION_DATA);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_LOCATIONS);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_REWARDS);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_REWARDUSER);
+            db.execSQL("DROP VIEW IF EXISTS " + VIEW_REWARDSTATUS_USER);
             onCreate(db);
+
         }
     }
 
@@ -365,7 +390,9 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
      ***********************************************************************************************
      */
 
-    public void insertActivity(int userId, int activityId, Date startDate, Date endDate, float distanceInFeet, float calories, float points){
+    public long insertActivity(int userId, int activityTypeId, Date startDate, Date endDate, float distanceInFeet, float calories, float points){
+
+        long activityId = -1;
 
         // Create and/or open the database for writing
         SQLiteDatabase db = getWritableDatabase();
@@ -377,7 +404,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
             ContentValues values = new ContentValues();
             values.put(KEY_ACTIVITY_USER_ID_FK, userId);
-            values.put(KEY_ACTIVITY_ACTIVITY_TYPE_ID_FK, activityId);
+            values.put(KEY_ACTIVITY_ACTIVITY_TYPE_ID_FK, activityTypeId);
             values.put(KEY_ACTIVITY_START_DATE, new SimpleDateFormat(DATE_FORMAT).format(startDate));
             values.put(KEY_ACTIVITY_END_DATE, new SimpleDateFormat(DATE_FORMAT).format(endDate));
             values.put(KEY_ACTIVITY_DISTANCE_FEET, distanceInFeet);
@@ -385,13 +412,15 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             values.put(KEY_ACTIVITY_POINTS_EARNED, points);
 
             // Notice how we haven't specified the primary key. SQLite auto increments the primary key column.
-            db.insertOrThrow(TABLE_ACTIVITIES, null, values);
+            activityId = db.insertOrThrow(TABLE_ACTIVITIES, null, values);
             db.setTransactionSuccessful();
         } catch (Exception e) {
             Log.d(LOGTAG, "Error during insertActivity()");
         } finally {
             db.endTransaction();
         }
+
+        return activityId;
     }
 
     public List<ActivityDetail> getActivityDetailList(int userId){
@@ -441,6 +470,39 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         }
 
         return activityDetailList;
+    }
+
+    /***********************************************************************************************
+     ACTIVITY_LOCATION_DATA Operations
+     ***********************************************************************************************
+     */
+
+    public void insertActivityLocationData(long activityId, Date timeStamp, double latitude, double longitude, double altitude, float accuracy){
+
+        // Create and/or open the database for writing
+        SQLiteDatabase db = getWritableDatabase();
+
+        // It's a good idea to wrap our insert in a transaction. This helps with performance and ensures
+        // consistency of the database.
+        db.beginTransaction();
+        try {
+
+            ContentValues values = new ContentValues();
+            values.put(KEY_ACTIVITY_ID_FK, activityId);
+            values.put(KEY_ACTIVITY_LOCATION_DATA_TIMESTAMP, new SimpleDateFormat(DATE_FORMAT).format(timeStamp));
+            values.put(KEY_ACTIVITY_LOCATION_DATA_LATITUDE, latitude);
+            values.put(KEY_ACTIVITY_LOCATION_DATA_LONGITUDE, longitude);
+            values.put(KEY_ACTIVITY_LOCATION_DATA_ALTITUDE, altitude);
+            values.put(KEY_ACTIVITY_LOCATION_DATA_ACCURACY, accuracy);
+
+            // Notice how we haven't specified the primary key. SQLite auto increments the primary key column.
+            db.insertOrThrow(TABLE_ACTIVITY_LOCATION_DATA, null, values);
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            Log.d(LOGTAG, "Error during insertActivityLocationData()");
+        } finally {
+            db.endTransaction();
+        }
     }
 
     /***********************************************************************************************
