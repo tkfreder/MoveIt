@@ -34,7 +34,9 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.tinakit.moveit.db.FitnessDBHelper;
@@ -126,12 +128,22 @@ public class ActivityTracker extends AppCompatActivity
     private static final LatLng ADELAIDE = new LatLng(-34.92873, 138.59995);
     private static final LatLng PERTH = new LatLng(-31.95285, 115.85734);
 
+    private static final LatLng HOME1 = new LatLng(34.143000, -118.077089);
+    private static final LatLng HOME2 = new LatLng(34.143274, -118.077125);
+    private static final LatLng HOME3 = new LatLng(34.143273, -118.076434);
+    private static final LatLng HOME4 = new LatLng(34.142364, -118.076501);
+    private static final LatLng HOME5 = new LatLng(34.142342, -118.078899);
+    private static final LatLng HOME6 = new LatLng(34.143240, -118.078939);
+    private static final LatLng HOME7 = new LatLng(34.143255, -118.077145);
+
     private static final LatLng LHR = new LatLng(51.471547, -0.460052);
     private static final LatLng LAX = new LatLng(33.936524, -118.377686);
     private static final LatLng JFK = new LatLng(40.641051, -73.777485);
     private static final LatLng AKL = new LatLng(-37.006254, 174.783018);
 
-    private static final float ZOOM_STREET_ROUTE = 16.0f;
+    private static final float ZOOM_STREET_ROUTE = 15.0f;
+    private GoogleMap mGoogleMap;
+    private SupportMapFragment mMapFragment;
 
     //SharedPreferences
     //private static final String SHARED_PREFERENCES_LOGIN = "SHARED_PREFERENCES_LOGIN";
@@ -140,44 +152,22 @@ public class ActivityTracker extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap map) {
 
+        mGoogleMap = map;
+
+        /*
         // Override the default content description on the view, for accessibility mode.
         // Ideally this string would be localised.
         map.setContentDescription("Google Map with polylines.");
 
         // A simple polyline with the default options from Melbourne-Adelaide-Perth.
         map.addPolyline((new PolylineOptions())
-                .add(MELBOURNE, ADELAIDE, PERTH));
-
-        // A geodesic polyline that goes around the world.
-        map.addPolyline((new PolylineOptions())
-                .add(LHR, AKL, LAX, JFK, LHR)
-                .width(5)
-                .color(Color.BLUE)
-                .geodesic(true));
-
-        /*
-        // Rectangle centered at Sydney.  This polyline will be mutable.
-        int radius = 5;
-        PolylineOptions options = new PolylineOptions()
-                .add(new LatLng(SYDNEY.latitude + radius, SYDNEY.longitude + radius))
-                .add(new LatLng(SYDNEY.latitude + radius, SYDNEY.longitude - radius))
-                .add(new LatLng(SYDNEY.latitude - radius, SYDNEY.longitude - radius))
-                .add(new LatLng(SYDNEY.latitude - radius, SYDNEY.longitude + radius))
-                .add(new LatLng(SYDNEY.latitude + radius, SYDNEY.longitude + radius));
-
-
-        int color = Color.HSVToColor(mAlphaBar.getProgress(), new float[] {mColorBar.getProgress(), 1, 1});
-        mMutablePolyline = map.addPolyline(options
-                .color(color)
-                .width(mWidthBar.getProgress()));
-
-        mColorBar.setOnSeekBarChangeListener(this);
-        mAlphaBar.setOnSeekBarChangeListener(this);
-        mWidthBar.setOnSeekBarChangeListener(this);
-        */
+                //.add(MELBOURNE, ADELAIDE, PERTH));
+                .add(HOME1, HOME2, HOME3, HOME4, HOME5, HOME6, HOME7)
+                .color(Color.RED));
 
         // Move the map so that it is centered on the mutable polyline.
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(SYDNEY, ZOOM_STREET_ROUTE));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(HOME1, ZOOM_STREET_ROUTE));
+        */
     }
 
     @Override
@@ -226,9 +216,11 @@ public class ActivityTracker extends AppCompatActivity
         mCoins = (TextView)findViewById(R.id.coins);
         mFeetPerMinute = (TextView)findViewById(R.id.feetPerMinute);
 
-        SupportMapFragment mapFragment =
+        mMapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        mMapFragment.getMapAsync(this);
+        mMapFragment.getView().setVisibility(View.INVISIBLE);
+
 
 
 
@@ -285,7 +277,7 @@ public class ActivityTracker extends AppCompatActivity
                         Toast.makeText(getApplicationContext(), "Not enough route information. Restart your activity.", Toast.LENGTH_LONG);
                     }
 
-                    //display number of coins earned
+                    //display number of coins
                     displayResults();
 
                 } else if (mStartButton.getText().equals(getResources().getString(R.string.done))) {
@@ -503,6 +495,8 @@ public class ActivityTracker extends AppCompatActivity
     private void displayResults(){
 
         mResults.setText("You earned " + mCoins.getText() + " coins!");
+
+        displayMap();
 
         //TODO: placeholder for real map
         //mMapImage.setVisibility(View.VISIBLE);
@@ -764,6 +758,46 @@ public class ActivityTracker extends AppCompatActivity
             }
     }
 
+    private void displayMap(){
+
+        if (mGoogleMap != null){
+
+            mMapFragment.getView().setVisibility(View.VISIBLE);
+
+            // Override the default content description on the view, for accessibility mode.
+            // Ideally this string would be localised.
+            mGoogleMap.setContentDescription("Google Map with polylines.");
+
+            ArrayList<LatLng> locationList = new ArrayList<>();
+            for ( int i = 0 ; i < mUnitSplitCalorieList.size(); i++) {
+                locationList.add(new LatLng(mUnitSplitCalorieList.get(i).getLocation().getLatitude(), mUnitSplitCalorieList.get(i).getLocation().getLongitude()));
+            }
+
+
+            mGoogleMap.addPolyline((new PolylineOptions().addAll(locationList).color(Color.RED)));
+            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(HOME1, ZOOM_STREET_ROUTE));
+
+            //render markers
+            addMarkersToMap(locationList.get(0), locationList.get(locationList.size() - 1));
+        }
+
+    }
+
+    private void addMarkersToMap(LatLng start, LatLng end) {
+
+        //start marker
+        mGoogleMap.addMarker(new MarkerOptions()
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                .position(start)
+                .title("start")
+                );
+
+        //start marker
+        mGoogleMap.addMarker(new MarkerOptions()
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                .position(end)
+                .title("end"));
+    }
 
     private float getDistance(int units){
 
@@ -773,7 +807,7 @@ public class ActivityTracker extends AppCompatActivity
         //DEBUG
         //StringBuilder stringBuilder = new StringBuilder();
 
-        for (int i = 0 ; i < mUnitSplitCalorieList.size() - 1; i++){
+        for (int i = 0 ; i < mUnitSplitCalorieList.size() - 1 ; i++){
             Location.distanceBetween(mUnitSplitCalorieList.get(i).getLocation().getLatitude(),mUnitSplitCalorieList.get(i).getLocation().getLongitude(),mUnitSplitCalorieList.get(i+1).getLocation().getLatitude(),mUnitSplitCalorieList.get(i + 1).getLocation().getLongitude(), intervalDistance);
             totalDistance += Math.abs(intervalDistance[0]);
             //DEBUG
