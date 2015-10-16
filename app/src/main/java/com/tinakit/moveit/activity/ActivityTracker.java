@@ -55,6 +55,7 @@ import java.util.List;
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.utility.CalorieCalculator;
 import com.tinakit.moveit.model.ActivityDetail;
+import com.tinakit.moveit.utility.Map;
 import com.tinakit.moveit.utility.UnitConverter;
 
 public class ActivityTracker extends AppCompatActivity
@@ -97,7 +98,7 @@ public class ActivityTracker extends AppCompatActivity
     private static long FASTEST_INTERVAL = 10 * 1000; //5 second
     private static long DISPLACEMENT = 1; //meters //displacement takes precedent over interval/fastestInterval
     private static long STOP_SERVICE_TIME_LIMIT = 30 * 60 * 1000 * 60; // 30 minutes in seconds
-    private static final long LOCATION_ACCURACY = 50; //within # meter accuracy
+    private static final long LOCATION_ACCURACY = 20; //within # meter accuracy
     private boolean mIsTimeLimit = false;
 
     public static final String GOOGLEAPI_CONNECTION_FAILURE = "x40241.tina.fredericks.a5.app.GOOGLEAPI_CONNECTION_FAILURE";
@@ -791,7 +792,7 @@ public class ActivityTracker extends AppCompatActivity
             }
 
             mGoogleMap.addPolyline((new PolylineOptions().addAll(locationList).color(Color.BLUE)));
-            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(HOME1, ZOOM_STREET_ROUTE));
+            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(HOME1, ZOOM_STREET_ROUTE/*Map.getZoomByDistance(getDistance(1))*/));
 
             //render markers
             addMarkersToMap(locationList.get(0), locationList.get(locationList.size() - 1));
