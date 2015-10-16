@@ -468,13 +468,21 @@ public class ActivityTracker extends AppCompatActivity
 
         if (activityId != -1){
 
-            //TODO: save unit split location data
-            ArrayList<LatLng> locationList = new ArrayList<>();
-            for ( int i = 0 ; i < mUnitSplitCalorieList.size(); i++) {
-
-                databaseHelper.insertActivityLocationData(activityId, mStartDate, mUnitSplitCalorieList.get(i).getLocation().getLatitude(), mUnitSplitCalorieList.get(i).getLocation().getLongitude(), mUnitSplitCalorieList.get(i).getLocation().getAltitude(), mUnitSplitCalorieList.get(i).getLocation().getAccuracy());
-
+            for ( UnitSplitCalorie unitSplitCalorie : mUnitSplitCalorieList ) {
+                databaseHelper.insertActivityLocationData(activityId, mStartDate, unitSplitCalorie.getLocation().getLatitude(), unitSplitCalorie.getLocation().getLongitude(), unitSplitCalorie.getLocation().getAltitude(), unitSplitCalorie.getLocation().getAccuracy());
             }
+        }
+
+        //TODO: debug - display the map based on location data just saved
+        List<UnitSplitCalorie> unitSplitList = databaseHelper.getActivityLocationData(activityId);
+
+        for (UnitSplitCalorie unitSplitCalorie : unitSplitList){
+            System.out.println("latitude = " + String.valueOf(unitSplitCalorie.getLocation().getLatitude()));
+            System.out.println("longitude = " + String.valueOf(unitSplitCalorie.getLocation().getLongitude()));
+            System.out.println("altitude = " + String.valueOf(unitSplitCalorie.getLocation().getAltitude()));
+            System.out.println("accuracy = " + String.valueOf(unitSplitCalorie.getAccuracy()));
+            System.out.println("activity id = " + String.valueOf(unitSplitCalorie.getActivityId()));
+            System.out.println("timeStamp = " + unitSplitCalorie.getTimeStamp());
         }
 
     }
@@ -506,7 +514,7 @@ public class ActivityTracker extends AppCompatActivity
         mResults.setText("You earned " + mCoins.getText() + " coins!");
 
 
-        displayMap();
+        displayMap(mUnitSplitCalorieList);
 
         //TODO:  why does sound get truncated?
         playSound();
@@ -767,15 +775,7 @@ public class ActivityTracker extends AppCompatActivity
             }
     }
 
-    private void saveLocationDataToDatabase(){
-
-        ArrayList<LatLng> locationList = new ArrayList<>();
-        for ( int i = 0 ; i < mUnitSplitCalorieList.size(); i++) {
-            locationList.add(new LatLng(mUnitSplitCalorieList.get(i).getLocation().getLatitude(), mUnitSplitCalorieList.get(i).getLocation().getLongitude()));
-        }
-    }
-
-    private void displayMap(){
+    private void displayMap(List<UnitSplitCalorie> unitSplitCalorieList){
 
         if (mGoogleMap != null){
 
@@ -786,10 +786,9 @@ public class ActivityTracker extends AppCompatActivity
             mGoogleMap.setContentDescription("Google Map with polylines.");
 
             ArrayList<LatLng> locationList = new ArrayList<>();
-            for ( int i = 0 ; i < mUnitSplitCalorieList.size(); i++) {
-                locationList.add(new LatLng(mUnitSplitCalorieList.get(i).getLocation().getLatitude(), mUnitSplitCalorieList.get(i).getLocation().getLongitude()));
+            for ( UnitSplitCalorie unitSplitCalorie : unitSplitCalorieList) {
+                locationList.add(new LatLng(unitSplitCalorie.getLocation().getLatitude(), unitSplitCalorie.getLocation().getLongitude()));
             }
-
 
             mGoogleMap.addPolyline((new PolylineOptions().addAll(locationList).color(Color.BLUE)));
             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(HOME1, ZOOM_STREET_ROUTE));

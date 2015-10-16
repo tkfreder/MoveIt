@@ -15,6 +15,7 @@ import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.ActivityType;
 import com.tinakit.moveit.model.Reward;
 import com.tinakit.moveit.model.RewardStatusType;
+import com.tinakit.moveit.model.UnitSplitCalorie;
 import com.tinakit.moveit.model.User;
 
 import java.sql.SQLException;
@@ -78,6 +79,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     private static final String KEY_ACTIVITY_LOCATION_DATA_LONGITUDE = "longitude";
     private static final String KEY_ACTIVITY_LOCATION_DATA_ALTITUDE = "altitude";
     private static final String KEY_ACTIVITY_LOCATION_DATA_ACCURACY = "accuracy";
+    private static final String LOCATION_PLACEHOLDER_PROVIDER = "location_placeholder_provider";
 
     //ACTIVITY TYPE TABLE
     private static final String TABLE_ACTIVITY_TYPE = "ActivityType";
@@ -239,6 +241,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 5.0, 'estimate based on 20 km/h, world record does not exist', 3,'scooter', 1);");
         db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 74.7,'1985 world record, cycling speed meters/second',4,'bike', 1);");
         db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 4.6,'1995 world record, walking speed meters/second', 5,'hike', 1);");
+        db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 2.3,'1990 world record, swimming speed meters/second', 6,'swim', 1);");
 
         //TODO: DUMMY DATA
         //populate Rewards table
@@ -466,7 +469,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             }
 
         } catch (Exception e) {
-            Log.d(LOGTAG, "Error during getActivityTypes()");
+            Log.d(LOGTAG, "Error during getActivityDetailList()");
         }
 
         return activityDetailList;
@@ -503,6 +506,58 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         } finally {
             db.endTransaction();
         }
+    }
+
+    public List<UnitSplitCalorie> getActivityLocationData(long activityId){
+
+        // Create and/or open the database for writing
+        SQLiteDatabase db = getReadableDatabase();
+
+        //initialize UnitSplitCalorie array
+        List<UnitSplitCalorie> locationList = new ArrayList<>();
+
+        try {
+
+            Cursor cursor = db.query(TABLE_ACTIVITY_LOCATION_DATA,
+                    new String[]{KEY_ACTIVITY_ID_FK, KEY_ACTIVITY_LOCATION_DATA_TIMESTAMP,KEY_ACTIVITY_LOCATION_DATA_LATITUDE,KEY_ACTIVITY_LOCATION_DATA_LONGITUDE,KEY_ACTIVITY_LOCATION_DATA_ALTITUDE,KEY_ACTIVITY_LOCATION_DATA_ACCURACY},
+                    KEY_ACTIVITY_ID_FK + " = ?",
+                    new String[]{String.valueOf(activityId)}, null, null, null);
+
+            try{
+
+                if (cursor.moveToFirst()) {
+
+                    do{
+                        Location location = new Location(LOCATION_PLACEHOLDER_PROVIDER);
+                        location.setLatitude(cursor.getFloat(cursor.getColumnIndex(KEY_ACTIVITY_LOCATION_DATA_LATITUDE)));
+                        location.setLongitude(cursor.getFloat(cursor.getColumnIndex(KEY_ACTIVITY_LOCATION_DATA_LONGITUDE)));
+                        location.setAltitude(cursor.getFloat(cursor.getColumnIndex(KEY_ACTIVITY_LOCATION_DATA_ALTITUDE)));
+
+                        UnitSplitCalorie unitSplitCalorie = new UnitSplitCalorie(new SimpleDateFormat(DATE_FORMAT).parse(cursor.getString(cursor.getColumnIndex(KEY_ACTIVITY_LOCATION_DATA_TIMESTAMP))), location);
+                        unitSplitCalorie.setAccuracy(cursor.getFloat(cursor.getColumnIndex(KEY_ACTIVITY_LOCATION_DATA_ACCURACY)));
+                        unitSplitCalorie.setActivityId(cursor.getInt(cursor.getColumnIndex(KEY_ACTIVITY_ID_FK)));
+                        locationList.add(unitSplitCalorie);
+                    }while (cursor.moveToNext());
+
+                }
+
+            }catch(Exception exception) {
+
+                exception.printStackTrace();
+
+            } finally{
+
+                if (cursor != null && !cursor.isClosed())
+                {
+                    cursor.close();
+                }
+            }
+
+        } catch (Exception e) {
+            Log.d(LOGTAG, "Error during getActivityLocationData()");
+        }
+
+        return locationList;
     }
 
     /***********************************************************************************************
@@ -571,7 +626,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             }
 
         } catch (Exception e) {
-            Log.d(LOGTAG, "Error during getActivityTypes()");
+            Log.d(LOGTAG, "Error during getReward()");
         }
 
         return reward;
@@ -619,7 +674,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             }
 
         } catch (Exception e) {
-            Log.d(LOGTAG, "Error during getActivityTypes()");
+            Log.d(LOGTAG, "Error during getAllRewards()");
         }
 
         return rewardList;
@@ -848,6 +903,11 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             db.delete(TABLE_USERS, null, null);
             db.delete(TABLE_ACTIVITIES, null, null);
             db.delete(TABLE_ACTIVITY_TYPE, null, null);
+            db.delete(TABLE_ACTIVITY_LOCATION_DATA, null, null);
+            db.delete(TABLE_REWARDS, null, null);
+            db.delete(TABLE_REWARDUSER, null, null);
+            db.delete(VIEW_REWARDSTATUS_USER, null, null);
+
             db.setTransactionSuccessful();
         } catch (Exception e) {
             Log.d(LOGTAG, "Error while trying to delete all posts and users");
