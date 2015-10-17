@@ -9,8 +9,10 @@ import android.widget.TextView;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.adapter.RewardRecyclerAdapter;
+import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.Reward;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,6 +21,7 @@ import java.util.List;
 public class RewardView extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
+    private TextView mMessage;
 
     //TODO: dummy data
     int mTotalCoins = 0;
@@ -45,6 +48,20 @@ public class RewardView extends AppCompatActivity {
             if  (getIntent().getExtras().containsKey("total_coins")) {
                 mTotalCoins = getIntent().getExtras().getInt("total_coins");
                 mTotalCoins_textview.setText(String.valueOf(mTotalCoins));
+            }
+        } else {
+
+            mTotalCoins_textview.setText("0");
+        }
+
+        //display message if not enough coins to redeem reward
+        FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(getApplicationContext());
+        List<Reward> rewardList = databaseHelper.getAllRewards();
+        if (rewardList.size() != 0){
+            int minCoins = Integer.parseInt(mTotalCoins_textview.getText().toString());
+            if (rewardList.get(0).getPoints() > minCoins){
+                mMessage = (TextView)findViewById(R.id.message);
+                mMessage.setText("You need " + String.valueOf(minCoins - rewardList.get(0).getPoints()) + " to get a reward.");
             }
         }
 

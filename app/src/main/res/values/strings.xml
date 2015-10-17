@@ -2,7 +2,7 @@
     <string name="intro_text">Hi! Let\'s listen to some available data sources! Check the menu for more actions!</string>
     <string name="action_unregister_listener">Unregister listener</string>
 
-    <string name="app_name">Move It!</string>
+    <string name="app_name">Family Fit</string>
 
     <string name="action_settings">Settings</string>
 
@@ -10,6 +10,7 @@
     <string name="service_stopped">Service stopped.</string>
     <string name="go">Go!</string>
     <string name="stop">Stop!</string>
+    <string name="restart">Restart</string>
     <string name="again">Let\'s do it again!</string>
     <string name="rewards">Rewards</string>
     <string name="time_limit">Time Limit</string>
@@ -84,13 +85,8 @@
     </string-array>
     <string name="title_activity_sensor_api">SensorAPI</string>
 
-    <string name="hello_world">Hello world!</string>
     <string name="title_activity_fused_location_api">FusedLocationApi</string>
-
-<!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="choose_activity_type">Choose an activity type:</string>
-    <string name="title_activity_activity_chooser">ActivityChooser</string>
+    <string name="title_activity_activity_chooser">Activity Chooser</string>
     <string name="feet_per_minute">ft per min.</string>
     <string name="activity_history">ActivityHistory</string>
     <string name="reward_view">Reward View</string>

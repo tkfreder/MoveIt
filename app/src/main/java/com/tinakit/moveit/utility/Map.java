@@ -13,15 +13,15 @@ public class Map {
     public static float getZoomByDistance(float distance){
 
         if (distance < SHORT_DISTANCE_FEET){
-            return 2.0f;
+            return 21.0f;
         }
         else if (distance >= SHORT_DISTANCE_FEET && distance < MEDIUM_DISTANCE_FEET ){
             return 15.0f;
         }
         else if (distance >= MEDIUM_DISTANCE_FEET && distance < LONG_DISTANCE_FEET ){
-            return 18.0f;
+            return 12.0f;
 
         }else
-            return 21.0f;
+            return 6.0f;
     }
 }

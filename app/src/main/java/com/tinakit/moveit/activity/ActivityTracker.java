@@ -4,10 +4,10 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.location.Location;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.Fragment;
@@ -73,7 +73,6 @@ public class ActivityTracker extends AppCompatActivity
     private static final float FEET_COIN_CONVERSION = 0.5f;
      //2 feet = 1 coin
     private static final float CALORIE_COIN_CONVERSION = 10f; //#coins equal to 1 calorie
-    protected static final String SHARED_PREFERENCES_COINS = "SHARED_PREFERENCES_COINS";
 
     //UNITS
     private static final int MILES = 0;
@@ -94,8 +93,8 @@ public class ActivityTracker extends AppCompatActivity
     //LocationRequest settings
     GoogleApiClient mGoogleApiClient;
     LocationRequest mLocationRequest;
-    private static long UPDATE_INTERVAL = 10 * 1000; //10 seconds
-    private static long FASTEST_INTERVAL = 10 * 1000; //5 second
+    private static long POLLING_FREQUENCY = 10 * 1000; //10 seconds
+    private static long FASTEST_POLLING_FREQUENCY = 10 * 1000; //5 second
     private static long DISPLACEMENT = 1; //meters //displacement takes precedent over interval/fastestInterval
     private static long STOP_SERVICE_TIME_LIMIT = 30 * 60 * 1000 * 60; // 30 minutes in seconds
     private static final long LOCATION_ACCURACY = 20; //within # meter accuracy
@@ -124,11 +123,11 @@ public class ActivityTracker extends AppCompatActivity
     public static ArrayList<ActivityDetail> mActivityDetailList = new ArrayList<>();
     private User mUser;
 
-    private static final LatLng MELBOURNE = new LatLng(-37.81319, 144.96298);
-    private static final LatLng SYDNEY = new LatLng(-33.87365, 151.20689);
-    private static final LatLng ADELAIDE = new LatLng(-34.92873, 138.59995);
-    private static final LatLng PERTH = new LatLng(-31.95285, 115.85734);
+    private static final float ZOOM_STREET_ROUTE = 15.0f;
+    private GoogleMap mGoogleMap;
+    private SupportMapFragment mMapFragment;
 
+    //TODO: DEBUG
     private static final LatLng HOME1 = new LatLng(34.143000, -118.077089);
     private static final LatLng HOME2 = new LatLng(34.143274, -118.077125);
     private static final LatLng HOME3 = new LatLng(34.143273, -118.076434);
@@ -136,19 +135,6 @@ public class ActivityTracker extends AppCompatActivity
     private static final LatLng HOME5 = new LatLng(34.142342, -118.078899);
     private static final LatLng HOME6 = new LatLng(34.143240, -118.078939);
     private static final LatLng HOME7 = new LatLng(34.143255, -118.077145);
-
-    private static final LatLng LHR = new LatLng(51.471547, -0.460052);
-    private static final LatLng LAX = new LatLng(33.936524, -118.377686);
-    private static final LatLng JFK = new LatLng(40.641051, -73.777485);
-    private static final LatLng AKL = new LatLng(-37.006254, 174.783018);
-
-    private static final float ZOOM_STREET_ROUTE = 15.0f;
-    private GoogleMap mGoogleMap;
-    private SupportMapFragment mMapFragment;
-
-    //SharedPreferences
-    //private static final String SHARED_PREFERENCES_LOGIN = "SHARED_PREFERENCES_LOGIN";
-    //SharedPreferences mSharedPreferences = getSharedPreferences(SHARED_PREFERENCES_LOGIN, 0);
 
     @Override
     public void onMapReady(GoogleMap map) {
@@ -181,30 +167,24 @@ public class ActivityTracker extends AppCompatActivity
         this.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_main);
 
-        //TODO: replace this with DB call or Application Preferences
-        mUser = new User();
-        mUser.setUserId(1);
-        mUser.setUserName("Lucy");
-        mUser.setIsAdmin(false);
-        mUser.setWeight(40);
-        mUser.setAvatarFileName("tiger");
-
         //display admin menu, if user is admin
         if(mUser.isAdmin()){
             findViewById(R.id.action_rewards).setVisibility(View.VISIBLE);
         }
 
-        //TODO: this came from Login screen, removing Login for now
-        //get userId out of the intent
-        /*
-        if(getIntent().getExtras().containsKey("userId"))
-            mUserId = getIntent().getExtras().getInt("userId");
-        */
-        //TODO: how to end this elegantly?
-        //if(!checkPlayServices()){
-        //    Toast.makeText(this, "You need to install Google Play Services for this app to work.", Toast.LENGTH_LONG);
-        //    finish();
-        //}
+        //end the activity if Google Play Services is not present
+        //redirect user to Google Play Services
+        if(!checkPlayServices()){
+            finish();
+
+            final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
+            try {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+            } catch (android.content.ActivityNotFoundException anfe) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+            }
+
+        }
 
 
         //wire up UI widgets
@@ -262,6 +242,16 @@ public class ActivityTracker extends AppCompatActivity
 
                     startRun();
 
+                }
+                else if (mStartButton.getText().equals(getResources().getString(R.string.restart))){
+
+                    //get timestamp of start
+                    mStartDate = new Date();
+
+                    startRun();
+
+                    mResults.setText("");
+
                 } else if (mStartButton.getText().equals(getResources().getString(R.string.stop))) {
 
                     //get timestamp of end
@@ -273,13 +263,15 @@ public class ActivityTracker extends AppCompatActivity
                     if (mUnitSplitCalorieList.size() > 1){
 
                         saveToDB();
+
+                        //display number of coins
+                        displayResults();
                     }
                     else{
-                        Toast.makeText(getApplicationContext(), "Not enough route information. Restart your activity.", Toast.LENGTH_LONG);
-                    }
+                        mResults.setText("Not enough route information. Restart your activity.");
+                        mStartButton.setText(getResources().getString(R.string.restart));
 
-                    //display number of coins
-                    displayResults();
+                    }
 
                 } else if (mStartButton.getText().equals(getResources().getString(R.string.done))) {
 
@@ -293,6 +285,15 @@ public class ActivityTracker extends AppCompatActivity
                 }
             }
         });
+    }
+
+    private void resetFields(){
+
+        mCoins.setText("0");
+        mDistance.setText("0");
+        mFeetPerMinute.setText("0");
+        mChronometer.setBase(SystemClock.elapsedRealtime());
+
     }
 
     private void initialize(){
@@ -329,15 +330,12 @@ public class ActivityTracker extends AppCompatActivity
     @Override
     public void onConnectionSuspended(int i) {
         //TODO: do something if connection suspended
-        //need to stop service, return back to Main and stop run
+        //let chronometer continue, user should get credit for activity
     }
 
     @Override
     public void onConnectionFailed(com.google.android.gms.common.ConnectionResult connectionResult) {
         //TODO: do something if connection failed
-        if (DEBUG) Log.d(LOG, "GoogleAPIClient Connection failed.");
-        GoogleApiConnectionFailure(GOOGLEAPI_CONNECTION_FAILURE + connectionResult.toString());
-
     }
 
     @Override
@@ -377,8 +375,8 @@ public class ActivityTracker extends AppCompatActivity
     //PERIODIC LOCATION UPDATES
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(UPDATE_INTERVAL);//get location updates every x seconds
-        mLocationRequest.setFastestInterval(FASTEST_INTERVAL);//not to exceed location updates every x seconds
+        mLocationRequest.setInterval(POLLING_FREQUENCY);//get location updates every x seconds
+        mLocationRequest.setFastestInterval(FASTEST_POLLING_FREQUENCY);//not to exceed location updates every x seconds
         //mLocationRequest.setSmallestDisplacement(DISPLACEMENT);// to avoid unnecessary updates, but we want to know if runner has not moved so no need to set a minimum distance displacement
         // TODO:  build a warning system or tracker autoshutoff
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -522,36 +520,6 @@ public class ActivityTracker extends AppCompatActivity
 
     }
 
-    private void saveCoins(int userId, int numberOfCoins){
-
-        //TODO: either cache coin count or save to DB
-        //get data from SharedPreferences
-        //SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-
-        SharedPreferences sharedPreferences = getSharedPreferences(Login.SHARED_PREFERENCES_MOVEIT, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        String commaDelimitedCoins = sharedPreferences.getString(RegisterUserFragment.SHARED_PREFERENCES_COINS, "");
-        List<String> coinList = new ArrayList<String>(Arrays.asList(commaDelimitedCoins.split(",")));
-
-        int currentCoins = 0;
-
-        //if userId is within range of the indices of the list
-        if(userId <= coinList.size() && userId >= 0){
-
-            //add coins earned to the current total
-            currentCoins = Integer.parseInt(coinList.get(userId));
-            coinList.set(userId, String.valueOf(numberOfCoins + currentCoins));
-
-            //convert back to comma-delimited string
-            commaDelimitedCoins = TextUtils.join(",", coinList);
-
-            //save in SharedPreferences
-            editor.putString(SHARED_PREFERENCES_COINS, commaDelimitedCoins);
-            editor.commit();
-        }
-    }
-
-
     //**********************************************************************************************
     //  onStart()
     //**********************************************************************************************
@@ -626,6 +594,10 @@ public class ActivityTracker extends AppCompatActivity
         //other apps may run concurrently, such as music player
 
         super.onPause();
+
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
     }
 
     //**********************************************************************************************
@@ -637,6 +609,10 @@ public class ActivityTracker extends AppCompatActivity
         if (DEBUG) Log.d(LOG, "onResume");
 
         super.onResume();
+
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.connect();
+        }
     }
 
     private void refreshData(){
@@ -664,14 +640,6 @@ public class ActivityTracker extends AppCompatActivity
     //**********************************************************************************************
     //  Message methods
     //**********************************************************************************************
-
-
-    private void GoogleApiConnectionFailure(String message){
-
-        String connectionResult = message.substring(LocationService.GOOGLEAPI_CONNECTION_FAILURE.length() - 1, (message.length() - 1));
-        String errorMessage = "Google Play Services connection failure: " + connectionResult + ". Try again.";
-        Toast.makeText(ActivityTracker.this, errorMessage, Toast.LENGTH_LONG);
-    }
 
     private void reachedTimeLimit(){
 
@@ -792,7 +760,7 @@ public class ActivityTracker extends AppCompatActivity
             }
 
             mGoogleMap.addPolyline((new PolylineOptions().addAll(locationList).color(Color.BLUE)));
-            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(HOME1, ZOOM_STREET_ROUTE/*Map.getZoomByDistance(getDistance(1))*/));
+            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(HOME1, Map.getZoomByDistance(getDistance(1))));
 
             //render markers
             addMarkersToMap(locationList.get(0), locationList.get(locationList.size() - 1));
