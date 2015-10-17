@@ -91,8 +91,9 @@ public class ActivityTracker extends AppCompatActivity
     private boolean mIsStatView = false;
 
     //LocationRequest settings
-    GoogleApiClient mGoogleApiClient;
-    LocationRequest mLocationRequest;
+    private GoogleApiClient mGoogleApiClient;
+    private LocationRequest mLocationRequest;
+    private Location mBestReading;
     private static long POLLING_FREQUENCY = 10 * 1000; //10 seconds
     private static long FASTEST_POLLING_FREQUENCY = 10 * 1000; //5 second
     private static long DISPLACEMENT = 1; //meters //displacement takes precedent over interval/fastestInterval
@@ -160,21 +161,11 @@ public class ActivityTracker extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         if (DEBUG) Log.d(LOG, "onCreate()");
-        initialize();
         super.onCreate(savedInstanceState);
-
-        //fix the orientation to portrait
-        this.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        setContentView(R.layout.activity_main);
-
-        //display admin menu, if user is admin
-        if(mUser.isAdmin()){
-            findViewById(R.id.action_rewards).setVisibility(View.VISIBLE);
-        }
 
         //end the activity if Google Play Services is not present
         //redirect user to Google Play Services
-        if(!checkPlayServices()){
+        if(!servicesAvailable()){
             finish();
 
             final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
@@ -186,6 +177,15 @@ public class ActivityTracker extends AppCompatActivity
 
         }
 
+        //fix the orientation to portrait
+        this.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        setContentView(R.layout.activity_main);
+
+        //display admin menu, if user is admin
+        if(mUser.isAdmin()){
+            findViewById(R.id.action_rewards).setVisibility(View.VISIBLE);
+        }
 
         //wire up UI widgets
         mStartButton = (Button)findViewById(R.id.startButton);
@@ -201,7 +201,6 @@ public class ActivityTracker extends AppCompatActivity
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mMapFragment.getMapAsync(this);
         mMapFragment.getView().setVisibility(View.INVISIBLE);
-
 
 
 
@@ -296,11 +295,6 @@ public class ActivityTracker extends AppCompatActivity
 
     }
 
-    private void initialize(){
-        if (DEBUG) Log.d (LOG, "initialize(): STARTING");
-        if (DEBUG) Log.d (LOG, "initialize(): COMPLETE");
-    }
-
     private void getRunData() {
 
         //create instance of LocationRequest
@@ -325,6 +319,37 @@ public class ActivityTracker extends AppCompatActivity
 
         //start getting location data after there is a connection
         startLocationUpdates();
+
+    }
+
+    //TODO:  may be able to utilize this to get a more accurage first data point
+    //reference:  http://www.adavis.info/2014/09/android-location-updates-with.html?m=1
+    private Location bestLastKnownLocation(float minAccuracy, long minTime) {
+        Location bestResult = null;
+        float bestAccuracy = Float.MAX_VALUE;
+        long bestTime = Long.MIN_VALUE;
+
+        // Get the best most recent location currently available
+        Location mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+        if (mCurrentLocation != null) {
+            float accuracy = mCurrentLocation.getAccuracy();
+            long time = mCurrentLocation.getTime();
+
+            if (accuracy < bestAccuracy) {
+                bestResult = mCurrentLocation;
+                bestAccuracy = accuracy;
+                bestTime = time;
+            }
+        }
+
+        // Return best reading or null
+        if (bestAccuracy > minAccuracy || bestTime < minTime) {
+            return null;
+        }
+        else {
+            return bestResult;
+        }
     }
 
     @Override
@@ -594,10 +619,6 @@ public class ActivityTracker extends AppCompatActivity
         //other apps may run concurrently, such as music player
 
         super.onPause();
-
-        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
-        }
     }
 
     //**********************************************************************************************
@@ -610,9 +631,6 @@ public class ActivityTracker extends AppCompatActivity
 
         super.onResume();
 
-        if (mGoogleApiClient != null) {
-            mGoogleApiClient.connect();
-        }
     }
 
     private void refreshData(){
@@ -852,7 +870,7 @@ public class ActivityTracker extends AppCompatActivity
     /**
      * Method to verify google play services on the device
      * */
-    private boolean checkPlayServices() {
+    private boolean servicesAvailable() {
         int resultCode = GooglePlayServicesUtil
                 .isGooglePlayServicesAvailable(this);
         if (resultCode != ConnectionResult.SUCCESS) {
