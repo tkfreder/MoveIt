@@ -1,6 +1,7 @@
 package com.tinakit.moveit.activity;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -55,6 +56,7 @@ import java.util.List;
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.utility.CalorieCalculator;
 import com.tinakit.moveit.model.ActivityDetail;
+import com.tinakit.moveit.utility.DialogUtility;
 import com.tinakit.moveit.utility.Map;
 import com.tinakit.moveit.utility.UnitConverter;
 
@@ -182,6 +184,7 @@ public class ActivityTracker extends AppCompatActivity
 
         setContentView(R.layout.activity_main);
 
+        //TODO:  do something with this check
         //display admin menu, if user is admin
         if(mUser.isAdmin()){
             findViewById(R.id.action_rewards).setVisibility(View.VISIBLE);
@@ -261,10 +264,24 @@ public class ActivityTracker extends AppCompatActivity
                     //save Activity Detail data
                     if (mUnitSplitCalorieList.size() > 1){
 
-                        saveToDB();
-
                         //display number of coins
                         displayResults();
+
+                        DialogUtility.displayConfirmDialog(getApplicationContext(), getString(R.string.save_this_activity),
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        saveToDB();
+                                    }
+                                },
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        //do nothing
+                                    }
+                                });
+
+
+
+
                     }
                     else{
                         mResults.setText("Not enough route information. Restart your activity.");
