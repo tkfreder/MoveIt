@@ -8,7 +8,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.tinakit.moveit.R;
-import com.tinakit.moveit.utility.Dialog;
+import com.tinakit.moveit.utility.DialogUtility;
 
 /**
  * Created by Tina on 10/4/2015.
@@ -63,7 +63,7 @@ public class Login extends AppCompatActivity{
                     //display new screen based on whether user is parent or child
                     //displayNewScreen(getActivity(), userId);
                 } else {
-                    Dialog.displayAlertDialog(getApplicationContext(), "Alert", "Your username/password is incorrect. Try again.", "OK");
+                    DialogUtility.displayAlertDialog(getApplicationContext(), "Alert", "Your username/password is incorrect. Try again.", "OK");
                 }
             }
         });

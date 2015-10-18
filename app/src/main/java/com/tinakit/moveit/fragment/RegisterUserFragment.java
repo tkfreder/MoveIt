@@ -20,13 +20,11 @@ import android.widget.Toast;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.Login;
-import com.tinakit.moveit.utility.Dialog;
+import com.tinakit.moveit.utility.DialogUtility;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by Tina on 7/3/2015.
@@ -69,7 +67,7 @@ public class RegisterUserFragment extends Fragment {
 
         if (getNumberOfUsers() == 0){
             mHeadingTextView.setText("SIGN IN (Parents Only)");
-            Dialog.displayAlertDialog(getActivity(), "Warning: Are you a parent?", "The first registered user must be a parent.", "OK");
+            DialogUtility.displayAlertDialog(getActivity(), "Warning: Are you a parent?", "The first registered user must be a parent.", "OK");
             mWeightLinearLayout.setVisibility(View.GONE);
         }
 
@@ -148,11 +146,11 @@ public class RegisterUserFragment extends Fragment {
 
     private boolean validateForm(){
         if(mUserNameEditText.getText().toString().trim().equals("") || mPasswordEditText.getText().toString().trim().equals("")){
-            Dialog.displayAlertDialog(getActivity(), "Incomplete form", "Please fill out Username and Password.", "OK");
+            DialogUtility.displayAlertDialog(getActivity(), "Incomplete form", "Please fill out Username and Password.", "OK");
             //mSubmitButton.setEnabled(false);
             return false;
         } else if (mWeightSpinner.getSelectedItemPosition() == 0 && getNumberOfUsers() != 0) {
-            Dialog.displayAlertDialog(getActivity(), "Incomplete form", "Please choose a Weight.", "OK");
+            DialogUtility.displayAlertDialog(getActivity(), "Incomplete form", "Please choose a Weight.", "OK");
             //mSubmitButton.setEnabled(false);
             return false;
         } else{

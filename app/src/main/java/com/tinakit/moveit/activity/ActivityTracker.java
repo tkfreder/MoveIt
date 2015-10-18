@@ -6,6 +6,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -61,7 +65,10 @@ import com.tinakit.moveit.utility.Map;
 import com.tinakit.moveit.utility.UnitConverter;
 
 public class ActivityTracker extends AppCompatActivity
-        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, OnMapReadyCallback {
+        implements GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        LocationListener, OnMapReadyCallback,
+        SensorEventListener {
 
     //DEBUG
     private static final String LOG = "MAIN_ACTIVITY";
@@ -139,6 +146,51 @@ public class ActivityTracker extends AppCompatActivity
     private static final LatLng HOME6 = new LatLng(34.143240, -118.078939);
     private static final LatLng HOME7 = new LatLng(34.143255, -118.077145);
 
+    //ACCELEROMETER
+    private SensorManager mSensorManager;
+    private Sensor sensorAccelerometer;
+
+    private long lastUpdate = 0;
+    private float last_x, last_y, last_z;
+    private static final int SHAKE_THRESHOLD = 600;
+
+
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+
+        Sensor mySensor = sensorEvent.sensor;
+
+        if (mySensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            float x = sensorEvent.values[0];
+            float y = sensorEvent.values[1];
+            float z = sensorEvent.values[2];
+
+            long curTime = System.currentTimeMillis();
+
+            if ((curTime - lastUpdate) > 100) {
+                long diffTime = (curTime - lastUpdate);
+                lastUpdate = curTime;
+
+                float speed = Math.abs(x + y + z - last_x - last_y - last_z)/ diffTime * 10000;
+
+                //check for inactivity, below shake threshold
+                if (speed < SHAKE_THRESHOLD) {
+
+                    //TODO:  pause the activity and display dialog asking if user want to continue tracking
+                }
+
+                last_x = x;
+                last_y = y;
+                last_z = z;
+            }
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
+
     @Override
     public void onMapReady(GoogleMap map) {
 
@@ -184,7 +236,16 @@ public class ActivityTracker extends AppCompatActivity
 
         setContentView(R.layout.activity_main);
 
-        //TODO:  do something with this check
+        //TODO:  replace this:  check UI multiselection of users, save the userid's in an array
+
+        //TODO: replace this with DB call or Application Preferences
+        mUser = new User();
+        mUser.setUserId(1);
+        mUser.setUserName("Lucy");
+        mUser.setIsAdmin(false);
+        mUser.setWeight(40);
+        mUser.setAvatarFileName("tiger");
+
         //display admin menu, if user is admin
         if(mUser.isAdmin()){
             findViewById(R.id.action_rewards).setVisibility(View.VISIBLE);
@@ -226,7 +287,6 @@ public class ActivityTracker extends AppCompatActivity
             //if(getIntent().getExtras().containsKey("username"))
         }
 
-
     //**********************************************************************************************
     //  onClickListeners
     //**********************************************************************************************
@@ -267,7 +327,7 @@ public class ActivityTracker extends AppCompatActivity
                         //display number of coins
                         displayResults();
 
-                        DialogUtility.displayConfirmDialog(getApplicationContext(), getString(R.string.save_this_activity),
+                        Dialog confirmDialog = DialogUtility.displayConfirmDialog(ActivityTracker.this, getString(R.string.save_this_activity),
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
                                         saveToDB();
@@ -279,7 +339,7 @@ public class ActivityTracker extends AppCompatActivity
                                     }
                                 });
 
-
+                        confirmDialog.show();
 
 
                     }
@@ -335,7 +395,7 @@ public class ActivityTracker extends AppCompatActivity
         //updateCache(LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient));
 
         //start getting location data after there is a connection
-        startLocationUpdates();
+        startServices();
 
     }
 
@@ -435,14 +495,40 @@ public class ActivityTracker extends AppCompatActivity
 
     }
 
+    //TODO: rename this method to reflect both operations
     //PERIODIC LOCATION UPDATES
-    protected void startLocationUpdates() {
+    protected void startServices() {
+
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+
+        //ACCELEROMETER
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        if (hasAccelerometer()) {
+            // success! we have an accelerometer
+
+            sensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            mSensorManager.registerListener(this, sensorAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        }
     }
 
-    protected void stopLocationUpdates() {
-        LocationServices.FusedLocationApi.removeLocationUpdates(
-                mGoogleApiClient, this);
+    private boolean hasAccelerometer(){
+
+        return mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null;
+    }
+
+    //TODO: rename this method to reflect both operations
+    protected void stopServices() {
+
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()){
+
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+
+        }
+
+        //unregister accelerometer
+        if(sensorAccelerometer != null)
+            mSensorManager.unregisterListener(this);
+
     }
 
     //**********************************************************************************************
@@ -464,8 +550,7 @@ public class ActivityTracker extends AppCompatActivity
 
     private void stopRun(){
 
-        if (mGoogleApiClient != null && mGoogleApiClient.isConnected())
-            stopLocationUpdates();
+        stopServices();
 
         mStartButton.setText(getString(R.string.done));
 

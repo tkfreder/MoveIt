@@ -90,5 +90,8 @@
     <string name="feet_per_minute">ft per min.</string>
     <string name="activity_history">ActivityHistory</string>
     <string name="reward_view">Reward View</string>
+    <string name="yes">Yes</string>
+    <string name="cancel">Cancel</string>
+    <string name="save_this_activity">Save this activity?</string>
 
 </resources>
