@@ -14,6 +14,7 @@ import android.location.Location;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -56,6 +57,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.utility.CalorieCalculator;
@@ -116,6 +121,9 @@ public class ActivityTracker extends AppCompatActivity
     private TextView mResults;
     private Button mStartButton;
     private Button mStopButton;
+    private Button mPauseButton;
+    private Button mSaveButton;
+    private Button mResumeButton;
     private TextView mActivityHeader;
     private static Chronometer mChronometer;
     private ImageView mActivityIcon;
@@ -132,6 +140,8 @@ public class ActivityTracker extends AppCompatActivity
     private Date mEndDate;
     public static ArrayList<ActivityDetail> mActivityDetailList = new ArrayList<>();
     private User mUser;
+    private long mTimeWhenPaused;
+    private boolean mSaveLocationData = false;
 
     private static final float ZOOM_STREET_ROUTE = 15.0f;
     private GoogleMap mGoogleMap;
@@ -149,10 +159,13 @@ public class ActivityTracker extends AppCompatActivity
     //ACCELEROMETER
     private SensorManager mSensorManager;
     private Sensor sensorAccelerometer;
+    private int ACCELEROMETER_DELAY = 60 * 5; //in seconds
+    ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+
 
     private long lastUpdate = 0;
     private float last_x, last_y, last_z;
-    private static final int SHAKE_THRESHOLD = 600;
+    private static final float SHAKE_THRESHOLD = 0.5f;
 
 
     @Override
@@ -176,7 +189,28 @@ public class ActivityTracker extends AppCompatActivity
                 //check for inactivity, below shake threshold
                 if (speed < SHAKE_THRESHOLD) {
 
-                    //TODO:  pause the activity and display dialog asking if user want to continue tracking
+                    playSound();
+
+                    pauseTracking();
+
+                    //disable accelerometer listener until user clicks on confirm dialog
+                    unregisterAccelerometer();
+
+                    Dialog confirmDialog = DialogUtility.displayConfirmDialog(ActivityTracker.this, getResources().getString(R.string.no_movement),
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+
+                                    resumeTracking();
+                                }
+                            },
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+
+                                    stopRun();
+                                }
+                            });
+
+                    confirmDialog.show();
                 }
 
                 last_x = x;
@@ -184,6 +218,36 @@ public class ActivityTracker extends AppCompatActivity
                 last_z = z;
             }
         }
+    }
+
+    private void pauseTracking(){
+
+        //set the flag to not save location data
+        mSaveLocationData = false;
+
+        //disable Accelerometer listener
+        unregisterAccelerometer();
+
+        //stop timer
+        mChronometer.stop();
+
+        //save current time
+        mTimeWhenPaused = mChronometer.getBase() - SystemClock.elapsedRealtime();
+    }
+
+    private void resumeTracking(){
+
+        //set flag to save location data
+        mSaveLocationData = true;
+
+        //start accelerometer listener, after a delay of 5 minutes
+        registerAccelerometer();
+
+        //reset time to the time when paused
+        mChronometer.setBase(SystemClock.elapsedRealtime() + mTimeWhenPaused);
+
+        //start timer
+        mChronometer.start();
     }
 
     @Override
@@ -219,7 +283,7 @@ public class ActivityTracker extends AppCompatActivity
 
         //end the activity if Google Play Services is not present
         //redirect user to Google Play Services
-        if(!servicesAvailable()){
+        if (!servicesAvailable()) {
             finish();
 
             final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
@@ -247,19 +311,23 @@ public class ActivityTracker extends AppCompatActivity
         mUser.setAvatarFileName("tiger");
 
         //display admin menu, if user is admin
-        if(mUser.isAdmin()){
+        if (mUser.isAdmin()) {
             findViewById(R.id.action_rewards).setVisibility(View.VISIBLE);
         }
 
         //wire up UI widgets
-        mStartButton = (Button)findViewById(R.id.startButton);
-        mResults = (TextView)findViewById(R.id.results);
-        mActivityHeader = (TextView)findViewById(R.id.activityHeader);
-        mChronometer = (Chronometer)findViewById(R.id.chronometer);
-        mActivityIcon = (ImageView)findViewById(R.id.activityType_icon);
-        mDistance = (TextView)findViewById(R.id.distance);
-        mCoins = (TextView)findViewById(R.id.coins);
-        mFeetPerMinute = (TextView)findViewById(R.id.feetPerMinute);
+        mStartButton = (Button) findViewById(R.id.startButton);
+        mStopButton = (Button) findViewById(R.id.stopButton);
+        mPauseButton = (Button) findViewById(R.id.pauseButton);
+        mSaveButton = (Button) findViewById(R.id.saveButton);
+        mResumeButton = (Button) findViewById(R.id.resumeButton);
+        mResults = (TextView) findViewById(R.id.results);
+        mActivityHeader = (TextView) findViewById(R.id.activityHeader);
+        mChronometer = (Chronometer) findViewById(R.id.chronometer);
+        mActivityIcon = (ImageView) findViewById(R.id.activityType_icon);
+        mDistance = (TextView) findViewById(R.id.distance);
+        mCoins = (TextView) findViewById(R.id.coins);
+        mFeetPerMinute = (TextView) findViewById(R.id.feetPerMinute);
 
         mMapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -267,11 +335,10 @@ public class ActivityTracker extends AppCompatActivity
         mMapFragment.getView().setVisibility(View.INVISIBLE);
 
 
-
         //TODO: get activity details from Preference Activity, to be displayed at the top of the screen
-        if(getIntent() != null){
+        if (getIntent() != null) {
 
-            if(getIntent().getExtras().containsKey("username") && getIntent().getExtras().containsKey("activity_type")){
+            if (getIntent().getExtras().containsKey("username") && getIntent().getExtras().containsKey("activity_type")) {
                 mActivityHeader.setText(getIntent().getExtras().getString("username") +
                         " " + getIntent().getExtras().getString("activity_type") +
                         " " + new SimpleDateFormat("EEEE h:mm a").format(new Date()));
@@ -280,87 +347,115 @@ public class ActivityTracker extends AppCompatActivity
 
             }
 
-            if(getIntent().getExtras().containsKey("activityTypeId")){
+            if (getIntent().getExtras().containsKey("activityTypeId")) {
                 mActivityTypeId = getIntent().getExtras().getInt("activityTypeId");
             }
             //if(getIntent().getExtras().containsKey("avatar_id"))
             //if(getIntent().getExtras().containsKey("username"))
         }
 
-    //**********************************************************************************************
-    //  onClickListeners
-    //**********************************************************************************************
-
+        //**********************************************************************************************
+        //  onClickListeners
+        //**********************************************************************************************
 
         mStartButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
+                //set flag to save location data
+                mSaveLocationData = true;
 
-                if (mStartButton.getText().equals(getResources().getString(R.string.go))) {
-                    // Perform action on click
-
-                    //get timestamp of start
-                    mStartDate = new Date();
-
-                    startRun();
-
-                }
-                else if (mStartButton.getText().equals(getResources().getString(R.string.restart))){
-
-                    //get timestamp of start
-                    mStartDate = new Date();
-
-                    startRun();
-
+                if (mStartButton.getText().equals(getResources().getString(R.string.restart))) {
                     mResults.setText("");
+                }
 
-                } else if (mStartButton.getText().equals(getResources().getString(R.string.stop))) {
+                //get timestamp of start
+                mStartDate = new Date();
 
-                    //get timestamp of end
-                    mEndDate = new Date();
+                //set button visibility
+                mStartButton.setVisibility(View.GONE);
+                mStopButton.setVisibility(View.VISIBLE);
+                mPauseButton.setVisibility(View.VISIBLE);
 
-                    stopRun();
+                startRun();
+            }
+        });
 
-                    //save Activity Detail data
-                    if (mUnitSplitCalorieList.size() > 1){
+        mStopButton.setOnClickListener(new View.OnClickListener() {
 
-                        //display number of coins
-                        displayResults();
+            public void onClick(View v) {
 
-                        Dialog confirmDialog = DialogUtility.displayConfirmDialog(ActivityTracker.this, getString(R.string.save_this_activity),
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        saveToDB();
-                                    }
-                                },
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        //do nothing
-                                    }
-                                });
+                //get timestamp of end
+                mEndDate = new Date();
 
-                        confirmDialog.show();
+                //set button visibility
+                mStopButton.setVisibility(View.GONE);
+                mPauseButton.setVisibility(View.GONE);
 
+                stopRun();
 
-                    }
-                    else{
-                        mResults.setText("Not enough route information. Restart your activity.");
-                        mStartButton.setText(getResources().getString(R.string.restart));
+                //save Activity Detail data
+                if (mUnitSplitCalorieList.size() > 1) {
 
-                    }
+                    mSaveButton.setVisibility(View.VISIBLE);
 
-                } else if (mStartButton.getText().equals(getResources().getString(R.string.done))) {
+                    //display number of coins
+                    displayResults();
 
-                    //destroy current activity
-                    finish();
-
-                    //display Activity history screen
-                    Intent intent = new Intent(getApplicationContext(), ActivityHistory.class);
-                    startActivity(intent);
+                } else {
+                    mResults.setText("Not enough route information. Restart your activity.");
+                    mStartButton.setText(getResources().getString(R.string.restart));
 
                 }
             }
         });
+
+
+        mPauseButton.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View v) {
+
+                pauseTracking();
+
+                //set button visibility
+                mPauseButton.setVisibility(View.GONE);
+                mResumeButton.setVisibility(View.VISIBLE);
+                mStopButton.setVisibility(View.VISIBLE);
+
+            }
+        });
+
+        mSaveButton.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View v) {
+
+                //save location data to database
+                saveToDB();
+
+                //destroy current activity
+                finish();
+
+                //display Activity history screen
+                Intent intent = new Intent(getApplicationContext(), ActivityHistory.class);
+                startActivity(intent);
+
+            }
+        });
+
+        mResumeButton.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View v) {
+
+                resumeTracking();
+
+                //set button visibility
+                mResumeButton.setVisibility(View.GONE);
+                mStopButton.setVisibility(View.VISIBLE);
+                mPauseButton.setVisibility(View.VISIBLE);
+
+            }
+        });
+
+
     }
 
     private void resetFields(){
@@ -372,13 +467,20 @@ public class ActivityTracker extends AppCompatActivity
 
     }
 
-    private void getRunData() {
+    //this method should be called once at start of run
+    //while stopServices should be called once at end of run
+    //do not call buildLocationRequest() and stopServices multiple times, difficult to trach asynchronous process
+    //use flag mSaveLocationData to determine whether to save data.  during Pause, set mSaveLocationData to false
+    private void buildLocationRequest() {
 
         //create instance of LocationRequest
         createLocationRequest();
 
-        //create instance of Google Play Services API client
-        buildGoogleApiClient();
+        //if connection doesn't exist
+        if (mGoogleApiClient == null) {
+            //create instance of Google Play Services API client
+            buildGoogleApiClient();
+        }
 
     }
 
@@ -446,14 +548,15 @@ public class ActivityTracker extends AppCompatActivity
 
         if (DEBUG) Log.d(LOG, "Accuracy: " + location.getAccuracy());
 
-        //only track data when it has high level of accuracy
-        if (isAccurate(location)){
+        //only track data when it has high level of accuracy && not Pause mode
+        if (isAccurate(location) && mSaveLocationData){
             //update cache
             updateCache(location);
 
             refreshData();
         }
 
+        //TODO: do we still want a time limit?
         if(getSecondsFromChronometer() > STOP_SERVICE_TIME_LIMIT && !mIsTimeLimit){
             mIsTimeLimit = true;
             reachedTimeLimit();
@@ -495,24 +598,18 @@ public class ActivityTracker extends AppCompatActivity
 
     }
 
-    //TODO: rename this method to reflect both operations
     //PERIODIC LOCATION UPDATES
     protected void startServices() {
 
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
 
-        //ACCELEROMETER
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        if (hasAccelerometer()) {
-            // success! we have an accelerometer
+        registerAccelerometer();
 
-            sensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-            mSensorManager.registerListener(this, sensorAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-        }
     }
 
     private boolean hasAccelerometer(){
 
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         return mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null;
     }
 
@@ -525,9 +622,40 @@ public class ActivityTracker extends AppCompatActivity
 
         }
 
+        unregisterAccelerometer();
+
+    }
+
+    private void registerAccelerometer(){
+
+        if (hasAccelerometer()) {
+            // success! we have an accelerometer
+
+            executor.schedule(new Runnable(){
+
+                @Override
+                public void run(){
+
+                    //mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+                    sensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+                    mSensorManager.registerListener(ActivityTracker.this, sensorAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+                }
+            }, ACCELEROMETER_DELAY, TimeUnit.SECONDS);
+
+        }
+
+    }
+
+    private void unregisterAccelerometer(){
+
         //unregister accelerometer
-        if(sensorAccelerometer != null)
+        if(sensorAccelerometer != null){
             mSensorManager.unregisterListener(this);
+
+            if (!executor.isTerminated())
+                executor.shutdownNow();
+
+        }
 
     }
 
@@ -538,9 +666,7 @@ public class ActivityTracker extends AppCompatActivity
     private void startRun(){
         mRequestedService = true;
 
-        getRunData();
-
-        mStartButton.setText(getResources().getString(R.string.stop));
+        buildLocationRequest();
 
         //chronometer settings, set base time right before starting the chronometer
         mChronometer.setBase(SystemClock.elapsedRealtime());
@@ -551,8 +677,6 @@ public class ActivityTracker extends AppCompatActivity
     private void stopRun(){
 
         stopServices();
-
-        mStartButton.setText(getString(R.string.done));
 
         //stop chronometer
         mChronometer.stop();
@@ -638,7 +762,6 @@ public class ActivityTracker extends AppCompatActivity
     private void displayResults(){
 
         mResults.setText("You earned " + mCoins.getText() + " coins!");
-
 
         displayMap(mUnitSplitCalorieList);
 
@@ -755,6 +878,10 @@ public class ActivityTracker extends AppCompatActivity
     protected void onDestroy() {
         if (DEBUG) Log.d(LOG, "onDestroy");
         super.onDestroy();
+
+        if(!executor.isTerminated()){
+            executor.shutdownNow();
+        }
     }
 
     //**********************************************************************************************

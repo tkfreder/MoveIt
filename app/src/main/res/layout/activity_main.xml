@@ -182,6 +182,12 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/buttonLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
     <Button
         android:id="@+id/startButton"
         android:layout_width="match_parent"
@@ -189,6 +195,47 @@
         android:layout_alignParentBottom="true"
         android:text="@string/go"
         />
+
+    <Button
+            android:id="@+id/stopButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_alignParentBottom="true"
+            android:text="Stop"
+            android:visibility="gone"
+            />
+    <Button
+            android:id="@+id/pauseButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_alignParentBottom="true"
+            android:text="Pause"
+            android:visibility="gone"
+            />
+
+    <Button
+            android:id="@+id/resumeButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_alignParentBottom="true"
+            android:text="Resume"
+            android:visibility="gone"
+            />
+
+    <Button
+            android:id="@+id/saveButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_alignParentBottom="true"
+            android:text="Save Activity"
+            android:visibility="gone"
+            />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/results"

@@ -61,7 +61,7 @@ public class RewardView extends AppCompatActivity {
             int minCoins = Integer.parseInt(mTotalCoins_textview.getText().toString());
             if (rewardList.get(0).getPoints() > minCoins){
                 mMessage = (TextView)findViewById(R.id.message);
-                mMessage.setText("You need " + String.valueOf(minCoins - rewardList.get(0).getPoints()) + " to get a reward.");
+                mMessage.setText("You need " + String.valueOf(rewardList.get(0).getPoints() - minCoins) + " more coins to get a reward.");
             }
         }
 
