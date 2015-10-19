@@ -564,6 +564,59 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         return locationList;
     }
 
+    public List<UnitSplitCalorie> getAllActivities(){
+
+        // Create and/or open the database for writing
+        SQLiteDatabase db = getReadableDatabase();
+
+        //initialize UnitSplitCalorie array
+        List<UnitSplitCalorie> locationList = new ArrayList<>();
+
+        try {
+
+            Cursor cursor = db.query(TABLE_ACTIVITY_LOCATION_DATA,
+                    new String[]{KEY_ACTIVITY_ID_FK, KEY_ACTIVITY_LOCATION_DATA_TIMESTAMP,KEY_ACTIVITY_LOCATION_DATA_LATITUDE,KEY_ACTIVITY_LOCATION_DATA_LONGITUDE,KEY_ACTIVITY_LOCATION_DATA_ALTITUDE,KEY_ACTIVITY_LOCATION_DATA_ACCURACY,KEY_ACTIVITY_LOCATION_DATA_BEARING},
+                    null, null, null, null, null);
+
+            try{
+
+                if (cursor.moveToFirst()) {
+
+                    do{
+                        Location location = new Location(LOCATION_PLACEHOLDER_PROVIDER);
+                        location.setLatitude(cursor.getFloat(cursor.getColumnIndex(KEY_ACTIVITY_LOCATION_DATA_LATITUDE)));
+                        location.setLongitude(cursor.getFloat(cursor.getColumnIndex(KEY_ACTIVITY_LOCATION_DATA_LONGITUDE)));
+                        location.setAltitude(cursor.getFloat(cursor.getColumnIndex(KEY_ACTIVITY_LOCATION_DATA_ALTITUDE)));
+
+                        UnitSplitCalorie unitSplitCalorie = new UnitSplitCalorie(new SimpleDateFormat(DATE_FORMAT).parse(cursor.getString(cursor.getColumnIndex(KEY_ACTIVITY_LOCATION_DATA_TIMESTAMP))), location);
+                        unitSplitCalorie.setAccuracy(cursor.getFloat(cursor.getColumnIndex(KEY_ACTIVITY_LOCATION_DATA_ACCURACY)));
+                        unitSplitCalorie.setActivityId(cursor.getInt(cursor.getColumnIndex(KEY_ACTIVITY_ID_FK)));
+                        unitSplitCalorie.setBearing(cursor.getFloat(cursor.getColumnIndex(KEY_ACTIVITY_LOCATION_DATA_BEARING)));
+                        locationList.add(unitSplitCalorie);
+                    }while (cursor.moveToNext());
+
+                }
+
+            }catch(Exception exception) {
+
+                exception.printStackTrace();
+
+            } finally{
+
+                if (cursor != null && !cursor.isClosed())
+                {
+                    cursor.close();
+                }
+            }
+
+        } catch (Exception e) {
+            Log.d(LOGTAG, "Error during getAllActivities()");
+        }
+
+        return locationList;
+    }
+
+
     /***********************************************************************************************
      REWARD Operations
      ***********************************************************************************************

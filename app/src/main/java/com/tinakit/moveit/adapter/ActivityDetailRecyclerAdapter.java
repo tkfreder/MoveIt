@@ -136,6 +136,7 @@ public class ActivityDetailRecyclerAdapter extends RecyclerView.Adapter<Activity
 
     @Override
     public ActivityDetailRecyclerAdapter.CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.activity_detail_list_item, viewGroup, false);
 
         CustomViewHolder viewHolder = new CustomViewHolder(view);

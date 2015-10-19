@@ -94,5 +94,6 @@
     <string name="yes">Yes</string>
     <string name="cancel">Cancel</string>
     <string name="save_this_activity">Save this activity?</string>
+    <string name="edit_activity">Edit Activity</string>
 
 </resources>

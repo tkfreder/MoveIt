@@ -45,6 +45,10 @@
             android:label="@string/activity_history" >
         </activity>
         <activity
+            android:name=".activity.EditActivity"
+            android:label="@string/edit_activity" >
+        </activity>
+        <activity
             android:name=".activity.RewardView"
             android:label="@string/reward_view" >
 
