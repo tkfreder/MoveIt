@@ -718,8 +718,25 @@ public class ActivityTracker extends AppCompatActivity
 
         if (activityId != -1){
 
-            for ( UnitSplitCalorie unitSplitCalorie : mUnitSplitCalorieList ) {
-                databaseHelper.insertActivityLocationData(activityId, mStartDate, unitSplitCalorie.getLocation().getLatitude(), unitSplitCalorie.getLocation().getLongitude(), unitSplitCalorie.getLocation().getAltitude(), unitSplitCalorie.getLocation().getAccuracy());
+            for ( int i = 0; i < mUnitSplitCalorieList.size(); i++) {
+
+                //calculate bearing for all data points except for last one, which will have the same bearing as the previous data point.
+                float bearing = 0f;
+
+                if(i < mUnitSplitCalorieList.size() - 1){
+
+                    Location current = mUnitSplitCalorieList.get(i).getLocation();
+                    Location next = mUnitSplitCalorieList.get(i+1).getLocation();
+                    bearing = current.bearingTo(next);
+                }
+
+                databaseHelper.insertActivityLocationData(activityId,
+                        mStartDate,
+                        mUnitSplitCalorieList.get(i).getLocation().getLatitude(),
+                        mUnitSplitCalorieList.get(i).getLocation().getLongitude(),
+                        mUnitSplitCalorieList.get(i).getLocation().getAltitude(),
+                        mUnitSplitCalorieList.get(i).getLocation().getAccuracy(),
+                        bearing);
             }
         }
 

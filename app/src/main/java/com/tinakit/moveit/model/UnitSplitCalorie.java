@@ -17,6 +17,7 @@ public class UnitSplitCalorie {
     private float mCalories;
     private float mAccuracy;
     private int mActivityId;
+    private float mBearing;//need subsequent location data point to calculate bearing
 
     public UnitSplitCalorie(Date timeStamp, Location location){
 
@@ -70,5 +71,13 @@ public class UnitSplitCalorie {
 
     public void setActivityId(int activityId) {
         mActivityId = activityId;
+    }
+
+    public float getBearing() {
+        return mBearing;
+    }
+
+    public void setBearing(float bearing) {
+        mBearing = bearing;
     }
 }
