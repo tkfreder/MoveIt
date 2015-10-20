@@ -54,19 +54,32 @@ public class EditActivityRecyclerAdapter extends RecyclerView.Adapter<EditActivi
 
         LatLng location = new LatLng(unitSplit.getLocation().getLatitude(), unitSplit.getLocation().getLongitude());
 
+        final LatLng SYDNEY = new LatLng(-33.87365, 151.20689);
 
+
+            customViewHolder.streetViewPanoramaFragment.getStreetViewPanoramaAsync(
+                    new OnStreetViewPanoramaReadyCallback(){
+                        @Override
+                        public void onStreetViewPanoramaReady(StreetViewPanorama streetViewPanorama) {
+
+                            streetViewPanorama.setPosition(SYDNEY);
+                        }
+                    });
+
+        /*
         SupportStreetViewPanoramaFragment streetViewPanoramaFragment =
                 (SupportStreetViewPanoramaFragment)
                         mEditActivity.getSupportFragmentManager().findFragmentById(R.id.streetviewpanorama);
         streetViewPanoramaFragment.getStreetViewPanoramaAsync(
                 new OnStreetViewPanoramaReadyCallback2(location));
+                */
 
 
     }
 
     public class OnStreetViewPanoramaReadyCallback2 implements OnStreetViewPanoramaReadyCallback{
 
-        private LatLng mLocation;
+        private final LatLng mLocation;
 
         public OnStreetViewPanoramaReadyCallback2(LatLng location){
             mLocation = location;
@@ -85,9 +98,14 @@ public class EditActivityRecyclerAdapter extends RecyclerView.Adapter<EditActivi
 
     public class CustomViewHolder extends RecyclerView.ViewHolder {
 
+        protected SupportStreetViewPanoramaFragment streetViewPanoramaFragment;
+
     public CustomViewHolder(View view) {
             super(view);
 
+        this.streetViewPanoramaFragment =
+                (SupportStreetViewPanoramaFragment)
+                        mEditActivity.getSupportFragmentManager().findFragmentById(R.id.streetviewpanorama);
         //do nothing for now.
 
         }

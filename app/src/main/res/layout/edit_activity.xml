@@ -74,6 +74,12 @@
                 android:layout_height="wrap_content"/>
         </LinearLayout>
 
+    <fragment
+        android:id="@+id/streetviewpanorama"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        class="com.google.android.gms.maps.SupportStreetViewPanoramaFragment"/>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"

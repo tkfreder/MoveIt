@@ -1,14 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:id="@+id/layout"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-                android:orientation="vertical">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
 
-    <fragment
-        android:id="@+id/streetviewpanorama"
+    <ImageView
+        android:id="@+id/streetView"
+        android:scaleType="fitCenter"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:src="@drawable/bunny"/>
+    <TextView
+        android:id="@+id/stats"
+        android:text="testing"
+        android:textSize="20sp"
+        android:textColor="@color/white"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        class="com.google.android.gms.maps.SupportStreetViewPanoramaFragment"/>
+        android:layout_marginTop="4dp"
+        android:gravity="center_horizontal"
 
-</LinearLayout>
+        />
+
+</FrameLayout>
