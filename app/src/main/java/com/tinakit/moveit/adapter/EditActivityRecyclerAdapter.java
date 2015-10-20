@@ -2,11 +2,13 @@ package com.tinakit.moveit.adapter;
 
 import android.content.Context;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.OnStreetViewPanoramaReadyCallback;
@@ -58,6 +60,8 @@ public class EditActivityRecyclerAdapter extends RecyclerView.Adapter<EditActivi
                         mEditActivity.getSupportFragmentManager().findFragmentById(R.id.streetviewpanorama);
         streetViewPanoramaFragment.getStreetViewPanoramaAsync(
                 new OnStreetViewPanoramaReadyCallback2(location));
+
+
     }
 
     public class OnStreetViewPanoramaReadyCallback2 implements OnStreetViewPanoramaReadyCallback{
@@ -81,14 +85,11 @@ public class EditActivityRecyclerAdapter extends RecyclerView.Adapter<EditActivi
 
     public class CustomViewHolder extends RecyclerView.ViewHolder {
 
-        protected ImageView streetView;
-        protected TextView streetName;
-
-        public CustomViewHolder(View view) {
+    public CustomViewHolder(View view) {
             super(view);
 
-            this.streetView = (ImageView)view.findViewById(R.id.streetView);
-            this.streetName = (TextView)view.findViewById(R.id.streetName);
+        //do nothing for now.
+
         }
     }
 }

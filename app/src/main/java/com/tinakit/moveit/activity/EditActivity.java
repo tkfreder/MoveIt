@@ -88,6 +88,7 @@ public class EditActivity extends AppCompatActivity {
 
             //button
             mRewardButton = (Button) findViewById(R.id.rewardButton);
+            /*
             mRewardButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -99,6 +100,7 @@ public class EditActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
             });
+            */
         }
 
         else {
