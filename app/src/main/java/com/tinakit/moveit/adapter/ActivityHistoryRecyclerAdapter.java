@@ -52,7 +52,6 @@ public class ActivityHistoryRecyclerAdapter  extends RecyclerView.Adapter<Activi
             Geocoder geocoder;
             List<Address> addresses;
 
-
             geocoder = new Geocoder(mContext, Locale.getDefault());
             addresses = geocoder.getFromLocation(mUnitList.get(i).getLocation().getLatitude(), mUnitList.get(i).getLocation().getLongitude(), 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
 
@@ -67,11 +66,9 @@ public class ActivityHistoryRecyclerAdapter  extends RecyclerView.Adapter<Activi
 
         customViewHolder.streetName.setText(address);
         Picasso.with(mContext)
-                //.load("https://maps.googleapis.com/maps/api/streetview?size=400x400&location=40.720032,-73.988354" +
-                //"&fov=90&heading=235&pitch=10" +
                 .load("https://maps.googleapis.com/maps/api/streetview?size=400x400&location=" + unitSplit.getLocation().getLatitude() + "," + unitSplit.getLocation().getLongitude() +
                         "&fov=90&heading=" + unitSplit.getBearing() + "&pitch=10" +
-                        "&key=AIzaSyC5IJ88NXWXdHNazquwM6O5EDaCZ3Daf5Y")
+                        "&key=AIzaSyC5IJ88NXWXdHNazquwM6O5EDaCZ3Daf5Y") //TODO: save API key in some config file
                         //.resize(50, 50)
                         //.centerCrop()
                 .into(customViewHolder.streetView);

@@ -32,7 +32,7 @@ public class ActivityHistory  extends AppCompatActivity {
 
         //TODO:  get Activity Detail history from DB
         FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(this);
-        unitList = databaseHelper.getAllActivities();
+        unitList = databaseHelper.getFirstLocationPoints();
 
         //RecyclerView
         // Initialize recycler view

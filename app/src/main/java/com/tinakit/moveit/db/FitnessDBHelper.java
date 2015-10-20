@@ -108,6 +108,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
     //VIEWS
     private static final String VIEW_REWARDSTATUS_USER = "RewardStatusUser";
+    private static final String VIEW_FIRST_LOCATION_POINTS = "FirstLocationPoints";
 
     private static Context mContext;
 
@@ -227,6 +228,16 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 " INNER JOIN " + TABLE_USERS + " u on u._id = ru.userId" +
                 " WHERE r." + KEY_REWARD_IS_ENABLED + " = 1";
 
+        String CREATE_VIEW_FIRST_LOCATION_POINTS = "CREATE VIEW " + VIEW_FIRST_LOCATION_POINTS + " AS" +
+                " SELECT " + KEY_ACTIVITY_LOCATION_DATA_TIMESTAMP +
+                "," + KEY_ACTIVITY_LOCATION_DATA_LATITUDE +
+                "," + KEY_ACTIVITY_LOCATION_DATA_LONGITUDE +
+                "," + KEY_ACTIVITY_LOCATION_DATA_ALTITUDE +
+                "," + KEY_ACTIVITY_LOCATION_DATA_ACCURACY +
+                "," + KEY_ACTIVITY_LOCATION_DATA_BEARING +
+                ", MIN(" + KEY_ACTIVITY_ID_FK + ") AS " + KEY_ACTIVITY_ID_FK +
+                " FROM " + TABLE_ACTIVITY_LOCATION_DATA +
+                " GROUP BY " + KEY_ACTIVITY_ID_FK;
 
         db.execSQL(CREATE_USERS_TABLE);
         db.execSQL(CREATE_ACTIVITY_TYPE_TABLE);
@@ -236,6 +247,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_REWARDS_TABLE);
         db.execSQL(CREATE_REWARDUSER_TABLE);
         db.execSQL(CREATE_VIEW_REWARDSTATUSUSER);
+        db.execSQL(CREATE_VIEW_FIRST_LOCATION_POINTS);
 
         //populate ActivityType table
         db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 4.6, '1995 world record, walking speed meters/second', 1,'walk',1);");
@@ -282,6 +294,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_REWARDS);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_REWARDUSER);
             db.execSQL("DROP VIEW IF EXISTS " + VIEW_REWARDSTATUS_USER);
+            db.execSQL("DROP VIEF IF EXISTS " + VIEW_FIRST_LOCATION_POINTS);
             onCreate(db);
 
         }
@@ -564,7 +577,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         return locationList;
     }
 
-    public List<UnitSplitCalorie> getAllActivities(){
+    public List<UnitSplitCalorie> getFirstLocationPoints(){
 
         // Create and/or open the database for writing
         SQLiteDatabase db = getReadableDatabase();
@@ -574,9 +587,14 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
         try {
 
-            Cursor cursor = db.query(TABLE_ACTIVITY_LOCATION_DATA,
-                    new String[]{KEY_ACTIVITY_ID_FK, KEY_ACTIVITY_LOCATION_DATA_TIMESTAMP,KEY_ACTIVITY_LOCATION_DATA_LATITUDE,KEY_ACTIVITY_LOCATION_DATA_LONGITUDE,KEY_ACTIVITY_LOCATION_DATA_ALTITUDE,KEY_ACTIVITY_LOCATION_DATA_ACCURACY,KEY_ACTIVITY_LOCATION_DATA_BEARING},
-                    null, null, null, null, null);
+            Cursor cursor = db.query(VIEW_FIRST_LOCATION_POINTS,
+                    new String[]{KEY_ACTIVITY_ID_FK,KEY_ACTIVITY_LOCATION_DATA_LATITUDE
+                            ,KEY_ACTIVITY_LOCATION_DATA_LONGITUDE
+                            ,KEY_ACTIVITY_LOCATION_DATA_ALTITUDE
+                            ,KEY_ACTIVITY_LOCATION_DATA_TIMESTAMP
+                            ,KEY_ACTIVITY_LOCATION_DATA_ACCURACY
+                            ,KEY_ACTIVITY_LOCATION_DATA_BEARING},
+                    null, null, null, null, KEY_ACTIVITY_LOCATION_DATA_TIMESTAMP);
 
             try{
 
