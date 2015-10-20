@@ -1,9 +1,5 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             android:padding="@dimen/activity_vertical_margin">
-
-    <LinearLayout android:layout_width="match_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:layout_width="match_parent"
                   android:layout_height="match_parent"
                   android:orientation="vertical">
         <Button
@@ -11,6 +7,56 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Go to Rewards"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal">
+        <TextView
+            android:id="@+id/startDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="startDate"/>
+
+        <TextView
+            android:id="@+id/streetName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="streetName"/>
+    </LinearLayout>
+
+        <!-- TODO: replace this with LinearLayout to hold multiple ImageViews of user avatars -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/participants"/>
+
+        <TextView
+            android:id="@+id/userList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/coins_earned"/>
+
+            <TextView
+                android:id="@+id/points"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -20,23 +66,18 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Total Coins: ">
-            </TextView>
+                android:text="@string/distance_in_feet"/>
+
             <TextView
-                android:id="@+id/coinTotal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-            </TextView>
-
+                android:id="@+id/distanceInFeet"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
         </LinearLayout>
-        <android.support.v7.widget.RecyclerView
-            xmlns:tools="http://schemas.android.com/tools"
-            android:id="@+id/recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true" />
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" />
 
-    </LinearLayout>
-
-</FrameLayout>
+</LinearLayout>

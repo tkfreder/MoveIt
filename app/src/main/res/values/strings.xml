@@ -95,5 +95,8 @@
     <string name="cancel">Cancel</string>
     <string name="save_this_activity">Save this activity?</string>
     <string name="edit_activity">Edit Activity</string>
+    <string name="coins_earned">Coins earned:</string>
+    <string name="distance_in_feet">Distance (ft.):</string>
+    <string name="participants">Participants:</string>
 
 </resources>

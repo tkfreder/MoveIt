@@ -441,6 +441,53 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         return activityId;
     }
 
+    public ActivityDetail getActivityDetail(int activityId){
+
+        // Create and/or open the database for writing
+        SQLiteDatabase db = getReadableDatabase();
+
+        //initialize ActivityDetail
+        ActivityDetail activityDetail = null;
+
+        try {
+
+            Cursor cursor = db.query(TABLE_ACTIVITIES,
+                    new String[]{KEY_ACTIVITY_ID, KEY_ACTIVITY_ACTIVITY_TYPE_ID_FK,KEY_ACTIVITY_START_DATE,KEY_ACTIVITY_END_DATE,KEY_ACTIVITY_POINTS_EARNED},
+                    KEY_ACTIVITY_ID + " = ?",
+                    new String[]{String.valueOf(activityId)}, null, null, KEY_ACTIVITY_START_DATE);
+
+            try{
+
+                if (cursor.moveToFirst())
+                {
+                    activityDetail = new ActivityDetail();
+                    activityDetail.setActivityId(cursor.getInt(cursor.getColumnIndex(KEY_ACTIVITY_ID)));
+                    activityDetail.setActivityTypeId(cursor.getInt(cursor.getColumnIndex(KEY_ACTIVITY_TYPE_ID)));
+                    activityDetail.setStartDate(new SimpleDateFormat(DATE_FORMAT).parse(cursor.getString(cursor.getColumnIndex(KEY_ACTIVITY_START_DATE))));
+                    activityDetail.setEndDate(new SimpleDateFormat(DATE_FORMAT).parse(cursor.getString(cursor.getColumnIndex(KEY_ACTIVITY_END_DATE))));
+                    activityDetail.setPointsEarned(cursor.getFloat(cursor.getColumnIndex(KEY_ACTIVITY_POINTS_EARNED)));
+
+                }
+
+            }catch(Exception exception) {
+
+                exception.printStackTrace();
+
+            } finally{
+
+                if (cursor != null && !cursor.isClosed())
+                {
+                    cursor.close();
+                }
+            }
+
+        } catch (Exception e) {
+            Log.d(LOGTAG, "Error during getActivityDetailList()");
+        }
+
+        return activityDetail;
+    }
+
     public List<ActivityDetail> getActivityDetailList(int userId){
 
         // Create and/or open the database for writing

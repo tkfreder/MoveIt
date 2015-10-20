@@ -17,6 +17,7 @@ import com.tinakit.moveit.R;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.UnitSplitCalorie;
 import com.tinakit.moveit.utility.Collections;
+import com.tinakit.moveit.utility.DateUtility;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -154,22 +155,11 @@ public class ActivityDetailRecyclerAdapter extends RecyclerView.Adapter<Activity
         // Populate data from ActivityDetail data object
         customViewHolder.activityId.setText(activityMap.get(activityDetail.getActivityId()));
 
-        //display day of the week for activities occurred in the last 7 days
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DATE, -7);
-        Date weekAgo = calendar.getTime();
 
         Date startDate = activityDetail.getStartDate();
         Date endDate = activityDetail.getEndDate();
 
-        if (startDate.after(weekAgo)){
-            customViewHolder.day.setText(new SimpleDateFormat("EEEE").format(startDate));
-        }
-        //otherwise, display the date of the activity
-        else {
-            customViewHolder.day.setText(new SimpleDateFormat("MM.dd.yy").format(startDate));
-        }
-
+        customViewHolder.day.setText(DateUtility.getDateFormattedRecent(startDate, 7));
         customViewHolder.time.setText(new SimpleDateFormat("h:mm a").format(startDate.getTime()));
 
         int secondsElapsed = (int)(endDate.getTime() - startDate.getTime())/1000;

@@ -12,9 +12,15 @@ import android.widget.TextView;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.adapter.ActivityDetailRecyclerAdapter;
+import com.tinakit.moveit.adapter.EditActivityRecyclerAdapter;
 import com.tinakit.moveit.db.FitnessDBHelper;
+import com.tinakit.moveit.model.ActivityDetail;
+import com.tinakit.moveit.model.UnitSplitCalorie;
 import com.tinakit.moveit.model.User;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -23,15 +29,20 @@ import java.util.List;
 public class EditActivity extends AppCompatActivity {
 
     //UI Widgets
-    private TextView mTotalCoins_textview;
-    private RecyclerView mRecyclerView;
     private Button mRewardButton;
 
 
-    private List<com.tinakit.moveit.model.ActivityDetail> mActivityDetailList;
-    private ActivityDetailRecyclerAdapter mActivityDetailRecyclerAdapter;
+    private ActivityDetail mActivityDetail;
+    private EditActivityRecyclerAdapter mEditActivityRecyclerAdapter;
+    private TextView mUserList;
+    private int mActivityId;
+    private TextView mPoints;
+    private TextView mDistance;
+    private RecyclerView mRecyclerView;
     private int mTotalCoins = 0;
     private User mUser;
+
+    FitnessDBHelper mDatabaseHelper;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,56 +52,60 @@ public class EditActivity extends AppCompatActivity {
         this.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.edit_activity);
 
-        //TODO: replace this with DB call or Application Preferences
-        mUser = new User();
-        mUser.setUserId(1);
-        mUser.setUserName("Lucy");
-        mUser.setIsAdmin(false);
-        mUser.setWeight(40);
-        mUser.setAvatarFileName("tiger");
+        if (getIntent() != null && getIntent().getExtras().containsKey("activityId")) {
 
-        //TODO:  get Activity Detail history from DB
-        FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(this);
-        mActivityDetailList = databaseHelper.getActivityDetailList(mUser.getUserId());
+            //save activityId
+            mActivityId = getIntent().getExtras().getInt("activityId");
 
-        //RecyclerView
-        // Initialize recycler view
-        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mActivityDetailRecyclerAdapter = new ActivityDetailRecyclerAdapter(this, mActivityDetailList);
-        mRecyclerView.setAdapter(mActivityDetailRecyclerAdapter);
+            //TODO:  get Activity Detail history from DB
+            mDatabaseHelper = FitnessDBHelper.getInstance(this);
+            mActivityDetail = mDatabaseHelper.getActivityDetail(mActivityId);
 
-        //display coin total
-        mTotalCoins_textview = (TextView)findViewById(R.id.coinTotal);
-        mTotalCoins = getCoinTotal();
-        mTotalCoins_textview.setText(String.valueOf(mTotalCoins));
+            if (mActivityDetail != null){
 
-        //button
-        mRewardButton = (Button)findViewById(R.id.rewardButton);
-        mRewardButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                mPoints = (TextView) findViewById(R.id.points);
+                mPoints.setText(String.valueOf(mActivityDetail.getPointsEarned()));
 
-                Intent intent = new Intent(getApplicationContext(),RewardView.class);
-                Bundle bundle = new Bundle();
-                bundle.putInt("total_coins", mTotalCoins);
-                intent.putExtras(bundle);
-                startActivity(intent);
+                mDistance = (TextView) findViewById(R.id.distanceInFeet);
+                mDistance.setText(String.valueOf(mActivityDetail.getDistanceInFeet()));
             }
-        });
+
+            //TODO: create DB table Activity_Users
+            mUserList = (TextView) findViewById(R.id.userList);
 
 
-    }
+            //RecyclerView
+            // Initialize recycler view
+            mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
-    private int getCoinTotal(){
+            List<UnitSplitCalorie> unitSplitList = new ArrayList<>();
+            unitSplitList = mDatabaseHelper.getActivityLocationData(mActivityId);
 
-        float totalCoins = 0;
 
-        for (com.tinakit.moveit.model.ActivityDetail activityDetail : mActivityDetailList){
+            mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+            mEditActivityRecyclerAdapter = new EditActivityRecyclerAdapter(this, unitSplitList, this);
+            mRecyclerView.setAdapter(mEditActivityRecyclerAdapter);
 
-            totalCoins += activityDetail.getPointsEarned();
+            //button
+            mRewardButton = (Button) findViewById(R.id.rewardButton);
+            mRewardButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    Intent intent = new Intent(getApplicationContext(), RewardView.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("total_coins", mTotalCoins);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                }
+            });
         }
 
-        return Math.round(totalCoins);
+        else {
+
+            startActivity(new Intent(this, ActivityHistory.class));
+        }
+
     }
+
 }
