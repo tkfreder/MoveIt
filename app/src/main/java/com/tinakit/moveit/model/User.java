@@ -70,4 +70,20 @@ public class User {
     public void setIsParticipant(boolean isParticipant) {
         mIsParticipant = isParticipant;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        User user = (User) o;
+
+        return !(mUserName != null ? !mUserName.equals(user.mUserName) : user.mUserName != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return mUserName != null ? mUserName.hashCode() : 0;
+    }
 }

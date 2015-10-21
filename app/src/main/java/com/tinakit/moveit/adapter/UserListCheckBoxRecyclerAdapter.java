@@ -11,9 +11,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.tinakit.moveit.R;
+import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,12 +27,12 @@ public class UserListCheckBoxRecyclerAdapter extends RecyclerView.Adapter<UserLi
     private List<User> mUserList;
     private ActivityDetail mActivityDetail;
 
-    public UserListCheckBoxRecyclerAdapter(Context context, List<User> userList, ActivityDetail activityDetail) {
+
+
+    public UserListCheckBoxRecyclerAdapter(Context context, ActivityDetail activityDetail) {
 
         mContext = context;
-        mUserList = userList;
         mActivityDetail = activityDetail;
-
     }
 
     @Override
@@ -44,6 +46,9 @@ public class UserListCheckBoxRecyclerAdapter extends RecyclerView.Adapter<UserLi
 
     @Override
     public void onBindViewHolder(final UserListCheckBoxRecyclerAdapter.CustomViewHolder customViewHolder, int i) {
+
+        FitnessDBHelper mDatabaseHelper = FitnessDBHelper.getInstance(mContext);
+        mUserList = mDatabaseHelper.getUsers();
 
         User user = mUserList.get(i);
 

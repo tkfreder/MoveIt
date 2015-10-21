@@ -332,7 +332,7 @@ public class ActivityTracker extends AppCompatActivity
 
         //user list checkboxes
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        UserListCheckBoxRecyclerAdapter mUserListCheckBoxRecyclerAdapter = new UserListCheckBoxRecyclerAdapter(ActivityTracker.this, userList, mActivityDetail);
+        UserListCheckBoxRecyclerAdapter mUserListCheckBoxRecyclerAdapter = new UserListCheckBoxRecyclerAdapter(ActivityTracker.this, mActivityDetail);
         mRecyclerView.setAdapter(mUserListCheckBoxRecyclerAdapter);
 
         mMapFragment =
