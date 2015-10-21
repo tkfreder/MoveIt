@@ -15,10 +15,12 @@ import com.google.android.gms.maps.OnStreetViewPanoramaReadyCallback;
 import com.google.android.gms.maps.StreetViewPanorama;
 import com.google.android.gms.maps.SupportStreetViewPanoramaFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.squareup.picasso.Picasso;
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.EditActivity;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.UnitSplitCalorie;
+import com.tinakit.moveit.utility.DateUtility;
 
 import java.util.List;
 
@@ -52,43 +54,17 @@ public class EditActivityRecyclerAdapter extends RecyclerView.Adapter<EditActivi
 
         UnitSplitCalorie unitSplit = mUnitSplitList.get(i);
 
-        LatLng location = new LatLng(unitSplit.getLocation().getLatitude(), unitSplit.getLocation().getLongitude());
+        customViewHolder.stats.setText("speed=" + String.format("%.0f", unitSplit.getSpeed()) + "mi/hr" + " calories=" + String.format("%.0f", unitSplit.getCalories()));
 
-        final LatLng SYDNEY = new LatLng(-33.87365, 151.20689);
-
-
-            customViewHolder.streetViewPanoramaFragment.getStreetViewPanoramaAsync(
-                    new OnStreetViewPanoramaReadyCallback(){
-                        @Override
-                        public void onStreetViewPanoramaReady(StreetViewPanorama streetViewPanorama) {
-
-                            streetViewPanorama.setPosition(SYDNEY);
-                        }
-                    });
-
-        /*
-        SupportStreetViewPanoramaFragment streetViewPanoramaFragment =
-                (SupportStreetViewPanoramaFragment)
-                        mEditActivity.getSupportFragmentManager().findFragmentById(R.id.streetviewpanorama);
-        streetViewPanoramaFragment.getStreetViewPanoramaAsync(
-                new OnStreetViewPanoramaReadyCallback2(location));
-                */
+        Picasso.with(mContext)
+                .load("https://maps.googleapis.com/maps/api/streetview?size=400x400&location=" + unitSplit.getLocation().getLatitude() + "," + unitSplit.getLocation().getLongitude() +
+                        "&fov=90&heading=" + unitSplit.getBearing() + "&pitch=10" +
+                        "&key=AIzaSyC5IJ88NXWXdHNazquwM6O5EDaCZ3Daf5Y") //TODO: save API key in some config file
+                        //.resize(50, 50)
+                        //.centerCrop()
+                .into(customViewHolder.streetView);
 
 
-    }
-
-    public class OnStreetViewPanoramaReadyCallback2 implements OnStreetViewPanoramaReadyCallback{
-
-        private final LatLng mLocation;
-
-        public OnStreetViewPanoramaReadyCallback2(LatLng location){
-            mLocation = location;
-        }
-        @Override
-        public void onStreetViewPanoramaReady(StreetViewPanorama streetViewPanorama) {
-
-            streetViewPanorama.setPosition(mLocation);
-        }
     }
 
     @Override
@@ -98,14 +74,14 @@ public class EditActivityRecyclerAdapter extends RecyclerView.Adapter<EditActivi
 
     public class CustomViewHolder extends RecyclerView.ViewHolder {
 
-        protected SupportStreetViewPanoramaFragment streetViewPanoramaFragment;
+        protected ImageView streetView;
+        protected TextView stats;
 
     public CustomViewHolder(View view) {
             super(view);
 
-        this.streetViewPanoramaFragment =
-                (SupportStreetViewPanoramaFragment)
-                        mEditActivity.getSupportFragmentManager().findFragmentById(R.id.streetviewpanorama);
+        this.streetView = (ImageView)view.findViewById(R.id.streetView);
+        this.stats = (TextView)view.findViewById(R.id.stats);
         //do nothing for now.
 
         }

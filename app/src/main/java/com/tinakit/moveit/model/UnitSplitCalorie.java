@@ -13,7 +13,7 @@ public class UnitSplitCalorie {
     //TODO: create DB table ActivityStats(activityId, userId, weight, minutes, speed, calories)
     private Date mTimeStamp;
     private Location mLocation;
-    private float mSpeed;
+    private float mSpeed; //miles per hour
     private float mCalories;
     private float mAccuracy;
     private int mActivityId;

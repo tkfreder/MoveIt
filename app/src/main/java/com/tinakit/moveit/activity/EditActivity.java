@@ -1,6 +1,7 @@
 package com.tinakit.moveit.activity;
 
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +11,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.OnStreetViewPanoramaReadyCallback;
+import com.google.android.gms.maps.StreetViewPanorama;
+import com.google.android.gms.maps.SupportStreetViewPanoramaFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.StreetViewPanoramaOrientation;
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.adapter.ActivityDetailRecyclerAdapter;
 import com.tinakit.moveit.adapter.EditActivityRecyclerAdapter;
@@ -17,6 +23,8 @@ import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.UnitSplitCalorie;
 import com.tinakit.moveit.model.User;
+import com.tinakit.moveit.utility.DateUtility;
+import com.tinakit.moveit.utility.Map;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -36,8 +44,11 @@ public class EditActivity extends AppCompatActivity {
     private EditActivityRecyclerAdapter mEditActivityRecyclerAdapter;
     private TextView mUserList;
     private int mActivityId;
+    private TextView mStartDate;
+    private TextView mStreetName;
     private TextView mPoints;
     private TextView mDistance;
+    private SupportStreetViewPanoramaFragment streetViewPanoramaFragment;
     private RecyclerView mRecyclerView;
     private int mTotalCoins = 0;
     private User mUser;
@@ -63,15 +74,35 @@ public class EditActivity extends AppCompatActivity {
 
             if (mActivityDetail != null){
 
+                mStartDate = (TextView)findViewById(R.id.startDate);
+                mStartDate.setText(DateUtility.getDateFormattedRecent(mActivityDetail.getStartDate(), 7));
+
+                mStreetName = (TextView)findViewById(R.id.streetName);
+                mStreetName.setText(Map.getStreetName(EditActivity.this, mActivityDetail.getStartLocation()));
+
                 mPoints = (TextView) findViewById(R.id.points);
-                mPoints.setText(String.valueOf(mActivityDetail.getPointsEarned()));
+                mPoints.setText(String.format("%.0f", mActivityDetail.getPointsEarned()));
 
                 mDistance = (TextView) findViewById(R.id.distanceInFeet);
-                mDistance.setText(String.valueOf(mActivityDetail.getDistanceInFeet()));
+                mDistance.setText(String.format("%.0f", mActivityDetail.getDistanceInFeet()));
             }
 
             //TODO: create DB table Activity_Users
             mUserList = (TextView) findViewById(R.id.userList);
+
+
+            StreetViewPanoramaOrientation.Builder builder = StreetViewPanoramaOrientation.builder().tilt(-10);
+
+            //streetview panorama
+            SupportStreetViewPanoramaFragment streetViewPanoramaFragment =
+                    (SupportStreetViewPanoramaFragment)
+                            getSupportFragmentManager().findFragmentById(R.id.streetviewpanorama);
+            streetViewPanoramaFragment.getStreetViewPanoramaAsync(new OnStreetViewPanoramaReadyCallback() {
+                @Override
+                public void onStreetViewPanoramaReady(StreetViewPanorama streetViewPanorama) {
+                    streetViewPanorama.setPosition(new LatLng(mActivityDetail.getStartLocation().latitude, mActivityDetail.getStartLocation().longitude));
+                 }
+            });
 
 
             //RecyclerView

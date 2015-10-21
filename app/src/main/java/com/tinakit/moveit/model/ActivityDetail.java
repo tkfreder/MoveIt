@@ -1,5 +1,7 @@
 package com.tinakit.moveit.model;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.util.Date;
 
 /**
@@ -10,6 +12,7 @@ public class ActivityDetail {
     private int mActivityId;
     private int mUserId;
     private int mActivityTypeId;
+    private LatLng mStartLocation;
     private Date mStartDate;  //"YYYY-MM-DD HH:MM:SS.SSS"
     private Date mEndDate;  //"YYYY-MM-DD HH:MM:SS.SSS"
     private float mDistanceInFeet;
@@ -40,6 +43,14 @@ public class ActivityDetail {
 
     public void setActivityTypeId(int activityTypeId) {
         mActivityTypeId = activityTypeId;
+    }
+
+    public LatLng getStartLocation() {
+        return mStartLocation;
+    }
+
+    public void setStartLocation(LatLng startLocation) {
+        mStartLocation = startLocation;
     }
 
     public Date getStartDate() {

@@ -703,7 +703,15 @@ public class ActivityTracker extends AppCompatActivity
         FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(getApplicationContext());
 
         //save Activity Detail (overall stats)
-        long activityId = databaseHelper.insertActivity(mUser.getUserId(), mActivityTypeId, mStartDate, mEndDate, getDistance(1), mTotalCalories, mTotalCoins);
+        long activityId = databaseHelper.insertActivity(mUser.getUserId()
+                ,mActivityTypeId
+                , (float)mUnitSplitCalorieList.get(0).getLocation().getLatitude()
+                , (float)mUnitSplitCalorieList.get(0).getLocation().getLongitude()
+                , mStartDate
+                , mEndDate
+                , getDistance(1)
+                , mTotalCalories
+                , mTotalCoins);
 
         if (activityId != -1){
 
@@ -720,27 +728,16 @@ public class ActivityTracker extends AppCompatActivity
                 }
 
                 databaseHelper.insertActivityLocationData(activityId,
-                        mStartDate,
-                        mUnitSplitCalorieList.get(i).getLocation().getLatitude(),
-                        mUnitSplitCalorieList.get(i).getLocation().getLongitude(),
-                        mUnitSplitCalorieList.get(i).getLocation().getAltitude(),
-                        mUnitSplitCalorieList.get(i).getLocation().getAccuracy(),
-                        bearing);
+                        mStartDate
+                        , mUnitSplitCalorieList.get(i).getLocation().getLatitude()
+                        , mUnitSplitCalorieList.get(i).getLocation().getLongitude()
+                        , mUnitSplitCalorieList.get(i).getLocation().getAltitude()
+                        , mUnitSplitCalorieList.get(i).getLocation().getAccuracy()
+                        , bearing
+                        , mUnitSplitCalorieList.get(i).getCalories()
+                        ,mUnitSplitCalorieList.get(i).getSpeed());
             }
         }
-
-        //TODO: debug - display the map based on location data just saved
-        List<UnitSplitCalorie> unitSplitList = databaseHelper.getActivityLocationData(activityId);
-
-        for (UnitSplitCalorie unitSplitCalorie : unitSplitList){
-            System.out.println("latitude = " + String.valueOf(unitSplitCalorie.getLocation().getLatitude()));
-            System.out.println("longitude = " + String.valueOf(unitSplitCalorie.getLocation().getLongitude()));
-            System.out.println("altitude = " + String.valueOf(unitSplitCalorie.getLocation().getAltitude()));
-            System.out.println("accuracy = " + String.valueOf(unitSplitCalorie.getAccuracy()));
-            System.out.println("activity id = " + String.valueOf(unitSplitCalorie.getActivityId()));
-            System.out.println("timeStamp = " + unitSplitCalorie.getTimeStamp());
-        }
-
     }
 
     //**********************************************************************************************

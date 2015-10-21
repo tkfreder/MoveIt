@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.squareup.picasso.Picasso;
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.ActivityTracker;
@@ -19,6 +20,7 @@ import com.tinakit.moveit.activity.EditActivity;
 import com.tinakit.moveit.model.ActivityType;
 import com.tinakit.moveit.model.UnitSplitCalorie;
 import com.tinakit.moveit.utility.DateUtility;
+import com.tinakit.moveit.utility.Map;
 
 import java.util.Date;
 import java.util.List;
@@ -51,27 +53,8 @@ public class ActivityHistoryRecyclerAdapter  extends RecyclerView.Adapter<Activi
     public void onBindViewHolder(ActivityHistoryRecyclerAdapter.CustomViewHolder customViewHolder, int i) {
 
         UnitSplitCalorie unitSplit = mUnitList.get(i);
-        String address = "";
 
-        try{
-
-            //get street name at location
-            Geocoder geocoder;
-            List<Address> addresses;
-
-            geocoder = new Geocoder(mContext, Locale.getDefault());
-            addresses = geocoder.getFromLocation(mUnitList.get(i).getLocation().getLatitude(), mUnitList.get(i).getLocation().getLongitude(), 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-
-            address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
-
-            //remove numbers
-            address = address.replaceAll("\\d","");
-
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-
-        customViewHolder.streetName.setText(DateUtility.getDateFormattedRecent(mUnitList.get(i).getTimeStamp(), 7) + " " +  address);
+        customViewHolder.streetName.setText(DateUtility.getDateFormattedRecent(unitSplit.getTimeStamp(), 7) + " " +  Map.getStreetName(mContext, new LatLng(unitSplit.getLocation().getLatitude(), unitSplit.getLocation().getLongitude())));
 
         Picasso.with(mContext)
                 .load("https://maps.googleapis.com/maps/api/streetview?size=400x400&location=" + unitSplit.getLocation().getLatitude() + "," + unitSplit.getLocation().getLongitude() +
