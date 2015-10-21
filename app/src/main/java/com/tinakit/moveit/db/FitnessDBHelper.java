@@ -281,14 +281,17 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
         //TODO: DUMMY DATA
         //populate Rewards table
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (1, 'cool treat', 25, 1);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (2, '$5 gift certificate', 50, 1);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (3, 'movie with friend', 100, 1);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (4, 'beach picnic', 150, 1);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (5, 'family roadtrip', 250, 1);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (1, 'cool treat', 1, 1);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (2, '$5 gift certificate', 3, 1);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (3, 'movie with friend', 5, 1);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (4, 'beach picnic', 7, 1);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (5, 'family roadtrip', 10, 1);");
 
         //TODO: DUMMY DATA
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Laura', 0, 50, 'bunny', 0);");
         db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Lucy', 0, 40, 'tiger', 0);");
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Alec', 0, 175, 'monkey', 0);");
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Tina', 0, 100, 'rat', 0);");
 
         //TODO: DUMMY DATA
         //TODO:  when adding User or Reward, ensure that RewardStatus gets populated with available rewards for that user
