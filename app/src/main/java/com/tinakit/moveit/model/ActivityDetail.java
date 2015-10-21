@@ -10,7 +10,6 @@ import java.util.Date;
 public class ActivityDetail {
 
     private int mActivityId;
-    private int mUserId;
     private int mActivityTypeId;
     private LatLng mStartLocation;
     private Date mStartDate;  //"YYYY-MM-DD HH:MM:SS.SSS"
@@ -27,14 +26,6 @@ public class ActivityDetail {
 
     public void setActivityId(int activityId) {
         mActivityId = activityId;
-    }
-
-    public int getUserId() {
-        return mUserId;
-    }
-
-    public void setUserId(int userId) {
-        mUserId = userId;
     }
 
     public int getActivityTypeId() {

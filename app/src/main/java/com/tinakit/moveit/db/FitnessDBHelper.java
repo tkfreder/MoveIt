@@ -178,7 +178,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         String CREATE_ACTIVITIES_TABLE = "CREATE TABLE " + TABLE_ACTIVITIES +
                 "(" +
                 KEY_ACTIVITY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // Define a primary key
-                KEY_ACTIVITY_USER_ID_FK + " INTEGER REFERENCES " + TABLE_USERS + "," + // Define a foreign key
                 KEY_ACTIVITY_ACTIVITY_TYPE_ID_FK + " INTEGER REFERENCES " + TABLE_ACTIVITY_TYPE + "," + // Define a foreign key
                 KEY_ACTIVITY_START_LATITUDE  + " REAL, " +
                 KEY_ACTIVITY_START_LONGITUDE  + " REAL, " +
@@ -417,7 +416,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
      ***********************************************************************************************
      */
 
-    public long insertActivity(int userId, int activityTypeId, float startLatitude, float startLongitude, Date startDate, Date endDate, float distanceInFeet, float calories, float points){
+    public long insertActivity(int activityTypeId, float startLatitude, float startLongitude, Date startDate, Date endDate, float distanceInFeet, float calories, float points){
 
         long activityId = -1;
 
@@ -430,7 +429,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         try {
 
             ContentValues values = new ContentValues();
-            values.put(KEY_ACTIVITY_USER_ID_FK, userId);
             values.put(KEY_ACTIVITY_ACTIVITY_TYPE_ID_FK, activityTypeId);
             values.put(KEY_ACTIVITY_START_LATITUDE, startLatitude);
             values.put(KEY_ACTIVITY_START_LONGITUDE, startLongitude);

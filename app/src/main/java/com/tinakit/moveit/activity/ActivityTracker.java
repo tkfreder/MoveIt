@@ -703,8 +703,7 @@ public class ActivityTracker extends AppCompatActivity
         FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(getApplicationContext());
 
         //save Activity Detail (overall stats)
-        long activityId = databaseHelper.insertActivity(mUser.getUserId()
-                ,mActivityTypeId
+        long activityId = databaseHelper.insertActivity(mActivityTypeId
                 , (float)mUnitSplitCalorieList.get(0).getLocation().getLatitude()
                 , (float)mUnitSplitCalorieList.get(0).getLocation().getLongitude()
                 , mStartDate
