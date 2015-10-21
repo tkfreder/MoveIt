@@ -2,7 +2,9 @@ package com.tinakit.moveit.model;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Tina on 9/22/2015.
@@ -10,6 +12,7 @@ import java.util.Date;
 public class ActivityDetail {
 
     private int mActivityId;
+    private List<User> mUserList;
     private int mActivityTypeId;
     private LatLng mStartLocation;
     private Date mStartDate;  //"YYYY-MM-DD HH:MM:SS.SSS"
@@ -18,7 +21,10 @@ public class ActivityDetail {
     private float mCalories;
     private float mPointsEarned;
 
-    public ActivityDetail(){}
+    public ActivityDetail(){
+
+        mUserList = new ArrayList<>();
+    }
 
     public int getActivityId() {
         return mActivityId;
@@ -30,6 +36,31 @@ public class ActivityDetail {
 
     public int getActivityTypeId() {
         return mActivityTypeId;
+    }
+
+    public void addUser(User user){
+
+        mUserList.add(user);
+    }
+
+    public void removeUser(User user){
+
+        mUserList.remove(user);
+    }
+
+    public List<User> getUserList(){
+
+        return mUserList;
+    }
+
+    public boolean hasUser(User user){
+
+        return mUserList.contains(user);
+    }
+
+    public void setUserList(List<User> userList){
+
+        mUserList = userList;
     }
 
     public void setActivityTypeId(int activityTypeId) {

@@ -11,6 +11,7 @@ public class User {
     private float mWeight;
     private String mAvatarFileName;
     private int mPoints;
+    private boolean mIsParticipant;
 
     public User(){}
 
@@ -60,5 +61,13 @@ public class User {
 
     public void setPoints(int points) {
         mPoints = points;
+    }
+
+    public boolean isParticipant() {
+        return mIsParticipant;
+    }
+
+    public void setIsParticipant(boolean isParticipant) {
+        mIsParticipant = isParticipant;
     }
 }

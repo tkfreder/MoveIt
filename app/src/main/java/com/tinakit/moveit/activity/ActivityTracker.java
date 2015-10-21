@@ -16,6 +16,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -39,7 +41,10 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.tinakit.moveit.adapter.EditActivityRecyclerAdapter;
+import com.tinakit.moveit.adapter.UserListCheckBoxRecyclerAdapter;
 import com.tinakit.moveit.db.FitnessDBHelper;
+import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.ActivityType2;
 import com.tinakit.moveit.model.UnitSplitCalorie;
 import com.tinakit.moveit.model.User;
@@ -119,15 +124,10 @@ public class ActivityTracker extends AppCompatActivity
     private TextView mDistance;
     private TextView mCoins;
     private TextView mFeetPerMinute;
+    private RecyclerView mRecyclerView;
 
     //local cache
-    private float mTotalCoins = 0f;
-    private int mActivityTypeId = -1;
-    private int mUserId;
-    private float mTotalCalories = 0;
-    private Date mStartDate;
-    private Date mEndDate;
-    public static ArrayList<com.tinakit.moveit.model.ActivityDetail> mActivityDetailList = new ArrayList<>();
+    private ActivityDetail mActivityDetail = new ActivityDetail();
     private User mUser;
     private long mTimeWhenPaused;
     private boolean mSaveLocationData = false;
@@ -318,6 +318,23 @@ public class ActivityTracker extends AppCompatActivity
         mCoins = (TextView) findViewById(R.id.coins);
         mFeetPerMinute = (TextView) findViewById(R.id.feetPerMinute);
 
+        //RecyclerView
+        // Initialize recycler view
+        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+
+        //get user list
+        List<User> userList = new ArrayList<>();
+        FitnessDBHelper mDatabaseHelper = FitnessDBHelper.getInstance(this);
+        userList = mDatabaseHelper.getUsers();
+
+        //store user list in ActivityDetail
+        mActivityDetail.setUserList(userList);
+
+        //user list checkboxes
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        UserListCheckBoxRecyclerAdapter mUserListCheckBoxRecyclerAdapter = new UserListCheckBoxRecyclerAdapter(ActivityTracker.this, userList, mActivityDetail);
+        mRecyclerView.setAdapter(mUserListCheckBoxRecyclerAdapter);
+
         mMapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mMapFragment.getMapAsync(this);
@@ -337,7 +354,7 @@ public class ActivityTracker extends AppCompatActivity
             }
 
             if (getIntent().getExtras().containsKey("activityTypeId")) {
-                mActivityTypeId = getIntent().getExtras().getInt("activityTypeId");
+                mActivityDetail.setActivityTypeId(getIntent().getExtras().getInt("activityTypeId"));
             }
             //if(getIntent().getExtras().containsKey("avatar_id"))
             //if(getIntent().getExtras().containsKey("username"))
@@ -358,7 +375,7 @@ public class ActivityTracker extends AppCompatActivity
                 }
 
                 //get timestamp of start
-                mStartDate = new Date();
+                mActivityDetail.setStartDate(new Date());
 
                 //set button visibility
                 mStartButton.setVisibility(View.GONE);
@@ -374,7 +391,7 @@ public class ActivityTracker extends AppCompatActivity
             public void onClick(View v) {
 
                 //get timestamp of end
-                mEndDate = new Date();
+                mActivityDetail.setEndDate(new Date());
 
                 //set button visibility
                 mStopButton.setVisibility(View.GONE);
@@ -703,16 +720,24 @@ public class ActivityTracker extends AppCompatActivity
         FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(getApplicationContext());
 
         //save Activity Detail (overall stats)
-        long activityId = databaseHelper.insertActivity(mActivityTypeId
+        long activityId = databaseHelper.insertActivity(mActivityDetail.getActivityTypeId()
                 , (float)mUnitSplitCalorieList.get(0).getLocation().getLatitude()
                 , (float)mUnitSplitCalorieList.get(0).getLocation().getLongitude()
-                , mStartDate
-                , mEndDate
+                , mActivityDetail.getStartDate()
+                , mActivityDetail.getEndDate()
                 , getDistance(1)
-                , mTotalCalories
-                , mTotalCoins);
+                , mActivityDetail.getCalories()
+                , mActivityDetail.getPointsEarned());
 
         if (activityId != -1){
+
+            //create arraylist of userIds
+            List<Integer> userIdList = new ArrayList<>();
+            for (User user : mActivityDetail.getUserList())
+                    userIdList.add(user.getUserId());
+
+            //track participants for this activity: save userIds for this activityId
+            int rowsAffected = databaseHelper.insertActivityUsers(activityId, userIdList);
 
             for ( int i = 0; i < mUnitSplitCalorieList.size(); i++) {
 
@@ -726,8 +751,8 @@ public class ActivityTracker extends AppCompatActivity
                     bearing = current.bearingTo(next);
                 }
 
-                databaseHelper.insertActivityLocationData(activityId,
-                        mStartDate
+                databaseHelper.insertActivityLocationData(activityId
+                        , mActivityDetail.getStartDate()
                         , mUnitSplitCalorieList.get(i).getLocation().getLatitude()
                         , mUnitSplitCalorieList.get(i).getLocation().getLongitude()
                         , mUnitSplitCalorieList.get(i).getLocation().getAltitude()
@@ -949,12 +974,10 @@ public class ActivityTracker extends AppCompatActivity
             refreshUnitSplitCalorie();
 
             //number of coins earned
-            //int totalCoins = (int) (distanceFeet * FEET_COIN_CONVERSION);
-            //int totalCoins = Math.round(mTotalCalories * CALORIE_COIN_CONVERSION);
-            float totalCoins =  mTotalCalories * CALORIE_COIN_CONVERSION;
+            float totalCoins =  mActivityDetail.getCalories() * CALORIE_COIN_CONVERSION;
 
             //compare previous totalCoins to current one
-            float delta = totalCoins - mTotalCoins;
+            float delta = totalCoins - mActivityDetail.getPointsEarned();
 
             if(delta > 0 ){
                 playSound();
@@ -964,7 +987,7 @@ public class ActivityTracker extends AppCompatActivity
             mCoins.setText(String.format("%d", Math.round(totalCoins)));
 
             //save latest total number of coins
-            mTotalCoins = totalCoins;
+            mActivityDetail.setPointsEarned(totalCoins);
 
         }
     }
@@ -974,7 +997,7 @@ public class ActivityTracker extends AppCompatActivity
 
         //TODO: how to handle the first split, first data point is captured up to 4 seconds after the run starts.
 
-        mTotalCalories = 0f;
+        mActivityDetail.setCalories(0.0f);
 
             for ( int i = 0 ; i < mUnitSplitCalorieList.size() - 1; i++ ){
 
@@ -989,7 +1012,7 @@ public class ActivityTracker extends AppCompatActivity
                 mUnitSplitCalorieList.get(i).setSpeed(speed);
 
                 //add to total calories
-                mTotalCalories += calorie;
+                mActivityDetail.setCalories(mActivityDetail.getCalories() + calorie);
             }
     }
 
@@ -1072,7 +1095,7 @@ public class ActivityTracker extends AppCompatActivity
 
         float calorie = 0f;
 
-        switch (mActivityTypeId){
+        switch (mActivityDetail.getActivityId()){
 
             case 1:
                 calorie = CalorieCalculator.getCalorieByRun(weight, minutes, speed);

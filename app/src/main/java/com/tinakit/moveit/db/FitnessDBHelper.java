@@ -51,6 +51,12 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     private static final String KEY_LOCATION_ACCURACY = "accuracy";
     private static final String  KEY_LOCATION_CREATED_DATE = "createdDate";
 
+    //ACTIVITY_USERS TABLE
+    private static final String TABLE_ACTIVITY_USERS = "ActivityUsers";
+    private static final String KEY_ACTIVITY_USERS_ID = "_id";
+    private static final String KEY_ACTIVITY_USERS_ACTIVITY_ID = "activityId";
+    private static final String KEY_ACTIVITY_USERS_USER_ID = "userId";
+
     //USERS TABLE
     private static final String TABLE_USERS = "Users";
     private static final String KEY_USER_ID = "_id";
@@ -165,6 +171,13 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 KEY_USER_POINTS + " INTEGER" +
                 ")";
 
+        String CREATE_ACTIVITY_USERS_TABLE = "CREATE TABLE " + TABLE_ACTIVITY_USERS +
+                "(" +
+                KEY_ACTIVITY_USERS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // Define a primary key
+                KEY_ACTIVITY_USERS_ACTIVITY_ID + " INTEGER, " +
+                KEY_ACTIVITY_USERS_USER_ID  + " INTEGER " +
+                ")";
+
         String CREATE_ACTIVITY_TYPE_TABLE = "CREATE TABLE " + TABLE_ACTIVITY_TYPE +
                 "(" +
                 KEY_ACTIVITY_TYPE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // Define a primary key
@@ -248,6 +261,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 " GROUP BY " + KEY_ACTIVITY_ID_FK;
 
         db.execSQL(CREATE_USERS_TABLE);
+        db.execSQL(CREATE_ACTIVITY_USERS_TABLE);
         db.execSQL(CREATE_ACTIVITY_TYPE_TABLE);
         db.execSQL(CREATE_ACTIVITIES_TABLE);
         db.execSQL(CREATE_ACTIVITY_LOCATION_DATA_TABLE);
@@ -295,6 +309,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             // Simplest implementation is to drop all old tables and recreate them
 
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACTIVITY_USERS);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACTIVITY_TYPE);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACTIVITIES);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACTIVITY_LOCATION_DATA);
@@ -338,6 +353,50 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         } finally {
             db.endTransaction();
         }
+    }
+
+    public List<User> getUsers()
+    {
+        // Create and/or open the database for writing
+        SQLiteDatabase db = getReadableDatabase();
+
+        List<User> userList = new ArrayList<>();
+
+        try {
+
+            Cursor cursor = db.query(TABLE_USERS,
+                    new String[]{KEY_USER_ID, KEY_USER_NAME, KEY_USER_IS_ADMIN, KEY_USER_WEIGHT, KEY_USER_AVATAR_FILENAME, KEY_USER_POINTS},
+                    null, null, null, null, KEY_USER_ID);
+
+            try{
+
+                if (cursor.moveToFirst())
+                {
+                    do{
+                        User user = new User();
+                        user.setUserId(cursor.getInt(cursor.getColumnIndex(KEY_USER_ID)));
+                        user.setUserName(cursor.getString(cursor.getColumnIndex(KEY_USER_NAME)));
+                        user.setIsAdmin(cursor.getInt(cursor.getColumnIndex(KEY_USER_IS_ADMIN)) > 0 ? true : false);
+                        user.setWeight(cursor.getFloat(cursor.getColumnIndex(KEY_USER_WEIGHT)));
+                        user.setAvatarFileName(cursor.getString(cursor.getColumnIndex(KEY_USER_AVATAR_FILENAME)));
+                        user.setPoints(cursor.getInt(cursor.getColumnIndex(KEY_USER_POINTS)));
+                        userList.add(user);
+                    }while (cursor.moveToNext());
+                }
+
+            } finally{
+
+                if (cursor != null && !cursor.isClosed())
+                {
+                    cursor.close();
+                }
+            }
+
+        } catch (Exception e) {
+            Log.d(LOGTAG, "Error while trying to get user to database");
+        }
+
+        return userList;
     }
 
     public User getUser(String userName)
@@ -410,6 +469,49 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         else
             return false;
     }
+
+
+    /***********************************************************************************************
+     ACTIVITY_USERS Operations
+     ***********************************************************************************************
+     */
+
+    public int insertActivityUsers(long activityId, List<Integer> userIdList){
+
+        int rowsAffected = 0;
+
+        // Create and/or open the database for writing
+        SQLiteDatabase db = getWritableDatabase();
+
+        for (Integer userId : userIdList){
+
+            // It's a good idea to wrap our insert in a transaction. This helps with performance and ensures
+            // consistency of the database.
+            db.beginTransaction();
+
+            try {
+
+                ContentValues values = new ContentValues();
+                values.put(KEY_ACTIVITY_USERS_ACTIVITY_ID, activityId);
+                values.put(KEY_ACTIVITY_USERS_USER_ID, userId);
+
+                // Notice how we haven't specified the primary key. SQLite auto increments the primary key column.
+                if (db.insertOrThrow(TABLE_ACTIVITY_USERS, null, values) != -1)
+                    rowsAffected++;
+
+                db.setTransactionSuccessful();
+            } catch (Exception e) {
+                Log.d(LOGTAG, "Error during insertActivity()");
+            } finally {
+                db.endTransaction();
+            }
+
+        }
+
+        return rowsAffected;
+    }
+
+
 
     /***********************************************************************************************
      ACTIVITY Operations
