@@ -119,19 +119,16 @@ public class EditActivity extends AppCompatActivity {
 
             //button
             mRewardButton = (Button) findViewById(R.id.rewardButton);
-            /*
+
             mRewardButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
                     Intent intent = new Intent(getApplicationContext(), RewardView.class);
-                    Bundle bundle = new Bundle();
-                    bundle.putInt("total_coins", mTotalCoins);
-                    intent.putExtras(bundle);
                     startActivity(intent);
                 }
             });
-            */
+
         }
 
         else {
