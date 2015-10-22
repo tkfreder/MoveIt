@@ -31,19 +31,16 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
     public static List<Reward> mRewardList;
     FitnessDBHelper mDatabaseHelper;
     private User mUser;
-    private int mTotalPoints;
-    private int mUserId;
 
-    public RewardRecyclerAdapter(Context context, int totalPoints, int userId) {
+    public RewardRecyclerAdapter(Context context, User user) {
         mContext = context;
-        mUser.setPoints(totalPoints);
-        mUserId = userId;
+        mUser = user;
 
         // Get singleton instance of database
         mDatabaseHelper = FitnessDBHelper.getInstance(context);
 
         // Get Activity Types
-        mRewardList = mDatabaseHelper.getUserRewards(userId);
+        mRewardList = mDatabaseHelper.getUserRewards(mUser.getUserId());
     }
 
     @Override
@@ -80,7 +77,7 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
                     mDatabaseHelper.updateUser(mUser);
 
                     //update the reward status
-                    mDatabaseHelper.setRewardStatus(mUserId, reward.getRewardId(), RewardStatusType.PENDING);
+                    mDatabaseHelper.setRewardStatus(mUser.getUserId(), reward.getRewardId(), RewardStatusType.PENDING);
 
                 }
                 else if (button.getText().equals("Cancel")){
@@ -92,7 +89,7 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
                     mDatabaseHelper.updateUser(mUser);
 
                     //update the reward status
-                    mDatabaseHelper.setRewardStatus(mUserId, reward.getRewardId(), RewardStatusType.AVAILABLE);
+                    mDatabaseHelper.setRewardStatus(mUser.getUserId(), reward.getRewardId(), RewardStatusType.AVAILABLE);
 
                 }
 

@@ -33,6 +33,7 @@ public class RewardView extends AppCompatActivity {
     private RewardRecyclerAdapter mRewardRecyclerAdapter;
 
     FitnessDBHelper mDatabaseHelper;
+    List<User> mUserList;
     User mUser;
 
     @Override
@@ -46,8 +47,23 @@ public class RewardView extends AppCompatActivity {
         //wire up UI components
         initialize();
 
-        //add radio buttons to userList_RadioGroup
-        addUserListRadioButtons();
+        //get Users to populate radio group
+        mUserList = mDatabaseHelper.getUsers();
+
+        if (mUserList != null) {
+            //if this is a refresh of the screen, get the userId
+            if (getIntent().getExtras() != null) {
+                if (getIntent().getExtras().containsKey("user")) {
+                    mUser = getIntent().getExtras().getParcelable("user");
+                }
+            }
+
+            //add radio buttons to userList_RadioGroup
+            addUserListRadioButtons();
+
+            if (mUser != null)
+                displayRewards();
+        }
 
     }
 
@@ -60,12 +76,10 @@ public class RewardView extends AppCompatActivity {
 
         mDatabaseHelper = FitnessDBHelper.getInstance(getApplicationContext());
     }
+
     private void addUserListRadioButtons(){
 
-        //get Users to populate radio group
-        List<User> userList = mDatabaseHelper.getUsers();
-
-        for ( User user : userList){
+        for ( User user : mUserList){
 
             RadioButton radioButton = new RadioButton(this);
             radioButton.setText(user.getUserName());
@@ -77,11 +91,7 @@ public class RewardView extends AppCompatActivity {
             mUserList_RadioGroup.addView(radioButton);
         }
 
-        //if this is a refresh of the screen, get the userId
-        if (getIntent() != null && getIntent().getExtras().containsKey("user")) {
-            mUser = getIntent().getExtras().getParcelable("user");
-            refreshPage(mUser);
-        }
+
 
         //set checked listener
         mUserList_RadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -90,31 +100,32 @@ public class RewardView extends AppCompatActivity {
 
                 RadioButton radioButton = (RadioButton)group.findViewById(group.getCheckedRadioButtonId());
                 mUser = (User)radioButton.getTag();
-                refreshPage(mUser);
+                displayRewards();
 
             }
         });
     }
 
-    private void refreshPage(User user){
+    private void displayRewards(){
 
-        mTotalCoins_textview.setText(String.format("%d",user.getPoints()));
+        //TODO: check points are rounding in a consistent way throughout code, including updating DB
+        mTotalCoins_textview.setText(String.format("%d", mUser.getPoints()));
 
         List<Reward> rewardList = mDatabaseHelper.getAllRewards();
 
         if (rewardList.size() != 0){
 
             //display message if not enough coins to redeem reward
-            if (rewardList.get(0).getPoints() > user.getPoints()){
+            if (rewardList.get(0).getPoints() > mUser.getPoints()){
 
-                mMessage.setText("You need " + String.valueOf(rewardList.get(0).getPoints() - user.getPoints()) + " more coins to get a reward.");
+                mMessage.setText("You need " + String.valueOf(rewardList.get(0).getPoints() - mUser.getPoints()) + " more coins to get a reward.");
             }
         }
 
         //RecyclerView
         // Initialize recycler view
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRewardRecyclerAdapter = new RewardRecyclerAdapter(this, user.getPoints(), user.getUserId());
+        mRewardRecyclerAdapter = new RewardRecyclerAdapter(this, mUser);
         mRecyclerView.setAdapter(mRewardRecyclerAdapter);
 
     }

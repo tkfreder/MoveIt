@@ -344,7 +344,7 @@ public class ActivityTracker extends AppCompatActivity
 
 
         //TODO: get activity details from Preference Activity, to be displayed at the top of the screen
-        if (getIntent() != null) {
+        if (getIntent().getExtras() != null) {
 
             if (getIntent().getExtras().containsKey("username") && getIntent().getExtras().containsKey("activity_type")) {
                 mActivityHeader.setText(getIntent().getExtras().getString("username") +

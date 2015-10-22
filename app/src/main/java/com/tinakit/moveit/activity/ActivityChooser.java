@@ -19,10 +19,6 @@ public class ActivityChooser extends AppCompatActivity {
     //UI Widgets
     private RecyclerView mRecyclerView;
     private ChooserRecyclerAdapter mChooserRecyclerAdapter;
-    //TODO: replace test data with intent bundle from login screen
-    //Session variables
-    //private User mUser = new User("Lucy","password",false,40,"tiger");
-    private User mUser;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -31,15 +27,6 @@ public class ActivityChooser extends AppCompatActivity {
         //fix the orientation to portrait
         this.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_chooser);
-
-        //View view = inflater.inflate(R.layout.fragment_activity_chooser, container, false);
-
-        //TODO: get user details from Intent bundle or SharedPreferences
-
-
-        //TODO: to delete
-        //delete database
-        deleteDatabase("fitnessDatabase");
 
         // Get singleton instance of database
         FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(this);
