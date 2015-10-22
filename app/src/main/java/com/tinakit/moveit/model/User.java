@@ -1,9 +1,12 @@
 package com.tinakit.moveit.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by Tina on 7/2/2015.
  */
-public class User {
+public class User  implements Parcelable {
 
     private int mUserId;
     private String mUserName;
@@ -86,4 +89,43 @@ public class User {
     public int hashCode() {
         return mUserName != null ? mUserName.hashCode() : 0;
     }
+
+    protected User(Parcel in) {
+        mUserId = in.readInt();
+        mUserName = in.readString();
+        mIsAdmin = in.readInt();
+        mWeight = in.readFloat();
+        mAvatarFileName = in.readString();
+        mPoints = in.readInt();
+        mIsParticipant = in.readByte() != 0x00;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(mUserId);
+        dest.writeString(mUserName);
+        dest.writeInt(mIsAdmin);
+        dest.writeFloat(mWeight);
+        dest.writeString(mAvatarFileName);
+        dest.writeInt(mPoints);
+        dest.writeByte((byte) (mIsParticipant ? 0x01 : 0x00));
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
+        @Override
+        public User createFromParcel(Parcel in) {
+            return new User(in);
+        }
+
+        @Override
+        public User[] newArray(int size) {
+            return new User[size];
+        }
+    };
 }

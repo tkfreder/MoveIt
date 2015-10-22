@@ -33,21 +33,18 @@ public class RewardView extends AppCompatActivity {
     private RewardRecyclerAdapter mRewardRecyclerAdapter;
 
     FitnessDBHelper mDatabaseHelper;
-
-    //TODO: dummy data
-    int mTotalCoins = 0;
-    int mUserId = 1;
+    User mUser;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //wire up UI components
-        initialize();
-
         //fix the orientation to portrait
         this.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.reward_view);
+
+        //wire up UI components
+        initialize();
 
         //add radio buttons to userList_RadioGroup
         addUserListRadioButtons();
@@ -59,7 +56,6 @@ public class RewardView extends AppCompatActivity {
         mTotalCoins_textview = (TextView)findViewById(R.id.coinTotal);
         mMessage = (TextView)findViewById(R.id.message);
         mRecyclerView = (RecyclerView)findViewById(R.id.recycler_view);
-        mRewardRecyclerAdapter = new RewardRecyclerAdapter(this, mTotalCoins, mUserId);
         mUserList_RadioGroup = (RadioGroup)findViewById(R.id.userListRadioGroup);
 
         mDatabaseHelper = FitnessDBHelper.getInstance(getApplicationContext());
@@ -69,22 +65,22 @@ public class RewardView extends AppCompatActivity {
         //get Users to populate radio group
         List<User> userList = mDatabaseHelper.getUsers();
 
-        for ( int i = 0; i < userList.size(); i++){
+        for ( User user : userList){
 
             RadioButton radioButton = new RadioButton(this);
-            radioButton.setText(userList.get(i).getUserName());
-            radioButton.setTag(userList.get(i));
+            radioButton.setText(user.getUserName());
+            radioButton.setTag(user);
             radioButton.setLayoutParams(new ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT));
 
-            //check the first radio button
-            if (i == 0){
-
-                radioButton.setChecked(true);
-            }
-
             mUserList_RadioGroup.addView(radioButton);
+        }
+
+        //if this is a refresh of the screen, get the userId
+        if (getIntent() != null && getIntent().getExtras().containsKey("user")) {
+            mUser = getIntent().getExtras().getParcelable("user");
+            refreshPage(mUser);
         }
 
         //set checked listener
@@ -93,8 +89,8 @@ public class RewardView extends AppCompatActivity {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
 
                 RadioButton radioButton = (RadioButton)group.findViewById(group.getCheckedRadioButtonId());
-                User user = (User)radioButton.getTag();
-                refreshPage(user);
+                mUser = (User)radioButton.getTag();
+                refreshPage(mUser);
 
             }
         });
@@ -102,9 +98,7 @@ public class RewardView extends AppCompatActivity {
 
     private void refreshPage(User user){
 
-        //TODO: replace placeholder total points
-        user.setPoints(10);
-        mTotalCoins_textview.setText(String.valueOf(mTotalCoins));
+        mTotalCoins_textview.setText(String.format("%d",user.getPoints()));
 
         List<Reward> rewardList = mDatabaseHelper.getAllRewards();
 
@@ -120,6 +114,7 @@ public class RewardView extends AppCompatActivity {
         //RecyclerView
         // Initialize recycler view
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRewardRecyclerAdapter = new RewardRecyclerAdapter(this, user.getPoints(), user.getUserId());
         mRecyclerView.setAdapter(mRewardRecyclerAdapter);
 
     }

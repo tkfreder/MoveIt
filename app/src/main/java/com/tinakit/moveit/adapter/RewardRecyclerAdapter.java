@@ -17,6 +17,7 @@ import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.ActivityType;
 import com.tinakit.moveit.model.Reward;
 import com.tinakit.moveit.model.RewardStatusType;
+import com.tinakit.moveit.model.User;
 
 import java.util.List;
 
@@ -29,12 +30,13 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
     //TODO: make private after building DB
     public static List<Reward> mRewardList;
     FitnessDBHelper mDatabaseHelper;
+    private User mUser;
     private int mTotalPoints;
     private int mUserId;
 
     public RewardRecyclerAdapter(Context context, int totalPoints, int userId) {
         mContext = context;
-        mTotalPoints = totalPoints;
+        mUser.setPoints(totalPoints);
         mUserId = userId;
 
         // Get singleton instance of database
@@ -72,10 +74,10 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
                 Button button = (Button)v;
                 if (button.getText().equals("Get It")){
                     Reward reward = (Reward)v.getTag();
-                    mTotalPoints -= reward.getPoints();
+                    mUser.setPoints(mUser.getPoints() - reward.getPoints());
 
                     //update user's points
-                    mDatabaseHelper.setUserPoints(mUserId, mTotalPoints);
+                    mDatabaseHelper.updateUser(mUser);
 
                     //update the reward status
                     mDatabaseHelper.setRewardStatus(mUserId, reward.getRewardId(), RewardStatusType.PENDING);
@@ -84,22 +86,22 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
                 else if (button.getText().equals("Cancel")){
 
                     Reward reward = (Reward)v.getTag();
-                    mTotalPoints += reward.getPoints();
+                    mUser.setPoints(mUser.getPoints() + reward.getPoints());
 
                     //update user's points
-                    mDatabaseHelper.setUserPoints(mUserId, mTotalPoints);
+                    mDatabaseHelper.updateUser(mUser);
 
                     //update the reward status
                     mDatabaseHelper.setRewardStatus(mUserId, reward.getRewardId(), RewardStatusType.AVAILABLE);
 
                 }
 
+
                 //TODO: is there another way to refresh the screen, ie notifydatasethaschanged?
                 ((Activity)mContext).finish();
                 Intent intent = new Intent(mContext, RewardView.class);
                 Bundle bundle = new Bundle();
-                bundle.putInt("total_coins", mTotalPoints);
-                bundle.putInt("reward_list", 1);
+                bundle.putParcelable("user", mUser);
                 intent.putExtras(bundle);
                 mContext.startActivity(intent);
 
@@ -113,7 +115,7 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
         });
 
         //if user has enough points, enable this button
-        if (reward.getPoints() <= mTotalPoints && reward.getRewardStatusType() == RewardStatusType.AVAILABLE) {
+        if (reward.getPoints() <= mUser.getPoints() && reward.getRewardStatusType() == RewardStatusType.AVAILABLE) {
             customViewHolder.statusButton.setText("Get It");
             customViewHolder.statusButton.setTag(reward);
             customViewHolder.statusButton.setVisibility(View.VISIBLE);

@@ -243,10 +243,14 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 ")";
 
         String CREATE_VIEW_REWARDSTATUSUSER = "CREATE VIEW " + VIEW_REWARDSTATUS_USER + " AS" +
-                " SELECT r._id AS " + KEY_REWARDUSER_REWARD_ID_FK + " , r." + KEY_REWARD_POINTS + " AS " + KEY_REWARD_POINTS + " , ru." + KEY_REWARDUSER_REWARD_STATUS_ID + " AS " + KEY_REWARDUSER_REWARD_STATUS_ID + " , u._id as " + KEY_REWARDUSER_USER_ID_FK + " , r." + KEY_REWARD_NAME + " AS " + KEY_REWARD_NAME +
+                " SELECT r._id AS " + KEY_REWARDUSER_REWARD_ID_FK +
+                " , r." + KEY_REWARD_POINTS + " AS " + KEY_REWARD_POINTS +
+                " , ru." + KEY_REWARDUSER_REWARD_STATUS_ID + " AS " + KEY_REWARDUSER_REWARD_STATUS_ID +
+                " , ru." + KEY_REWARDUSER_USER_ID_FK + " AS " + KEY_REWARDUSER_USER_ID_FK +
+                " , r." + KEY_REWARD_NAME + " AS " + KEY_REWARD_NAME +
                 " FROM " + TABLE_REWARDUSER + " ru" +
-                " INNER JOIN " + TABLE_REWARDS + " r on ru._id = r._id" +
-                " INNER JOIN " + TABLE_USERS + " u on u._id = ru.userId" +
+                " LEFT JOIN " + TABLE_REWARDS + " r on ru." + KEY_REWARDUSER_REWARD_ID_FK + " = r._id" +
+                //" LEFT JOIN " + TABLE_USERS + " u on u._id = ru.userId" +
                 " WHERE r." + KEY_REWARD_IS_ENABLED + " = 1";
 
         String CREATE_VIEW_FIRST_LOCATION_POINTS = "CREATE VIEW " + VIEW_FIRST_LOCATION_POINTS + " AS" +
@@ -296,11 +300,30 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         //TODO: DUMMY DATA
         //TODO:  when adding User or Reward, ensure that RewardStatus gets populated with available rewards for that user
         //populate RewardStatus table
-        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (1, 1, 1, 0);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (2, 2, 1, 0);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (3, 3, 1, 0);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (4, 4, 1, 0);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (5, 5, 1, 0);");
+
+        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 1, 1, 0);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 2, 1, 0);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 3, 1, 0);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 4, 1, 0);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 5, 1, 0);");
+
+        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 1, 2, 0);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 2, 2, 0);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 3, 2, 0);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 4, 2, 0);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 5, 2, 0);");
+
+        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 1, 3, 0);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 2, 3, 0);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 3, 3, 0);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 4, 3, 0);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 5, 3, 0);");
+
+        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 1, 4, 0);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 2, 4, 0);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 3, 4, 0);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 4, 4, 0);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 5, 4, 0);");
 
     }
 
@@ -471,6 +494,37 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             return true;
         else
             return false;
+    }
+
+    public long updateUser(User user){
+
+        // Create and/or open the database for writing
+        SQLiteDatabase db = getWritableDatabase();
+
+        long rowsAffected = 0;
+
+        // It's a good idea to wrap the update in a transaction. This helps with performance and ensures
+        // consistency of the database.
+        db.beginTransaction();
+        try {
+
+            ContentValues values = new ContentValues();
+            values.put(KEY_USER_NAME, user.getUserName());
+            values.put(KEY_USER_IS_ADMIN, user.isAdmin());
+            values.put(KEY_USER_WEIGHT, user.getWeight());
+            values.put(KEY_USER_AVATAR_FILENAME, user.getAvatarFileName());
+            values.put(KEY_USER_POINTS, user.getPoints());;
+
+            rowsAffected = db.update(TABLE_USERS, values, KEY_USER_ID + "= ?", new String[]{String.valueOf(user.getUserId())});
+
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            Log.d(LOGTAG, "Error during setUserPoints()");
+        } finally {
+            db.endTransaction();
+        }
+
+        return rowsAffected;
     }
 
 
@@ -668,8 +722,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
      */
 
     public void insertActivityLocationData(long activityId, Date timeStamp, double latitude, double longitude, double altitude, float accuracy, float bearing, float calories, float milesPerHour){
-
-
 
         // Create and/or open the database for writing
         SQLiteDatabase db = getWritableDatabase();
@@ -1163,12 +1215,14 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             // Order of deletions is important when foreign key relationships exist.
             db.delete(TABLE_LOCATIONS, null, null);
             db.delete(TABLE_USERS, null, null);
+            db.delete(TABLE_ACTIVITY_USERS, null, null);
             db.delete(TABLE_ACTIVITIES, null, null);
             db.delete(TABLE_ACTIVITY_TYPE, null, null);
             db.delete(TABLE_ACTIVITY_LOCATION_DATA, null, null);
             db.delete(TABLE_REWARDS, null, null);
             db.delete(TABLE_REWARDUSER, null, null);
             db.delete(VIEW_REWARDSTATUS_USER, null, null);
+            db.delete(VIEW_FIRST_LOCATION_POINTS, null, null);
 
             db.setTransactionSuccessful();
         } catch (Exception e) {

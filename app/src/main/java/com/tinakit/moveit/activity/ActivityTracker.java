@@ -727,9 +727,16 @@ public class ActivityTracker extends AppCompatActivity
                 , (float)mUnitSplitCalorieList.get(0).getLocation().getLongitude()
                 , mActivityDetail.getStartDate()
                 , mActivityDetail.getEndDate()
-                , getDistance(1)
+                , getDistance(1) //TODO:replace with Enum type
                 , mActivityDetail.getCalories()
                 , mActivityDetail.getPointsEarned());
+
+        //update points for each user
+        for (User user: mActivityDetail.getUserList()){
+
+            databaseHelper.setUserPoints(user.getUserId(), (int)(user.getPoints() + mActivityDetail.getPointsEarned()));
+
+        }
 
         if (activityId != -1){
 
