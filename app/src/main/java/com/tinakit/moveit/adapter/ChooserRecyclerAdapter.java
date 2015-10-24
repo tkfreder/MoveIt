@@ -23,7 +23,6 @@ import java.util.List;
  */
 public class ChooserRecyclerAdapter extends RecyclerView.Adapter<ChooserRecyclerAdapter.CustomViewHolder> {
 
-    //private List<ActivityType> mActivityTypeList = new ArrayList<>(Arrays.asList(ActivityType.values()));
     private List<ActivityType> mActivityTypeList = new ArrayList<>();
     private Context mContext;
 
@@ -47,8 +46,6 @@ public class ChooserRecyclerAdapter extends RecyclerView.Adapter<ChooserRecycler
        ActivityType activityType = mActivityTypeList.get(i);
 
         // Populate data from ActivityType data object
-        customViewHolder.activityName.setText(activityType.getActivityName());
-        customViewHolder.activityName.setTag(activityType);
         customViewHolder.activityIcon.setImageResource(mContext.getResources().getIdentifier(activityType.getActivityName() + "_icon_small", "drawable", mContext.getPackageName()));
 
         View.OnClickListener clickListener = new View.OnClickListener() {
@@ -69,11 +66,8 @@ public class ChooserRecyclerAdapter extends RecyclerView.Adapter<ChooserRecycler
             }
         };
 
-        //Handle click event on both title and image click
-        customViewHolder.activityName.setOnClickListener(clickListener);
+        //Handle click event on all UI widgets
         customViewHolder.activityIcon.setOnClickListener(clickListener);
-
-        customViewHolder.activityName.setTag(customViewHolder);
         customViewHolder.activityIcon.setTag(customViewHolder);
 
     }
@@ -84,12 +78,10 @@ public class ChooserRecyclerAdapter extends RecyclerView.Adapter<ChooserRecycler
     }
 
     public class CustomViewHolder extends RecyclerView.ViewHolder {
-        protected TextView activityName;
         protected ImageView activityIcon;
 
         public CustomViewHolder(View view) {
             super(view);
-            this.activityName = (TextView) view.findViewById(R.id.activityName);
             this.activityIcon = (ImageView) view.findViewById(R.id.activityIcon);
         }
     }

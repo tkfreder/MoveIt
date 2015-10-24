@@ -1,5 +1,6 @@
 package com.tinakit.moveit.activity;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -55,6 +56,7 @@ public class RewardView extends AppCompatActivity {
             if (getIntent().getExtras() != null) {
                 if (getIntent().getExtras().containsKey("user")) {
                     mUser = getIntent().getExtras().getParcelable("user");
+                    getIntent().getExtras().clear();
                 }
             }
 
@@ -81,12 +83,19 @@ public class RewardView extends AppCompatActivity {
 
         for ( User user : mUserList){
 
-            RadioButton radioButton = new RadioButton(this);
+            ToggleableRadioButton radioButton = new ToggleableRadioButton(this);
             radioButton.setText(user.getUserName());
             radioButton.setTag(user);
             radioButton.setLayoutParams(new ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            /*
+            if (mUser != null && user.equals(mUser)){
+
+                    radioButton.setChecked(true);
+            }
+*/
 
             mUserList_RadioGroup.addView(radioButton);
         }
@@ -128,5 +137,23 @@ public class RewardView extends AppCompatActivity {
         mRewardRecyclerAdapter = new RewardRecyclerAdapter(this, mUser);
         mRecyclerView.setAdapter(mRewardRecyclerAdapter);
 
+    }
+
+    public class ToggleableRadioButton extends RadioButton {
+
+        public ToggleableRadioButton(Context context) {
+            super(context);
+        }
+
+        @Override
+        public void toggle() {
+            if(isChecked()) {
+                if(getParent() instanceof RadioGroup) {
+                    ((RadioGroup)getParent()).clearCheck();
+                }
+            } else {
+                setChecked(true);
+            }
+        }
     }
 }

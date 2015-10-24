@@ -93,7 +93,7 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
 
                 }
 
-
+/*
                 //TODO: is there another way to refresh the screen, ie notifydatasethaschanged?
                 ((Activity)mContext).finish();
                 Intent intent = new Intent(mContext, RewardView.class);
@@ -101,6 +101,9 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
                 bundle.putParcelable("user", mUser);
                 intent.putExtras(bundle);
                 mContext.startActivity(intent);
+
+                */
+                notifyDataSetChanged();
 
                 //TODO
                 // put this reward item in the queue

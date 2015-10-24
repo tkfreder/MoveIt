@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -15,6 +16,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -28,6 +30,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -109,6 +112,15 @@ public class ActivityTracker extends AppCompatActivity
     private static final long LOCATION_ACCURACY = 20; //within # meter accuracy
     private boolean mIsTimeLimit = false;
 
+    //GOOGLE PLAY SERVICES
+    // Request code to use when launching the resolution activity
+    private static final int REQUEST_RESOLVE_ERROR = 1001;
+    // Unique tag for the error dialog fragment
+    private static final String DIALOG_ERROR = "dialog_error";
+    // Bool to track whether the app is already resolving an error
+    private boolean mResolvingError = false;
+    private static final String STATE_RESOLVING_ERROR = "resolving_error";
+
     public static final String GOOGLEAPI_CONNECTION_FAILURE = "x40241.tina.fredericks.a5.app.GOOGLEAPI_CONNECTION_FAILURE";
 
     //UI widgets
@@ -129,6 +141,7 @@ public class ActivityTracker extends AppCompatActivity
     //local cache
     private ActivityDetail mActivityDetail = new ActivityDetail();
     private User mUser;
+    private int mWeight = 50;
     private long mTimeWhenPaused;
     private boolean mSaveLocationData = false;
 
@@ -266,6 +279,12 @@ public class ActivityTracker extends AppCompatActivity
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(STATE_RESOLVING_ERROR, mResolvingError);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         if (DEBUG) Log.d(LOG, "onCreate()");
         super.onCreate(savedInstanceState);
@@ -274,15 +293,11 @@ public class ActivityTracker extends AppCompatActivity
         //redirect user to Google Play Services
         if (!servicesAvailable()) {
             finish();
-
-            final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
-            try {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
-            } catch (android.content.ActivityNotFoundException anfe) {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
-            }
-
         }
+
+        //check  savedInstanceState not null
+        mResolvingError = savedInstanceState != null
+                && savedInstanceState.getBoolean(STATE_RESOLVING_ERROR, false);
 
         //fix the orientation to portrait
         this.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -546,8 +561,58 @@ public class ActivityTracker extends AppCompatActivity
     }
 
     @Override
-    public void onConnectionFailed(com.google.android.gms.common.ConnectionResult connectionResult) {
-        //TODO: do something if connection failed
+    public void onConnectionFailed(com.google.android.gms.common.ConnectionResult result) {
+
+        if (mResolvingError) {
+            // Already attempting to resolve an error.
+            return;
+        } else if (result.hasResolution()) {
+            try {
+                mResolvingError = true;
+                result.startResolutionForResult(this, REQUEST_RESOLVE_ERROR);
+            } catch (IntentSender.SendIntentException e) {
+                // There was an error with the resolution intent. Try again.
+                mGoogleApiClient.connect();
+            }
+        } else {
+            // Show dialog using GoogleApiAvailability.getErrorDialog()
+            showErrorDialog(result.getErrorCode());
+            mResolvingError = true;
+        }
+    }
+
+    /* Creates a dialog for an error message */
+    private void showErrorDialog(int errorCode) {
+        // Create a fragment for the error dialog
+        ErrorDialogFragment dialogFragment = new ErrorDialogFragment();
+        // Pass the error that should be displayed
+        Bundle args = new Bundle();
+        args.putInt(DIALOG_ERROR, errorCode);
+        dialogFragment.setArguments(args);
+        dialogFragment.show(getSupportFragmentManager(), "errordialog");
+    }
+
+    /* Called from ErrorDialogFragment when the dialog is dismissed. */
+    public void onDialogDismissed() {
+        mResolvingError = false;
+    }
+
+    /* A fragment to display an error dialog */
+    public static class ErrorDialogFragment extends DialogFragment {
+        public ErrorDialogFragment() { }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Get the error code and retrieve the appropriate dialog
+            int errorCode = this.getArguments().getInt(DIALOG_ERROR);
+            return GoogleApiAvailability.getInstance().getErrorDialog(
+                    this.getActivity(), errorCode, REQUEST_RESOLVE_ERROR);
+        }
+
+        @Override
+        public void onDismiss(DialogInterface dialog) {
+            ((ActivityTracker) getActivity()).onDialogDismissed();
+        }
     }
 
     @Override
@@ -889,8 +954,15 @@ public class ActivityTracker extends AppCompatActivity
     @Override
     protected void onResume() {
         if (DEBUG) Log.d(LOG, "onResume");
-
         super.onResume();
+
+        //ensures that if the user returns to the running app through some other means,
+        //such as through the back button, the check is still performed.
+        //end the activity if Google Play Services is not present
+        //redirect user to Google Play Services
+        if (!servicesAvailable()) {
+            finish();
+        }
 
     }
 
@@ -1131,7 +1203,7 @@ public class ActivityTracker extends AppCompatActivity
     }
 
     /**
-     * Method to verify google play services on the device
+     * Method to verify google play services on the device, will direct user to Google Play Store if not installed
      * */
     private boolean servicesAvailable() {
         int resultCode = GooglePlayServicesUtil
@@ -1147,6 +1219,20 @@ public class ActivityTracker extends AppCompatActivity
             return false;
         }
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_RESOLVE_ERROR) {
+            mResolvingError = false;
+            if (resultCode == RESULT_OK) {
+                // Make sure the app is not already connected or attempting to connect
+                if (!mGoogleApiClient.isConnecting() &&
+                        !mGoogleApiClient.isConnected()) {
+                    mGoogleApiClient.connect();
+                }
+            }
+        }
     }
 
 
