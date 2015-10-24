@@ -24,9 +24,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.Chronometer;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -121,8 +125,6 @@ public class ActivityTracker extends AppCompatActivity
     private boolean mResolvingError = false;
     private static final String STATE_RESOLVING_ERROR = "resolving_error";
 
-    public static final String GOOGLEAPI_CONNECTION_FAILURE = "x40241.tina.fredericks.a5.app.GOOGLEAPI_CONNECTION_FAILURE";
-
     //UI widgets
     private TextView mResults;
     private Button mStartButton;
@@ -130,13 +132,13 @@ public class ActivityTracker extends AppCompatActivity
     private Button mPauseButton;
     private Button mSaveButton;
     private Button mResumeButton;
-    private TextView mActivityHeader;
     private static Chronometer mChronometer;
     private ImageView mActivityIcon;
     private TextView mDistance;
     private TextView mCoins;
     private TextView mFeetPerMinute;
     private RecyclerView mRecyclerView;
+    private LinearLayout mUserCheckBoxLayout;
 
     //local cache
     private ActivityDetail mActivityDetail = new ActivityDetail();
@@ -148,15 +150,6 @@ public class ActivityTracker extends AppCompatActivity
     private static final float ZOOM_STREET_ROUTE = 15.0f;
     private GoogleMap mGoogleMap;
     private SupportMapFragment mMapFragment;
-
-    //TODO: DEBUG
-    private static final LatLng HOME1 = new LatLng(34.143000, -118.077089);
-    private static final LatLng HOME2 = new LatLng(34.143274, -118.077125);
-    private static final LatLng HOME3 = new LatLng(34.143273, -118.076434);
-    private static final LatLng HOME4 = new LatLng(34.142364, -118.076501);
-    private static final LatLng HOME5 = new LatLng(34.142342, -118.078899);
-    private static final LatLng HOME6 = new LatLng(34.143240, -118.078939);
-    private static final LatLng HOME7 = new LatLng(34.143255, -118.077145);
 
     //ACCELEROMETER
     private SensorManager mSensorManager;
@@ -326,12 +319,12 @@ public class ActivityTracker extends AppCompatActivity
         mSaveButton = (Button) findViewById(R.id.saveButton);
         mResumeButton = (Button) findViewById(R.id.resumeButton);
         mResults = (TextView) findViewById(R.id.results);
-        mActivityHeader = (TextView) findViewById(R.id.activityHeader);
         mChronometer = (Chronometer) findViewById(R.id.chronometer);
         mActivityIcon = (ImageView) findViewById(R.id.activityType_icon);
         mDistance = (TextView) findViewById(R.id.distance);
         mCoins = (TextView) findViewById(R.id.coins);
         mFeetPerMinute = (TextView) findViewById(R.id.feetPerMinute);
+        mUserCheckBoxLayout = (LinearLayout)findViewById(R.id.checkBoxLayout);
 
         //RecyclerView
         // Initialize recycler view
@@ -345,12 +338,42 @@ public class ActivityTracker extends AppCompatActivity
         //store user list in ActivityDetail
         mActivityDetail.setUserList(userList);
 
-        //user list checkboxes
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        mRecyclerView.setLayoutManager(linearLayoutManager);
-        UserListCheckBoxRecyclerAdapter mUserListCheckBoxRecyclerAdapter = new UserListCheckBoxRecyclerAdapter(ActivityTracker.this, mActivityDetail);
-        mRecyclerView.setAdapter(mUserListCheckBoxRecyclerAdapter);
+        //add user check boxes
+        for (User user : mActivityDetail.getUserList()){
+
+            LinearLayout linearLayout = new LinearLayout(this);
+            linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+            linearLayout.setLayoutParams(new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
+
+            CheckBox checkBox = new CheckBox(this);
+            checkBox.setChecked(true);
+            checkBox.setTag(user);
+            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                    CheckBox checkBox = (CheckBox)buttonView;
+                    User user = (User)checkBox.getTag();
+
+                    if (isChecked)
+                        mActivityDetail.addUser(user);
+                    else
+                        mActivityDetail.removeUser(user);
+                }
+            });
+
+            TextView textView = new TextView(this);
+            textView.setText(user.getUserName());
+
+            //add checkbox and textview to linear layout
+            linearLayout.addView(checkBox);
+            linearLayout.addView(textView);
+
+            //add linear layout to parent linear layout
+            mUserCheckBoxLayout.addView(linearLayout);
+
+
+        }
 
         mMapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -361,10 +384,7 @@ public class ActivityTracker extends AppCompatActivity
         //TODO: get activity details from Preference Activity, to be displayed at the top of the screen
         if (getIntent().getExtras() != null) {
 
-            if (getIntent().getExtras().containsKey("username") && getIntent().getExtras().containsKey("activity_type")) {
-                mActivityHeader.setText(getIntent().getExtras().getString("username") +
-                        " " + getIntent().getExtras().getString("activity_type") +
-                        " " + new SimpleDateFormat("EEEE h:mm a").format(new Date()));
+            if (getIntent().getExtras().containsKey("activity_type")) {
 
                 mActivityIcon.setImageResource(getResources().getIdentifier(getIntent().getExtras().getString("activity_type") + "_icon_small", "drawable", getPackageName()));
 
@@ -373,8 +393,6 @@ public class ActivityTracker extends AppCompatActivity
             if (getIntent().getExtras().containsKey("activityTypeId")) {
                 mActivityDetail.setActivityTypeId(getIntent().getExtras().getInt("activityTypeId"));
             }
-            //if(getIntent().getExtras().containsKey("avatar_id"))
-            //if(getIntent().getExtras().containsKey("username"))
         }
 
         //**********************************************************************************************
@@ -1113,7 +1131,8 @@ public class ActivityTracker extends AppCompatActivity
             }
 
             mGoogleMap.addPolyline((new PolylineOptions().addAll(locationList).color(Color.BLUE)));
-            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(HOME1, Map.getZoomByDistance(getDistance(1))));
+            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                    new LatLng(locationList.get(0).latitude, locationList.get(0).longitude), Map.getZoomByDistance(getDistance(1))));
 
             //render markers
             addMarkersToMap(locationList.get(0), locationList.get(locationList.size() - 1));
