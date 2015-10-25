@@ -262,10 +262,10 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 "," + KEY_ACTIVITY_LOCATION_DATA_BEARING +
                 "," + KEY_ACTIVITY_USERS_USER_ID +
                 ",a." + KEY_ACTIVITY_USERS_ACTIVITY_ID + " AS " + KEY_ACTIVITY_USERS_ACTIVITY_ID +
-                ", MIN(d." + KEY_ACTIVITY_LOCATION_DATA_ID + ")" +
+                //", MIN(d." + KEY_ACTIVITY_LOCATION_DATA_ID + ")" +
                 " FROM " + TABLE_ACTIVITY_LOCATION_DATA  + " d" +
                 " INNER JOIN " + TABLE_ACTIVITY_USERS + " a on a." + KEY_ACTIVITY_USERS_ACTIVITY_ID + " = d." + KEY_ACTIVITY_LOCATION_DATA_ACTIVITY_ID_FK +
-                " GROUP BY d." + KEY_ACTIVITY_USERS_ACTIVITY_ID +
+                //" GROUP BY d." + KEY_ACTIVITY_USERS_ACTIVITY_ID +
                 " ORDER BY a." + KEY_ACTIVITY_USERS_ACTIVITY_ID + ",d." + KEY_ACTIVITY_LOCATION_DATA_ID;
 
         db.execSQL(CREATE_USERS_TABLE);
