@@ -13,18 +13,15 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Chronometer;
@@ -48,15 +45,12 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.tinakit.moveit.adapter.EditActivityRecyclerAdapter;
-import com.tinakit.moveit.adapter.UserListCheckBoxRecyclerAdapter;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.ActivityType2;
 import com.tinakit.moveit.model.UnitSplitCalorie;
 import com.tinakit.moveit.model.User;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -85,9 +79,9 @@ public class ActivityTracker extends AppCompatActivity
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
     private static final float METER_MILE_CONVERSION = 0.00062137f;
     private static final float METER_FEET_CONVERSION = 3.28084f;
-    private static final float FEET_COIN_CONVERSION = 0.5f;
-     //2 feet = 1 coin
+    private static final float FEET_COIN_CONVERSION = 0.5f;  //2 feet = 1 coin
     private static final float CALORIE_COIN_CONVERSION = 10f; //#coins equal to 1 calorie
+    private static final float USER_WEIGHT = 50f;
 
     //UNITS
     private static final int MILES = 0;
@@ -126,24 +120,22 @@ public class ActivityTracker extends AppCompatActivity
     private static final String STATE_RESOLVING_ERROR = "resolving_error";
 
     //UI widgets
-    private TextView mResults;
     private Button mStartButton;
     private Button mStopButton;
     private Button mPauseButton;
     private Button mSaveButton;
     private Button mResumeButton;
+    private Button mCancelButton;
     private static Chronometer mChronometer;
-    private ImageView mActivityIcon;
     private TextView mDistance;
     private TextView mCoins;
     private TextView mFeetPerMinute;
-    private RecyclerView mRecyclerView;
     private LinearLayout mUserCheckBoxLayout;
+    private TextView mMessage;
+
 
     //local cache
     private ActivityDetail mActivityDetail = new ActivityDetail();
-    private User mUser;
-    private int mWeight = 50;
     private long mTimeWhenPaused;
     private boolean mSaveLocationData = false;
 
@@ -156,7 +148,6 @@ public class ActivityTracker extends AppCompatActivity
     private Sensor sensorAccelerometer;
     private int ACCELEROMETER_DELAY = 60 * 5; //in seconds
     ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-
 
     private long lastUpdate = 0;
     private float last_x, last_y, last_z;
@@ -255,20 +246,13 @@ public class ActivityTracker extends AppCompatActivity
 
         mGoogleMap = map;
 
-        /*
-        // Override the default content description on the view, for accessibility mode.
-        // Ideally this string would be localised.
-        map.setContentDescription("Google Map with polylines.");
+        displayStartMap();
 
-        // A simple polyline with the default options from Melbourne-Adelaide-Perth.
-        map.addPolyline((new PolylineOptions())
-                //.add(MELBOURNE, ADELAIDE, PERTH));
-                .add(HOME1, HOME2, HOME3, HOME4, HOME5, HOME6, HOME7)
-                .color(Color.RED));
+    }
 
-        // Move the map so that it is centered on the mutable polyline.
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(HOME1, ZOOM_STREET_ROUTE));
-        */
+    private boolean isMapReady(){
+
+        return mGoogleMap != null;
     }
 
     @Override
@@ -288,6 +272,9 @@ public class ActivityTracker extends AppCompatActivity
             finish();
         }
 
+        //connect to Google Play Services
+        buildLocationRequest();
+
         //check  savedInstanceState not null
         mResolvingError = savedInstanceState != null
                 && savedInstanceState.getBoolean(STATE_RESOLVING_ERROR, false);
@@ -297,20 +284,14 @@ public class ActivityTracker extends AppCompatActivity
 
         setContentView(R.layout.activity_main);
 
-        //TODO:  replace this:  check UI multiselection of users, save the userid's in an array
 
-        //TODO: replace this with DB call or Application Preferences
-        mUser = new User();
-        mUser.setUserId(1);
-        mUser.setUserName("Lucy");
-        mUser.setIsAdmin(false);
-        mUser.setWeight(40);
-        mUser.setAvatarFileName("tiger");
-
+        //TODO:  how to handle admin page?
+        /*
         //display admin menu, if user is admin
         if (mUser.isAdmin()) {
             findViewById(R.id.action_rewards).setVisibility(View.VISIBLE);
         }
+        */
 
         //wire up UI widgets
         mStartButton = (Button) findViewById(R.id.startButton);
@@ -318,17 +299,13 @@ public class ActivityTracker extends AppCompatActivity
         mPauseButton = (Button) findViewById(R.id.pauseButton);
         mSaveButton = (Button) findViewById(R.id.saveButton);
         mResumeButton = (Button) findViewById(R.id.resumeButton);
-        mResults = (TextView) findViewById(R.id.results);
+        mCancelButton = (Button)findViewById(R.id.cancelButton);
         mChronometer = (Chronometer) findViewById(R.id.chronometer);
-        mActivityIcon = (ImageView) findViewById(R.id.activityType_icon);
         mDistance = (TextView) findViewById(R.id.distance);
         mCoins = (TextView) findViewById(R.id.coins);
         mFeetPerMinute = (TextView) findViewById(R.id.feetPerMinute);
         mUserCheckBoxLayout = (LinearLayout)findViewById(R.id.checkBoxLayout);
-
-        //RecyclerView
-        // Initialize recycler view
-        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        mMessage = (TextView)findViewById(R.id.message);
 
         //get user list
         List<User> userList = new ArrayList<>();
@@ -363,6 +340,7 @@ public class ActivityTracker extends AppCompatActivity
             });
 
             TextView textView = new TextView(this);
+            textView.setTextColor(getResources().getColor(R.color.white));
             textView.setText(user.getUserName());
 
             //add checkbox and textview to linear layout
@@ -378,17 +356,9 @@ public class ActivityTracker extends AppCompatActivity
         mMapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mMapFragment.getMapAsync(this);
-        mMapFragment.getView().setVisibility(View.INVISIBLE);
-
 
         //TODO: get activity details from Preference Activity, to be displayed at the top of the screen
         if (getIntent().getExtras() != null) {
-
-            if (getIntent().getExtras().containsKey("activity_type")) {
-
-                mActivityIcon.setImageResource(getResources().getIdentifier(getIntent().getExtras().getString("activity_type") + "_icon_small", "drawable", getPackageName()));
-
-            }
 
             if (getIntent().getExtras().containsKey("activityTypeId")) {
                 mActivityDetail.setActivityTypeId(getIntent().getExtras().getInt("activityTypeId"));
@@ -402,17 +372,28 @@ public class ActivityTracker extends AppCompatActivity
         mStartButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
-                //set flag to save location data
-                mSaveLocationData = true;
+                //if this is a restart
+                if (mStartButton.getText().equals(getResources().getString(R.string.go))){
 
-                if (mStartButton.getText().equals(getResources().getString(R.string.restart))) {
-                    mResults.setText("");
+                    //set flag to save location data
+                    mSaveLocationData = true;
+
+                    //get timestamp of start
+                    mActivityDetail.setStartDate(new Date());
+
+                    //set visibility
+                    mMapFragment.getView().setVisibility(View.GONE);
+
+                }
+                else {
+
+                    //Restart
+                    mCancelButton.setVisibility(View.GONE);
+
+                    //clear out error message
+                    mMessage.setText("");
                 }
 
-                //get timestamp of start
-                mActivityDetail.setStartDate(new Date());
-
-                //set button visibility
                 mStartButton.setVisibility(View.GONE);
                 mStopButton.setVisibility(View.VISIBLE);
                 mPauseButton.setVisibility(View.VISIBLE);
@@ -431,6 +412,7 @@ public class ActivityTracker extends AppCompatActivity
                 //set button visibility
                 mStopButton.setVisibility(View.GONE);
                 mPauseButton.setVisibility(View.GONE);
+                mResumeButton.setVisibility(View.GONE);
 
                 stopRun();
 
@@ -443,13 +425,20 @@ public class ActivityTracker extends AppCompatActivity
                     displayResults();
 
                 } else {
-                    mResults.setText("Not enough route information. Restart your activity.");
+
+                    //not enough data
+                    mStartButton.setVisibility(View.VISIBLE);
                     mStartButton.setText(getResources().getString(R.string.restart));
+
+                    mCancelButton.setVisibility(View.VISIBLE);
+
+                    //message:  no data to display
+                    mMessage.setText("No location data was collected. " + getResources().getString(R.string.restart) + "?");
+                    playSound();
 
                 }
             }
         });
-
 
         mPauseButton.setOnClickListener(new View.OnClickListener() {
 
@@ -461,6 +450,7 @@ public class ActivityTracker extends AppCompatActivity
                 mPauseButton.setVisibility(View.GONE);
                 mResumeButton.setVisibility(View.VISIBLE);
                 mStopButton.setVisibility(View.VISIBLE);
+                mCancelButton.setVisibility(View.GONE);
 
             }
         });
@@ -496,7 +486,14 @@ public class ActivityTracker extends AppCompatActivity
             }
         });
 
+        mCancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
+                //TODO: redirect to the rewards screen when that component is done
+                finish();
+            }
+        });
     }
 
     private void resetFields(){
@@ -537,12 +534,37 @@ public class ActivityTracker extends AppCompatActivity
         //get the starting point
         //updateCache(LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient));
 
+        //display map of starting point
+        displayStartMap();
+
         //start getting location data after there is a connection
         startServices();
 
     }
 
-    //TODO:  may be able to utilize this to get a more accurage first data point
+    private void displayStartMap(){
+
+        if (isMapReady() && isConnectedToGoogle()){
+
+            mGoogleMap.setContentDescription("Starting point");
+            Location mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            LatLng latLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM_STREET_ROUTE));
+
+            //start marker
+            mGoogleMap.addMarker(new MarkerOptions()
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                            .position(latLng)
+                            .title("start")
+            );
+        }
+    }
+
+    private boolean isConnectedToGoogle(){
+        return(mGoogleApiClient != null && mGoogleApiClient.isConnected());
+    }
+
+    //TODO:  may be able to utilize this to get a more accurate first data point
     //reference:  http://www.adavis.info/2014/09/android-location-updates-with.html?m=1
     private Location bestLastKnownLocation(float minAccuracy, long minTime) {
         Location bestResult = null;
@@ -707,7 +729,7 @@ public class ActivityTracker extends AppCompatActivity
     //TODO: rename this method to reflect both operations
     protected void stopServices() {
 
-        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()){
+        if (isConnectedToGoogle()){
 
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
 
@@ -757,12 +779,32 @@ public class ActivityTracker extends AppCompatActivity
     private void startRun(){
         mRequestedService = true;
 
-        buildLocationRequest();
+        //buildLocationRequest();
 
         //chronometer settings, set base time right before starting the chronometer
         mChronometer.setBase(SystemClock.elapsedRealtime());
         mChronometer.start();
 
+        disableCheckBoxes();
+
+    }
+
+    private void disableCheckBoxes(){
+
+        int numUsers = mUserCheckBoxLayout.getChildCount();
+
+        for (int i = 0; i < numUsers; i++){
+
+            LinearLayout linearLayout = (LinearLayout)mUserCheckBoxLayout.getChildAt(i);
+            CheckBox checkBox = (CheckBox)linearLayout.getChildAt(0);
+            checkBox.setVisibility(View.GONE);
+            TextView textView = (TextView)linearLayout.getChildAt(1);
+
+            if (!checkBox.isChecked()){
+                textView.setVisibility(View.GONE);
+            }
+
+        }
     }
 
     private void stopRun(){
@@ -879,8 +921,6 @@ public class ActivityTracker extends AppCompatActivity
 
 
     private void displayResults(){
-
-        mResults.setText("You earned " + mCoins.getText() + " coins!");
 
         displayMap(mUnitSplitCalorieList);
 
@@ -1018,9 +1058,6 @@ public class ActivityTracker extends AppCompatActivity
 
         displayAlertDialog(getString(R.string.time_limit), getString(R.string.reached_time_limit_30_minutes));
         stopRun();
-        //TODO:  disable this until main functionality is done
-        //save the total number of coins
-        //saveCoins(mUserId, Integer.parseInt(mCoins.getText().toString()));
 
         //display number of coins earned
         displayResults();
@@ -1104,7 +1141,8 @@ public class ActivityTracker extends AppCompatActivity
                 float miles = UnitConverter.convertMetersToMiles(mUnitSplitCalorieList.get(i + 1).getLocation().distanceTo(mUnitSplitCalorieList.get(i).getLocation()));
                 float hoursElapsed = minutesElapsed/60f;
                 float speed = miles / hoursElapsed;
-                float calorie = getCalorieByActivity(mUser.getWeight(), minutesElapsed , speed);
+                //TODO:  calculate different calorie based on each participants weight, in the meantime use the same weight for all participants
+                float calorie = getCalorieByActivity(USER_WEIGHT, minutesElapsed , speed);
 
                 //save calorie and speed in list
                 mUnitSplitCalorieList.get(i).setCalories(calorie);
@@ -1119,7 +1157,11 @@ public class ActivityTracker extends AppCompatActivity
 
         if (mGoogleMap != null){
 
+            //ensure map is visible
             mMapFragment.getView().setVisibility(View.VISIBLE);
+
+            //clear out existing markers if any
+            mGoogleMap.clear();
 
             // Override the default content description on the view, for accessibility mode.
             // Ideally this string would be localised.
