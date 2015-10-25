@@ -198,7 +198,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_gravity="center_horizontal"
-            android:paddingTop="250dp">
+            android:paddingTop="225dp">
 
             <Button
                 android:id="@+id/startButton"

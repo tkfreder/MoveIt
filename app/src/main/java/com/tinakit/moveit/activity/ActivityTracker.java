@@ -107,7 +107,7 @@ public class ActivityTracker extends AppCompatActivity
     private static long FASTEST_POLLING_FREQUENCY = 10 * 1000; //5 second
     private static long DISPLACEMENT = 1; //meters //displacement takes precedent over interval/fastestInterval
     private static long STOP_SERVICE_TIME_LIMIT = 30 * 60 * 1000 * 60; // 30 minutes in seconds
-    private static final long LOCATION_ACCURACY = 20; //within # meter accuracy
+    private static final long LOCATION_ACCURACY = 50; //within # meter accuracy //TODO: change this for better accuracy
     private boolean mIsTimeLimit = false;
 
     //GOOGLE PLAY SERVICES
@@ -142,6 +142,9 @@ public class ActivityTracker extends AppCompatActivity
     private static final float ZOOM_STREET_ROUTE = 15.0f;
     private GoogleMap mGoogleMap;
     private SupportMapFragment mMapFragment;
+
+    //database
+    FitnessDBHelper mDatabaseHelper;
 
     //ACCELEROMETER
     private SensorManager mSensorManager;
@@ -309,7 +312,7 @@ public class ActivityTracker extends AppCompatActivity
 
         //get user list
         List<User> userList = new ArrayList<>();
-        FitnessDBHelper mDatabaseHelper = FitnessDBHelper.getInstance(this);
+        mDatabaseHelper = FitnessDBHelper.getInstance(this);
         userList = mDatabaseHelper.getUsers();
 
         //store user list in ActivityDetail
@@ -466,7 +469,7 @@ public class ActivityTracker extends AppCompatActivity
                 finish();
 
                 //display Activity history screen
-                Intent intent = new Intent(getApplicationContext(), ActivityHistory.class);
+                Intent intent = new Intent(getApplicationContext(), ViewUsers.class);
                 startActivity(intent);
 
             }
@@ -843,11 +846,8 @@ public class ActivityTracker extends AppCompatActivity
 
     private void saveToDB(){
 
-        // Get singleton instance of database
-        FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(getApplicationContext());
-
         //save Activity Detail (overall stats)
-        long activityId = databaseHelper.insertActivity(mActivityDetail.getActivityTypeId()
+        long activityId = mDatabaseHelper.insertActivity(mActivityDetail.getActivityTypeId()
                 , (float)mUnitSplitCalorieList.get(0).getLocation().getLatitude()
                 , (float)mUnitSplitCalorieList.get(0).getLocation().getLongitude()
                 , mActivityDetail.getStartDate()
@@ -859,7 +859,7 @@ public class ActivityTracker extends AppCompatActivity
         //update points for each user
         for (User user: mActivityDetail.getUserList()){
 
-            databaseHelper.setUserPoints(user.getUserId(), (int)(user.getPoints() + mActivityDetail.getPointsEarned()));
+            mDatabaseHelper.setUserPoints(user.getUserId(), (int)(user.getPoints() + mActivityDetail.getPointsEarned()));
 
         }
 
@@ -871,7 +871,7 @@ public class ActivityTracker extends AppCompatActivity
                     userIdList.add(user.getUserId());
 
             //track participants for this activity: save userIds for this activityId
-            int rowsAffected = databaseHelper.insertActivityUsers(activityId, userIdList);
+            int rowsAffected = mDatabaseHelper.insertActivityUsers(activityId, userIdList);
 
             for ( int i = 0; i < mUnitSplitCalorieList.size(); i++) {
 
@@ -885,7 +885,7 @@ public class ActivityTracker extends AppCompatActivity
                     bearing = current.bearingTo(next);
                 }
 
-                databaseHelper.insertActivityLocationData(activityId
+                mDatabaseHelper.insertActivityLocationData(activityId
                         , mActivityDetail.getStartDate()
                         , mUnitSplitCalorieList.get(i).getLocation().getLatitude()
                         , mUnitSplitCalorieList.get(i).getLocation().getLongitude()

@@ -11,7 +11,6 @@ import android.widget.TextView;
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.adapter.ChooserRecyclerAdapter;
 import com.tinakit.moveit.db.FitnessDBHelper;
-import com.tinakit.moveit.model.User;
 
 
 public class ActivityChooser extends AppCompatActivity {
