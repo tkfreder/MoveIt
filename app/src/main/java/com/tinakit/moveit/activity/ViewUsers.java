@@ -1,10 +1,51 @@
 package com.tinakit.moveit.activity;
 
+import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+
+import com.tinakit.moveit.R;
+import com.tinakit.moveit.adapter.ActivityHistoryRecyclerAdapter;
+import com.tinakit.moveit.adapter.AvatarRecyclerAdapter;
+import com.tinakit.moveit.adapter.ChooserRecyclerAdapter;
+import com.tinakit.moveit.db.FitnessDBHelper;
 
 /**
  * Created by Tina on 10/24/2015.
  */
 public class ViewUsers extends AppCompatActivity {
+    //UI Widgets
+    private RecyclerView mRecyclerView;
+    private AvatarRecyclerAdapter mAvatarRecyclerAdapter;
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        //fix the orientation to portrait
+        this.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        setContentView(R.layout.view_users);
+
+        //TODO: remove this after testing
+        deleteDatabase("fitnessDatabase");
+
+        // Get singleton instance of database
+        FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(this);
+
+
+        //RecyclerView
+        // Initialize recycler view
+        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        mRecyclerView.setHasFixedSize(true); //child items have fixed dimensions, allows the RecyclerView to optimize better by figuring out the exact height and width of the entire list based on the adapter.
+
+
+        // The number of Columns
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mAvatarRecyclerAdapter = new AvatarRecyclerAdapter(this, databaseHelper.getUsers());
+        mRecyclerView.setAdapter(mAvatarRecyclerAdapter);
+
+
+    }
 }

@@ -292,10 +292,10 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (5, 'family roadtrip', 10, 1);");
 
         //TODO: DUMMY DATA
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Laura', 0, 50, 'bunny', 0);");
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Lucy', 0, 40, 'tiger', 0);");
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Alec', 0, 175, 'monkey', 0);");
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Tina', 0, 100, 'rat', 0);");
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Laura', 0, 50, 'swimming', 0);");
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Lucy', 0, 40, 'tigers', 0);");
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Alec', 0, 175, 'marvel', 0);");
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Tina', 0, 100, 'beach_houses', 0);");
 
         //TODO: DUMMY DATA
         //TODO:  when adding User or Reward, ensure that RewardStatus gets populated with available rewards for that user
