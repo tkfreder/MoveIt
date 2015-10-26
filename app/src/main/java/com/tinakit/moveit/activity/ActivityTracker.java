@@ -45,6 +45,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.tinakit.moveit.AndroidDatabaseManager;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.ActivityType2;
@@ -91,6 +92,7 @@ public class ActivityTracker extends AppCompatActivity
     //save all location points during location updates
     private List<Location> mLocationList;
     private List<UnitSplitCalorie> mUnitSplitCalorieList = new ArrayList<>();
+    private float mCurrentAccuracy;
 
 
     protected static boolean mRequestedService = false;
@@ -499,6 +501,8 @@ public class ActivityTracker extends AppCompatActivity
         });
     }
 
+
+
     private void resetFields(){
 
         mCoins.setText("0");
@@ -663,6 +667,7 @@ public class ActivityTracker extends AppCompatActivity
         if (DEBUG) Log.d(LOG, "onLocationChanged");
 
         if (DEBUG) Log.d(LOG, "Accuracy: " + location.getAccuracy());
+
 
         //only track data when it has high level of accuracy && not Pause mode
         if (isAccurate(location) && mSaveLocationData){
@@ -846,6 +851,18 @@ public class ActivityTracker extends AppCompatActivity
 
     private void saveToDB(){
 
+        /*
+        //calculate bearing for first split
+        float bearingFirst = 0f;
+
+        if(mUnitSplitCalorieList.size() > 1){
+
+            Location current = mUnitSplitCalorieList.get(0).getLocation();
+            Location next = mUnitSplitCalorieList.get(1).getLocation();
+            bearingFirst = current.bearingTo(next);
+        }
+        */
+
         //save Activity Detail (overall stats)
         long activityId = mDatabaseHelper.insertActivity(mActivityDetail.getActivityTypeId()
                 , (float)mUnitSplitCalorieList.get(0).getLocation().getLatitude()
@@ -854,27 +871,24 @@ public class ActivityTracker extends AppCompatActivity
                 , mActivityDetail.getEndDate()
                 , getDistance(1) //TODO:replace with Enum type
                 , mActivityDetail.getCalories()
-                , mActivityDetail.getPointsEarned());
+                , mActivityDetail.getPointsEarned()
+                , mUnitSplitCalorieList.size() > 1 ? mUnitSplitCalorieList.get(0).getBearing() : 0);
 
         //update points for each user
         for (User user: mActivityDetail.getUserList()){
 
-            mDatabaseHelper.setUserPoints(user.getUserId(), (int)(user.getPoints() + mActivityDetail.getPointsEarned()));
+            mDatabaseHelper.setUserPoints(user, (int)(user.getPoints() + mActivityDetail.getPointsEarned()));
 
         }
 
         if (activityId != -1){
 
-            //create arraylist of userIds
-            List<Integer> userIdList = new ArrayList<>();
-            for (User user : mActivityDetail.getUserList())
-                    userIdList.add(user.getUserId());
-
             //track participants for this activity: save userIds for this activityId
-            int rowsAffected = mDatabaseHelper.insertActivityUsers(activityId, userIdList);
+            int rowsAffected = mDatabaseHelper.insertActivityUsers(activityId, mActivityDetail.getUserList());
 
             for ( int i = 0; i < mUnitSplitCalorieList.size(); i++) {
 
+                /*
                 //calculate bearing for all data points except for last one, which will have the same bearing as the previous data point.
                 float bearing = 0f;
 
@@ -884,6 +898,7 @@ public class ActivityTracker extends AppCompatActivity
                     Location next = mUnitSplitCalorieList.get(i+1).getLocation();
                     bearing = current.bearingTo(next);
                 }
+                */
 
                 mDatabaseHelper.insertActivityLocationData(activityId
                         , mActivityDetail.getStartDate()
@@ -891,7 +906,7 @@ public class ActivityTracker extends AppCompatActivity
                         , mUnitSplitCalorieList.get(i).getLocation().getLongitude()
                         , mUnitSplitCalorieList.get(i).getLocation().getAltitude()
                         , mUnitSplitCalorieList.get(i).getLocation().getAccuracy()
-                        , bearing
+                        , mUnitSplitCalorieList.get(i).getBearing()
                         , mUnitSplitCalorieList.get(i).getCalories()
                         ,mUnitSplitCalorieList.get(i).getSpeed());
             }
@@ -905,14 +920,10 @@ public class ActivityTracker extends AppCompatActivity
     private void  updateCache(Location location) {
         if (DEBUG) Log.d(LOG, "updateCache()");
 
-        //TODO:to be replaced by mLocationTimeList
-        //save current location
-        //mLocationList.add(location);
+        UnitSplitCalorie unitSplitCalorie = new UnitSplitCalorie(location);
 
-        //save current location and timestamp
-        Date date = new Date();
-        float timeStamp = date.getTime();
-        mUnitSplitCalorieList.add(new UnitSplitCalorie(date, location));
+
+        mUnitSplitCalorieList.add(unitSplitCalorie);
 
         //save time elapsed
         //get time from Chronometer
@@ -949,7 +960,7 @@ public class ActivityTracker extends AppCompatActivity
         for (int i = 1; i < mUnitSplitCalorieList.size() - 2; i++){
 
             float distance = mUnitSplitCalorieList.get(i).getLocation().distanceTo(mUnitSplitCalorieList.get(i+1).getLocation());
-            float time = (mUnitSplitCalorieList.get(i+1).getTimeStamp().getTime() - mUnitSplitCalorieList.get(i).getTimeStamp().getTime())/1000;
+            float time = (mUnitSplitCalorieList.get(i+1).getLocation().getTime() - mUnitSplitCalorieList.get(i).getLocation().getTime())/1000;
             float speed = distance/time;
 
             //compare against world records for this activity
@@ -1029,7 +1040,6 @@ public class ActivityTracker extends AppCompatActivity
 
         mTimeElapsed = getSecondsFromChronometer();
 
-
         //remove outliers from LocationTimeList, save location data in mLocationList
         removeOutliers();
 
@@ -1106,6 +1116,7 @@ public class ActivityTracker extends AppCompatActivity
             float elapsedMinutes = (float)(SystemClock.elapsedRealtime() - mChronometer.getBase())/(1000 * 60);
             mFeetPerMinute.setText(String.format("%.0f", (float)distanceFeet/elapsedMinutes));
 
+            //TODO: move this somewhere else, where business rules are updated, not UI update
             //update the UnitSplitCalorie list with calorie and speed values
             refreshUnitSplitCalorie();
 
@@ -1137,16 +1148,20 @@ public class ActivityTracker extends AppCompatActivity
 
             for ( int i = 0 ; i < mUnitSplitCalorieList.size() - 1; i++ ){
 
-                float minutesElapsed = (mUnitSplitCalorieList.get(i+1).getTimeStamp().getTime() - mUnitSplitCalorieList.get(i).getTimeStamp().getTime()) / (1000f * 60f) ;
+                float minutesElapsed = (mUnitSplitCalorieList.get(i+1).getLocation().getTime() - mUnitSplitCalorieList.get(i).getLocation().getTime()) / (1000f * 60f) ;
                 float miles = UnitConverter.convertMetersToMiles(mUnitSplitCalorieList.get(i + 1).getLocation().distanceTo(mUnitSplitCalorieList.get(i).getLocation()));
                 float hoursElapsed = minutesElapsed/60f;
-                float speed = miles / hoursElapsed;
+                float milesPerHour = miles / hoursElapsed;
                 //TODO:  calculate different calorie based on each participants weight, in the meantime use the same weight for all participants
-                float calorie = getCalorieByActivity(USER_WEIGHT, minutesElapsed , speed);
+                float calorie = getCalorieByActivity(USER_WEIGHT, minutesElapsed , milesPerHour);
 
-                //save calorie and speed in list
+                //calculate bearing
+                float bearing = mUnitSplitCalorieList.get(i).getLocation().bearingTo(mUnitSplitCalorieList.get(i+1).getLocation());
+
+                //save calorie, speed, bearing in list
                 mUnitSplitCalorieList.get(i).setCalories(calorie);
-                mUnitSplitCalorieList.get(i).setSpeed(speed);
+                mUnitSplitCalorieList.get(i).setSpeed(milesPerHour);
+                mUnitSplitCalorieList.get(i).setBearing(bearing);
 
                 //add to total calories
                 mActivityDetail.setCalories(mActivityDetail.getCalories() + calorie);

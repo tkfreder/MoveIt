@@ -30,3 +30,22 @@ FROM ActivityLocationData d
 LEFT JOIN ActivityUsers a 
 on a.activityId = d.activityId 
 ORDER BY a.activityId,d._id
+
+CREATE VIEW FirstLocationPoints AS 
+SELECT MIN(d._id), timeStamp,latitude,longitude,altitude,accuracy,bearing,userId,a.activityId AS activityId
+FROM ActivityLocationData d 
+LEFT JOIN ActivityUsers a on a.activityId = d.activityId 
+GROUP BY d.activityId 
+ORDER BY a.activityId,d._id
+
+CREATE VIEW FirstLocationPoints AS 
+SELECT timeStamp,latitude,longitude,altitude,accuracy,bearing,userId,a.activityId AS activityId 
+FROM ActivityLocationData d 
+INNER JOIN ActivityUsers a 
+on a.activityId = d.activityId 
+ORDER BY a.activityId,d._id
+
+SELECT MIN(OrderID), CustomerID, e.EmployeeID, FirstName
+from Orders r
+inner join Employees e on e.EmployeeID = r.EmployeeID
+group by e.EmployeeID

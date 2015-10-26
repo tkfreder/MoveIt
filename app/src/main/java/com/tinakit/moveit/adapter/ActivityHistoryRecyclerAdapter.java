@@ -17,6 +17,7 @@ import com.squareup.picasso.Picasso;
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.ActivityTracker;
 import com.tinakit.moveit.activity.EditActivity;
+import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.ActivityType;
 import com.tinakit.moveit.model.UnitSplitCalorie;
 import com.tinakit.moveit.utility.DateUtility;
@@ -32,12 +33,12 @@ import java.util.Locale;
 public class ActivityHistoryRecyclerAdapter  extends RecyclerView.Adapter<ActivityHistoryRecyclerAdapter.CustomViewHolder> {
 
     private Context mContext;
-    private List<UnitSplitCalorie> mUnitList;
+    private List<ActivityDetail> mActivityList;
 
-    public ActivityHistoryRecyclerAdapter(Context context, List<UnitSplitCalorie> unitList) {
+    public ActivityHistoryRecyclerAdapter(Context context, List<ActivityDetail> activityList) {
 
         mContext = context;
-        mUnitList = unitList;
+        mActivityList = activityList;
     }
 
     @Override
@@ -52,13 +53,13 @@ public class ActivityHistoryRecyclerAdapter  extends RecyclerView.Adapter<Activi
     @Override
     public void onBindViewHolder(ActivityHistoryRecyclerAdapter.CustomViewHolder customViewHolder, int i) {
 
-        UnitSplitCalorie unitSplit = mUnitList.get(i);
+        final ActivityDetail activityDetail = mActivityList.get(i);
 
-        customViewHolder.streetName.setText(DateUtility.getDateFormattedRecent(unitSplit.getTimeStamp(), 7) + " " +  Map.getStreetName(mContext, new LatLng(unitSplit.getLocation().getLatitude(), unitSplit.getLocation().getLongitude())));
+        customViewHolder.streetName.setText(DateUtility.getDateFormattedRecent(activityDetail.getStartDate(), 7) + " " +  Map.getStreetName(mContext, new LatLng(activityDetail.getStartLocation().latitude, activityDetail.getStartLocation().longitude)));
 
         Picasso.with(mContext)
-                .load("https://maps.googleapis.com/maps/api/streetview?size=400x400&location=" + unitSplit.getLocation().getLatitude() + "," + unitSplit.getLocation().getLongitude() +
-                        "&fov=90&heading=" + unitSplit.getBearing() + "&pitch=10" +
+                .load("https://maps.googleapis.com/maps/api/streetview?size=400x400&location=" + activityDetail.getStartLocation().latitude + "," + activityDetail.getStartLocation().longitude +
+                        "&fov=90&heading=" + activityDetail.getBearing() + "&pitch=10" +
                         "&key=AIzaSyC5IJ88NXWXdHNazquwM6O5EDaCZ3Daf5Y") //TODO: save API key in some config file
                         //.resize(50, 50)
                         //.centerCrop()
@@ -70,11 +71,11 @@ public class ActivityHistoryRecyclerAdapter  extends RecyclerView.Adapter<Activi
                 CustomViewHolder holder = (CustomViewHolder) view.getTag();
                 int position = holder.getAdapterPosition();
 
-                UnitSplitCalorie unitSplitCalorie = mUnitList.get(position);
+                ActivityDetail activityDetail = mActivityList.get(position);
 
                 Intent intent = new Intent(mContext, EditActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putInt("activityId", unitSplitCalorie.getActivityId());
+                bundle.putInt("activityId", activityDetail.getActivityId());
                 intent.putExtras(bundle);
                 mContext.startActivity(intent);
             }
@@ -91,7 +92,7 @@ public class ActivityHistoryRecyclerAdapter  extends RecyclerView.Adapter<Activi
 
     @Override
     public int getItemCount() {
-        return (null != mUnitList ? mUnitList.size() : 0);
+        return (null != mActivityList ? mActivityList.size() : 0);
     }
 
     public class CustomViewHolder extends RecyclerView.ViewHolder {

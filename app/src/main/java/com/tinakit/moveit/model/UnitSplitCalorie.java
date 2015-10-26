@@ -11,26 +11,14 @@ public class UnitSplitCalorie {
 
     //TODO:  create DB table Splits(userId, timeStart, timeEnd, activityId, weight, minutes, speed, calories)
     //TODO: create DB table ActivityStats(activityId, userId, weight, minutes, speed, calories)
-    private Date mTimeStamp;
-    private Location mLocation;
+    private Location mLocation; //contains latitude, longitude, altitude, accuracy, timestamp
     private float mSpeed; //miles per hour
     private float mCalories;
-    private float mAccuracy;
     private int mActivityId;
     private float mBearing;//need subsequent location data point to calculate bearing
 
-    public UnitSplitCalorie(Date timeStamp, Location location){
-
-        mTimeStamp = timeStamp;
+    public UnitSplitCalorie(Location location){
         mLocation = location;
-    }
-
-    public Date getTimeStamp() {
-        return mTimeStamp;
-    }
-
-    public void setTimeStamp(Date timeStamp) {
-        mTimeStamp = timeStamp;
     }
 
     public Location getLocation() {
@@ -55,14 +43,6 @@ public class UnitSplitCalorie {
 
     public void setCalories(float calories) {
         mCalories = calories;
-    }
-
-    public float getAccuracy() {
-        return mAccuracy;
-    }
-
-    public void setAccuracy(float accuracy) {
-        mAccuracy = accuracy;
     }
 
     public int getActivityId() {

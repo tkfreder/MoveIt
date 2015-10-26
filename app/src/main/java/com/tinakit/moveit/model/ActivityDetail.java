@@ -20,6 +20,7 @@ public class ActivityDetail {
     private float mDistanceInFeet;
     private float mCalories;
     private float mPointsEarned;
+    private float mBearing;
 
     public ActivityDetail(){
 
@@ -113,5 +114,13 @@ public class ActivityDetail {
 
     public void setPointsEarned(float pointsEarned) {
         mPointsEarned = pointsEarned;
+    }
+
+    public float getBearing() {
+        return mBearing;
+    }
+
+    public void setBearing(float bearing) {
+        mBearing = bearing;
     }
 }

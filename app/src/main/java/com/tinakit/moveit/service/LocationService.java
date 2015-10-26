@@ -381,10 +381,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         //save current location
         mLocationList.add(location);
 
-        //save current location and timestamp
-        Date date = new Date();
-        float timeStamp = date.getTime();
-        mUnitSplitCalorieList.add(new UnitSplitCalorie(date, location));
+        mUnitSplitCalorieList.add(new UnitSplitCalorie(location));
 
         //save time elapsed
         //get time from Chronometer in MainActivity
