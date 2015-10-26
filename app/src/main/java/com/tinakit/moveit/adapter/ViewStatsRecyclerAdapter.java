@@ -8,13 +8,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.ActivityHistory;
-import com.tinakit.moveit.activity.ActivityTracker;
-import com.tinakit.moveit.model.ActivityType;
 import com.tinakit.moveit.model.User;
-import com.tinakit.moveit.utility.Collections;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,32 +20,34 @@ import java.util.List;
 /**
  * Created by Tina on 10/24/2015.
  */
-public class AvatarRecyclerAdapter extends RecyclerView.Adapter<AvatarRecyclerAdapter.CustomViewHolder> {
+public class ViewStatsRecyclerAdapter extends RecyclerView.Adapter<ViewStatsRecyclerAdapter.CustomViewHolder> {
 
     private List<User> mUserList = new ArrayList<>();
     private Context mContext;
 
-    public AvatarRecyclerAdapter(Context context, List<User> userList) {
+    public ViewStatsRecyclerAdapter(Context context, List<User> userList) {
 
         mContext = context;
         mUserList = userList;
     }
 
     @Override
-    public AvatarRecyclerAdapter.CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.view_users_list_item, null);
+    public ViewStatsRecyclerAdapter.CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.view_stats_list_item, null);
 
         CustomViewHolder viewHolder = new CustomViewHolder(view);
         return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(AvatarRecyclerAdapter.CustomViewHolder customViewHolder, int i) {
+    public void onBindViewHolder(ViewStatsRecyclerAdapter.CustomViewHolder customViewHolder, int i) {
 
         User user = mUserList.get(i);
 
         // Populate data from ActivityType data object
         customViewHolder.avatar.setImageResource(mContext.getResources().getIdentifier(user.getAvatarFileName(), "drawable", mContext.getPackageName()));
+        customViewHolder.username.setText(user.getUserName());
+        customViewHolder.points.setText(String.valueOf(user.getPoints()));
 
         View.OnClickListener clickListener = new View.OnClickListener() {
             @Override
@@ -77,11 +77,16 @@ public class AvatarRecyclerAdapter extends RecyclerView.Adapter<AvatarRecyclerAd
     }
 
     public class CustomViewHolder extends RecyclerView.ViewHolder {
+
         protected ImageView avatar;
+        protected TextView username;
+        protected TextView points;
 
         public CustomViewHolder(View view) {
             super(view);
             this.avatar = (ImageView) view.findViewById(R.id.avatar);
+            this.username = (TextView)view.findViewById(R.id.username);
+            this.points = (TextView)view.findViewById(R.id.points);
         }
     }
 

@@ -2,6 +2,7 @@ package com.tinakit.moveit.activity;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
@@ -10,9 +11,10 @@ import com.tinakit.moveit.adapter.ViewStatsRecyclerAdapter;
 import com.tinakit.moveit.db.FitnessDBHelper;
 
 /**
- * Created by Tina on 10/24/2015.
+ * Created by Tina on 10/26/2015.
  */
-public class ViewUsers extends AppCompatActivity {
+public class ViewStats  extends AppCompatActivity {
+
     //UI Widgets
     private RecyclerView mRecyclerView;
     private ViewStatsRecyclerAdapter mViewStatsRecyclerAdapter;
@@ -28,6 +30,7 @@ public class ViewUsers extends AppCompatActivity {
         // Get singleton instance of database
         FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(this);
 
+
         //RecyclerView
         // Initialize recycler view
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
@@ -35,7 +38,7 @@ public class ViewUsers extends AppCompatActivity {
 
 
         // The number of Columns
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         mViewStatsRecyclerAdapter = new ViewStatsRecyclerAdapter(this, databaseHelper.getUsers());
         mRecyclerView.setAdapter(mViewStatsRecyclerAdapter);
 

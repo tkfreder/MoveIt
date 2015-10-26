@@ -45,7 +45,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.tinakit.moveit.AndroidDatabaseManager;
+import com.tinakit.moveit.utility.AndroidDatabaseManager;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.ActivityType2;
@@ -105,7 +105,7 @@ public class ActivityTracker extends AppCompatActivity
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private Location mBestReading;
-    private static long POLLING_FREQUENCY = 10 * 1000; //10 seconds
+    private static long POLLING_FREQUENCY = 5 * 1000; //10 seconds
     private static long FASTEST_POLLING_FREQUENCY = 10 * 1000; //5 second
     private static long DISPLACEMENT = 1; //meters //displacement takes precedent over interval/fastestInterval
     private static long STOP_SERVICE_TIME_LIMIT = 30 * 60 * 1000 * 60; // 30 minutes in seconds
@@ -157,7 +157,6 @@ public class ActivityTracker extends AppCompatActivity
     private long lastUpdate = 0;
     private float last_x, last_y, last_z;
     private static final float SHAKE_THRESHOLD = 0.5f;
-
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
@@ -471,7 +470,7 @@ public class ActivityTracker extends AppCompatActivity
                 finish();
 
                 //display Activity history screen
-                Intent intent = new Intent(getApplicationContext(), ViewUsers.class);
+                Intent intent = new Intent(getApplicationContext(), ViewStats.class);
                 startActivity(intent);
 
             }
@@ -852,16 +851,15 @@ public class ActivityTracker extends AppCompatActivity
     private void saveToDB(){
 
         /*
-        //calculate bearing for first split
-        float bearingFirst = 0f;
+        //save to cache
+        ActivityDetail activityDetail = new ActivityDetail();
+        activityDetail.setStartLocation(new LatLng(mUnitSplitCalorieList.get(0).getLocation().getLatitude(),mUnitSplitCalorieList.get(0).getLocation().getLongitude()));
+        activityDetail.setDistanceInFeet(getDistance(1));
+        activityDetail.setBearing(mUnitSplitCalorieList.size() > 1 ? mUnitSplitCalorieList.get(0).getBearing() : 0);
 
-        if(mUnitSplitCalorieList.size() > 1){
+        mActivityDetailList.add(activityDetail);
+*/
 
-            Location current = mUnitSplitCalorieList.get(0).getLocation();
-            Location next = mUnitSplitCalorieList.get(1).getLocation();
-            bearingFirst = current.bearingTo(next);
-        }
-        */
 
         //save Activity Detail (overall stats)
         long activityId = mDatabaseHelper.insertActivity(mActivityDetail.getActivityTypeId()
@@ -873,6 +871,7 @@ public class ActivityTracker extends AppCompatActivity
                 , mActivityDetail.getCalories()
                 , mActivityDetail.getPointsEarned()
                 , mUnitSplitCalorieList.size() > 1 ? mUnitSplitCalorieList.get(0).getBearing() : 0);
+
 
         //update points for each user
         for (User user: mActivityDetail.getUserList()){
@@ -888,18 +887,6 @@ public class ActivityTracker extends AppCompatActivity
 
             for ( int i = 0; i < mUnitSplitCalorieList.size(); i++) {
 
-                /*
-                //calculate bearing for all data points except for last one, which will have the same bearing as the previous data point.
-                float bearing = 0f;
-
-                if(i < mUnitSplitCalorieList.size() - 1){
-
-                    Location current = mUnitSplitCalorieList.get(i).getLocation();
-                    Location next = mUnitSplitCalorieList.get(i+1).getLocation();
-                    bearing = current.bearingTo(next);
-                }
-                */
-
                 mDatabaseHelper.insertActivityLocationData(activityId
                         , mActivityDetail.getStartDate()
                         , mUnitSplitCalorieList.get(i).getLocation().getLatitude()
@@ -911,6 +898,7 @@ public class ActivityTracker extends AppCompatActivity
                         ,mUnitSplitCalorieList.get(i).getSpeed());
             }
         }
+
     }
 
     //**********************************************************************************************

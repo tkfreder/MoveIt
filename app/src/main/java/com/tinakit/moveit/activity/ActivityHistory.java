@@ -7,7 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import com.tinakit.moveit.AndroidDatabaseManager;
+import com.tinakit.moveit.utility.AndroidDatabaseManager;
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.adapter.ActivityHistoryRecyclerAdapter;
 import com.tinakit.moveit.db.FitnessDBHelper;
@@ -32,7 +32,7 @@ public class ActivityHistory  extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+/*
         //fix the orientation to portrait
         this.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_history);
@@ -53,10 +53,13 @@ public class ActivityHistory  extends AppCompatActivity {
                 mActivityHistoryRecyclerAdapter = new ActivityHistoryRecyclerAdapter(this, activityList);
                 mRecyclerView.setAdapter(mActivityHistoryRecyclerAdapter);
 
-                if (DEBUG)
-                    displayDatabaseManager();
+
             }
         }
+        */
+
+        if (DEBUG)
+            displayDatabaseManager();
     }
 
     private void displayDatabaseManager(){

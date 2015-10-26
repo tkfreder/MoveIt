@@ -124,6 +124,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     private static final String VIEW_FIRST_LOCATION_POINTS = "FirstLocationPoints";
 
     private static Context mContext;
+    private SQLiteDatabase db;
 
     /**
      * Constructor should be private to prevent direct instantiation.
@@ -131,6 +132,9 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
      */
     private FitnessDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+
+        // Create and/or open the database for writing
+        db = getWritableDatabase();
     }
 
     //reference:  Singleton pattern https://www.youtube.com/watch?v=GH5_lhFShfU
@@ -141,6 +145,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         // See this article for more information: http://bit.ly/6LRzfx
 
         mContext = context;
+
         return Holder.INSTANCE;
     }
 
@@ -294,10 +299,10 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (5, 'family roadtrip', 10, 1);");
 
         //TODO: DUMMY DATA
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Laura', 0, 50, 'swimming', 0);");
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Lucy', 0, 40, 'tigers', 0);");
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Alec', 0, 175, 'marvel', 0);");
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Tina', 0, 100, 'beach_houses', 0);");
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Laura', 0, 50, 'avatar_cat_purple', 0);");
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Lucy', 0, 40, 'avatar_cat_blue', 0);");
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Alec', 0, 175, 'avatar_cat_green', 0);");
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Tina', 0, 100, 'avatar_cat_red', 0);");
 
         //TODO: DUMMY DATA
         //TODO:  when adding User or Reward, ensure that RewardStatus gets populated with available rewards for that user
@@ -359,7 +364,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     // Insert a User into the database
     public void addUser(User user) {
         // Create and/or open the database for writing
-        SQLiteDatabase db = getWritableDatabase();
+        //SQLiteDatabase db = getWritableDatabase();
 
         // It's a good idea to wrap our insert in a transaction. This helps with performance and ensures
         // consistency of the database.
@@ -381,12 +386,14 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         } finally {
             db.endTransaction();
         }
+
+        db.close();
     }
 
     public List<User> getUsers()
     {
         // Create and/or open the database for writing
-        SQLiteDatabase db = getReadableDatabase();
+        //SQLiteDatabase db = getReadableDatabase();
 
         List<User> userList = new ArrayList<>();
 
@@ -430,7 +437,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     public User getUser(String userName)
     {
         // Create and/or open the database for writing
-        SQLiteDatabase db = getReadableDatabase();
+        //SQLiteDatabase db = getReadableDatabase();
 
         User user = new User();
 
@@ -469,7 +476,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
     public boolean hasUser(User user) {
 
-        SQLiteDatabase db = getReadableDatabase();
+        //SQLiteDatabase db = getReadableDatabase();
 
         long userId = -1;
 
@@ -501,7 +508,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     public long updateUser(User user){
 
         // Create and/or open the database for writing
-        SQLiteDatabase db = getWritableDatabase();
+        //SQLiteDatabase db = getWritableDatabase();
 
         long rowsAffected = 0;
 
@@ -526,6 +533,8 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             db.endTransaction();
         }
 
+        db.close();
+
         return rowsAffected;
     }
 
@@ -540,7 +549,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         int rowsAffected = 0;
 
         // Create and/or open the database for writing
-        SQLiteDatabase db = getWritableDatabase();
+        //SQLiteDatabase db = getWritableDatabase();
 
         for (User user : userList){
 
@@ -582,7 +591,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         long activityId = -1;
 
         // Create and/or open the database for writing
-        SQLiteDatabase db = getWritableDatabase();
+        //SQLiteDatabase db = getWritableDatabase();
 
         // It's a good idea to wrap our insert in a transaction. This helps with performance and ensures
         // consistency of the database.
@@ -616,7 +625,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     public ActivityDetail getActivityDetail(int activityId){
 
         // Create and/or open the database for writing
-        SQLiteDatabase db = getReadableDatabase();
+        //SQLiteDatabase db = getReadableDatabase();
 
         //initialize ActivityDetail
         ActivityDetail activityDetail = null;
@@ -674,7 +683,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     public List<ActivityDetail> getActivityDetailList(User user){
 
         // Create and/or open the database for writing
-        SQLiteDatabase db = getReadableDatabase();
+        //SQLiteDatabase db = getReadableDatabase();
 
         //initialize ActivityType list
         List<ActivityDetail> activityDetailList = new ArrayList<>();
@@ -728,7 +737,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     public void insertActivityLocationData(long activityId, Date timeStamp, double latitude, double longitude, double altitude, float accuracy, float bearing, float calories, float milesPerHour){
 
         // Create and/or open the database for writing
-        SQLiteDatabase db = getWritableDatabase();
+        //SQLiteDatabase db = getWritableDatabase();
 
         // It's a good idea to wrap our insert in a transaction. This helps with performance and ensures
         // consistency of the database.
@@ -754,12 +763,13 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         } finally {
             db.endTransaction();
         }
+
     }
 
     public List<UnitSplitCalorie> getActivityLocationData(long activityId){
 
         // Create and/or open the database for writing
-        SQLiteDatabase db = getReadableDatabase();
+        //SQLiteDatabase db = getReadableDatabase();
 
         //initialize UnitSplitCalorie array
         List<UnitSplitCalorie> locationList = new ArrayList<>();
@@ -824,7 +834,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     public List<ActivityDetail> getFirstLocationPoints(User user){
 
         // Create and/or open the database for writing
-        SQLiteDatabase db = getReadableDatabase();
+        //SQLiteDatabase db = getReadableDatabase();
 
         //initialize UnitSplitCalorie array
         List<ActivityDetail> locationList = new ArrayList<>();
@@ -883,7 +893,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     public void insertReward(String rewardName, int points){
 
         // Create and/or open the database for writing
-        SQLiteDatabase db = getWritableDatabase();
+        //SQLiteDatabase db = getWritableDatabase();
 
         // It's a good idea to wrap our insert in a transaction. This helps with performance and ensures
         // consistency of the database.
@@ -903,12 +913,13 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         } finally {
             db.endTransaction();
         }
+
     }
 
     public Reward getReward(int rewardId){
 
         // Create and/or open the database for writing
-        SQLiteDatabase db = getReadableDatabase();
+        //SQLiteDatabase db = getReadableDatabase();
 
         //initialize Reward object
         Reward reward = new Reward();
@@ -950,7 +961,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     public List<Reward> getAllRewards(){
 
         // Create and/or open the database for writing
-        SQLiteDatabase db = getReadableDatabase();
+        //SQLiteDatabase db = getReadableDatabase();
 
         //initialize Reward array
         List<Reward> rewardList = new ArrayList<>();
@@ -998,7 +1009,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     public int updateReward(int rewardId, String rewardName, int points, int isEnabled){
 
         // Create and/or open the database for writing
-        SQLiteDatabase db = getWritableDatabase();
+        //SQLiteDatabase db = getWritableDatabase();
 
         int rowsAffected = 0;
 
@@ -1027,7 +1038,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     public boolean deleteReward(int rewardId){
 
         // Create and/or open the database for writing
-        SQLiteDatabase db = getWritableDatabase();
+        //SQLiteDatabase db = getWritableDatabase();
 
         // It's a good idea to wrap the delete in a transaction. This helps with performance and ensures
         // consistency of the database.
@@ -1042,6 +1053,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             db.endTransaction();
         }
 
+
         return false;
     }
 
@@ -1054,7 +1066,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     public List<Reward> getUserRewards(int userId){
 
         // Create and/or open the database for writing
-        SQLiteDatabase db = getReadableDatabase();
+        //SQLiteDatabase db = getReadableDatabase();
 
         //initialize ActivityType list
         List<Reward> rewardList = new ArrayList<>();
@@ -1102,7 +1114,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     public long setRewardStatus(int userId, int rewardId, RewardStatusType rewardStatusType){
 
         // Create and/or open the database for writing
-        SQLiteDatabase db = getWritableDatabase();
+        //SQLiteDatabase db = getWritableDatabase();
 
         long rowsAffected = 0;
 
@@ -1129,7 +1141,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     public long setUserPoints(User user, int points){
 
         // Create and/or open the database for writing
-        SQLiteDatabase db = getWritableDatabase();
+        //SQLiteDatabase db = getWritableDatabase();
 
         long rowsAffected = 0;
 
@@ -1161,7 +1173,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     public List<ActivityType> getActivityTypes(){
 
         // Create and/or open the database for writing
-        SQLiteDatabase db = getReadableDatabase();
+        //SQLiteDatabase db = getReadableDatabase();
 
         //initialize ActivityType list
         List<ActivityType> activityTypeList = new ArrayList<>();
@@ -1210,7 +1222,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     public void deleteAll() {
         Log.d(LOGTAG, "***deleteAll***");
 
-        SQLiteDatabase db = getWritableDatabase();
+        //SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
         try {
             // Order of deletions is important when foreign key relationships exist.
@@ -1231,12 +1243,14 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         } finally {
             db.endTransaction();
         }
+
     }
 
 
     public ArrayList<Cursor> getData(String Query){
         //get writable database
-        SQLiteDatabase sqlDB = this.getWritableDatabase();
+        //SQLiteDatabase sqlDB = this.getWritableDatabase();
+
         String[] columns = new String[] { "mesage" };
         //an array list of cursor to save two cursors one has results from the query
         //other cursor stores error message if any errors are triggered
@@ -1249,7 +1263,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         try{
             String maxQuery = Query ;
             //execute the query results will be save in Cursor c
-            Cursor c = sqlDB.rawQuery(maxQuery, null);
+            Cursor c = db.rawQuery(maxQuery, null);
 
 
             //add value to cursor2
