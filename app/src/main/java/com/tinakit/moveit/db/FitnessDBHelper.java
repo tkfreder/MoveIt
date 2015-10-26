@@ -533,8 +533,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             db.endTransaction();
         }
 
-        db.close();
-
         return rowsAffected;
     }
 

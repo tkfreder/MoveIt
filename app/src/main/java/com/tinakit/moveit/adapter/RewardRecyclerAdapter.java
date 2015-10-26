@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.tinakit.moveit.R;
@@ -29,7 +30,7 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
     private Context mContext;
     //TODO: make private after building DB
     public static List<Reward> mRewardList;
-    FitnessDBHelper mDatabaseHelper;
+
     private User mUser;
 
     public RewardRecyclerAdapter(Context context, User user) {
@@ -37,14 +38,15 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
         mUser = user;
 
         // Get singleton instance of database
-        mDatabaseHelper = FitnessDBHelper.getInstance(context);
+        FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(context);
 
-        // Get Activity Types
-        mRewardList = mDatabaseHelper.getUserRewards(mUser.getUserId());
+        // Get Reward list
+        mRewardList = databaseHelper.getUserRewards(mUser.getUserId());
     }
 
     @Override
     public RewardRecyclerAdapter.CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+
             View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.reward_list_item, viewGroup, false);
 
             CustomViewHolder viewHolder = new CustomViewHolder(view);
@@ -68,16 +70,18 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
             @Override
             public void onClick(View v) {
 
+                FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(mContext);
+
                 Button button = (Button)v;
                 if (button.getText().equals("Get It")){
                     Reward reward = (Reward)v.getTag();
                     mUser.setPoints(mUser.getPoints() - reward.getPoints());
 
                     //update user's points
-                    mDatabaseHelper.updateUser(mUser);
+                    databaseHelper.updateUser(mUser);
 
                     //update the reward status
-                    mDatabaseHelper.setRewardStatus(mUser.getUserId(), reward.getRewardId(), RewardStatusType.PENDING);
+                    databaseHelper.setRewardStatus(mUser.getUserId(), reward.getRewardId(), RewardStatusType.PENDING);
 
                 }
                 else if (button.getText().equals("Cancel")){
@@ -86,14 +90,14 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
                     mUser.setPoints(mUser.getPoints() + reward.getPoints());
 
                     //update user's points
-                    mDatabaseHelper.updateUser(mUser);
+                    databaseHelper.updateUser(mUser);
 
                     //update the reward status
-                    mDatabaseHelper.setRewardStatus(mUser.getUserId(), reward.getRewardId(), RewardStatusType.AVAILABLE);
+                    databaseHelper.setRewardStatus(mUser.getUserId(), reward.getRewardId(), RewardStatusType.AVAILABLE);
 
                 }
 
-/*
+
                 //TODO: is there another way to refresh the screen, ie notifydatasethaschanged?
                 ((Activity)mContext).finish();
                 Intent intent = new Intent(mContext, RewardView.class);
@@ -102,8 +106,8 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
                 intent.putExtras(bundle);
                 mContext.startActivity(intent);
 
-                */
-                notifyDataSetChanged();
+
+                //notifyDataSetChanged();
 
                 //TODO
                 // put this reward item in the queue

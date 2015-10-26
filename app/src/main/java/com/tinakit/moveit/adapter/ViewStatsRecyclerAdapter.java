@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.ActivityHistory;
+import com.tinakit.moveit.activity.RewardView;
 import com.tinakit.moveit.model.User;
 
 import java.util.ArrayList;
@@ -57,7 +58,7 @@ public class ViewStatsRecyclerAdapter extends RecyclerView.Adapter<ViewStatsRecy
 
                 User user = mUserList.get(position);
 
-                Intent intent = new Intent(mContext, ActivityHistory.class);
+                Intent intent = new Intent(mContext, RewardView.class);
                 Bundle bundle = new Bundle();
                 bundle.putParcelable("user", user);
                 intent.putExtras(bundle);
