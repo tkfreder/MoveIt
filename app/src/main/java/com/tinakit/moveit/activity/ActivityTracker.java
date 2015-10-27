@@ -17,7 +17,6 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,7 +25,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Chronometer;
 import android.widget.CompoundButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -45,7 +43,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.tinakit.moveit.utility.AndroidDatabaseManager;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.ActivityType2;
@@ -286,7 +283,7 @@ public class ActivityTracker extends AppCompatActivity
         //fix the orientation to portrait
         this.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.chooser_master);
 
 
         //TODO:  how to handle admin page?
