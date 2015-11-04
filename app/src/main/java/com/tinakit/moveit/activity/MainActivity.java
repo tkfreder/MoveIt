@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    /*
     class MyPagerAdapter extends FragmentPagerAdapter {
 
         @Override
@@ -55,5 +56,5 @@ public class MainActivity extends AppCompatActivity {
             return 0;
         }
     }
-
+*/
 }

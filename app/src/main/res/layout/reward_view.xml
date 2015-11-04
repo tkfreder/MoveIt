@@ -3,7 +3,13 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical"
-              android:padding="@dimen/activity_vertical_margin">
+              android:padding="16dp">
+
+    <Button
+        android:id="@+id/statsButton"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="User Stats"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,6 +26,7 @@
             android:id="@+id/avatar"
             android:layout_width="30dp"
             android:layout_height="30dp"/>
+
 
     </LinearLayout>
 
@@ -51,8 +58,9 @@
         android:id="@+id/message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/abc_text_size_display_1_material"
-        style="@style/LabelSmallPurple"/>
+        android:textColor="@color/green"
+        android:textSize="20sp"
+        android:visibility="gone"/>
 
     <android.support.v7.widget.RecyclerView
         xmlns:tools="http://schemas.android.com/tools"

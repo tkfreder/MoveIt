@@ -130,7 +130,7 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
             customViewHolder.statusButton.setText("Cancel");
             customViewHolder.statusButton.setTag(reward);
             customViewHolder.statusButton.setVisibility(View.VISIBLE);
-            customViewHolder.status.setText("waiting for Mommy");
+            customViewHolder.status.setText("in progress");
 
         } else if (reward.getRewardStatusType() == RewardStatusType.DENIED) {
 

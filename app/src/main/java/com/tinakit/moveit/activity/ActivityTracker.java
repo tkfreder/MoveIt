@@ -18,6 +18,7 @@ import android.os.SystemClock;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -80,6 +81,7 @@ public class ActivityTracker extends AppCompatActivity
     private static final float FEET_COIN_CONVERSION = 0.5f;  //2 feet = 1 coin
     private static final float CALORIE_COIN_CONVERSION = 10f; //#coins equal to 1 calorie
     private static final float USER_WEIGHT = 50f;
+    private static final float USERNAME_FONT_SIZE = 20f;
 
     //UNITS
     private static final int MILES = 0;
@@ -103,10 +105,10 @@ public class ActivityTracker extends AppCompatActivity
     private LocationRequest mLocationRequest;
     private Location mBestReading;
     private static long POLLING_FREQUENCY = 5 * 1000; //10 seconds
-    private static long FASTEST_POLLING_FREQUENCY = 10 * 1000; //5 second
+    private static long FASTEST_POLLING_FREQUENCY = 5 * 1000; //5 second
     private static long DISPLACEMENT = 1; //meters //displacement takes precedent over interval/fastestInterval
     private static long STOP_SERVICE_TIME_LIMIT = 30 * 60 * 1000 * 60; // 30 minutes in seconds
-    private static final long LOCATION_ACCURACY = 50; //within # meter accuracy //TODO: change this for better accuracy
+    private static final long LOCATION_ACCURACY = 10; //within # meter accuracy //TODO: change this for better accuracy
     private boolean mIsTimeLimit = false;
 
     //GOOGLE PLAY SERVICES
@@ -283,7 +285,7 @@ public class ActivityTracker extends AppCompatActivity
         //fix the orientation to portrait
         this.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        setContentView(R.layout.chooser_master);
+        setContentView(R.layout.activity_tracker);
 
 
         //TODO:  how to handle admin page?
@@ -342,6 +344,7 @@ public class ActivityTracker extends AppCompatActivity
 
             TextView textView = new TextView(this);
             textView.setTextColor(getResources().getColor(R.color.white));
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, USERNAME_FONT_SIZE);
             textView.setText(user.getUserName());
 
             //add checkbox and textview to linear layout
@@ -699,8 +702,6 @@ public class ActivityTracker extends AppCompatActivity
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(POLLING_FREQUENCY);//get location updates every x seconds
         mLocationRequest.setFastestInterval(FASTEST_POLLING_FREQUENCY);//not to exceed location updates every x seconds
-        //mLocationRequest.setSmallestDisplacement(DISPLACEMENT);// to avoid unnecessary updates, but we want to know if runner has not moved so no need to set a minimum distance displacement
-        // TODO:  build a warning system or tracker autoshutoff
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
@@ -803,6 +804,7 @@ public class ActivityTracker extends AppCompatActivity
             CheckBox checkBox = (CheckBox)linearLayout.getChildAt(0);
             checkBox.setVisibility(View.GONE);
             TextView textView = (TextView)linearLayout.getChildAt(1);
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, USERNAME_FONT_SIZE);
 
             if (!checkBox.isChecked()){
                 textView.setVisibility(View.GONE);

@@ -158,7 +158,9 @@
             android:text="@string/participants"
             android:layout_gravity="center"
             android:paddingRight="2dp"
-            android:textColor="@color/white"/>
+            android:textSize="10sp"
+            android:textColor="@color/white"
+            android:visibility="gone"/>
 
         <LinearLayout
             android:id="@+id/checkBoxLayout"

@@ -1,5 +1,6 @@
 package com.tinakit.moveit.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -57,6 +58,9 @@ public class ViewStatsRecyclerAdapter extends RecyclerView.Adapter<ViewStatsRecy
                 int position = holder.getAdapterPosition();
 
                 User user = mUserList.get(position);
+
+                //close current activity
+                ((Activity)mContext).finish();
 
                 Intent intent = new Intent(mContext, RewardView.class);
                 Bundle bundle = new Bundle();
