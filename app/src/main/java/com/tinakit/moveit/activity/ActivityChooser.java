@@ -40,10 +40,6 @@ public class ActivityChooser extends AppCompatActivity {
         FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(this);
         List<User> userList = databaseHelper.getUsers();
         List<ActivityType> activityTypeList = databaseHelper.getActivityTypes();
-        List<String> activityTypeStringList = new ArrayList<>();
-        for ( ActivityType activityType : activityTypeList){
-            activityTypeStringList.add(activityType.getActivityName());
-        }
 
 
         //RecyclerView
@@ -55,7 +51,7 @@ public class ActivityChooser extends AppCompatActivity {
         // The number of Columns
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
 
-        mMultiChooserRecyclerAdapter = new MultiChooserRecyclerAdapter(this, userList, activityTypeStringList);
+        mMultiChooserRecyclerAdapter = new MultiChooserRecyclerAdapter(this, userList, activityTypeList);
         mRecyclerView.setAdapter(mMultiChooserRecyclerAdapter);
 
         //next button

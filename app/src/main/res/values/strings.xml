@@ -110,5 +110,8 @@
     <string name="participants">Participants:</string>
     <string name="next">Next</string>
     <string name="not_participant">Not participating</string>
+    <string name="preference_userIdList">preferenceUserIdList</string>
+    <string name="preference_activityTypeList">preferenceActivityTypeList</string>
+    <string name="preferences_multiChooserRecyclerAdapter">preferencesMultiChooserRecyclerAdapter</string>
 
 </resources>

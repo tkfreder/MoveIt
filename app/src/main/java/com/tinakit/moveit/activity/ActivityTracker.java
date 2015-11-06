@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -26,6 +27,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Chronometer;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -52,6 +54,7 @@ import com.tinakit.moveit.model.UnitSplitCalorie;
 import com.tinakit.moveit.model.User;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -137,7 +140,8 @@ public class ActivityTracker extends AppCompatActivity
 
 
     //local cache
-    private ActivityDetail mActivityDetail = new ActivityDetail();
+    //TODO: possibly use EventBus to pass data between previous screen to this one, instead of using static members
+    public static ActivityDetail mActivityDetail = new ActivityDetail();
     private long mTimeWhenPaused;
     private boolean mSaveLocationData = false;
 
@@ -311,6 +315,9 @@ public class ActivityTracker extends AppCompatActivity
         mUserCheckBoxLayout = (LinearLayout)findViewById(R.id.checkBoxLayout);
         mMessage = (TextView)findViewById(R.id.message);
 
+
+        //create user checkboxes and activity icons
+        createUserActivityList();
         /*
         //get user list
         List<User> userList = new ArrayList<>();
@@ -363,6 +370,10 @@ public class ActivityTracker extends AppCompatActivity
         mMapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mMapFragment.getMapAsync(this);
+
+        //get user list and activity type list from static member mActivityDetail
+
+
 
         //TODO: get activity details from Preference Activity, to be displayed at the top of the screen
         if (getIntent().getExtras() != null) {
@@ -510,6 +521,43 @@ public class ActivityTracker extends AppCompatActivity
     }
 
 
+    private void createUserActivityList(){
+
+        //get user list
+        List<User> userList = new ArrayList<>();
+        mDatabaseHelper = FitnessDBHelper.getInstance(this);
+        userList = mDatabaseHelper.getUsers();
+
+
+        //add user check boxes
+        for (int i = 0; i < mActivityDetail.getUserList().size(); i++){
+
+            LinearLayout linearLayout = new LinearLayout(this);
+            linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+            linearLayout.setLayoutParams(new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
+
+            //username
+            TextView textView = new TextView(this);
+            textView.setTextColor(getResources().getColor(R.color.white));
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, USERNAME_FONT_SIZE);
+            textView.setText(mActivityDetail.getUserList().get(i).getUserName());
+
+            //activity type icon
+            ImageView imageView = new ImageView(this);
+            imageView.setImageResource(getResources().getIdentifier(mActivityDetail.getActivityTypeList().get(i).getActivityName() + "_icon_small", "drawable", getPackageName()));
+            imageView.setMaxWidth(15);
+            imageView.setMaxHeight(15);
+
+            //add checkbox and textview to linear layout
+            linearLayout.addView(textView);
+            linearLayout.addView(imageView);
+
+            //add linear layout to parent linear layout
+            mUserCheckBoxLayout.addView(linearLayout);
+
+
+        }
+    }
 
     private void resetFields(){
 

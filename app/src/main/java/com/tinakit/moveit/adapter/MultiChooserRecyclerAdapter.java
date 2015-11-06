@@ -3,12 +3,14 @@ package com.tinakit.moveit.adapter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -66,11 +68,13 @@ public class MultiChooserRecyclerAdapter extends RecyclerView.Adapter<MultiChoos
         customViewHolder.avatar.setTag(customViewHolder);
         customViewHolder.username.setText(user.getUserName());
 
-        View.OnClickListener clickListener = new View.OnClickListener() {
+        //Handle click event on spinner
+        customViewHolder.activityTypes.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onClick(View view) {
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
                 CustomViewHolder holder = (CustomViewHolder) view.getTag();
-                int position = holder.getAdapterPosition();
+                //int position = holder.getAdapterPosition();
 
                 User user = mUserList.get(position);
 
@@ -88,22 +92,16 @@ public class MultiChooserRecyclerAdapter extends RecyclerView.Adapter<MultiChoos
 
                 }
 
-                //TODO: how to save activityDetail
-                //store in SharedPreferences
-                //can't save in intent bc don't want to start an activity
-                /*
-                Intent intent = new Intent(mContext, RewardView.class);
-                Bundle bundle = new Bundle();
-                bundle.putParcelable("activityDetail", mActivityDetail);
-                intent.putExtras(bundle);
-                mContext.startActivity(intent);
-                */
+                //TODO: possibly replace this with EventBus to pass data to ActivityTracker.java
+                ActivityTracker.mActivityDetail.setUserList(mActivityDetail.getUserList());
+                ActivityTracker.mActivityDetail.setActivityTypeList(mActivityDetail.getActivityTypeList());
             }
-        };
 
-        //Handle click event on spinner
-        customViewHolder.activityTypes.setOnClickListener(clickListener);
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
 
+            }
+        });
 
         //get string array of activity types
         List<String> activityTypeStringList = new ArrayList<>();
