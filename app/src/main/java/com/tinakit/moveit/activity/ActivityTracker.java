@@ -46,6 +46,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.ActivityDetail;
+import com.tinakit.moveit.model.ActivityType;
 import com.tinakit.moveit.model.ActivityType2;
 import com.tinakit.moveit.model.UnitSplitCalorie;
 import com.tinakit.moveit.model.User;
@@ -310,6 +311,7 @@ public class ActivityTracker extends AppCompatActivity
         mUserCheckBoxLayout = (LinearLayout)findViewById(R.id.checkBoxLayout);
         mMessage = (TextView)findViewById(R.id.message);
 
+        /*
         //get user list
         List<User> userList = new ArrayList<>();
         mDatabaseHelper = FitnessDBHelper.getInstance(this);
@@ -317,6 +319,7 @@ public class ActivityTracker extends AppCompatActivity
 
         //store user list in ActivityDetail
         mActivityDetail.setUserList(userList);
+
 
         //add user check boxes
         for (User user : mActivityDetail.getUserList()){
@@ -356,7 +359,7 @@ public class ActivityTracker extends AppCompatActivity
 
 
         }
-
+*/
         mMapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mMapFragment.getMapAsync(this);
@@ -364,8 +367,14 @@ public class ActivityTracker extends AppCompatActivity
         //TODO: get activity details from Preference Activity, to be displayed at the top of the screen
         if (getIntent().getExtras() != null) {
 
-            if (getIntent().getExtras().containsKey("activityTypeId")) {
-                mActivityDetail.setActivityTypeId(getIntent().getExtras().getInt("activityTypeId"));
+            if (getIntent().getExtras().containsKey("activityTypeList")) {
+                ArrayList<ActivityType> activityTypeList = getIntent().getExtras().getParcelableArrayList("activityTypeList");
+                mActivityDetail.setActivityTypeList(activityTypeList);
+            }
+
+            if (getIntent().getExtras().containsKey("userList")) {
+                ArrayList<User> userList = getIntent().getExtras().getParcelableArrayList("userList");
+                mActivityDetail.setUserList(userList);
             }
         }
 
@@ -861,8 +870,7 @@ public class ActivityTracker extends AppCompatActivity
 
 
         //save Activity Detail (overall stats)
-        long activityId = mDatabaseHelper.insertActivity(mActivityDetail.getActivityTypeId()
-                , (float)mUnitSplitCalorieList.get(0).getLocation().getLatitude()
+        long activityId = mDatabaseHelper.insertActivity((float)mUnitSplitCalorieList.get(0).getLocation().getLatitude()
                 , (float)mUnitSplitCalorieList.get(0).getLocation().getLongitude()
                 , mActivityDetail.getStartDate()
                 , mActivityDetail.getEndDate()
@@ -882,7 +890,7 @@ public class ActivityTracker extends AppCompatActivity
         if (activityId != -1){
 
             //track participants for this activity: save userIds for this activityId
-            int rowsAffected = mDatabaseHelper.insertActivityUsers(activityId, mActivityDetail.getUserList());
+            int rowsAffected = mDatabaseHelper.insertActivityUsers(activityId, mActivityDetail.getUserList(), mActivityDetail.getActivityTypeList());
 
             for ( int i = 0; i < mUnitSplitCalorieList.size(); i++) {
 

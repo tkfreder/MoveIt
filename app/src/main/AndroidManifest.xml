@@ -52,6 +52,8 @@
             android:name=".activity.RewardView"
             android:label="@string/reward_view" >
 
+
+
         </activity>
         <activity
             android:name=".activity.EditReward"

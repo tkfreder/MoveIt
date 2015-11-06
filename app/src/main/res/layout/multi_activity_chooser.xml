@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+>
+
+    <android.support.v7.widget.RecyclerView
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1">
+            <ImageView
+                android:src="@drawable/avatar_cat_purple"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+            <Spinner
+                android:id="@+id/spinner1"
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:entries="@array/activity_types"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="225dp"
+                />
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1">
+
+            <ImageView
+                android:src="@drawable/avatar_cat_blue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+            <Spinner
+                android:id="@+id/spinner2"
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:entries="@array/activity_types"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="225dp"
+                />
+
+        </LinearLayout>
+        </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        >
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1">
+            <ImageView
+                android:src="@drawable/avatar_cat_red"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+            <Spinner
+                android:id="@+id/spinner3"
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:entries="@array/activity_types"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="225dp"
+                />
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1">
+
+            <ImageView
+                android:src="@drawable/avatar_cat_green"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+            <Spinner
+                android:id="@+id/spinner4"
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:entries="@array/activity_types"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="225dp"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>

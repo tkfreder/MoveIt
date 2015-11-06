@@ -25,11 +25,12 @@ public class ActivityChooser extends AppCompatActivity {
 
         //fix the orientation to portrait
         this.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        setContentView(R.layout.activity_chooser);
+        setContentView(R.layout.multi_activity_chooser);
 
         // Get singleton instance of database
-        FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(this);
+        //FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(this);
 
+        /*
         //RecyclerView
         // Initialize recycler view
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
@@ -41,6 +42,7 @@ public class ActivityChooser extends AppCompatActivity {
 
         mChooserRecyclerAdapter = new ChooserRecyclerAdapter(this);
         mRecyclerView.setAdapter(mChooserRecyclerAdapter);
+        */
 
     }
 }

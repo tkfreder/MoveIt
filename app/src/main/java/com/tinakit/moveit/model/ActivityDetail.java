@@ -13,7 +13,7 @@ public class ActivityDetail {
 
     private int mActivityId;
     private List<User> mUserList;
-    private int mActivityTypeId;
+    private List<ActivityType> mActivityTypeList;
     private LatLng mStartLocation;
     private Date mStartDate;  //"YYYY-MM-DD HH:MM:SS.SSS"
     private Date mEndDate;  //"YYYY-MM-DD HH:MM:SS.SSS"
@@ -33,10 +33,6 @@ public class ActivityDetail {
 
     public void setActivityId(int activityId) {
         mActivityId = activityId;
-    }
-
-    public int getActivityTypeId() {
-        return mActivityTypeId;
     }
 
     public void addUser(User user){
@@ -64,8 +60,12 @@ public class ActivityDetail {
         mUserList = userList;
     }
 
-    public void setActivityTypeId(int activityTypeId) {
-        mActivityTypeId = activityTypeId;
+    public void setActivityTypeList(List<ActivityType> activityTypeList){
+        mActivityTypeList = activityTypeList;
+    }
+
+    public List<ActivityType> getActivityTypeList(){
+        return mActivityTypeList;
     }
 
     public LatLng getStartLocation() {
