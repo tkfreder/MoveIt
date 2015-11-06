@@ -185,7 +185,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 KEY_ACTIVITY_USERS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // Define a primary key
                 KEY_ACTIVITY_USERS_ACTIVITY_ID + " INTEGER, " +
                 KEY_ACTIVITY_USERS_USER_ID  + " INTEGER, " +
-                KEY_ACTIVITY_USERS_ACTIVITY_TYPE_ID_FK + " INTEGER  REFERENCES \" + TABLE_ACTIVITY_TYPE" +
+                KEY_ACTIVITY_USERS_ACTIVITY_TYPE_ID_FK + " INTEGER " +
                 ")";
 
         String CREATE_ACTIVITY_TYPE_TABLE = "CREATE TABLE " + TABLE_ACTIVITY_TYPE +
@@ -287,12 +287,12 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_VIEW_FIRST_LOCATION_POINTS);
 
         //populate ActivityType table
-        db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 4.6, '1995 world record, walking speed meters/second', 1,'walk',1);");
-        db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 12.4, '2009 world record, running speed meters/second', 2,'run', 1);");
-        db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 5.0, 'estimate based on 20 km/h, world record does not exist', 3,'scooter', 1);");
-        db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 74.7,'1985 world record, cycling speed meters/second',4,'bike', 1);");
-        db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 4.6,'1995 world record, walking speed meters/second', 5,'hike', 1);");
-        db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 2.3,'1990 world record, swimming speed meters/second', 6,'swim', 1);");
+        db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 'walk', 4.6, '1995 world record, walking speed meters/second', 1,'walk',1);");
+        db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 'run', 12.4, '2009 world record, running speed meters/second', 2,'run', 1);");
+        db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 'scooter', 5.0, 'estimate based on 20 km/h, world record does not exist', 3,'scooter', 1);");
+        db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 'bike', 74.7,'1985 world record, cycling speed meters/second',4,'bike', 1);");
+        db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 'hike', 4.6,'1995 world record, walking speed meters/second', 5,'hike', 1);");
+        db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 'swim', 2.3,'1990 world record, swimming speed meters/second', 6,'swim', 1);");
 
         //TODO: DUMMY DATA
         //populate Rewards table
@@ -591,7 +591,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
 
         //initialize ActivityDetail
-        List<ActivityType> activityTypeList = null;
+        List<ActivityType> activityTypeList = new ArrayList<>();
 
         try {
 
@@ -602,7 +602,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                             ,KEY_ACTIVITY_TYPE_MAXSPEED_NOTES
                             ,KEY_ACTIVITY_TYPE_PRIORITY
                             ,KEY_ACTIVITY_TYPE_ICON_FILENAME
-},
+                    },
                     KEY_ACTIVITY_TYPE_IS_ENABLED + " = 1",
                     null, null, null, KEY_ACTIVITY_TYPE_PRIORITY);
 

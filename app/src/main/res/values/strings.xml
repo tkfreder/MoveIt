@@ -108,5 +108,7 @@
     <string name="coins_earned">Coins earned:</string>
     <string name="distance_in_feet">Distance (ft.):</string>
     <string name="participants">Participants:</string>
+    <string name="next">Next</string>
+    <string name="not_participant">Not participating</string>
 
 </resources>
