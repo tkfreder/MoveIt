@@ -38,7 +38,7 @@ public class MultiChooserRecyclerAdapter extends RecyclerView.Adapter<MultiChoos
     private Context mContext;
     private List<User> mParticipantList;
     private List<ActivityType> mParticipantActivityList;
-    private ActivityDetail mActivityDetail;
+    private ActivityDetail mActivityDetail = new ActivityDetail();
 
     public MultiChooserRecyclerAdapter(Context context, List<User> userList, List<ActivityType> activityTypeList) {
 
@@ -65,30 +65,32 @@ public class MultiChooserRecyclerAdapter extends RecyclerView.Adapter<MultiChoos
 
         // Populate data from ActivityType data object
         customViewHolder.avatar.setImageResource(mContext.getResources().getIdentifier(user.getAvatarFileName(), "drawable", mContext.getPackageName()));
-        customViewHolder.avatar.setTag(customViewHolder);
         customViewHolder.username.setText(user.getUserName());
+        customViewHolder.activityTypes.setTag(user);
 
         //Handle click event on spinner
         customViewHolder.activityTypes.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                CustomViewHolder holder = (CustomViewHolder) view.getTag();
-                //int position = holder.getAdapterPosition();
-
-                User user = mUserList.get(position);
+                User user = (User) parent.getTag();
 
                 //check if "not participant" was selected
-                Spinner spinner = (Spinner)view;
-                if (spinner.getSelectedItemPosition() == -1){
+                if (position == 0) {
 
                     //remove this user, if exists
                     mActivityDetail.removeUserActivity(user);
-                }
-                else{
+                } else {
+
+                    //check if user already exists in the ActivityDetail.userList
+                    //first remove that activity before adding a new activity for that user
+                    if (mActivityDetail.getUserList().contains(user)){
+                        mActivityDetail.removeUserActivity(user);
+                    }
 
                     //add user and corresponding activity
-                    mActivityDetail.addUserActivity(user, mActivityTypeList.get(spinner.getSelectedItemPosition()));
+                    //TODO: due to adding the first item in spinner as empty selection, must decrement the index
+                    mActivityDetail.addUserActivity(user, mActivityTypeList.get(position - 1));
 
                 }
 
@@ -105,6 +107,10 @@ public class MultiChooserRecyclerAdapter extends RecyclerView.Adapter<MultiChoos
 
         //get string array of activity types
         List<String> activityTypeStringList = new ArrayList<>();
+
+        //add an empty item called no participant
+        activityTypeStringList.add(mContext.getResources().getString(R.string.not_participant));
+
         for ( ActivityType activityType : mActivityTypeList){
             activityTypeStringList.add(activityType.getActivityName());
         }
@@ -113,7 +119,6 @@ public class MultiChooserRecyclerAdapter extends RecyclerView.Adapter<MultiChoos
                 android.R.layout.simple_spinner_item, activityTypeStringList);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         customViewHolder.activityTypes.setAdapter(dataAdapter);
-        customViewHolder.activityTypes.setPrompt(mContext.getResources().getString(R.string.not_participant));
 
     }
 

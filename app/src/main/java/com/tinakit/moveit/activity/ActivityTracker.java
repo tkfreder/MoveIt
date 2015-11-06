@@ -545,8 +545,7 @@ public class ActivityTracker extends AppCompatActivity
             //activity type icon
             ImageView imageView = new ImageView(this);
             imageView.setImageResource(getResources().getIdentifier(mActivityDetail.getActivityTypeList().get(i).getActivityName() + "_icon_small", "drawable", getPackageName()));
-            imageView.setMaxWidth(15);
-            imageView.setMaxHeight(15);
+            imageView.setLayoutParams(new LinearLayout.LayoutParams(100,100));
 
             //add checkbox and textview to linear layout
             linearLayout.addView(textView);

@@ -1,5 +1,6 @@
 package com.tinakit.moveit.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.adapter.ChooserRecyclerAdapter;
@@ -60,7 +62,16 @@ public class ActivityChooser extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                //get users and activity type selected
+                //TODO: replace this with BroadcastReceiver to listen for RecyclerView has at least one user activity selected
+                if (ActivityTracker.mActivityDetail.getUserList().size() > 0){
+
+                    //get users and activity type selected
+                    startActivity(new Intent(getApplicationContext(), ActivityTracker.class));
+                }
+                else {
+
+                    Toast.makeText(getApplicationContext(), "Please select an activity for at least one user.", Toast.LENGTH_LONG);
+                }
 
 
             }
