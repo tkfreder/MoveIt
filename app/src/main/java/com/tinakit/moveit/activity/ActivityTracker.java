@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -26,7 +25,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Chronometer;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -50,11 +48,10 @@ import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.ActivityType;
 import com.tinakit.moveit.model.ActivityType2;
-import com.tinakit.moveit.model.UnitSplitCalorie;
+import com.tinakit.moveit.model.UnitSplit;
 import com.tinakit.moveit.model.User;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -62,6 +59,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import com.tinakit.moveit.R;
+import com.tinakit.moveit.model.UserActivity;
 import com.tinakit.moveit.utility.CalorieCalculator;
 import com.tinakit.moveit.utility.DialogUtility;
 import com.tinakit.moveit.utility.Map;
@@ -82,7 +80,7 @@ public class ActivityTracker extends AppCompatActivity
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
     private static final float METER_MILE_CONVERSION = 0.00062137f;
     private static final float METER_FEET_CONVERSION = 3.28084f;
-    private static final float FEET_COIN_CONVERSION = 0.5f;  //2 feet = 1 coin
+    private static final float FEET_COIN_CONVERSION = 0.05f;  //20 feet = 1 coin
     private static final float CALORIE_COIN_CONVERSION = 10f; //#coins equal to 1 calorie
     private static final float USER_WEIGHT = 50f;
     private static final float USERNAME_FONT_SIZE = 20f;
@@ -94,7 +92,7 @@ public class ActivityTracker extends AppCompatActivity
 
     //save all location points during location updates
     private List<Location> mLocationList;
-    private List<UnitSplitCalorie> mUnitSplitCalorieList = new ArrayList<>();
+    private List<UnitSplit> mUnitSplitList = new ArrayList<>();
     private float mCurrentAccuracy;
 
 
@@ -318,76 +316,11 @@ public class ActivityTracker extends AppCompatActivity
 
         //create user checkboxes and activity icons
         createUserActivityList();
-        /*
-        //get user list
-        List<User> userList = new ArrayList<>();
-        mDatabaseHelper = FitnessDBHelper.getInstance(this);
-        userList = mDatabaseHelper.getUsers();
 
-        //store user list in ActivityDetail
-        mActivityDetail.setUserList(userList);
-
-
-        //add user check boxes
-        for (User user : mActivityDetail.getUserList()){
-
-            LinearLayout linearLayout = new LinearLayout(this);
-            linearLayout.setOrientation(LinearLayout.HORIZONTAL);
-            linearLayout.setLayoutParams(new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
-
-            CheckBox checkBox = new CheckBox(this);
-            checkBox.setChecked(true);
-            checkBox.setTag(user);
-            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-                    CheckBox checkBox = (CheckBox)buttonView;
-                    User user = (User)checkBox.getTag();
-
-                    if (isChecked)
-                        mActivityDetail.addUser(user);
-                    else
-                        mActivityDetail.removeUser(user);
-                }
-            });
-
-            TextView textView = new TextView(this);
-            textView.setTextColor(getResources().getColor(R.color.white));
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, USERNAME_FONT_SIZE);
-            textView.setText(user.getUserName());
-
-            //add checkbox and textview to linear layout
-            linearLayout.addView(checkBox);
-            linearLayout.addView(textView);
-
-            //add linear layout to parent linear layout
-            mUserCheckBoxLayout.addView(linearLayout);
-
-
-        }
-*/
         mMapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mMapFragment.getMapAsync(this);
 
-        //get user list and activity type list from static member mActivityDetail
-
-
-
-        //TODO: get activity details from Preference Activity, to be displayed at the top of the screen
-        if (getIntent().getExtras() != null) {
-
-            if (getIntent().getExtras().containsKey("activityTypeList")) {
-                ArrayList<ActivityType> activityTypeList = getIntent().getExtras().getParcelableArrayList("activityTypeList");
-                mActivityDetail.setActivityTypeList(activityTypeList);
-            }
-
-            if (getIntent().getExtras().containsKey("userList")) {
-                ArrayList<User> userList = getIntent().getExtras().getParcelableArrayList("userList");
-                mActivityDetail.setUserList(userList);
-            }
-        }
 
         //**********************************************************************************************
         //  onClickListeners
@@ -441,7 +374,7 @@ public class ActivityTracker extends AppCompatActivity
                 stopRun();
 
                 //save Activity Detail data
-                if (mUnitSplitCalorieList.size() > 1) {
+                if (mUnitSplitList.size() > 1) {
 
                     mSaveButton.setVisibility(View.VISIBLE);
 
@@ -530,7 +463,7 @@ public class ActivityTracker extends AppCompatActivity
 
 
         //add user check boxes
-        for (int i = 0; i < mActivityDetail.getUserList().size(); i++){
+        for (int i = 0; i < mActivityDetail.getUserActivityList().size(); i++){
 
             LinearLayout linearLayout = new LinearLayout(this);
             linearLayout.setOrientation(LinearLayout.HORIZONTAL);
@@ -540,11 +473,11 @@ public class ActivityTracker extends AppCompatActivity
             TextView textView = new TextView(this);
             textView.setTextColor(getResources().getColor(R.color.white));
             textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, USERNAME_FONT_SIZE);
-            textView.setText(mActivityDetail.getUserList().get(i).getUserName());
+            textView.setText(mActivityDetail.getUserActivityList().get(i).getUser().getUserName());
 
             //activity type icon
             ImageView imageView = new ImageView(this);
-            imageView.setImageResource(getResources().getIdentifier(mActivityDetail.getActivityTypeList().get(i).getActivityName() + "_icon_small", "drawable", getPackageName()));
+            imageView.setImageResource(getResources().getIdentifier(mActivityDetail.getUserActivityList().get(i).getActivityType().getActivityName() + "_icon_small", "drawable", getPackageName()));
             imageView.setLayoutParams(new LinearLayout.LayoutParams(100,100));
 
             //add checkbox and textview to linear layout
@@ -917,39 +850,37 @@ public class ActivityTracker extends AppCompatActivity
 
 
         //save Activity Detail (overall stats)
-        long activityId = mDatabaseHelper.insertActivity((float)mUnitSplitCalorieList.get(0).getLocation().getLatitude()
-                , (float)mUnitSplitCalorieList.get(0).getLocation().getLongitude()
+        long activityId = mDatabaseHelper.insertActivity((float) mUnitSplitList.get(0).getLocation().getLatitude()
+                , (float) mUnitSplitList.get(0).getLocation().getLongitude()
                 , mActivityDetail.getStartDate()
                 , mActivityDetail.getEndDate()
                 , getDistance(1) //TODO:replace with Enum type
-                , mActivityDetail.getCalories()
                 , mActivityDetail.getPointsEarned()
-                , mUnitSplitCalorieList.size() > 1 ? mUnitSplitCalorieList.get(0).getBearing() : 0);
+                , mUnitSplitList.size() > 1 ? mUnitSplitList.get(0).getBearing() : 0);
 
 
         //update points for each user
-        for (User user: mActivityDetail.getUserList()){
+        for (UserActivity userActivity: mActivityDetail.getUserActivityList()){
 
-            mDatabaseHelper.setUserPoints(user, (int)(user.getPoints() + mActivityDetail.getPointsEarned()));
+            mDatabaseHelper.setUserPoints(userActivity.getUser(), (int)(userActivity.getUser().getPoints() + mActivityDetail.getPointsEarned()));
 
         }
 
         if (activityId != -1){
 
             //track participants for this activity: save userIds for this activityId
-            int rowsAffected = mDatabaseHelper.insertActivityUsers(activityId, mActivityDetail.getUserList(), mActivityDetail.getActivityTypeList());
+            int rowsAffected = mDatabaseHelper.insertActivityUsers(activityId, mActivityDetail.getUserActivityList());
 
-            for ( int i = 0; i < mUnitSplitCalorieList.size(); i++) {
+            for ( int i = 0; i < mUnitSplitList.size(); i++) {
 
                 mDatabaseHelper.insertActivityLocationData(activityId
                         , mActivityDetail.getStartDate()
-                        , mUnitSplitCalorieList.get(i).getLocation().getLatitude()
-                        , mUnitSplitCalorieList.get(i).getLocation().getLongitude()
-                        , mUnitSplitCalorieList.get(i).getLocation().getAltitude()
-                        , mUnitSplitCalorieList.get(i).getLocation().getAccuracy()
-                        , mUnitSplitCalorieList.get(i).getBearing()
-                        , mUnitSplitCalorieList.get(i).getCalories()
-                        ,mUnitSplitCalorieList.get(i).getSpeed());
+                        , mUnitSplitList.get(i).getLocation().getLatitude()
+                        , mUnitSplitList.get(i).getLocation().getLongitude()
+                        , mUnitSplitList.get(i).getLocation().getAltitude()
+                        , mUnitSplitList.get(i).getLocation().getAccuracy()
+                        , mUnitSplitList.get(i).getBearing()
+                        , mUnitSplitList.get(i).getSpeed());
             }
         }
 
@@ -962,10 +893,10 @@ public class ActivityTracker extends AppCompatActivity
     private void  updateCache(Location location) {
         if (DEBUG) Log.d(LOG, "updateCache()");
 
-        UnitSplitCalorie unitSplitCalorie = new UnitSplitCalorie(location);
+        UnitSplit unitSplit = new UnitSplit(location);
 
 
-        mUnitSplitCalorieList.add(unitSplitCalorie);
+        mUnitSplitList.add(unitSplit);
 
         //save time elapsed
         //get time from Chronometer
@@ -975,7 +906,7 @@ public class ActivityTracker extends AppCompatActivity
 
     private void displayResults(){
 
-        displayMap(mUnitSplitCalorieList);
+        displayMap(mUnitSplitList);
 
         //TODO:  why does sound get truncated?
         playSound();
@@ -996,13 +927,13 @@ public class ActivityTracker extends AppCompatActivity
     private void removeOutliers(){
 
         //assume first and last data points are accurate
-        if (mUnitSplitCalorieList.size() >= 4)
+        if (mUnitSplitList.size() >= 4)
 
         //check for outliers for all other data
-        for (int i = 1; i < mUnitSplitCalorieList.size() - 2; i++){
+        for (int i = 1; i < mUnitSplitList.size() - 2; i++){
 
-            float distance = mUnitSplitCalorieList.get(i).getLocation().distanceTo(mUnitSplitCalorieList.get(i+1).getLocation());
-            float time = (mUnitSplitCalorieList.get(i+1).getLocation().getTime() - mUnitSplitCalorieList.get(i).getLocation().getTime())/1000;
+            float distance = mUnitSplitList.get(i).getLocation().distanceTo(mUnitSplitList.get(i+1).getLocation());
+            float time = (mUnitSplitList.get(i+1).getLocation().getTime() - mUnitSplitList.get(i).getLocation().getTime())/1000;
             float speed = distance/time;
 
             //compare against world records for this activity
@@ -1011,11 +942,11 @@ public class ActivityTracker extends AppCompatActivity
 
                 Log.i(LOG, "Removing location data: Distance: " + distance + ", Time: " + time + "\n");
                 //remove this datapoint
-                mUnitSplitCalorieList.remove(i+1);
+                mUnitSplitList.remove(i+1);
 
                 //if there are more than 3 datapoints left, re-evaluate the next speed based on the previous and following data points from the one that was removed,
                 //by decrementing.  For example if there are 5 datapoints and the 3rd one was removed, need to reevaluate the speed between datapoint 2 and datapoint 4.
-                if(mUnitSplitCalorieList.size() >= 4){
+                if(mUnitSplitList.size() >= 4){
                     i--;
                 }
             }
@@ -1146,9 +1077,9 @@ public class ActivityTracker extends AppCompatActivity
 
         //TODO: replace references of mLocationList with mLocationTimeList
         //if (DEBUG) Log.d(LOG, "displayCurrent: intervalCount" + mLocationList.size());
-        if (DEBUG) Log.d(LOG, "displayCurrent: intervalCount" + mUnitSplitCalorieList.size());
+        if (DEBUG) Log.d(LOG, "displayCurrent: intervalCount" + mUnitSplitList.size());
 
-        if (mUnitSplitCalorieList.size() > 1){
+        if (mUnitSplitList.size() > 1){
 
             //update distance textview
             float distanceFeet = getDistance(1);
@@ -1160,10 +1091,10 @@ public class ActivityTracker extends AppCompatActivity
 
             //TODO: move this somewhere else, where business rules are updated, not UI update
             //update the UnitSplitCalorie list with calorie and speed values
-            refreshUnitSplitCalorie();
+            refreshUnitSplitAndTotalCalorie();
 
-            //number of coins earned
-            float totalCoins =  mActivityDetail.getCalories() * CALORIE_COIN_CONVERSION;
+            //number of coins earned based on distance traveled
+            float totalCoins =  mActivityDetail.getDistanceInFeet() * FEET_COIN_CONVERSION;
 
             //compare previous totalCoins to current one
             float delta = totalCoins - mActivityDetail.getPointsEarned();
@@ -1182,35 +1113,38 @@ public class ActivityTracker extends AppCompatActivity
     }
 
 
-    private void refreshUnitSplitCalorie(){
+    private void refreshUnitSplitAndTotalCalorie(){
 
         //TODO: how to handle the first split, first data point is captured up to 4 seconds after the run starts.
 
-        mActivityDetail.setCalories(0.0f);
+        for ( int i = 0 ; i < mUnitSplitList.size() - 1; i++ ){
 
-            for ( int i = 0 ; i < mUnitSplitCalorieList.size() - 1; i++ ){
+            float minutesElapsed = (mUnitSplitList.get(i+1).getLocation().getTime() - mUnitSplitList.get(i).getLocation().getTime()) / (1000f * 60f) ;
+            float miles = UnitConverter.convertMetersToMiles(mUnitSplitList.get(i + 1).getLocation().distanceTo(mUnitSplitList.get(i).getLocation()));
+            float hoursElapsed = minutesElapsed/60f;
+            float milesPerHour = miles / hoursElapsed;
 
-                float minutesElapsed = (mUnitSplitCalorieList.get(i+1).getLocation().getTime() - mUnitSplitCalorieList.get(i).getLocation().getTime()) / (1000f * 60f) ;
-                float miles = UnitConverter.convertMetersToMiles(mUnitSplitCalorieList.get(i + 1).getLocation().distanceTo(mUnitSplitCalorieList.get(i).getLocation()));
-                float hoursElapsed = minutesElapsed/60f;
-                float milesPerHour = miles / hoursElapsed;
-                //TODO:  calculate different calorie based on each participants weight, in the meantime use the same weight for all participants
-                float calorie = getCalorieByActivity(USER_WEIGHT, minutesElapsed , milesPerHour);
+            //calculate calorie for each participant for their specific activity
+            //update their total calorie count for this activity
+            for ( UserActivity userActivity : mActivityDetail.getUserActivityList()){
 
-                //calculate bearing
-                float bearing = mUnitSplitCalorieList.get(i).getLocation().bearingTo(mUnitSplitCalorieList.get(i+1).getLocation());
-
-                //save calorie, speed, bearing in list
-                mUnitSplitCalorieList.get(i).setCalories(calorie);
-                mUnitSplitCalorieList.get(i).setSpeed(milesPerHour);
-                mUnitSplitCalorieList.get(i).setBearing(bearing);
-
-                //add to total calories
-                mActivityDetail.setCalories(mActivityDetail.getCalories() + calorie);
+                User user = userActivity.getUser();
+                int currentCalorie = userActivity.getCalories();
+                mActivityDetail.setUserCalorie(user, currentCalorie + getCalorieByActivity(user.getWeight(), minutesElapsed, milesPerHour, userActivity.getActivityType().getActivityTypeId()));
             }
+
+            //calculate bearing
+            float bearing = mUnitSplitList.get(i).getLocation().bearingTo(mUnitSplitList.get(i+1).getLocation());
+
+            //save calorie, speed, bearing in list
+            //mUnitSplitCalorieList.get(i).setCalories(calorie);
+            mUnitSplitList.get(i).setSpeed(milesPerHour);
+            mUnitSplitList.get(i).setBearing(bearing);
+
+        }
     }
 
-    private void displayMap(List<UnitSplitCalorie> unitSplitCalorieList){
+    private void displayMap(List<UnitSplit> unitSplitList){
 
         if (mGoogleMap != null){
 
@@ -1225,8 +1159,8 @@ public class ActivityTracker extends AppCompatActivity
             mGoogleMap.setContentDescription("Google Map with polylines.");
 
             ArrayList<LatLng> locationList = new ArrayList<>();
-            for ( UnitSplitCalorie unitSplitCalorie : unitSplitCalorieList) {
-                locationList.add(new LatLng(unitSplitCalorie.getLocation().getLatitude(), unitSplitCalorie.getLocation().getLongitude()));
+            for ( UnitSplit unitSplit : unitSplitList) {
+                locationList.add(new LatLng(unitSplit.getLocation().getLatitude(), unitSplit.getLocation().getLongitude()));
             }
 
             mGoogleMap.addPolyline((new PolylineOptions().addAll(locationList).color(Color.BLUE)));
@@ -1263,8 +1197,8 @@ public class ActivityTracker extends AppCompatActivity
         //DEBUG
         //StringBuilder stringBuilder = new StringBuilder();
 
-        for (int i = 0 ; i < mUnitSplitCalorieList.size() - 1 ; i++){
-            Location.distanceBetween(mUnitSplitCalorieList.get(i).getLocation().getLatitude(),mUnitSplitCalorieList.get(i).getLocation().getLongitude(),mUnitSplitCalorieList.get(i+1).getLocation().getLatitude(),mUnitSplitCalorieList.get(i + 1).getLocation().getLongitude(), intervalDistance);
+        for (int i = 0 ; i < mUnitSplitList.size() - 1 ; i++){
+            Location.distanceBetween(mUnitSplitList.get(i).getLocation().getLatitude(), mUnitSplitList.get(i).getLocation().getLongitude(), mUnitSplitList.get(i+1).getLocation().getLatitude(), mUnitSplitList.get(i + 1).getLocation().getLongitude(), intervalDistance);
             totalDistance += Math.abs(intervalDistance[0]);
             //DEBUG
             //stringBuilder.append("\n" + i + ": " + intervalDistance[0] + " meters");
@@ -1290,11 +1224,11 @@ public class ActivityTracker extends AppCompatActivity
         return totalDistance;
     }
 
-    private float getCalorieByActivity(float weight, float minutes, float speed){
+    private int getCalorieByActivity(float weight, float minutes, float speed, int activityId){
 
         float calorie = 0f;
 
-        switch (mActivityDetail.getActivityId()){
+        switch (activityId){
 
             case 1:
                 calorie = CalorieCalculator.getCalorieByRun(weight, minutes, speed);
@@ -1317,7 +1251,7 @@ public class ActivityTracker extends AppCompatActivity
                 break;
         }
 
-        return calorie;
+        return Math.round(calorie);
     }
 
     /**

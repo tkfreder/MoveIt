@@ -2,8 +2,6 @@ package com.tinakit.moveit.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.location.Address;
-import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,17 +13,12 @@ import android.widget.TextView;
 import com.google.android.gms.maps.model.LatLng;
 import com.squareup.picasso.Picasso;
 import com.tinakit.moveit.R;
-import com.tinakit.moveit.activity.ActivityTracker;
 import com.tinakit.moveit.activity.EditActivity;
 import com.tinakit.moveit.model.ActivityDetail;
-import com.tinakit.moveit.model.ActivityType;
-import com.tinakit.moveit.model.UnitSplitCalorie;
 import com.tinakit.moveit.utility.DateUtility;
 import com.tinakit.moveit.utility.Map;
 
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Created by Tina on 10/19/2015.

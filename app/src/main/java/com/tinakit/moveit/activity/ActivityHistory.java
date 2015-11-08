@@ -4,15 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.tinakit.moveit.utility.AndroidDatabaseManager;
-import com.tinakit.moveit.R;
 import com.tinakit.moveit.adapter.ActivityHistoryRecyclerAdapter;
-import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.ActivityDetail;
-import com.tinakit.moveit.model.UnitSplitCalorie;
 import com.tinakit.moveit.model.User;
 
 import java.util.List;

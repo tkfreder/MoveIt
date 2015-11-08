@@ -7,17 +7,14 @@ import java.util.Date;
 /**
  * Created by Tina on 6/18/2015.
  */
-public class UnitSplitCalorie {
+public class UnitSplit {
 
-    //TODO:  create DB table Splits(userId, timeStart, timeEnd, activityId, weight, minutes, speed, calories)
-    //TODO: create DB table ActivityStats(activityId, userId, weight, minutes, speed, calories)
     private Location mLocation; //contains latitude, longitude, altitude, accuracy, timestamp
     private float mSpeed; //miles per hour
-    private float mCalories;
     private int mActivityId;
     private float mBearing;//need subsequent location data point to calculate bearing
 
-    public UnitSplitCalorie(Location location){
+    public UnitSplit(Location location){
         mLocation = location;
     }
 
@@ -35,14 +32,6 @@ public class UnitSplitCalorie {
 
     public void setSpeed(float speed) {
         mSpeed = speed;
-    }
-
-    public float getCalories() {
-        return mCalories;
-    }
-
-    public void setCalories(float calories) {
-        mCalories = calories;
     }
 
     public int getActivityId() {

@@ -1,7 +1,6 @@
 package com.tinakit.moveit.activity;
 
 import android.content.Intent;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -17,18 +16,15 @@ import com.google.android.gms.maps.SupportStreetViewPanoramaFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.StreetViewPanoramaOrientation;
 import com.tinakit.moveit.R;
-import com.tinakit.moveit.adapter.ActivityDetailRecyclerAdapter;
 import com.tinakit.moveit.adapter.EditActivityRecyclerAdapter;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.ActivityDetail;
-import com.tinakit.moveit.model.UnitSplitCalorie;
+import com.tinakit.moveit.model.UnitSplit;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.utility.DateUtility;
 import com.tinakit.moveit.utility.Map;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -109,7 +105,7 @@ public class EditActivity extends AppCompatActivity {
             // Initialize recycler view
             mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
-            List<UnitSplitCalorie> unitSplitList = new ArrayList<>();
+            List<UnitSplit> unitSplitList = new ArrayList<>();
             unitSplitList = mDatabaseHelper.getActivityLocationData(mActivityId);
 
 

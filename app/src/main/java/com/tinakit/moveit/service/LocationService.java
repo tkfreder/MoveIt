@@ -18,7 +18,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.tinakit.moveit.activity.ActivityTracker;
-import com.tinakit.moveit.model.UnitSplitCalorie;
+import com.tinakit.moveit.model.UnitSplit;
 
 import org.apache.commons.lang3.time.StopWatch;
 
@@ -70,7 +70,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     // Location list
     //TODO:to be replaced by mLocationTimeList
     private List<Location> mLocationList = new ArrayList<Location>();
-    private List<UnitSplitCalorie> mUnitSplitCalorieList = new ArrayList<>();
+    private List<UnitSplit> mUnitSplitList = new ArrayList<>();
 
     StopWatch mStopWatch = new StopWatch();
     private Date mStartDate;
@@ -381,7 +381,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         //save current location
         mLocationList.add(location);
 
-        mUnitSplitCalorieList.add(new UnitSplitCalorie(location));
+        mUnitSplitList.add(new UnitSplit(location));
 
         //save time elapsed
         //get time from Chronometer in MainActivity
@@ -465,8 +465,8 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     //  getLocationTimeList()
     //**********************************************************************************************
 
-    public List<UnitSplitCalorie> getUnitSplitCalorieList(){
-        return mUnitSplitCalorieList;
+    public List<UnitSplit> getUnitSplitList(){
+        return mUnitSplitList;
     }
 
     //**********************************************************************************************

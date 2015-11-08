@@ -15,20 +15,18 @@ import android.os.Parcel;
 public class ActivityDetail implements Parcelable {
 
     private int mActivityId;
-    private List<User> mUserList;
-    private List<ActivityType> mActivityTypeList;
+    private List<UserActivity> mUserActivityList;
     private LatLng mStartLocation;
     private Date mStartDate;  //"YYYY-MM-DD HH:MM:SS.SSS"
     private Date mEndDate;  //"YYYY-MM-DD HH:MM:SS.SSS"
     private float mDistanceInFeet;
-    private float mCalories;
+
     private float mPointsEarned;
     private float mBearing;
 
     public ActivityDetail(){
 
-        mUserList = new ArrayList<>();
-        mActivityTypeList = new ArrayList<>();
+        mUserActivityList = new ArrayList<>();
     }
 
     public int getActivityId() {
@@ -39,11 +37,10 @@ public class ActivityDetail implements Parcelable {
         mActivityId = activityId;
     }
 
-    public boolean addUserActivity(User user, ActivityType activityType){
+    public boolean addUserActivity(UserActivity userActivity){
 
-        if (!mUserList.contains(user)){
-            mUserList.add(user);
-            mActivityTypeList.add(activityType);
+        if (!mUserActivityList.contains(userActivity.getUser())){
+            mUserActivityList.add(userActivity);
             return true;
         }
         else
@@ -51,41 +48,52 @@ public class ActivityDetail implements Parcelable {
 
     }
 
-    public boolean removeUserActivity(User user){
+    public boolean removeUserActivity(UserActivity userActivity){
 
-        if (mUserList.contains(user)){
-            int index = mUserList.indexOf(user);
-            mUserList.remove(user);
-
-            mActivityTypeList.remove(index);
+        if (mUserActivityList.contains(userActivity.getUser())){
+            mUserActivityList.remove(userActivity);
             return true;
         }
         else
             return false;
     }
 
-    public List<User> getUserList(){
+    public List<UserActivity> getUserActivityList(){
 
-        return mUserList;
+        return mUserActivityList;
     }
 
-    public boolean hasUser(User user){
+    public void setUserActivityList(List<UserActivity> userActivityList){
 
-        return mUserList.contains(user);
+        mUserActivityList = userActivityList;
     }
 
-    public void setUserList(List<User> userList){
+    public boolean setUserCalorie(User user, int calorie){
 
-        mUserList = userList;
+        for (UserActivity userActivity : mUserActivityList) {
+
+            if (user.equals(userActivity.getUser())) {
+
+                userActivity.setCalories(calorie);
+                return true;
+            }
+        }
+
+        return false;
     }
 
+    public int getUserCalorie(User user){
 
-    public void setActivityTypeList(List<ActivityType> activityTypeList){
-        mActivityTypeList = activityTypeList;
-    }
+        for (UserActivity userActivity : mUserActivityList) {
 
-    public List<ActivityType> getActivityTypeList(){
-        return mActivityTypeList;
+            if (user.equals(userActivity.getUser())) {
+
+                return userActivity.getCalories();
+
+            }
+        }
+
+        return -1;
     }
 
     public LatLng getStartLocation() {
@@ -120,14 +128,6 @@ public class ActivityDetail implements Parcelable {
         mDistanceInFeet = distanceInFeet;
     }
 
-    public float getCalories() {
-        return mCalories;
-    }
-
-    public void setCalories(float calories) {
-        mCalories = calories;
-    }
-
     public float getPointsEarned() {
         return mPointsEarned;
     }
@@ -144,19 +144,15 @@ public class ActivityDetail implements Parcelable {
         mBearing = bearing;
     }
 
+
+
     protected ActivityDetail(Parcel in) {
         mActivityId = in.readInt();
         if (in.readByte() == 0x01) {
-            mUserList = new ArrayList<User>();
-            in.readList(mUserList, User.class.getClassLoader());
+            mUserActivityList = new ArrayList<UserActivity>();
+            in.readList(mUserActivityList, UserActivity.class.getClassLoader());
         } else {
-            mUserList = null;
-        }
-        if (in.readByte() == 0x01) {
-            mActivityTypeList = new ArrayList<ActivityType>();
-            in.readList(mActivityTypeList, ActivityType.class.getClassLoader());
-        } else {
-            mActivityTypeList = null;
+            mUserActivityList = null;
         }
         mStartLocation = (LatLng) in.readValue(LatLng.class.getClassLoader());
         long tmpMStartDate = in.readLong();
@@ -164,7 +160,6 @@ public class ActivityDetail implements Parcelable {
         long tmpMEndDate = in.readLong();
         mEndDate = tmpMEndDate != -1 ? new Date(tmpMEndDate) : null;
         mDistanceInFeet = in.readFloat();
-        mCalories = in.readFloat();
         mPointsEarned = in.readFloat();
         mBearing = in.readFloat();
     }
@@ -177,23 +172,16 @@ public class ActivityDetail implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(mActivityId);
-        if (mUserList == null) {
+        if (mUserActivityList == null) {
             dest.writeByte((byte) (0x00));
         } else {
             dest.writeByte((byte) (0x01));
-            dest.writeList(mUserList);
-        }
-        if (mActivityTypeList == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeList(mActivityTypeList);
+            dest.writeList(mUserActivityList);
         }
         dest.writeValue(mStartLocation);
         dest.writeLong(mStartDate != null ? mStartDate.getTime() : -1L);
         dest.writeLong(mEndDate != null ? mEndDate.getTime() : -1L);
         dest.writeFloat(mDistanceInFeet);
-        dest.writeFloat(mCalories);
         dest.writeFloat(mPointsEarned);
         dest.writeFloat(mBearing);
     }

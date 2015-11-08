@@ -11,15 +11,15 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
 import android.util.Log;
 import android.database.SQLException;
-import android.view.View;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.ActivityType;
 import com.tinakit.moveit.model.Reward;
 import com.tinakit.moveit.model.RewardStatusType;
-import com.tinakit.moveit.model.UnitSplitCalorie;
+import com.tinakit.moveit.model.UnitSplit;
 import com.tinakit.moveit.model.User;
+import com.tinakit.moveit.model.UserActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -58,6 +58,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     private static final String KEY_ACTIVITY_USERS_ACTIVITY_ID = "activityId";
     private static final String KEY_ACTIVITY_USERS_USER_ID = "userId";
     private static final String KEY_ACTIVITY_USERS_ACTIVITY_TYPE_ID_FK = "activityTypeId";
+    private static final String KEY_ACTIVITY_USERS_CALORIE = "calorie";
 
     //USERS TABLE
     private static final String TABLE_USERS = "Users";
@@ -185,7 +186,8 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 KEY_ACTIVITY_USERS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // Define a primary key
                 KEY_ACTIVITY_USERS_ACTIVITY_ID + " INTEGER, " +
                 KEY_ACTIVITY_USERS_USER_ID  + " INTEGER, " +
-                KEY_ACTIVITY_USERS_ACTIVITY_TYPE_ID_FK + " INTEGER " +
+                KEY_ACTIVITY_USERS_ACTIVITY_TYPE_ID_FK + " INTEGER, " +
+                KEY_ACTIVITY_USERS_CALORIE + " INTEGER " +
                 ")";
 
         String CREATE_ACTIVITY_TYPE_TABLE = "CREATE TABLE " + TABLE_ACTIVITY_TYPE +
@@ -546,14 +548,14 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
      ***********************************************************************************************
      */
 
-    public int insertActivityUsers(long activityId, List<User> userList, List<ActivityType> activityTypeList){
+    public int insertActivityUsers(long activityId, List<UserActivity> userActivityList){
 
         int rowsAffected = 0;
 
         // Create and/or open the database for writing
         //SQLiteDatabase db = getWritableDatabase();
 
-        for (int i = 0; i < userList.size(); i++) {
+        for (int i = 0; i < userActivityList.size(); i++) {
 
             // It's a good idea to wrap our insert in a transaction. This helps with performance and ensures
             // consistency of the database.
@@ -563,8 +565,9 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
                 ContentValues values = new ContentValues();
                 values.put(KEY_ACTIVITY_USERS_ACTIVITY_ID, activityId);
-                values.put(KEY_ACTIVITY_USERS_USER_ID, userList.get(i).getUserId());
-                values.put(KEY_ACTIVITY_USERS_ACTIVITY_TYPE_ID_FK, activityTypeList.get(i).getActivityTypeId());
+                values.put(KEY_ACTIVITY_USERS_USER_ID, userActivityList.get(i).getUser().getUserId());
+                values.put(KEY_ACTIVITY_USERS_ACTIVITY_TYPE_ID_FK, userActivityList.get(i).getActivityType().getActivityTypeId());
+                values.put(KEY_ACTIVITY_USERS_CALORIE, userActivityList.get(i).getCalories());
 
                 // Notice how we haven't specified the primary key. SQLite auto increments the primary key column.
                 if (db.insertOrThrow(TABLE_ACTIVITY_USERS, null, values) != -1)
@@ -649,7 +652,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
      ***********************************************************************************************
      */
 
-    public long insertActivity(float startLatitude, float startLongitude, Date startDate, Date endDate, float distanceInFeet, float calories, float points, float bearing){
+    public long insertActivity(float startLatitude, float startLongitude, Date startDate, Date endDate, float distanceInFeet, float points, float bearing){
 
         long activityId = -1;
 
@@ -667,7 +670,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             values.put(KEY_ACTIVITY_START_DATE, new SimpleDateFormat(DATE_FORMAT).format(startDate));
             values.put(KEY_ACTIVITY_END_DATE, new SimpleDateFormat(DATE_FORMAT).format(endDate));
             values.put(KEY_ACTIVITY_DISTANCE_FEET, distanceInFeet);
-            values.put(KEY_ACTIVITY_CALORIES, calories);
             values.put(KEY_ACTIVITY_POINTS_EARNED, points);
             values.put(KEY_ACTIVITY_BEARING, bearing);
 
@@ -701,7 +703,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                             ,KEY_ACTIVITY_START_DATE
                             ,KEY_ACTIVITY_END_DATE
                             ,KEY_ACTIVITY_DISTANCE_FEET
-                            ,KEY_ACTIVITY_CALORIES
                             ,KEY_ACTIVITY_POINTS_EARNED},
                     KEY_ACTIVITY_ID + " = ?",
                     new String[]{String.valueOf(activityId)}, null, null, KEY_ACTIVITY_START_DATE);
@@ -715,7 +716,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                     activityDetail.setStartLocation(new LatLng(cursor.getFloat(cursor.getColumnIndex(KEY_ACTIVITY_START_LATITUDE)), cursor.getFloat(cursor.getColumnIndex(KEY_ACTIVITY_START_LONGITUDE))));
                     activityDetail.setStartDate(new SimpleDateFormat(DATE_FORMAT).parse(cursor.getString(cursor.getColumnIndex(KEY_ACTIVITY_START_DATE))));
                     activityDetail.setEndDate(new SimpleDateFormat(DATE_FORMAT).parse(cursor.getString(cursor.getColumnIndex(KEY_ACTIVITY_END_DATE))));
-                    activityDetail.setCalories(cursor.getFloat(cursor.getColumnIndex(KEY_ACTIVITY_CALORIES)));
                     activityDetail.setDistanceInFeet(cursor.getFloat(cursor.getColumnIndex(KEY_ACTIVITY_DISTANCE_FEET)));
                     activityDetail.setPointsEarned(cursor.getFloat(cursor.getColumnIndex(KEY_ACTIVITY_POINTS_EARNED)));
 
@@ -793,7 +793,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
      ***********************************************************************************************
      */
 
-    public void insertActivityLocationData(long activityId, Date timeStamp, double latitude, double longitude, double altitude, float accuracy, float bearing, float calories, float milesPerHour){
+    public void insertActivityLocationData(long activityId, Date timeStamp, double latitude, double longitude, double altitude, float accuracy, float bearing, float milesPerHour){
 
         // Create and/or open the database for writing
         //SQLiteDatabase db = getWritableDatabase();
@@ -811,7 +811,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             values.put(KEY_ACTIVITY_LOCATION_DATA_ALTITUDE, altitude);
             values.put(KEY_ACTIVITY_LOCATION_DATA_ACCURACY, accuracy);
             values.put(KEY_ACTIVITY_LOCATION_DATA_BEARING, bearing);
-            values.put(KEY_ACTIVITY_LOCATION_DATA_CALORIES, calories);
             values.put(KEY_ACTIVITY_LOCATION_DATA_MILES_PER_HOUR, milesPerHour);
 
             // Notice how we haven't specified the primary key. SQLite auto increments the primary key column.
@@ -825,13 +824,13 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
     }
 
-    public List<UnitSplitCalorie> getActivityLocationData(long activityId){
+    public List<UnitSplit> getActivityLocationData(long activityId){
 
         // Create and/or open the database for writing
         //SQLiteDatabase db = getReadableDatabase();
 
         //initialize UnitSplitCalorie array
-        List<UnitSplitCalorie> locationList = new ArrayList<>();
+        List<UnitSplit> locationList = new ArrayList<>();
 
         try {
 
@@ -843,7 +842,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                             ,KEY_ACTIVITY_LOCATION_DATA_ALTITUDE
                             ,KEY_ACTIVITY_LOCATION_DATA_ACCURACY
                             ,KEY_ACTIVITY_LOCATION_DATA_BEARING
-                            ,KEY_ACTIVITY_LOCATION_DATA_CALORIES
                             ,KEY_ACTIVITY_LOCATION_DATA_MILES_PER_HOUR
                     },
                     KEY_ACTIVITY_LOCATION_DATA_ACTIVITY_ID_FK + " = ?",
@@ -861,12 +859,11 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                         location.setAccuracy(cursor.getFloat(cursor.getColumnIndex(KEY_ACTIVITY_LOCATION_DATA_ACCURACY)));
                         location.setTime(new SimpleDateFormat(DATE_FORMAT).parse(cursor.getString(cursor.getColumnIndex(KEY_ACTIVITY_LOCATION_DATA_TIMESTAMP))).getTime());
 
-                        UnitSplitCalorie unitSplitCalorie = new UnitSplitCalorie(location);
-                        unitSplitCalorie.setActivityId(cursor.getInt(cursor.getColumnIndex(KEY_ACTIVITY_LOCATION_DATA_ACTIVITY_ID_FK)));
-                        unitSplitCalorie.setBearing(cursor.getFloat(cursor.getColumnIndex(KEY_ACTIVITY_LOCATION_DATA_BEARING)));
-                        unitSplitCalorie.setCalories(cursor.getFloat(cursor.getColumnIndex(KEY_ACTIVITY_LOCATION_DATA_CALORIES)));
-                        unitSplitCalorie.setSpeed(cursor.getFloat(cursor.getColumnIndex(KEY_ACTIVITY_LOCATION_DATA_MILES_PER_HOUR)));
-                        locationList.add(unitSplitCalorie);
+                        UnitSplit unitSplit = new UnitSplit(location);
+                        unitSplit.setActivityId(cursor.getInt(cursor.getColumnIndex(KEY_ACTIVITY_LOCATION_DATA_ACTIVITY_ID_FK)));
+                        unitSplit.setBearing(cursor.getFloat(cursor.getColumnIndex(KEY_ACTIVITY_LOCATION_DATA_BEARING)));
+                        unitSplit.setSpeed(cursor.getFloat(cursor.getColumnIndex(KEY_ACTIVITY_LOCATION_DATA_MILES_PER_HOUR)));
+                        locationList.add(unitSplit);
                     }while (cursor.moveToNext());
 
                 }

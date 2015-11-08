@@ -15,14 +15,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.squareup.picasso.Picasso;
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.model.ActivityDetail;
-import com.tinakit.moveit.model.UnitSplitCalorie;
+import com.tinakit.moveit.model.UnitSplit;
 import com.tinakit.moveit.utility.Collections;
 import com.tinakit.moveit.utility.DateUtility;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -60,7 +59,7 @@ public class ActivityDetailRecyclerAdapter extends RecyclerView.Adapter<Activity
     private Location location7 = new Location("tarpits1");
     private Location location8 = new Location("tarpits2");
     private float heading;
-    ArrayList<UnitSplitCalorie> locationList;
+    ArrayList<UnitSplit> locationList;
     String address;
 
 
@@ -71,14 +70,14 @@ public class ActivityDetailRecyclerAdapter extends RecyclerView.Adapter<Activity
 
         locationList = new ArrayList<>();
         float bearing = 0f;
-        UnitSplitCalorie unit;
+        UnitSplit unit;
 
         location1.setLatitude(HOME1.latitude);
         location1.setLongitude(HOME1.longitude);
         location2.setLatitude(HOME2.latitude);
         location2.setLongitude(HOME2.longitude);
         bearing = location1.bearingTo(location2);
-        unit = new UnitSplitCalorie(location1);
+        unit = new UnitSplit(location1);
         unit.setBearing(bearing);
         locationList.add(unit);
 
@@ -87,7 +86,7 @@ public class ActivityDetailRecyclerAdapter extends RecyclerView.Adapter<Activity
         location4.setLatitude(GETTY2.latitude);
         location4.setLongitude(GETTY2.longitude);
         bearing = location3.bearingTo(location4);
-        unit = new UnitSplitCalorie(location3);
+        unit = new UnitSplit(location3);
         unit.setBearing(bearing);
         locationList.add(unit);
 
@@ -96,7 +95,7 @@ public class ActivityDetailRecyclerAdapter extends RecyclerView.Adapter<Activity
         location6.setLatitude(ANNENBERG2.latitude);
         location6.setLongitude(ANNENBERG2.longitude);
         bearing = location5.bearingTo(location6);
-        unit = new UnitSplitCalorie(location5);
+        unit = new UnitSplit(location5);
         unit.setBearing(bearing);
         locationList.add(unit);
 
@@ -105,7 +104,7 @@ public class ActivityDetailRecyclerAdapter extends RecyclerView.Adapter<Activity
         location8.setLatitude(TARPITS2.latitude);
         location8.setLongitude(TARPITS2.longitude);
         bearing = location7.bearingTo(location8);
-        unit = new UnitSplitCalorie(location7);
+        unit = new UnitSplit(location7);
         unit.setBearing(bearing);
         locationList.add(unit);
 
