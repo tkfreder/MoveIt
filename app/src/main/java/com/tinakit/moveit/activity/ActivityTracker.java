@@ -787,27 +787,6 @@ public class ActivityTracker extends AppCompatActivity
         mChronometer.setBase(SystemClock.elapsedRealtime());
         mChronometer.start();
 
-        disableCheckBoxes();
-
-    }
-
-    private void disableCheckBoxes(){
-
-        int numUsers = mUserCheckBoxLayout.getChildCount();
-
-        for (int i = 0; i < numUsers; i++){
-
-            LinearLayout linearLayout = (LinearLayout)mUserCheckBoxLayout.getChildAt(i);
-            CheckBox checkBox = (CheckBox)linearLayout.getChildAt(0);
-            checkBox.setVisibility(View.GONE);
-            TextView textView = (TextView)linearLayout.getChildAt(1);
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, USERNAME_FONT_SIZE);
-
-            if (!checkBox.isChecked()){
-                textView.setVisibility(View.GONE);
-            }
-
-        }
     }
 
     private void stopRun(){
