@@ -77,7 +77,7 @@ public class EditActivity extends AppCompatActivity {
                 mStreetName.setText(Map.getStreetName(EditActivity.this, mActivityDetail.getStartLocation()));
 
                 mPoints = (TextView) findViewById(R.id.points);
-                mPoints.setText(String.format("%.0f", mActivityDetail.getPointsEarned()));
+                //mPoints.setText(String.format("%.0f", mActivityDetail.getPointsEarned()));
 
                 mDistance = (TextView) findViewById(R.id.distanceInFeet);
                 mDistance.setText(String.format("%.0f", mActivityDetail.getDistanceInFeet()));

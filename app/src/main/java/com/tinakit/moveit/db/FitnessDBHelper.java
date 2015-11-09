@@ -80,7 +80,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     private static final String KEY_ACTIVITY_END_DATE =  "endDate";  //milliseconds have passed since January 1, 1970, 00:00:00 GMT
     private static final String KEY_ACTIVITY_DISTANCE_FEET = "distanceInFeet";
     private static final String KEY_ACTIVITY_CALORIES = "calories";
-    private static final String KEY_ACTIVITY_POINTS_EARNED = "pointsEarned";
     private static final String KEY_ACTIVITY_BEARING = "bearing";
 
     //ACTIVITY_LOCATION_DATA TABLE
@@ -211,7 +210,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 KEY_ACTIVITY_END_DATE  + " TEXT, " +
                 KEY_ACTIVITY_DISTANCE_FEET  + " REAL, " +
                 KEY_ACTIVITY_CALORIES  + " REAL, " +
-                KEY_ACTIVITY_POINTS_EARNED  + " REAL," +
                 KEY_ACTIVITY_BEARING + " REAL" +
                 ")";
 
@@ -652,7 +650,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
      ***********************************************************************************************
      */
 
-    public long insertActivity(float startLatitude, float startLongitude, Date startDate, Date endDate, float distanceInFeet, float points, float bearing){
+    public long insertActivity(float startLatitude, float startLongitude, Date startDate, Date endDate, float distanceInFeet, float bearing){
 
         long activityId = -1;
 
@@ -670,7 +668,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             values.put(KEY_ACTIVITY_START_DATE, new SimpleDateFormat(DATE_FORMAT).format(startDate));
             values.put(KEY_ACTIVITY_END_DATE, new SimpleDateFormat(DATE_FORMAT).format(endDate));
             values.put(KEY_ACTIVITY_DISTANCE_FEET, distanceInFeet);
-            values.put(KEY_ACTIVITY_POINTS_EARNED, points);
             values.put(KEY_ACTIVITY_BEARING, bearing);
 
 
@@ -702,8 +699,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                             ,KEY_ACTIVITY_START_LONGITUDE
                             ,KEY_ACTIVITY_START_DATE
                             ,KEY_ACTIVITY_END_DATE
-                            ,KEY_ACTIVITY_DISTANCE_FEET
-                            ,KEY_ACTIVITY_POINTS_EARNED},
+                            ,KEY_ACTIVITY_DISTANCE_FEET},
                     KEY_ACTIVITY_ID + " = ?",
                     new String[]{String.valueOf(activityId)}, null, null, KEY_ACTIVITY_START_DATE);
 
@@ -717,8 +713,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                     activityDetail.setStartDate(new SimpleDateFormat(DATE_FORMAT).parse(cursor.getString(cursor.getColumnIndex(KEY_ACTIVITY_START_DATE))));
                     activityDetail.setEndDate(new SimpleDateFormat(DATE_FORMAT).parse(cursor.getString(cursor.getColumnIndex(KEY_ACTIVITY_END_DATE))));
                     activityDetail.setDistanceInFeet(cursor.getFloat(cursor.getColumnIndex(KEY_ACTIVITY_DISTANCE_FEET)));
-                    activityDetail.setPointsEarned(cursor.getFloat(cursor.getColumnIndex(KEY_ACTIVITY_POINTS_EARNED)));
-
                 }
 
             }catch(Exception exception) {
@@ -751,7 +745,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         try {
 
             Cursor cursor = db.query(TABLE_ACTIVITIES,
-                    new String[]{KEY_ACTIVITY_ID,KEY_ACTIVITY_START_DATE,KEY_ACTIVITY_END_DATE,KEY_ACTIVITY_POINTS_EARNED},
+                    new String[]{KEY_ACTIVITY_ID,KEY_ACTIVITY_START_DATE,KEY_ACTIVITY_END_DATE},
                     KEY_ACTIVITY_USER_ID_FK + " = ?",
                     new String[]{String.valueOf(user.getUserId())}, null, null, KEY_ACTIVITY_ID);
 
@@ -764,7 +758,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                         activityDetail.setActivityId(cursor.getInt(cursor.getColumnIndex(KEY_ACTIVITY_ID)));
                         activityDetail.setStartDate(new SimpleDateFormat(DATE_FORMAT).parse(cursor.getString(cursor.getColumnIndex(KEY_ACTIVITY_START_DATE))));
                         activityDetail.setEndDate(new SimpleDateFormat(DATE_FORMAT).parse(cursor.getString(cursor.getColumnIndex(KEY_ACTIVITY_END_DATE))));
-                        activityDetail.setPointsEarned(cursor.getFloat(cursor.getColumnIndex(KEY_ACTIVITY_POINTS_EARNED)));
                         activityDetailList.add(activityDetail);
 
                     } while(cursor.moveToNext());}

@@ -15,6 +15,7 @@ public class UserActivity implements Parcelable {
     public UserActivity(User user){
 
         mUser = user;
+        mCalories = 0;
     }
 
     public User getUser() {

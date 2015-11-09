@@ -20,8 +20,6 @@ public class ActivityDetail implements Parcelable {
     private Date mStartDate;  //"YYYY-MM-DD HH:MM:SS.SSS"
     private Date mEndDate;  //"YYYY-MM-DD HH:MM:SS.SSS"
     private float mDistanceInFeet;
-
-    private float mPointsEarned;
     private float mBearing;
 
     public ActivityDetail(){
@@ -37,27 +35,6 @@ public class ActivityDetail implements Parcelable {
         mActivityId = activityId;
     }
 
-    public boolean addUserActivity(UserActivity userActivity){
-
-        if (!mUserActivityList.contains(userActivity.getUser())){
-            mUserActivityList.add(userActivity);
-            return true;
-        }
-        else
-            return false;
-
-    }
-
-    public boolean removeUserActivity(UserActivity userActivity){
-
-        if (mUserActivityList.contains(userActivity.getUser())){
-            mUserActivityList.remove(userActivity);
-            return true;
-        }
-        else
-            return false;
-    }
-
     public List<UserActivity> getUserActivityList(){
 
         return mUserActivityList;
@@ -66,34 +43,6 @@ public class ActivityDetail implements Parcelable {
     public void setUserActivityList(List<UserActivity> userActivityList){
 
         mUserActivityList = userActivityList;
-    }
-
-    public boolean setUserCalorie(User user, int calorie){
-
-        for (UserActivity userActivity : mUserActivityList) {
-
-            if (user.equals(userActivity.getUser())) {
-
-                userActivity.setCalories(calorie);
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public int getUserCalorie(User user){
-
-        for (UserActivity userActivity : mUserActivityList) {
-
-            if (user.equals(userActivity.getUser())) {
-
-                return userActivity.getCalories();
-
-            }
-        }
-
-        return -1;
     }
 
     public LatLng getStartLocation() {
@@ -128,14 +77,6 @@ public class ActivityDetail implements Parcelable {
         mDistanceInFeet = distanceInFeet;
     }
 
-    public float getPointsEarned() {
-        return mPointsEarned;
-    }
-
-    public void setPointsEarned(float pointsEarned) {
-        mPointsEarned = pointsEarned;
-    }
-
     public float getBearing() {
         return mBearing;
     }
@@ -143,8 +84,6 @@ public class ActivityDetail implements Parcelable {
     public void setBearing(float bearing) {
         mBearing = bearing;
     }
-
-
 
     protected ActivityDetail(Parcel in) {
         mActivityId = in.readInt();
@@ -160,7 +99,6 @@ public class ActivityDetail implements Parcelable {
         long tmpMEndDate = in.readLong();
         mEndDate = tmpMEndDate != -1 ? new Date(tmpMEndDate) : null;
         mDistanceInFeet = in.readFloat();
-        mPointsEarned = in.readFloat();
         mBearing = in.readFloat();
     }
 
@@ -182,7 +120,6 @@ public class ActivityDetail implements Parcelable {
         dest.writeLong(mStartDate != null ? mStartDate.getTime() : -1L);
         dest.writeLong(mEndDate != null ? mEndDate.getTime() : -1L);
         dest.writeFloat(mDistanceInFeet);
-        dest.writeFloat(mPointsEarned);
         dest.writeFloat(mBearing);
     }
 

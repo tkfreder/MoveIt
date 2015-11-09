@@ -80,7 +80,7 @@ public class ActivityTracker extends AppCompatActivity
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
     private static final float METER_MILE_CONVERSION = 0.00062137f;
     private static final float METER_FEET_CONVERSION = 3.28084f;
-    private static final float FEET_COIN_CONVERSION = 0.05f;  //20 feet = 1 coin
+    private static final float FEET_COIN_CONVERSION = 0.5f;  //2 feet = 1 coin //TODO: DEBUG
     private static final float CALORIE_COIN_CONVERSION = 10f; //#coins equal to 1 calorie
     private static final float USER_WEIGHT = 50f;
     private static final float USERNAME_FONT_SIZE = 20f;
@@ -94,6 +94,7 @@ public class ActivityTracker extends AppCompatActivity
     private List<Location> mLocationList;
     private List<UnitSplit> mUnitSplitList = new ArrayList<>();
     private float mCurrentAccuracy;
+    private int mTotalPoints = 0;
 
 
     protected static boolean mRequestedService = false;
@@ -153,7 +154,7 @@ public class ActivityTracker extends AppCompatActivity
     //ACCELEROMETER
     private SensorManager mSensorManager;
     private Sensor sensorAccelerometer;
-    private int ACCELEROMETER_DELAY = 60 * 5; //in seconds
+    private int ACCELEROMETER_DELAY = 60 * 30; //in seconds
     ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     private long lastUpdate = 0;
@@ -186,23 +187,11 @@ public class ActivityTracker extends AppCompatActivity
                     pauseTracking();
 
                     //disable accelerometer listener until user clicks on confirm dialog
-                    unregisterAccelerometer();
+                    //unregisterAccelerometer();
 
-                    Dialog confirmDialog = DialogUtility.displayConfirmDialog(ActivityTracker.this, getResources().getString(R.string.no_movement),
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
+                    //display warning message that no movement has been detected
+                    DialogUtility.displayAlertDialog(ActivityTracker.this, getResources().getString(R.string.warning), getResources().getString(R.string.no_movement), getResources().getString(R.string.ok));
 
-                                    resumeTracking();
-                                }
-                            },
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-
-                                    stopRun();
-                                }
-                            });
-
-                    confirmDialog.show();
                 }
 
                 last_x = x;
@@ -217,9 +206,6 @@ public class ActivityTracker extends AppCompatActivity
         //set the flag to not save location data
         mSaveLocationData = false;
 
-        //disable Accelerometer listener
-        unregisterAccelerometer();
-
         //stop timer
         mChronometer.stop();
 
@@ -232,7 +218,7 @@ public class ActivityTracker extends AppCompatActivity
         //set flag to save location data
         mSaveLocationData = true;
 
-        //start accelerometer listener, after a delay of 5 minutes
+        //start accelerometer listener, after a delay of ACCELEROMETER_DELAY
         registerAccelerometer();
 
         //reset time to the time when paused
@@ -737,8 +723,6 @@ public class ActivityTracker extends AppCompatActivity
 
         }
 
-        unregisterAccelerometer();
-
     }
 
     private void registerAccelerometer(){
@@ -842,16 +826,7 @@ public class ActivityTracker extends AppCompatActivity
                 , mActivityDetail.getStartDate()
                 , mActivityDetail.getEndDate()
                 , getDistance(1) //TODO:replace with Enum type
-                , mActivityDetail.getPointsEarned()
                 , mUnitSplitList.size() > 1 ? mUnitSplitList.get(0).getBearing() : 0);
-
-
-        //update points for each user
-        for (UserActivity userActivity: mActivityDetail.getUserActivityList()){
-
-            mDatabaseHelper.setUserPoints(userActivity.getUser(), (int)(userActivity.getUser().getPoints() + mActivityDetail.getPointsEarned()));
-
-        }
 
         if (activityId != -1){
 
@@ -1015,9 +990,7 @@ public class ActivityTracker extends AppCompatActivity
         if (DEBUG) Log.d(LOG, "onDestroy");
         super.onDestroy();
 
-        if(!executor.isTerminated()){
-            executor.shutdownNow();
-        }
+        unregisterAccelerometer();
     }
 
     //**********************************************************************************************
@@ -1072,6 +1045,9 @@ public class ActivityTracker extends AppCompatActivity
             float distanceFeet = getDistance(1);
             mDistance.setText(String.format("%d", (int)distanceFeet));
 
+            //update distance in cache
+            mActivityDetail.setDistanceInFeet(Math.round(distanceFeet));
+
             //update speed feet/minute
             float elapsedMinutes = (float)(SystemClock.elapsedRealtime() - mChronometer.getBase())/(1000 * 60);
             mFeetPerMinute.setText(String.format("%.0f", (float)distanceFeet/elapsedMinutes));
@@ -1081,20 +1057,22 @@ public class ActivityTracker extends AppCompatActivity
             refreshUnitSplitAndTotalCalorie();
 
             //number of coins earned based on distance traveled
-            float totalCoins =  mActivityDetail.getDistanceInFeet() * FEET_COIN_CONVERSION;
+            int totalPoints =  Math.round(mActivityDetail.getDistanceInFeet() * FEET_COIN_CONVERSION);
 
             //compare previous totalCoins to current one
-            float delta = totalCoins - mActivityDetail.getPointsEarned();
+            //TODO:  for now, the points earned is based on distance, so each user will earn the same amount of coins
+            //for now, use points earned of first user to represent the points earned for each user
+            float delta = totalPoints - mTotalPoints;
 
             if(delta > 0 ){
                 playSound();
             }
 
             //update coins
-            mCoins.setText(String.format("%d", Math.round(totalCoins)));
+            mCoins.setText(String.format("%d", totalPoints));
 
             //save latest total number of coins
-            mActivityDetail.setPointsEarned(totalCoins);
+           mTotalPoints = totalPoints;
 
         }
     }
@@ -1113,13 +1091,12 @@ public class ActivityTracker extends AppCompatActivity
 
             //calculate calorie for each participant for their specific activity
             //update their total calorie count for this activity
-            for ( UserActivity userActivity : mActivityDetail.getUserActivityList()){
+            for (int j = 0; j < mActivityDetail.getUserActivityList().size(); j++){
 
-                User user = userActivity.getUser();
-                int currentCalorie = userActivity.getCalories();
-                mActivityDetail.setUserCalorie(user, currentCalorie + getCalorieByActivity(user.getWeight(), minutesElapsed, milesPerHour, userActivity.getActivityType().getActivityTypeId()));
+                User user = mActivityDetail.getUserActivityList().get(j).getUser();
+                int currentCalorie = mActivityDetail.getUserActivityList().get(j).getCalories();
+                mActivityDetail.getUserActivityList().get(j).setCalories(currentCalorie + getCalorieByActivity(user.getWeight(), minutesElapsed, milesPerHour, mActivityDetail.getUserActivityList().get(j).getActivityType().getActivityTypeId()));
             }
-
             //calculate bearing
             float bearing = mUnitSplitList.get(i).getLocation().bearingTo(mUnitSplitList.get(i+1).getLocation());
 

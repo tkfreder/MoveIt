@@ -166,7 +166,7 @@ public class ActivityDetailRecyclerAdapter extends RecyclerView.Adapter<Activity
 
         //TODO: implement leading zeros
         customViewHolder.minutes.setText(String.valueOf(minutesElapsed) + ":" + String.format("%02d", secondsElapsed % 60) + " min");
-        customViewHolder.coins.setText(String.format("%.0f", activityDetail.getPointsEarned()) + " coins");
+        //customViewHolder.coins.setText(String.format("%.0f", activityDetail.getPointsEarned()) + " coins");
 
         //TODO:  placeholder for image, testing Picasso
 

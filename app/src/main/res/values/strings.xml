@@ -113,5 +113,7 @@
     <string name="preference_userIdList">preferenceUserIdList</string>
     <string name="preference_activityTypeList">preferenceActivityTypeList</string>
     <string name="preferences_multiChooserRecyclerAdapter">preferencesMultiChooserRecyclerAdapter</string>
+    <string name="warning">Warning</string>
+    <string name="ok">OK</string>
 
 </resources>
