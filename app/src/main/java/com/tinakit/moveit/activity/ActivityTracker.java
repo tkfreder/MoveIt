@@ -462,32 +462,40 @@ public class ActivityTracker extends AppCompatActivity
         userList = mDatabaseHelper.getUsers();
 
 
-        //add user check boxes
-        for (int i = 0; i < mActivityDetail.getUserActivityList().size(); i++){
+        //get userActivityList out of bundle
+        Bundle bundle  = getIntent().getExtras();
+        if (bundle.containsKey("userActivityList")) {
 
-            LinearLayout linearLayout = new LinearLayout(this);
-            linearLayout.setOrientation(LinearLayout.HORIZONTAL);
-            linearLayout.setLayoutParams(new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
-
-            //username
-            TextView textView = new TextView(this);
-            textView.setTextColor(getResources().getColor(R.color.white));
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, USERNAME_FONT_SIZE);
-            textView.setText(mActivityDetail.getUserActivityList().get(i).getUser().getUserName());
-
-            //activity type icon
-            ImageView imageView = new ImageView(this);
-            imageView.setImageResource(getResources().getIdentifier(mActivityDetail.getUserActivityList().get(i).getActivityType().getActivityName() + "_icon_small", "drawable", getPackageName()));
-            imageView.setLayoutParams(new LinearLayout.LayoutParams(100,100));
-
-            //add checkbox and textview to linear layout
-            linearLayout.addView(textView);
-            linearLayout.addView(imageView);
-
-            //add linear layout to parent linear layout
-            mUserCheckBoxLayout.addView(linearLayout);
+            mActivityDetail.setUserActivityList(new ArrayList(bundle.getParcelableArrayList("userActivityList")));
 
 
+            //add user check boxes
+            for (int i = 0; i < mActivityDetail.getUserActivityList().size(); i++) {
+
+                LinearLayout linearLayout = new LinearLayout(this);
+                linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+                linearLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
+
+                //username
+                TextView textView = new TextView(this);
+                textView.setTextColor(getResources().getColor(R.color.white));
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, USERNAME_FONT_SIZE);
+                textView.setText(mActivityDetail.getUserActivityList().get(i).getUser().getUserName());
+
+                //activity type icon
+                ImageView imageView = new ImageView(this);
+                imageView.setImageResource(getResources().getIdentifier(mActivityDetail.getUserActivityList().get(i).getActivityType().getActivityName() + "_icon_small", "drawable", getPackageName()));
+                imageView.setLayoutParams(new LinearLayout.LayoutParams(100, 100));
+
+                //add checkbox and textview to linear layout
+                linearLayout.addView(textView);
+                linearLayout.addView(imageView);
+
+                //add linear layout to parent linear layout
+                mUserCheckBoxLayout.addView(linearLayout);
+
+
+            }
         }
     }
 

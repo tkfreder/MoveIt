@@ -45,7 +45,7 @@ public class EditActivityRecyclerAdapter extends RecyclerView.Adapter<EditActivi
 
         UnitSplit unitSplit = mUnitSplitList.get(i);
 
-        customViewHolder.stats.setText("speed=" + String.format("%.0f", unitSplit.getSpeed()) + "mi/hr" + " calories=" + String.format("%.0f", unitSplit.getCalories()));
+        customViewHolder.stats.setText("speed=" + String.format("%.0f", unitSplit.getSpeed()) + "mi/hr" );
 
         Picasso.with(mContext)
                 .load("https://maps.googleapis.com/maps/api/streetview?size=400x400&location=" + unitSplit.getLocation().getLatitude() + "," + unitSplit.getLocation().getLongitude() +

@@ -8,9 +8,14 @@ import android.os.Parcel;
  */
 public class UserActivity implements Parcelable {
 
-    User mUser;
-    ActivityType mActivityType;
-    Integer mCalories;
+    private User mUser;
+    private ActivityType mActivityType;
+    private Integer mCalories;
+
+    public UserActivity(User user){
+
+        mUser = user;
+    }
 
     public User getUser() {
         return mUser;
@@ -44,7 +49,7 @@ public class UserActivity implements Parcelable {
 
         UserActivity userActivity = (UserActivity) o;
 
-        return !(mUser != null ? !mUser.equals(userActivity.getUser()) : userActivity.getUser() != null);
+        return !(mUser.getUserName() != null ? !mUser.getUserName().equals(userActivity.getUser().getUserName()) : userActivity.getUser().getUserName() != null);
 
     }
 
@@ -52,6 +57,7 @@ public class UserActivity implements Parcelable {
     public int hashCode() {
         return mUser != null ? mUser.hashCode() : 0;
     }
+
 
     protected UserActivity(Parcel in) {
         mUser = (User) in.readValue(User.class.getClassLoader());
