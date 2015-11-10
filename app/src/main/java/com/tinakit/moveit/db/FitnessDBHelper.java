@@ -63,13 +63,12 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     private static final String TABLE_ACTIVITIES = "Activities";
     private static final String KEY_ACTIVITY_ID = "_id";
     private static final String KEY_ACTIVITY_USER_ID_FK = "userId";
-    private static final String KEY_ACTIVITY_START_LATITUDE = "startLatitude";
-    private static final String KEY_ACTIVITY_START_LONGITUDE = "startLongitude";
-    private static final String KEY_ACTIVITY_START_DATE = "startDate"; //milliseconds have passed since January 1, 1970, 00:00:00 GMT
-    private static final String KEY_ACTIVITY_END_DATE =  "endDate";  //milliseconds have passed since January 1, 1970, 00:00:00 GMT
-    private static final String KEY_ACTIVITY_DISTANCE_FEET = "distanceInFeet";
-    private static final String KEY_ACTIVITY_CALORIES = "calories";
-    private static final String KEY_ACTIVITY_BEARING = "bearing";
+    private static final String KEY_ACTIVITY_START_LATITUDE = "startLatitude";  //redundant from ACTIVITY_LOCATION_DATA, the latitude of the first location data
+    private static final String KEY_ACTIVITY_START_LONGITUDE = "startLongitude"; //redundant from ACTIVITY_LOCATION_DATA, the longitude of the first location data
+    private static final String KEY_ACTIVITY_START_DATE = "startDate"; //redundant from ACTIVITY_LOCATION_DATA, the start datetime of the first location data, milliseconds have passed since January 1, 1970, 00:00:00 GMT
+    private static final String KEY_ACTIVITY_END_DATE =  "endDate";  //redundant from ACTIVITY_LOCATION_DATA, the end datetime of the first location data, milliseconds have passed since January 1, 1970, 00:00:00 GMT
+    private static final String KEY_ACTIVITY_DISTANCE_FEET = "distanceInFeet"; //total feet traveled in this activity
+    private static final String KEY_ACTIVITY_BEARING = "bearing"; //redundant from ACTIVITY_LOCATION_DATA, the bearing of the first location data
 
     //ACTIVITY_LOCATION_DATA TABLE
     private static final String TABLE_ACTIVITY_LOCATION_DATA = "ActivityLocationData";
@@ -197,7 +196,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 KEY_ACTIVITY_START_DATE  + " TEXT, " +
                 KEY_ACTIVITY_END_DATE  + " TEXT, " +
                 KEY_ACTIVITY_DISTANCE_FEET  + " REAL, " +
-                KEY_ACTIVITY_CALORIES  + " REAL, " +
                 KEY_ACTIVITY_BEARING + " REAL" +
                 ")";
 
