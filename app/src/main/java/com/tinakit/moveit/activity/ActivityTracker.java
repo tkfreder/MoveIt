@@ -846,6 +846,14 @@ public class ActivityTracker extends AppCompatActivity
             }
         }
 
+        //update points for each user
+        for (UserActivity userActivity : mActivityDetail.getUserActivityList()){
+
+            User user = userActivity.getUser();
+            user.setPoints(mTotalPoints + user.getPoints());
+            mDatabaseHelper.updateUser(user);
+        }
+
     }
 
     //**********************************************************************************************

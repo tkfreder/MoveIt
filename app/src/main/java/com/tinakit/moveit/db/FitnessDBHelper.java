@@ -42,16 +42,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     //FORMATTING
     private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss:SSS";
 
-    //LOCATIONS TABLE
-    private static final String TABLE_LOCATIONS = "Locations";
-    private static final String KEY_LOCATION_ID = "_id";
-    private static final String KEY_LOCATION_ACTIVITY_ID_FK = "activityId";
-    private static final String KEY_LOCATION_LATITUDE = "latitude";
-    private static final String KEY_LOCATION_LONGITUDE = "longitude";
-    private static final String  KEY_LOCATION_ALTITUDE = "altitude";
-    private static final String KEY_LOCATION_ACCURACY = "accuracy";
-    private static final String  KEY_LOCATION_CREATED_DATE = "createdDate";
-
     //ACTIVITY_USERS TABLE
     private static final String TABLE_ACTIVITY_USERS = "ActivityUsers";
     private static final String KEY_ACTIVITY_USERS_ID = "_id";
@@ -73,7 +63,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     private static final String TABLE_ACTIVITIES = "Activities";
     private static final String KEY_ACTIVITY_ID = "_id";
     private static final String KEY_ACTIVITY_USER_ID_FK = "userId";
-    //private static final String KEY_ACTIVITY_ACTIVITY_TYPE_ID_FK = "activityTypeId";
     private static final String KEY_ACTIVITY_START_LATITUDE = "startLatitude";
     private static final String KEY_ACTIVITY_START_LONGITUDE = "startLongitude";
     private static final String KEY_ACTIVITY_START_DATE = "startDate"; //milliseconds have passed since January 1, 1970, 00:00:00 GMT
@@ -203,7 +192,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         String CREATE_ACTIVITIES_TABLE = "CREATE TABLE " + TABLE_ACTIVITIES +
                 "(" +
                 KEY_ACTIVITY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // Define a primary key
-                //KEY_ACTIVITY_ACTIVITY_TYPE_ID_FK + " INTEGER REFERENCES " + TABLE_ACTIVITY_TYPE + "," + // Define a foreign key
                 KEY_ACTIVITY_START_LATITUDE  + " REAL, " +
                 KEY_ACTIVITY_START_LONGITUDE  + " REAL, " +
                 KEY_ACTIVITY_START_DATE  + " TEXT, " +
@@ -227,16 +215,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 KEY_ACTIVITY_LOCATION_DATA_MILES_PER_HOUR  + " REAL " +
         ")";
 
-        String CREATE_LOCATION_TABLE = "CREATE TABLE " + TABLE_LOCATIONS +
-                "(" +
-                KEY_LOCATION_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // Define a primary key
-                KEY_LOCATION_ACTIVITY_ID_FK + " INTEGER REFERENCES " + TABLE_ACTIVITIES + "," + // Define a foreign key
-                KEY_LOCATION_LATITUDE  + " REAL, " +
-                KEY_LOCATION_LONGITUDE  + " REAL, " +
-                KEY_LOCATION_ALTITUDE  + " REAL, " +
-                KEY_LOCATION_ACCURACY  + " REAL, " +
-                KEY_LOCATION_CREATED_DATE + " INTEGER" +
-                ")";
+
 
         String CREATE_REWARDS_TABLE = "CREATE TABLE " + TABLE_REWARDS +
                 "(" +
@@ -271,7 +250,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 "," + KEY_ACTIVITY_START_LONGITUDE +
                 "," + KEY_ACTIVITY_USERS_USER_ID +
                 ",a." + KEY_ACTIVITY_USERS_ACTIVITY_ID + " AS " + KEY_ACTIVITY_USERS_ACTIVITY_ID +
-                //", MIN(d." + KEY_ACTIVITY_LOCATION_DATA_ID + ")" +
                 " FROM " + TABLE_ACTIVITIES  + " d" +
                 " INNER JOIN " + TABLE_ACTIVITY_USERS + " a on a." + KEY_ACTIVITY_USERS_ACTIVITY_ID + " = d." + KEY_ACTIVITY_ID;
 
@@ -280,7 +258,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_ACTIVITY_TYPE_TABLE);
         db.execSQL(CREATE_ACTIVITIES_TABLE);
         db.execSQL(CREATE_ACTIVITY_LOCATION_DATA_TABLE);
-        db.execSQL(CREATE_LOCATION_TABLE);
         db.execSQL(CREATE_REWARDS_TABLE);
         db.execSQL(CREATE_REWARDUSER_TABLE);
         db.execSQL(CREATE_VIEW_REWARDSTATUSUSER);
@@ -350,7 +327,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACTIVITY_TYPE);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACTIVITIES);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACTIVITY_LOCATION_DATA);
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_LOCATIONS);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_REWARDS);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_REWARDUSER);
             db.execSQL("DROP VIEW IF EXISTS " + VIEW_REWARDSTATUS_USER);
@@ -1275,7 +1251,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         db.beginTransaction();
         try {
             // Order of deletions is important when foreign key relationships exist.
-            db.delete(TABLE_LOCATIONS, null, null);
             db.delete(TABLE_USERS, null, null);
             db.delete(TABLE_ACTIVITY_USERS, null, null);
             db.delete(TABLE_ACTIVITIES, null, null);
