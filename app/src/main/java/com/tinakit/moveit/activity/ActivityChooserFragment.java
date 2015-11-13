@@ -3,8 +3,11 @@ package com.tinakit.moveit.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +31,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ActivityChooserFragment extends AppCompatActivity {
+public class ActivityChooserFragment extends Fragment {
+
+    private FragmentActivity mFragmentActivity;
 
     //cache
     private ActivityDetail mActivityDetail = new ActivityDetail();
@@ -38,52 +43,52 @@ public class ActivityChooserFragment extends AppCompatActivity {
     private MultiChooserRecyclerAdapter mMultiChooserRecyclerAdapter;
     private Button mNextButton;
 
+    @Nullable
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        //fix the orientation to portrait
-        this.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        setContentView(R.layout.multi_activity_chooser);
+        mFragmentActivity  = (FragmentActivity)    super.getActivity();
+        mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        View rootView = inflater.inflate(R.layout.multi_activity_chooser, container, false);
 
         // Get singleton instance of database
-        FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(this);
+        FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(mFragmentActivity);
         List<User> userList = databaseHelper.getUsers();
         List<ActivityType> activityTypeList = databaseHelper.getActivityTypes();
 
         //RecyclerView
         // Initialize recycler view
-        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true); //child items have fixed dimensions, allows the RecyclerView to optimize better by figuring out the exact height and width of the entire list based on the adapter.
 
         // The number of Columns
-        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        //mRecyclerView.setLayoutManager(new GridLayoutManager(mFragmentActivity, 2));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(mFragmentActivity));
 
-        mMultiChooserRecyclerAdapter = new MultiChooserRecyclerAdapter(this, userList, activityTypeList);
+        mMultiChooserRecyclerAdapter = new MultiChooserRecyclerAdapter(mFragmentActivity, userList, activityTypeList);
         mRecyclerView.setAdapter(mMultiChooserRecyclerAdapter);
 
         //next button
-        mNextButton = (Button)findViewById(R.id.nextButton);
+        mNextButton = (Button)rootView.findViewById(R.id.nextButton);
         mNextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                //TODO: replace this with BroadcastReceiver to listen for RecyclerView has at least one user activity selected
-
                 if (mActivityDetail.getUserActivityList().size() > 0){
                     //get users and activity type selected
-                    Intent intent = new Intent(ActivityChooserFragment.this, ActivityTracker.class);
+                    Intent intent = new Intent(mFragmentActivity, ActivityTracker.class);
                     intent.putParcelableArrayListExtra("userActivityList", new ArrayList(mActivityDetail.getUserActivityList()));
                     startActivity(intent);
                 }
                 else {
 
-                    Toast.makeText(getBaseContext(), "Please select an activity for at least one user.", Toast.LENGTH_LONG);
+                    Toast.makeText(getActivity(), "Please select an activity for at least one user.", Toast.LENGTH_LONG);
                 }
             }
         });
 
-
+        return rootView;
     }
 
     private class MultiChooserRecyclerAdapter extends RecyclerView.Adapter<MultiChooserRecyclerAdapter.CustomViewHolder> {
@@ -114,7 +119,7 @@ public class ActivityChooserFragment extends AppCompatActivity {
             User user = mUserList.get(i);
 
             // Populate data from ActivityType data object
-            customViewHolder.avatar.setImageResource(mContext.getResources().getIdentifier(user.getAvatarFileName(), "drawable", mContext.getPackageName()));
+            //customViewHolder.avatar.setImageResource(mContext.getResources().getIdentifier(user.getAvatarFileName(), "drawable", mContext.getPackageName()));
             customViewHolder.username.setText(user.getUserName());
             customViewHolder.activityTypes.setTag(user);
 
@@ -189,13 +194,13 @@ public class ActivityChooserFragment extends AppCompatActivity {
 
         public class CustomViewHolder extends RecyclerView.ViewHolder {
 
-            protected ImageView avatar;
+            ///protected ImageView avatar;
             protected TextView username;
             protected Spinner activityTypes;
 
             public CustomViewHolder(View view) {
                 super(view);
-                this.avatar = (ImageView) view.findViewById(R.id.avatar);
+                //this.avatar = (ImageView) view.findViewById(R.id.avatar);
                 this.username = (TextView)view.findViewById(R.id.username);
                 this.activityTypes = (Spinner)view.findViewById(R.id.activityTypeSpinner);
             }

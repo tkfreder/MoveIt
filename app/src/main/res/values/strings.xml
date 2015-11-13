@@ -12,6 +12,8 @@
     <string name="stop">Stop!</string>
     <string name="restart">Restart</string>
     <string name="again">Let\'s do it again!</string>
+    <string name="start">Start</string>
+    <string name="stats">Stats</string>
     <string name="rewards">Rewards</string>
     <string name="time_limit">Time Limit</string>
     <string name="reached_time_limit_30_minutes">You have reached the time limit of 30 minutes.</string>

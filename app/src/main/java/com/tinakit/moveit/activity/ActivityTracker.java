@@ -23,7 +23,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.Chronometer;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -46,7 +45,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.ActivityDetail;
-import com.tinakit.moveit.model.ActivityType;
 import com.tinakit.moveit.model.ActivityType2;
 import com.tinakit.moveit.model.UnitSplit;
 import com.tinakit.moveit.model.User;
@@ -409,7 +407,8 @@ public class ActivityTracker extends AppCompatActivity
                 finish();
 
                 //display Activity history screen
-                Intent intent = new Intent(getApplicationContext(), ViewStats.class);
+                Intent intent = new Intent(ActivityTracker.this, MainActivity.class);
+                intent.putExtra("tab_index", 1);
                 startActivity(intent);
 
             }

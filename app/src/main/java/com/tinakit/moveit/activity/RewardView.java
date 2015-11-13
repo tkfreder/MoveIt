@@ -66,7 +66,7 @@ public class RewardView extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                startActivity(new Intent(getApplicationContext(), ViewStats.class));
+                startActivity(new Intent(getApplicationContext(), ViewStatsFragment.class));
             }
         });
         mUserName = (TextView)findViewById(R.id.username);
