@@ -723,6 +723,8 @@ public class ActivityTracker extends AppCompatActivity
 
         }
 
+        unregisterAccelerometer();
+
     }
 
     private void registerAccelerometer(){
@@ -1102,7 +1104,7 @@ public class ActivityTracker extends AppCompatActivity
             for (int j = 0; j < mActivityDetail.getUserActivityList().size(); j++){
 
                 User user = mActivityDetail.getUserActivityList().get(j).getUser();
-                int currentCalorie = mActivityDetail.getUserActivityList().get(j).getCalories();
+                float currentCalorie = mActivityDetail.getUserActivityList().get(j).getCalories();
                 mActivityDetail.getUserActivityList().get(j).setCalories(currentCalorie + getCalorieByActivity(user.getWeight(), minutesElapsed, milesPerHour, mActivityDetail.getUserActivityList().get(j).getActivityType().getActivityTypeId()));
             }
             //calculate bearing
@@ -1196,7 +1198,7 @@ public class ActivityTracker extends AppCompatActivity
         return totalDistance;
     }
 
-    private int getCalorieByActivity(float weight, float minutes, float speed, int activityId){
+    private float getCalorieByActivity(float weight, float minutes, float speed, int activityId){
 
         float calorie = 0f;
 
@@ -1223,7 +1225,7 @@ public class ActivityTracker extends AppCompatActivity
                 break;
         }
 
-        return Math.round(calorie);
+        return calorie;
     }
 
     /**

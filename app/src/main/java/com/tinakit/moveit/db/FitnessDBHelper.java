@@ -174,7 +174,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 KEY_ACTIVITY_USERS_ACTIVITY_ID + " INTEGER, " +
                 KEY_ACTIVITY_USERS_USER_ID  + " INTEGER, " +
                 KEY_ACTIVITY_USERS_ACTIVITY_TYPE_ID_FK + " INTEGER, " +
-                KEY_ACTIVITY_USERS_CALORIE + " INTEGER " +
+                KEY_ACTIVITY_USERS_CALORIE + " REAL " +
                 ")";
 
         String CREATE_ACTIVITY_TYPE_TABLE = "CREATE TABLE " + TABLE_ACTIVITY_TYPE +
