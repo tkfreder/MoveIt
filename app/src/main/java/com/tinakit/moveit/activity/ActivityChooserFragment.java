@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ActivityChooser extends AppCompatActivity {
+public class ActivityChooserFragment extends AppCompatActivity {
 
     //cache
     private ActivityDetail mActivityDetail = new ActivityDetail();
@@ -72,7 +72,7 @@ public class ActivityChooser extends AppCompatActivity {
 
                 if (mActivityDetail.getUserActivityList().size() > 0){
                     //get users and activity type selected
-                    Intent intent = new Intent(ActivityChooser.this, ActivityTracker.class);
+                    Intent intent = new Intent(ActivityChooserFragment.this, ActivityTracker.class);
                     intent.putParcelableArrayListExtra("userActivityList", new ArrayList(mActivityDetail.getUserActivityList()));
                     startActivity(intent);
                 }

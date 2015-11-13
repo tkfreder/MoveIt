@@ -1,6 +1,7 @@
 package com.tinakit.moveit.activity;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,7 +14,7 @@ import com.tinakit.moveit.db.FitnessDBHelper;
 /**
  * Created by Tina on 10/26/2015.
  */
-public class ViewStats  extends AppCompatActivity {
+public class ViewStatsFragment extends Fragment {
 
     //UI Widgets
     private RecyclerView mRecyclerView;
