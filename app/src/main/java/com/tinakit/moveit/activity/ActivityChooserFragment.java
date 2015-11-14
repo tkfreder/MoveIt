@@ -54,7 +54,7 @@ public class ActivityChooserFragment extends Fragment {
     //UI Widgets
     private RecyclerView mRecyclerView;
     private MultiChooserRecyclerAdapter mMultiChooserRecyclerAdapter;
-    private Button mNextButton;
+    private static Button mNextButton;
     private CheckBox mUserCheckBox;
 
     @Nullable
@@ -80,7 +80,9 @@ public class ActivityChooserFragment extends Fragment {
 
         // The number of Columns
         //mRecyclerView.setLayoutManager(new GridLayoutManager(mFragmentActivity, 2));
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(mFragmentActivity));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mFragmentActivity);
+        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        mRecyclerView.setLayoutManager(linearLayoutManager);
 
         mMultiChooserRecyclerAdapter = new MultiChooserRecyclerAdapter(mFragmentActivity, userList, mActivityTypeList);
         mRecyclerView.setAdapter(mMultiChooserRecyclerAdapter);
@@ -134,6 +136,7 @@ public class ActivityChooserFragment extends Fragment {
                         public void onClick(DialogInterface dialog, int which) {
 
                             mSelectedActivityTypeId = which;
+
                         }
                     })
                     .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
@@ -164,6 +167,9 @@ public class ActivityChooserFragment extends Fragment {
                                    mActivityDetail.getUserActivityList().remove(index);
 
                             }
+
+                            enableNextButton();
+
                         }
                     })
 
@@ -178,6 +184,16 @@ public class ActivityChooserFragment extends Fragment {
         }
 
     }
+
+    private static void enableNextButton(){
+
+        //enable Next button if there is at least one user participating
+        if (mActivityDetail.getUserActivityList().size() > 0)
+            mNextButton.setEnabled(true);
+        else
+            mNextButton.setEnabled(false);
+    }
+
 
     private class MultiChooserRecyclerAdapter extends RecyclerView.Adapter<MultiChooserRecyclerAdapter.CustomViewHolder> {
 
@@ -209,7 +225,6 @@ public class ActivityChooserFragment extends Fragment {
             // Populate data from ActivityType data object
             //customViewHolder.avatar.setImageResource(mContext.getResources().getIdentifier(user.getAvatarFileName(), "drawable", mContext.getPackageName()));
             customViewHolder.username.setText(user.getUserName());
-            customViewHolder.activityTypes.setTag(user);
 
             //set click listener on checkbox
             customViewHolder.userCheckBox.setTag(user);
@@ -234,69 +249,9 @@ public class ActivityChooserFragment extends Fragment {
 
                             mActivityDetail.getUserActivityList().remove((mActivityDetail.getUserActivityList().indexOf(userActivity)));
 
+                            enableNextButton();
                         }
                     }
-
-                }
-            });
-
-            //get string array of activity types
-            List<String> activityTypeStringList = new ArrayList<>();
-
-            //add an empty item called no participant
-            activityTypeStringList.add(mContext.getResources().getString(R.string.not_participant));
-
-            for ( ActivityType activityType : mActivityTypeList){
-                activityTypeStringList.add(activityType.getActivityName());
-            }
-
-            ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(mContext,
-                    android.R.layout.simple_spinner_item, activityTypeStringList);
-            dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            customViewHolder.activityTypes.setAdapter(dataAdapter);
-
-            //Handle click event on spinner
-            customViewHolder.activityTypes.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                    User user = (User) parent.getTag();
-                    //TODO: due to adding the first item in spinner as empty selection, must increment the index to get the correct activitytype
-                    UserActivity userActivity = new UserActivity(user);
-
-                    //check if "not participant" was selected
-                    if (position == 0) {
-
-                        //remove this user, if exists
-                        mActivityDetail.getUserActivityList().remove(userActivity);
-
-                    } else {
-
-                        //set the activity type, only if position is not 0
-                        userActivity.setActivityType(mActivityTypeList.get(position - 1));
-
-                        //check if user already exists in the ActivityDetail.userList
-                        //first remove that activity before adding a new activity for that user
-                        if (mActivityDetail.getUserActivityList().contains(userActivity)){
-                            mActivityDetail.getUserActivityList().remove(userActivity);
-                        }
-
-                        //add user and corresponding activity
-                        mActivityDetail.getUserActivityList().add(userActivity);
-
-                    }
-
-                    //enable Next button if there is at least one user participating
-                    if (mActivityDetail.getUserActivityList().size() > 0)
-                        mNextButton.setEnabled(true);
-                    else
-                        mNextButton.setEnabled(false);
-
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-
                 }
             });
         }
@@ -309,16 +264,16 @@ public class ActivityChooserFragment extends Fragment {
         public class CustomViewHolder extends RecyclerView.ViewHolder {
 
             ///protected ImageView avatar;
-            protected TextView username;
-            protected Spinner activityTypes;
             protected CheckBox userCheckBox;
+            protected TextView username;
+
 
             public CustomViewHolder(View view) {
                 super(view);
                 //this.avatar = (ImageView) view.findViewById(R.id.avatar);
-                this.username = (TextView)view.findViewById(R.id.username);
-                this.activityTypes = (Spinner)view.findViewById(R.id.activityTypeSpinner);
                 this.userCheckBox = (CheckBox)view.findViewById(R.id.userCheckBox);
+                this.username = (TextView)view.findViewById(R.id.username);
+
             }
         }
 
