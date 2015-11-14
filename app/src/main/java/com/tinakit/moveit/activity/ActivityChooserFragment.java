@@ -55,7 +55,6 @@ public class ActivityChooserFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private MultiChooserRecyclerAdapter mMultiChooserRecyclerAdapter;
     private static Button mNextButton;
-    private CheckBox mUserCheckBox;
 
     @Nullable
     @Override
@@ -84,7 +83,7 @@ public class ActivityChooserFragment extends Fragment {
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         mRecyclerView.setLayoutManager(linearLayoutManager);
 
-        mMultiChooserRecyclerAdapter = new MultiChooserRecyclerAdapter(mFragmentActivity, userList, mActivityTypeList);
+        mMultiChooserRecyclerAdapter = new MultiChooserRecyclerAdapter(userList, mActivityTypeList);
         mRecyclerView.setAdapter(mMultiChooserRecyclerAdapter);
 
         //next button
@@ -108,12 +107,8 @@ public class ActivityChooserFragment extends Fragment {
         return rootView;
     }
 
-    public static class SingleChoiceDialogFragment extends DialogFragment
+    public static class ActivityChoiceDialogFragment extends DialogFragment
     {
-        public static final String DATA = "items";
-
-        public static final String SELECTED = "selected";
-
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState)
         {
@@ -199,14 +194,33 @@ public class ActivityChooserFragment extends Fragment {
 
         private List<User> mUserList;
         private List<ActivityType> mActivityTypeList;
-        private Context mContext;
 
 
-        public MultiChooserRecyclerAdapter(Context context, List<User> userList, List<ActivityType> activityTypeList) {
+        public MultiChooserRecyclerAdapter(List<User> userList, List<ActivityType> activityTypeList) {
 
-            mContext = context;
             mUserList = userList;
             mActivityTypeList = activityTypeList;
+        }
+
+        @Override
+        public int getItemCount() {
+            return (null != mUserList ? mUserList.size() : 0);
+        }
+
+        public class CustomViewHolder extends RecyclerView.ViewHolder {
+
+            ///protected ImageView avatar;
+            protected CheckBox userCheckBox;
+            protected TextView username;
+
+
+            public CustomViewHolder(View view) {
+                super(view);
+                //this.avatar = (ImageView) view.findViewById(R.id.avatar);
+                this.userCheckBox = (CheckBox)view.findViewById(R.id.userCheckBox);
+                this.username = (TextView)view.findViewById(R.id.username);
+
+            }
         }
 
         @Override
@@ -238,8 +252,8 @@ public class ActivityChooserFragment extends Fragment {
 
                     if (isChecked) {
 
-                        SingleChoiceDialogFragment singleChoiceDialogFragment = new SingleChoiceDialogFragment();
-                        singleChoiceDialogFragment.show(getFragmentManager(), "Activity Chooser");
+                        ActivityChoiceDialogFragment activityChoiceDialogFragment = new ActivityChoiceDialogFragment();
+                        activityChoiceDialogFragment.show(getFragmentManager(), "Activity Chooser");
 
                     } else {
 
@@ -255,27 +269,5 @@ public class ActivityChooserFragment extends Fragment {
                 }
             });
         }
-
-        @Override
-        public int getItemCount() {
-            return (null != mUserList ? mUserList.size() : 0);
-        }
-
-        public class CustomViewHolder extends RecyclerView.ViewHolder {
-
-            ///protected ImageView avatar;
-            protected CheckBox userCheckBox;
-            protected TextView username;
-
-
-            public CustomViewHolder(View view) {
-                super(view);
-                //this.avatar = (ImageView) view.findViewById(R.id.avatar);
-                this.userCheckBox = (CheckBox)view.findViewById(R.id.userCheckBox);
-                this.username = (TextView)view.findViewById(R.id.username);
-
-            }
-        }
-
     }
 }
