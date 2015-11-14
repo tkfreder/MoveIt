@@ -55,7 +55,7 @@ public class ActivityChooserFragment extends Fragment {
 
         mBundle = new Bundle();
 
-        mFragmentActivity  = (FragmentActivity)    super.getActivity();
+        mFragmentActivity  = (FragmentActivity)super.getActivity();
         mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         View rootView = inflater.inflate(R.layout.multi_activity_chooser, container, false);
@@ -206,7 +206,7 @@ public class ActivityChooserFragment extends Fragment {
 
 
             public CustomViewHolder(View view) {
-                
+
                 super(view);
                 //this.avatar = (ImageView) view.findViewById(R.id.avatar);
                 this.userCheckBox = (CheckBox)view.findViewById(R.id.userCheckBox);

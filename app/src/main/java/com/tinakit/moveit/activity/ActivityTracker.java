@@ -16,14 +16,21 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.Chronometer;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -45,6 +52,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.ActivityDetail;
+import com.tinakit.moveit.model.ActivityType;
 import com.tinakit.moveit.model.ActivityType2;
 import com.tinakit.moveit.model.UnitSplit;
 import com.tinakit.moveit.model.User;
@@ -122,7 +130,7 @@ public class ActivityTracker extends AppCompatActivity
     private static final String STATE_RESOLVING_ERROR = "resolving_error";
 
     //UI widgets
-    private Button mStartButton;
+    private static Button mStartButton;
     private Button mStopButton;
     private Button mPauseButton;
     private Button mSaveButton;
@@ -132,15 +140,18 @@ public class ActivityTracker extends AppCompatActivity
     private TextView mDistance;
     private TextView mCoins;
     private TextView mFeetPerMinute;
-    private LinearLayout mUserCheckBoxLayout;
     private TextView mMessage;
+    protected RecyclerView mRecyclerView;
 
 
     //local cache
     //TODO: possibly use EventBus to pass data between previous screen to this one, instead of using static members
     public static ActivityDetail mActivityDetail = new ActivityDetail();
+    protected static List<ActivityType> mActivityTypeList;
     private long mTimeWhenPaused;
     private boolean mSaveLocationData = false;
+    private static Bundle mBundle;
+    private static int mSelectedActivityTypeId;
 
     private static final float ZOOM_STREET_ROUTE = 15.0f;
     private GoogleMap mGoogleMap;
@@ -262,6 +273,9 @@ public class ActivityTracker extends AppCompatActivity
             finish();
         }
 
+        //get databaseHelper instance
+        mDatabaseHelper = FitnessDBHelper.getInstance(this);
+
         //connect to Google Play Services
         buildLocationRequest();
 
@@ -294,12 +308,10 @@ public class ActivityTracker extends AppCompatActivity
         mDistance = (TextView) findViewById(R.id.distance);
         mCoins = (TextView) findViewById(R.id.coins);
         mFeetPerMinute = (TextView) findViewById(R.id.feetPerMinute);
-        mUserCheckBoxLayout = (LinearLayout)findViewById(R.id.checkBoxLayout);
         mMessage = (TextView)findViewById(R.id.message);
 
-
-        //create user checkboxes and activity icons
-        createUserActivityList();
+        //recycler view
+        initializeRecyclerView();
 
         mMapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -438,12 +450,32 @@ public class ActivityTracker extends AppCompatActivity
         });
     }
 
+    private void initializeRecyclerView(){
+
+        mBundle = new Bundle();
+
+        // Get userlist
+        List<User> userList = mDatabaseHelper.getUsers();
+        mActivityTypeList = mDatabaseHelper.getActivityTypes();
+
+        //RecyclerView
+        // Initialize recycler view
+        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        mRecyclerView.setHasFixedSize(true); //child items have fixed dimensions, allows the RecyclerView to optimize better by figuring out the exact height and width of the entire list based on the adapter.
+
+        // The number of Columns
+        //mRecyclerView.setLayoutManager(new GridLayoutManager(mFragmentActivity, 2));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        mRecyclerView.setLayoutManager(linearLayoutManager);
+        mRecyclerView.setAdapter(new MultiChooserRecyclerAdapter(userList, mActivityTypeList));
+
+    }
 
     private void createUserActivityList(){
 
         //get user list
         List<User> userList = new ArrayList<>();
-        mDatabaseHelper = FitnessDBHelper.getInstance(this);
         userList = mDatabaseHelper.getUsers();
 
 
@@ -477,7 +509,7 @@ public class ActivityTracker extends AppCompatActivity
                 linearLayout.addView(imageView);
 
                 //add linear layout to parent linear layout
-                mUserCheckBoxLayout.addView(linearLayout);
+                //mUserCheckBoxLayout.addView(linearLayout);
 
 
             }
@@ -1319,4 +1351,167 @@ public class ActivityTracker extends AppCompatActivity
         Intent intent = new Intent(this, EditReward.class);
         startActivity(intent);
     }
+
+    private class MultiChooserRecyclerAdapter extends RecyclerView.Adapter<MultiChooserRecyclerAdapter.CustomViewHolder> {
+
+        private List<User> mUserList;
+        private List<ActivityType> mActivityTypeList;
+
+
+        public MultiChooserRecyclerAdapter(List<User> userList, List<ActivityType> activityTypeList) {
+
+            mUserList = userList;
+            mActivityTypeList = activityTypeList;
+        }
+
+        @Override
+        public int getItemCount() {
+            return (null != mUserList ? mUserList.size() : 0);
+        }
+
+        public class CustomViewHolder extends RecyclerView.ViewHolder {
+
+            ///protected ImageView avatar;
+            protected CheckBox userCheckBox;
+            protected TextView username;
+
+
+            public CustomViewHolder(View view) {
+
+                super(view);
+                //this.avatar = (ImageView) view.findViewById(R.id.avatar);
+                this.userCheckBox = (CheckBox)view.findViewById(R.id.userCheckBox);
+                this.username = (TextView)view.findViewById(R.id.username);
+
+            }
+        }
+
+        @Override
+        public MultiChooserRecyclerAdapter.CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+            View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.multi_activity_chooser_item, null);
+
+            CustomViewHolder viewHolder = new CustomViewHolder(view);
+            return viewHolder;
+        }
+
+        @Override
+        public void onBindViewHolder(MultiChooserRecyclerAdapter.CustomViewHolder customViewHolder, int i) {
+
+            User user = mUserList.get(i);
+
+            // Populate data from ActivityType data object
+            //customViewHolder.avatar.setImageResource(mContext.getResources().getIdentifier(user.getAvatarFileName(), "drawable", mContext.getPackageName()));
+            customViewHolder.username.setText(user.getUserName());
+
+            //set click listener on checkbox
+            customViewHolder.userCheckBox.setTag(user);
+            customViewHolder.userCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                    User user = (User) buttonView.getTag();
+                    //save user in Bundle
+                    mBundle.putParcelable("currentUser", user);
+
+                    if (isChecked) {
+
+                        ActivityChoiceDialogFragment activityChoiceDialogFragment = new ActivityChoiceDialogFragment();
+                        //activityChoiceDialogFragment.show(getFragmentManager(), "Activity Chooser");
+
+                    } else {
+
+                        UserActivity userActivity = new UserActivity(user);
+
+                        if (mActivityDetail.getUserActivityList().contains(userActivity)) {
+
+                            mActivityDetail.getUserActivityList().remove((mActivityDetail.getUserActivityList().indexOf(userActivity)));
+
+                            enableStartButton();
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    private static void enableStartButton(){
+
+        //enable Next button if there is at least one user participating
+        if (mActivityDetail.getUserActivityList().size() > 0)
+            mStartButton.setEnabled(true);
+        else
+            mStartButton.setEnabled(false);
+    }
+
+    public static class ActivityChoiceDialogFragment extends DialogFragment
+    {
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState)
+        {
+            android.support.v7.app.AlertDialog.Builder dialog = new android.support.v7.app.AlertDialog.Builder(getActivity());
+
+            dialog.setTitle(R.string.pick_activity);
+
+            List<String> activityTypeStringList = new ArrayList<>();
+
+            //create a string array
+            for (ActivityType activityType : mActivityTypeList)
+                activityTypeStringList.add(activityType.getActivityName());
+
+            dialog.setSingleChoiceItems(R.array.activity_types, -1,
+                    new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            mSelectedActivityTypeId = which;
+
+                        }
+                    })
+                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+
+                            User user = (User) mBundle.get("currentUser");
+                            UserActivity userActivity = new UserActivity(user);
+
+                            int index = mActivityDetail.getUserActivityList().indexOf(userActivity);
+                            userActivity.setActivityType(mActivityTypeList.get(mSelectedActivityTypeId));
+
+                            //if there was a selection
+                            //if mActivityTypeList is empty or user is not on the list, just add it
+                            if (mActivityDetail.getUserActivityList().size() == 0 || index == -1) {
+
+                                mActivityDetail.getUserActivityList().add(userActivity);
+
+                                //if user is on list already
+                            } else if (index != -1) {
+
+                                mActivityDetail.getUserActivityList().set(index, userActivity);
+                            }
+
+                            //remove the user if this user exists in mActivityDetail
+                            else {
+
+                                mActivityDetail.getUserActivityList().remove(index);
+
+                            }
+
+                            enableStartButton();
+
+                        }
+                    })
+
+                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            //don't do anything
+                        }
+                    });
+
+            return dialog.create();
+        }
+
+    }
+
 }
