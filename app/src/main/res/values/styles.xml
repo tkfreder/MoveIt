@@ -24,6 +24,11 @@
         <item name="android:textColor">#551a8b</item>
         <item name="android:typeface">serif</item>
     </style>
+    <style name="LabelSmallWhite">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:typeface">serif</item>
+    </style>
     <style name="LabelListItemPurple">
         <item name="android:textSize">15sp</item>
         <item name="android:textColor">#551a8b</item>

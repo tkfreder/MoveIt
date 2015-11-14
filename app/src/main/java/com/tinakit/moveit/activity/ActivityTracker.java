@@ -15,7 +15,9 @@ import android.location.Location;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -24,6 +26,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,7 +74,7 @@ import com.tinakit.moveit.utility.DialogUtility;
 import com.tinakit.moveit.utility.Map;
 import com.tinakit.moveit.utility.UnitConverter;
 
-public class ActivityTracker extends AppCompatActivity
+public class ActivityTracker extends Fragment
         implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener, OnMapReadyCallback,
@@ -136,16 +139,19 @@ public class ActivityTracker extends AppCompatActivity
     private Button mSaveButton;
     private Button mResumeButton;
     private Button mCancelButton;
+    private static LinearLayout mButtonLinearLayout;
     private static Chronometer mChronometer;
     private TextView mDistance;
     private TextView mCoins;
     private TextView mFeetPerMinute;
     private TextView mMessage;
-    protected RecyclerView mRecyclerView;
+    protected static RecyclerView mRecyclerView;
+    protected static MultiChooserRecyclerAdapter mRecyclerViewAdapter;
 
 
     //local cache
     //TODO: possibly use EventBus to pass data between previous screen to this one, instead of using static members
+    private FragmentActivity mFragmentActivity;
     public static ActivityDetail mActivityDetail = new ActivityDetail();
     protected static List<ActivityType> mActivityTypeList;
     private long mTimeWhenPaused;
@@ -170,111 +176,28 @@ public class ActivityTracker extends AppCompatActivity
     private float last_x, last_y, last_z;
     private static final float SHAKE_THRESHOLD = 0.5f;
 
+    @Nullable
     @Override
-    public void onSensorChanged(SensorEvent sensorEvent) {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        Sensor mySensor = sensorEvent.sensor;
+        if (DEBUG) Log.d(LOG, "onCreateView()");
 
-        if (mySensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            float x = sensorEvent.values[0];
-            float y = sensorEvent.values[1];
-            float z = sensorEvent.values[2];
+        mFragmentActivity  = (FragmentActivity)super.getActivity();
+        View rootView = inflater.inflate(R.layout.activity_tracker, container, false);
 
-            long curTime = System.currentTimeMillis();
+        //fix the orientation to portrait
+        mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-            if ((curTime - lastUpdate) > 100) {
-                long diffTime = (curTime - lastUpdate);
-                lastUpdate = curTime;
 
-                float speed = Math.abs(x + y + z - last_x - last_y - last_z)/ diffTime * 10000;
-
-                //check for inactivity, below shake threshold
-                if (speed < SHAKE_THRESHOLD) {
-
-                    playSound();
-
-                    pauseTracking();
-
-                    //disable accelerometer listener until user clicks on confirm dialog
-                    //unregisterAccelerometer();
-
-                    //display warning message that no movement has been detected
-                    DialogUtility.displayAlertDialog(ActivityTracker.this, getResources().getString(R.string.warning), getResources().getString(R.string.no_movement), getResources().getString(R.string.ok));
-
-                }
-
-                last_x = x;
-                last_y = y;
-                last_z = z;
-            }
-        }
-    }
-
-    private void pauseTracking(){
-
-        //set the flag to not save location data
-        mSaveLocationData = false;
-
-        //stop timer
-        mChronometer.stop();
-
-        //save current time
-        mTimeWhenPaused = mChronometer.getBase() - SystemClock.elapsedRealtime();
-    }
-
-    private void resumeTracking(){
-
-        //set flag to save location data
-        mSaveLocationData = true;
-
-        //start accelerometer listener, after a delay of ACCELEROMETER_DELAY
-        registerAccelerometer();
-
-        //reset time to the time when paused
-        mChronometer.setBase(SystemClock.elapsedRealtime() + mTimeWhenPaused);
-
-        //start timer
-        mChronometer.start();
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-    }
-
-    @Override
-    public void onMapReady(GoogleMap map) {
-
-        mGoogleMap = map;
-
-        displayStartMap();
-
-    }
-
-    private boolean isMapReady(){
-
-        return mGoogleMap != null;
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean(STATE_RESOLVING_ERROR, mResolvingError);
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        if (DEBUG) Log.d(LOG, "onCreate()");
-        super.onCreate(savedInstanceState);
 
         //end the activity if Google Play Services is not present
         //redirect user to Google Play Services
         if (!servicesAvailable()) {
-            finish();
+            mFragmentActivity.finish();
         }
 
         //get databaseHelper instance
-        mDatabaseHelper = FitnessDBHelper.getInstance(this);
+        mDatabaseHelper = FitnessDBHelper.getInstance(mFragmentActivity);
 
         //connect to Google Play Services
         buildLocationRequest();
@@ -282,11 +205,6 @@ public class ActivityTracker extends AppCompatActivity
         //check  savedInstanceState not null
         mResolvingError = savedInstanceState != null
                 && savedInstanceState.getBoolean(STATE_RESOLVING_ERROR, false);
-
-        //fix the orientation to portrait
-        this.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
-        setContentView(R.layout.activity_tracker);
 
 
         //TODO:  how to handle admin page?
@@ -298,25 +216,32 @@ public class ActivityTracker extends AppCompatActivity
         */
 
         //wire up UI widgets
-        mStartButton = (Button) findViewById(R.id.startButton);
-        mStopButton = (Button) findViewById(R.id.stopButton);
-        mPauseButton = (Button) findViewById(R.id.pauseButton);
-        mSaveButton = (Button) findViewById(R.id.saveButton);
-        mResumeButton = (Button) findViewById(R.id.resumeButton);
-        mCancelButton = (Button)findViewById(R.id.cancelButton);
-        mChronometer = (Chronometer) findViewById(R.id.chronometer);
-        mDistance = (TextView) findViewById(R.id.distance);
-        mCoins = (TextView) findViewById(R.id.coins);
-        mFeetPerMinute = (TextView) findViewById(R.id.feetPerMinute);
-        mMessage = (TextView)findViewById(R.id.message);
+        mStartButton = (Button) rootView.findViewById(R.id.startButton);
+        mStopButton = (Button) rootView.findViewById(R.id.stopButton);
+        mPauseButton = (Button) rootView.findViewById(R.id.pauseButton);
+        mSaveButton = (Button) rootView.findViewById(R.id.saveButton);
+        mResumeButton = (Button) rootView.findViewById(R.id.resumeButton);
+        mCancelButton = (Button)rootView.findViewById(R.id.cancelButton);
+        mButtonLinearLayout = (LinearLayout)rootView.findViewById(R.id.buttonLayout);
+        setButtonOnClickListeners();
+
+        mChronometer = (Chronometer) rootView.findViewById(R.id.chronometer);
+        mDistance = (TextView) rootView.findViewById(R.id.distance);
+        mCoins = (TextView) rootView.findViewById(R.id.coins);
+        mFeetPerMinute = (TextView) rootView.findViewById(R.id.feetPerMinute);
+        mMessage = (TextView) rootView.findViewById(R.id.message);
 
         //recycler view
-        initializeRecyclerView();
+        initializeRecyclerView(rootView);
 
-        mMapFragment =
-                (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mMapFragment = (SupportMapFragment)getChildFragmentManager().findFragmentById(R.id.map);
         mMapFragment.getMapAsync(this);
 
+        return rootView;
+
+    }
+
+    protected void setButtonOnClickListeners(){
 
         //**********************************************************************************************
         //  onClickListeners
@@ -416,10 +341,10 @@ public class ActivityTracker extends AppCompatActivity
                 saveToDB();
 
                 //destroy current activity
-                finish();
+                mFragmentActivity.finish();
 
                 //display Activity history screen
-                Intent intent = new Intent(ActivityTracker.this, MainActivity.class);
+                Intent intent = new Intent(mFragmentActivity, MainActivity.class);
                 intent.putExtra("tab_index", 1);
                 startActivity(intent);
 
@@ -445,12 +370,107 @@ public class ActivityTracker extends AppCompatActivity
             public void onClick(View v) {
 
                 //TODO: redirect to the rewards screen when that component is done
-                finish();
+                mFragmentActivity.finish();
             }
         });
     }
 
-    private void initializeRecyclerView(){
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+
+        Sensor mySensor = sensorEvent.sensor;
+
+        if (mySensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            float x = sensorEvent.values[0];
+            float y = sensorEvent.values[1];
+            float z = sensorEvent.values[2];
+
+            long curTime = System.currentTimeMillis();
+
+            if ((curTime - lastUpdate) > 100) {
+                long diffTime = (curTime - lastUpdate);
+                lastUpdate = curTime;
+
+                float speed = Math.abs(x + y + z - last_x - last_y - last_z)/ diffTime * 10000;
+
+                //check for inactivity, below shake threshold
+                if (speed < SHAKE_THRESHOLD) {
+
+                    playSound();
+
+                    pauseTracking();
+
+                    //disable accelerometer listener until user clicks on confirm dialog
+                    //unregisterAccelerometer();
+
+                    //display warning message that no movement has been detected
+                    DialogUtility.displayAlertDialog(mFragmentActivity, getResources().getString(R.string.warning), getResources().getString(R.string.no_movement), getResources().getString(R.string.ok));
+
+                }
+
+                last_x = x;
+                last_y = y;
+                last_z = z;
+            }
+        }
+    }
+
+    private void pauseTracking(){
+
+        //set the flag to not save location data
+        mSaveLocationData = false;
+
+        //stop timer
+        mChronometer.stop();
+
+        //save current time
+        mTimeWhenPaused = mChronometer.getBase() - SystemClock.elapsedRealtime();
+    }
+
+    private void resumeTracking(){
+
+        //set flag to save location data
+        mSaveLocationData = true;
+
+        //start accelerometer listener, after a delay of ACCELEROMETER_DELAY
+        registerAccelerometer();
+
+        //reset time to the time when paused
+        mChronometer.setBase(SystemClock.elapsedRealtime() + mTimeWhenPaused);
+
+        //start timer
+        mChronometer.start();
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
+
+    @Override
+    public void onMapReady(GoogleMap map) {
+
+        mGoogleMap = map;
+
+        displayStartMap();
+
+    }
+
+    private boolean isMapReady(){
+
+        return mGoogleMap != null;
+    }
+
+    /*
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(STATE_RESOLVING_ERROR, mResolvingError);
+    }
+
+  */
+
+    private void initializeRecyclerView(View rootView){
 
         mBundle = new Bundle();
 
@@ -460,15 +480,16 @@ public class ActivityTracker extends AppCompatActivity
 
         //RecyclerView
         // Initialize recycler view
-        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true); //child items have fixed dimensions, allows the RecyclerView to optimize better by figuring out the exact height and width of the entire list based on the adapter.
 
         // The number of Columns
         //mRecyclerView.setLayoutManager(new GridLayoutManager(mFragmentActivity, 2));
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mFragmentActivity);
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         mRecyclerView.setLayoutManager(linearLayoutManager);
-        mRecyclerView.setAdapter(new MultiChooserRecyclerAdapter(userList, mActivityTypeList));
+        mRecyclerViewAdapter = new MultiChooserRecyclerAdapter(userList, mActivityTypeList);
+        mRecyclerView.setAdapter(mRecyclerViewAdapter);
 
     }
 
@@ -480,28 +501,28 @@ public class ActivityTracker extends AppCompatActivity
 
 
         //get userActivityList out of bundle
-        Bundle bundle  = getIntent().getExtras();
-        if (bundle.containsKey("userActivityList")) {
+        //Bundle bundle  = getIntent().getExtras();
+        if (mBundle.containsKey("userActivityList")) {
 
-            mActivityDetail.setUserActivityList(new ArrayList(bundle.getParcelableArrayList("userActivityList")));
+            mActivityDetail.setUserActivityList(new ArrayList(mBundle.getParcelableArrayList("userActivityList")));
 
 
             //add user check boxes
             for (int i = 0; i < mActivityDetail.getUserActivityList().size(); i++) {
 
-                LinearLayout linearLayout = new LinearLayout(this);
+                LinearLayout linearLayout = new LinearLayout(mFragmentActivity);
                 linearLayout.setOrientation(LinearLayout.HORIZONTAL);
                 linearLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
 
                 //username
-                TextView textView = new TextView(this);
+                TextView textView = new TextView(mFragmentActivity);
                 textView.setTextColor(getResources().getColor(R.color.white));
                 textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, USERNAME_FONT_SIZE);
                 textView.setText(mActivityDetail.getUserActivityList().get(i).getUser().getUserName());
 
                 //activity type icon
-                ImageView imageView = new ImageView(this);
-                imageView.setImageResource(getResources().getIdentifier(mActivityDetail.getUserActivityList().get(i).getActivityType().getActivityName() + "_icon_small", "drawable", getPackageName()));
+                ImageView imageView = new ImageView(mFragmentActivity);
+                imageView.setImageResource(getResources().getIdentifier(mActivityDetail.getUserActivityList().get(i).getActivityType().getActivityName() + "_icon_small", "drawable", mFragmentActivity.getPackageName()));
                 imageView.setLayoutParams(new LinearLayout.LayoutParams(100, 100));
 
                 //add checkbox and textview to linear layout
@@ -629,7 +650,7 @@ public class ActivityTracker extends AppCompatActivity
         } else if (result.hasResolution()) {
             try {
                 mResolvingError = true;
-                result.startResolutionForResult(this, REQUEST_RESOLVE_ERROR);
+                result.startResolutionForResult(mFragmentActivity, REQUEST_RESOLVE_ERROR);
             } catch (IntentSender.SendIntentException e) {
                 // There was an error with the resolution intent. Try again.
                 mGoogleApiClient.connect();
@@ -649,7 +670,7 @@ public class ActivityTracker extends AppCompatActivity
         Bundle args = new Bundle();
         args.putInt(DIALOG_ERROR, errorCode);
         dialogFragment.setArguments(args);
-        dialogFragment.show(getSupportFragmentManager(), "errordialog");
+        dialogFragment.show(mFragmentActivity.getSupportFragmentManager(), "errordialog");
     }
 
     /* Called from ErrorDialogFragment when the dialog is dismissed. */
@@ -671,7 +692,7 @@ public class ActivityTracker extends AppCompatActivity
 
         @Override
         public void onDismiss(DialogInterface dialog) {
-            ((ActivityTracker) getActivity()).onDialogDismissed();
+            //((ActivityTracker) getActivity()).onDialogDismissed();
         }
     }
 
@@ -720,7 +741,7 @@ public class ActivityTracker extends AppCompatActivity
     }
 
     protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
+        mGoogleApiClient = new GoogleApiClient.Builder(mFragmentActivity)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
@@ -741,7 +762,7 @@ public class ActivityTracker extends AppCompatActivity
 
     private boolean hasAccelerometer(){
 
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mSensorManager = (SensorManager) mFragmentActivity.getSystemService(Context.SENSOR_SERVICE);
         return mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null;
     }
 
@@ -821,7 +842,7 @@ public class ActivityTracker extends AppCompatActivity
     private void playSound(){
 
         MediaPlayer mp;
-        mp = MediaPlayer.create(getApplicationContext(), R.raw.cat_meow);
+        mp = MediaPlayer.create(mFragmentActivity, R.raw.cat_meow);
         mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
             @Override
@@ -921,11 +942,12 @@ public class ActivityTracker extends AppCompatActivity
     //**********************************************************************************************
 
     @Override
-    protected void onStart() {
+    public void onStart() {
         if (DEBUG) Log.d(LOG, "onStart");
         super.onStart();
 
     }
+
 
     private void removeOutliers(){
 
@@ -971,9 +993,8 @@ public class ActivityTracker extends AppCompatActivity
     //**********************************************************************************************
     //  onStop()
     //**********************************************************************************************
-
     @Override
-    protected void onStop() {
+    public void onStop() {
         if (DEBUG) Log.d(LOG, "onStop");
         super.onStop();
     }
@@ -983,7 +1004,7 @@ public class ActivityTracker extends AppCompatActivity
     //**********************************************************************************************
 
     @Override
-    protected void onPause() {
+    public void onPause() {
         if (DEBUG) Log.d(LOG, "onPause");
 
         //do nothing, we want to continue to collect location data until user clicks Stop button
@@ -997,7 +1018,7 @@ public class ActivityTracker extends AppCompatActivity
     //**********************************************************************************************
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         if (DEBUG) Log.d(LOG, "onResume");
         super.onResume();
 
@@ -1006,7 +1027,7 @@ public class ActivityTracker extends AppCompatActivity
         //end the activity if Google Play Services is not present
         //redirect user to Google Play Services
         if (!servicesAvailable()) {
-            finish();
+            mFragmentActivity.finish();
         }
 
     }
@@ -1027,7 +1048,7 @@ public class ActivityTracker extends AppCompatActivity
     //**********************************************************************************************
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         if (DEBUG) Log.d(LOG, "onDestroy");
         super.onDestroy();
 
@@ -1048,8 +1069,7 @@ public class ActivityTracker extends AppCompatActivity
     }
 
     private void displayAlertDialog(String title, String message){
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                ActivityTracker.this);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mFragmentActivity);
 
         // set title
         alertDialogBuilder.setTitle(title);
@@ -1264,14 +1284,14 @@ public class ActivityTracker extends AppCompatActivity
      * */
     private boolean servicesAvailable() {
         int resultCode = GooglePlayServicesUtil
-                .isGooglePlayServicesAvailable(this);
+                .isGooglePlayServicesAvailable(mFragmentActivity);
         if (resultCode != ConnectionResult.SUCCESS) {
             if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-                GooglePlayServicesUtil.getErrorDialog(resultCode, this,
+                GooglePlayServicesUtil.getErrorDialog(resultCode, mFragmentActivity,
                         PLAY_SERVICES_RESOLUTION_REQUEST).show();
             } else {
                 if (DEBUG) Log.d(LOG, "This device does not support Google Play Services.");
-                finish();
+                mFragmentActivity.finish();
             }
             return false;
         }
@@ -1279,10 +1299,10 @@ public class ActivityTracker extends AppCompatActivity
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_RESOLVE_ERROR) {
             mResolvingError = false;
-            if (resultCode == RESULT_OK) {
+            if (resultCode == mFragmentActivity.RESULT_OK) {
                 // Make sure the app is not already connected or attempting to connect
                 if (!mGoogleApiClient.isConnecting() &&
                         !mGoogleApiClient.isConnected()) {
@@ -1319,12 +1339,10 @@ public class ActivityTracker extends AppCompatActivity
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
+        mFragmentActivity.getMenuInflater().inflate(R.menu.menu_main, menu);
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -1348,11 +1366,11 @@ public class ActivityTracker extends AppCompatActivity
     }
 
     private void EditRewards(){
-        Intent intent = new Intent(this, EditReward.class);
+        Intent intent = new Intent(mFragmentActivity, EditReward.class);
         startActivity(intent);
     }
 
-    private class MultiChooserRecyclerAdapter extends RecyclerView.Adapter<MultiChooserRecyclerAdapter.CustomViewHolder> {
+    protected class MultiChooserRecyclerAdapter extends RecyclerView.Adapter<MultiChooserRecyclerAdapter.CustomViewHolder> {
 
         private List<User> mUserList;
         private List<ActivityType> mActivityTypeList;
@@ -1374,6 +1392,7 @@ public class ActivityTracker extends AppCompatActivity
             ///protected ImageView avatar;
             protected CheckBox userCheckBox;
             protected TextView username;
+            protected ImageView activityIcon;
 
 
             public CustomViewHolder(View view) {
@@ -1382,6 +1401,7 @@ public class ActivityTracker extends AppCompatActivity
                 //this.avatar = (ImageView) view.findViewById(R.id.avatar);
                 this.userCheckBox = (CheckBox)view.findViewById(R.id.userCheckBox);
                 this.username = (TextView)view.findViewById(R.id.username);
+                this.activityIcon = (ImageView)view.findViewById(R.id.activityIcon);
 
             }
         }
@@ -1405,7 +1425,21 @@ public class ActivityTracker extends AppCompatActivity
 
             //set click listener on checkbox
             customViewHolder.userCheckBox.setTag(user);
-            customViewHolder.userCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+            //if user is on the list of participants
+            if (mActivityDetail.getUserActivityList().contains(new UserActivity(user))){
+
+                customViewHolder.userCheckBox.setChecked(true);
+                int index = mActivityDetail.getUserActivityList().indexOf(new UserActivity(user));
+                customViewHolder.activityIcon.setImageResource(getResources().getIdentifier(mActivityDetail.getUserActivityList().get(index).getActivityType().getActivityName() + "_icon_small", "drawable", mFragmentActivity.getPackageName()));
+                customViewHolder.activityIcon.setLayoutParams(new LinearLayout.LayoutParams(100, 100));
+            }
+
+            //if user is not on the list, remove the icon if it is displayed
+            else
+                customViewHolder.activityIcon.setImageResource(0);
+
+       customViewHolder.userCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
@@ -1416,7 +1450,7 @@ public class ActivityTracker extends AppCompatActivity
                     if (isChecked) {
 
                         ActivityChoiceDialogFragment activityChoiceDialogFragment = new ActivityChoiceDialogFragment();
-                        //activityChoiceDialogFragment.show(getFragmentManager(), "Activity Chooser");
+                        activityChoiceDialogFragment.show(getFragmentManager(), "Activity Chooser");
 
                     } else {
 
@@ -1426,7 +1460,7 @@ public class ActivityTracker extends AppCompatActivity
 
                             mActivityDetail.getUserActivityList().remove((mActivityDetail.getUserActivityList().indexOf(userActivity)));
 
-                            enableStartButton();
+                            refreshDisplay();
                         }
                     }
                 }
@@ -1434,14 +1468,20 @@ public class ActivityTracker extends AppCompatActivity
         }
     }
 
-    private static void enableStartButton(){
+    private static void refreshDisplay(){
 
-        //enable Next button if there is at least one user participating
+        //enable or disable buttons if there are participants or not
+        //enable button if there is at least one user participating
         if (mActivityDetail.getUserActivityList().size() > 0)
-            mStartButton.setEnabled(true);
+            mButtonLinearLayout.setVisibility(View.VISIBLE);
         else
-            mStartButton.setEnabled(false);
+            mButtonLinearLayout.setVisibility(View.GONE);
+
+        //fresh the icons in case user list has changed
+        mRecyclerViewAdapter.notifyDataSetChanged();
+
     }
+
 
     public static class ActivityChoiceDialogFragment extends DialogFragment
     {
@@ -1497,7 +1537,7 @@ public class ActivityTracker extends AppCompatActivity
 
                             }
 
-                            enableStartButton();
+                            refreshDisplay();
 
                         }
                     })
