@@ -117,5 +117,6 @@
     <string name="preferences_multiChooserRecyclerAdapter">preferencesMultiChooserRecyclerAdapter</string>
     <string name="warning">Warning</string>
     <string name="ok">OK</string>
+    <string name="pick_activity">Pick an activity:</string>
 
 </resources>

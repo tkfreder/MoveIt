@@ -1,11 +1,15 @@
 package com.tinakit.moveit.activity;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,7 +19,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,18 +41,27 @@ import java.util.List;
 public class ActivityChooserFragment extends Fragment {
 
     private FragmentActivity mFragmentActivity;
+    private FitnessDBHelper mFitnessDBHelper;
+
+    //ActivityTypes
+    protected static List<ActivityType> mActivityTypeList;
 
     //cache
-    private ActivityDetail mActivityDetail = new ActivityDetail();
+    private static ActivityDetail mActivityDetail = new ActivityDetail();
+    private static int mSelectedActivityTypeId = -1;
+    protected static Bundle mBundle;
 
     //UI Widgets
     private RecyclerView mRecyclerView;
     private MultiChooserRecyclerAdapter mMultiChooserRecyclerAdapter;
     private Button mNextButton;
+    private CheckBox mUserCheckBox;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
+        mBundle = new Bundle();
 
         mFragmentActivity  = (FragmentActivity)    super.getActivity();
         mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -53,9 +69,9 @@ public class ActivityChooserFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.multi_activity_chooser, container, false);
 
         // Get singleton instance of database
-        FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(mFragmentActivity);
-        List<User> userList = databaseHelper.getUsers();
-        List<ActivityType> activityTypeList = databaseHelper.getActivityTypes();
+        mFitnessDBHelper = FitnessDBHelper.getInstance(mFragmentActivity);
+        List<User> userList = mFitnessDBHelper.getUsers();
+        mActivityTypeList = mFitnessDBHelper.getActivityTypes();
 
         //RecyclerView
         // Initialize recycler view
@@ -66,7 +82,7 @@ public class ActivityChooserFragment extends Fragment {
         //mRecyclerView.setLayoutManager(new GridLayoutManager(mFragmentActivity, 2));
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mFragmentActivity));
 
-        mMultiChooserRecyclerAdapter = new MultiChooserRecyclerAdapter(mFragmentActivity, userList, activityTypeList);
+        mMultiChooserRecyclerAdapter = new MultiChooserRecyclerAdapter(mFragmentActivity, userList, mActivityTypeList);
         mRecyclerView.setAdapter(mMultiChooserRecyclerAdapter);
 
         //next button
@@ -75,13 +91,12 @@ public class ActivityChooserFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                if (mActivityDetail.getUserActivityList().size() > 0){
+                if (mActivityDetail.getUserActivityList().size() > 0) {
                     //get users and activity type selected
                     Intent intent = new Intent(mFragmentActivity, ActivityTracker.class);
                     intent.putParcelableArrayListExtra("userActivityList", new ArrayList(mActivityDetail.getUserActivityList()));
                     startActivity(intent);
-                }
-                else {
+                } else {
 
                     Toast.makeText(getActivity(), "Please select an activity for at least one user.", Toast.LENGTH_LONG);
                 }
@@ -89,6 +104,79 @@ public class ActivityChooserFragment extends Fragment {
         });
 
         return rootView;
+    }
+
+    public static class SingleChoiceDialogFragment extends DialogFragment
+    {
+        public static final String DATA = "items";
+
+        public static final String SELECTED = "selected";
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState)
+        {
+            Bundle bundle = getArguments();
+
+            AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+
+            dialog.setTitle(R.string.pick_activity);
+
+            List<String> activityTypeStringList = new ArrayList<>();
+
+            //create a string array
+            for (ActivityType activityType : mActivityTypeList)
+                activityTypeStringList.add(activityType.getActivityName());
+
+            dialog.setSingleChoiceItems(R.array.activity_types, -1,
+                    new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            mSelectedActivityTypeId = which;
+                        }
+                    })
+                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+
+                            User user = (User) mBundle.get("currentUser");
+                            UserActivity userActivity = new UserActivity(user);
+
+                            int index = mActivityDetail.getUserActivityList().indexOf(userActivity);
+                            userActivity.setActivityType(mActivityTypeList.get(mSelectedActivityTypeId));
+
+                            //if there was a selection
+                            //if mActivityTypeList is empty or user is not on the list, just add it
+                            if (mActivityDetail.getUserActivityList().size() == 0 || index == -1) {
+
+                                mActivityDetail.getUserActivityList().add(userActivity);
+
+                            //if user is on list already
+                            } else if (index != -1) {
+
+                                mActivityDetail.getUserActivityList().set(index, userActivity);
+                            }
+
+                            //remove the user if this user exists in mActivityDetail
+                            else {
+
+                                   mActivityDetail.getUserActivityList().remove(index);
+
+                            }
+                        }
+                    })
+
+                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            //don't do anything
+                        }
+                    });
+
+            return dialog.create();
+        }
+
     }
 
     private class MultiChooserRecyclerAdapter extends RecyclerView.Adapter<MultiChooserRecyclerAdapter.CustomViewHolder> {
@@ -122,6 +210,35 @@ public class ActivityChooserFragment extends Fragment {
             //customViewHolder.avatar.setImageResource(mContext.getResources().getIdentifier(user.getAvatarFileName(), "drawable", mContext.getPackageName()));
             customViewHolder.username.setText(user.getUserName());
             customViewHolder.activityTypes.setTag(user);
+
+            //set click listener on checkbox
+            customViewHolder.userCheckBox.setTag(user);
+            customViewHolder.userCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                    User user = (User) buttonView.getTag();
+                    //save user in Bundle
+                    mBundle.putParcelable("currentUser", user);
+
+                    if (isChecked) {
+
+                        SingleChoiceDialogFragment singleChoiceDialogFragment = new SingleChoiceDialogFragment();
+                        singleChoiceDialogFragment.show(getFragmentManager(), "Activity Chooser");
+
+                    } else {
+
+                        UserActivity userActivity = new UserActivity(user);
+
+                        if (mActivityDetail.getUserActivityList().contains(userActivity)) {
+
+                            mActivityDetail.getUserActivityList().remove((mActivityDetail.getUserActivityList().indexOf(userActivity)));
+
+                        }
+                    }
+
+                }
+            });
 
             //get string array of activity types
             List<String> activityTypeStringList = new ArrayList<>();
@@ -182,9 +299,6 @@ public class ActivityChooserFragment extends Fragment {
 
                 }
             });
-
-
-
         }
 
         @Override
@@ -197,12 +311,14 @@ public class ActivityChooserFragment extends Fragment {
             ///protected ImageView avatar;
             protected TextView username;
             protected Spinner activityTypes;
+            protected CheckBox userCheckBox;
 
             public CustomViewHolder(View view) {
                 super(view);
                 //this.avatar = (ImageView) view.findViewById(R.id.avatar);
                 this.username = (TextView)view.findViewById(R.id.username);
                 this.activityTypes = (Spinner)view.findViewById(R.id.activityTypeSpinner);
+                this.userCheckBox = (CheckBox)view.findViewById(R.id.userCheckBox);
             }
         }
 
