@@ -118,5 +118,6 @@
     <string name="warning">Warning</string>
     <string name="ok">OK</string>
     <string name="pick_activity">Pick an activity:</string>
+    <string name="not_participating">Not participating</string>
 
 </resources>

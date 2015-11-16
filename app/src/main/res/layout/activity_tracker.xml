@@ -163,10 +163,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/participants"
-            android:layout_gravity="center"
-            android:paddingRight="2dp"
-            android:textSize="10sp"
-            android:textColor="@color/white"
+            android:paddingRight="4dp"
+            style="@style/LabelSmallWhite"
             android:visibility="gone"/>
 
         <android.support.v7.widget.RecyclerView
@@ -175,10 +173,6 @@
             android:layout_width="match_parent"
             android:layout_height="40dp"/>
     </LinearLayout>
-
-
-
-
 
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
                  android:layout_width="match_parent"
@@ -199,7 +193,6 @@
             android:textSize="20sp"
             android:paddingTop="50dp"/>
 
-
         <LinearLayout
             android:id="@+id/buttonLayout"
             android:layout_width="300dp"
@@ -207,6 +200,7 @@
             android:orientation="horizontal"
             android:layout_gravity="center_horizontal"
             android:paddingTop="225dp"
+
             android:visibility="gone">
 
             <Button

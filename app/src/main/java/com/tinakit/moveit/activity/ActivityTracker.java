@@ -34,6 +34,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Chronometer;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -133,6 +134,7 @@ public class ActivityTracker extends Fragment
     private static final String STATE_RESOLVING_ERROR = "resolving_error";
 
     //UI widgets
+    protected LinearLayout mCounterLayout;
     private static Button mStartButton;
     private Button mStopButton;
     private Button mPauseButton;
@@ -148,7 +150,6 @@ public class ActivityTracker extends Fragment
     protected static RecyclerView mRecyclerView;
     protected static MultiChooserRecyclerAdapter mRecyclerViewAdapter;
 
-
     //local cache
     //TODO: possibly use EventBus to pass data between previous screen to this one, instead of using static members
     private FragmentActivity mFragmentActivity;
@@ -157,7 +158,7 @@ public class ActivityTracker extends Fragment
     private long mTimeWhenPaused;
     private boolean mSaveLocationData = false;
     private static Bundle mBundle;
-    private static int mSelectedActivityTypeId;
+    private static int mSelectedActivityTypeIndex;
 
     private static final float ZOOM_STREET_ROUTE = 15.0f;
     private GoogleMap mGoogleMap;
@@ -216,6 +217,7 @@ public class ActivityTracker extends Fragment
         */
 
         //wire up UI widgets
+        mCounterLayout = (LinearLayout)rootView.findViewById(R.id.counterLayout);
         mStartButton = (Button) rootView.findViewById(R.id.startButton);
         mStopButton = (Button) rootView.findViewById(R.id.stopButton);
         mPauseButton = (Button) rootView.findViewById(R.id.pauseButton);
@@ -825,6 +827,10 @@ public class ActivityTracker extends Fragment
         mChronometer.setBase(SystemClock.elapsedRealtime());
         mChronometer.start();
 
+        //display counters
+        mCounterLayout.setVisibility(View.VISIBLE);
+
+
     }
 
     private void stopRun(){
@@ -1392,7 +1398,7 @@ public class ActivityTracker extends Fragment
             ///protected ImageView avatar;
             protected CheckBox userCheckBox;
             protected TextView username;
-            protected ImageView activityIcon;
+            protected ImageButton activityIcon;
 
 
             public CustomViewHolder(View view) {
@@ -1401,7 +1407,7 @@ public class ActivityTracker extends Fragment
                 //this.avatar = (ImageView) view.findViewById(R.id.avatar);
                 this.userCheckBox = (CheckBox)view.findViewById(R.id.userCheckBox);
                 this.username = (TextView)view.findViewById(R.id.username);
-                this.activityIcon = (ImageView)view.findViewById(R.id.activityIcon);
+                this.activityIcon = (ImageButton)view.findViewById(R.id.activityIcon);
 
             }
         }
@@ -1423,23 +1429,51 @@ public class ActivityTracker extends Fragment
             //customViewHolder.avatar.setImageResource(mContext.getResources().getIdentifier(user.getAvatarFileName(), "drawable", mContext.getPackageName()));
             customViewHolder.username.setText(user.getUserName());
 
-            //set click listener on checkbox
+            //TODO: remove this after image listener is implemented
+            //set tag on checkbox
             customViewHolder.userCheckBox.setTag(user);
 
-            //if user is on the list of participants
-            if (mActivityDetail.getUserActivityList().contains(new UserActivity(user))){
+            //set click listener and tag on imageview
+            customViewHolder.activityIcon.setTag(user);
+            customViewHolder.activityIcon.setLayoutParams(new LinearLayout.LayoutParams(100, 100));
 
-                customViewHolder.userCheckBox.setChecked(true);
-                int index = mActivityDetail.getUserActivityList().indexOf(new UserActivity(user));
-                customViewHolder.activityIcon.setImageResource(getResources().getIdentifier(mActivityDetail.getUserActivityList().get(index).getActivityType().getActivityName() + "_icon_small", "drawable", mFragmentActivity.getPackageName()));
-                customViewHolder.activityIcon.setLayoutParams(new LinearLayout.LayoutParams(100, 100));
+            //default icon
+            customViewHolder.activityIcon.setBackgroundResource(getResources().getIdentifier("checkbox_icon_small", "drawable", mFragmentActivity.getPackageName()));
+
+            //if user list is not empty
+            if (mActivityDetail.getUserActivityList().size() > 0){
+
+                //user is on the list of participants
+                UserActivity userActivity = new UserActivity(user);
+                if (mActivityDetail.getUserActivityList().contains(userActivity)){
+
+                    customViewHolder.userCheckBox.setChecked(true);
+                    int index = mActivityDetail.getUserActivityList().indexOf(new UserActivity(user));
+                    customViewHolder.activityIcon.setVisibility(View.VISIBLE);
+                    customViewHolder.activityIcon.setBackgroundResource(getResources().getIdentifier(mActivityDetail.getUserActivityList().get(index).getActivityType().getActivityName() + "_icon_small", "drawable", mFragmentActivity.getPackageName()));
+                }
             }
 
-            //if user is not on the list, remove the icon if it is displayed
-            else
-                customViewHolder.activityIcon.setImageResource(0);
+            //set onclicklistener for image
+            customViewHolder.activityIcon.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
-       customViewHolder.userCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    User user = (User) v.getTag();
+                    //save user in Bundle
+                    mBundle.putParcelable("currentUser", user);
+
+                    //display Activity Chooser popup
+
+                    ActivityChoiceDialogFragment activityChoiceDialogFragment = new ActivityChoiceDialogFragment();
+                    activityChoiceDialogFragment.show(getFragmentManager(), "Activity Chooser");
+
+                }
+            });
+
+            //TODO: remove this after implementing onclicklistener on image
+            /*
+            customViewHolder.userCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
@@ -1465,6 +1499,7 @@ public class ActivityTracker extends Fragment
                     }
                 }
             });
+            */
         }
     }
 
@@ -1498,13 +1533,16 @@ public class ActivityTracker extends Fragment
             for (ActivityType activityType : mActivityTypeList)
                 activityTypeStringList.add(activityType.getActivityName());
 
-            dialog.setSingleChoiceItems(R.array.activity_types, -1,
+            //add the non-participant option at the end
+            activityTypeStringList.add(getResources().getString(R.string.not_participating));
+
+            dialog.setSingleChoiceItems(activityTypeStringList.toArray(new String[activityTypeStringList.size()]), -1,
                     new DialogInterface.OnClickListener() {
 
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            mSelectedActivityTypeId = which;
+                            mSelectedActivityTypeIndex = which;
 
                         }
                     })
@@ -1512,29 +1550,43 @@ public class ActivityTracker extends Fragment
                         @Override
                         public void onClick(DialogInterface dialog, int id) {
 
-                            User user = (User) mBundle.get("currentUser");
+                            User user = (User) mBundle.getParcelable("currentUser");
                             UserActivity userActivity = new UserActivity(user);
 
+                            //get the index if user exists on the list
                             int index = mActivityDetail.getUserActivityList().indexOf(userActivity);
-                            userActivity.setActivityType(mActivityTypeList.get(mSelectedActivityTypeId));
 
-                            //if there was a selection
-                            //if mActivityTypeList is empty or user is not on the list, just add it
-                            if (mActivityDetail.getUserActivityList().size() == 0 || index == -1) {
+                            //if the user selected an activity type (not including non-participating)
+                            if (mSelectedActivityTypeIndex < mActivityTypeList.size())
+                                //save the activity type in the UserActivity
+                                userActivity.setActivityType(mActivityTypeList.get(mSelectedActivityTypeIndex));
 
-                                mActivityDetail.getUserActivityList().add(userActivity);
+                            //if the user list is empty
+                            if (mActivityDetail.getUserActivityList().size() == 0) {
+                                //if activity type is a valid activity type - not non-participating, add the user
+                                if (mSelectedActivityTypeIndex != mActivityTypeList.size())
+                                    mActivityDetail.getUserActivityList().add(userActivity);
 
-                                //if user is on list already
-                            } else if (index != -1) {
-
-                                mActivityDetail.getUserActivityList().set(index, userActivity);
                             }
-
-                            //remove the user if this user exists in mActivityDetail
+                            //the user list is not empty
                             else {
 
-                                mActivityDetail.getUserActivityList().remove(index);
+                                //if the user exists on the list
+                                if (index != -1) {
 
+                                    //the user selected non-participating
+                                    if (mSelectedActivityTypeIndex == mActivityTypeList.size()) {
+
+                                        //remove the user on the list
+                                        mActivityDetail.getUserActivityList().remove(index);
+                                    }
+                                    //otherwise, update the user's activity
+                                    else
+                                        mActivityDetail.getUserActivityList().set(index, userActivity);
+                                }
+                                //the user is not on the list and if user did not select non-participating, add the user
+                                else if (mSelectedActivityTypeIndex != mActivityTypeList.size())
+                                    mActivityDetail.getUserActivityList().add(userActivity);
                             }
 
                             refreshDisplay();
