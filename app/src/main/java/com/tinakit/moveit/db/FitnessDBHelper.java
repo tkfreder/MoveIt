@@ -49,6 +49,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     private static final String KEY_ACTIVITY_USERS_USER_ID = "userId";
     private static final String KEY_ACTIVITY_USERS_ACTIVITY_TYPE_ID_FK = "activityTypeId";
     private static final String KEY_ACTIVITY_USERS_CALORIE = "calorie";
+    private static final String KEY_ACTIVITY_USERS_POINTS = "points";
 
     //USERS TABLE
     private static final String TABLE_USERS = "Users";
@@ -174,7 +175,8 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 KEY_ACTIVITY_USERS_ACTIVITY_ID + " INTEGER, " +
                 KEY_ACTIVITY_USERS_USER_ID  + " INTEGER, " +
                 KEY_ACTIVITY_USERS_ACTIVITY_TYPE_ID_FK + " INTEGER, " +
-                KEY_ACTIVITY_USERS_CALORIE + " REAL " +
+                KEY_ACTIVITY_USERS_CALORIE + " REAL, " +
+                KEY_USER_POINTS + " INTEGER " +
                 ")";
 
         String CREATE_ACTIVITY_TYPE_TABLE = "CREATE TABLE " + TABLE_ACTIVITY_TYPE +
@@ -540,6 +542,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 values.put(KEY_ACTIVITY_USERS_USER_ID, userActivityList.get(i).getUser().getUserId());
                 values.put(KEY_ACTIVITY_USERS_ACTIVITY_TYPE_ID_FK, userActivityList.get(i).getActivityType().getActivityTypeId());
                 values.put(KEY_ACTIVITY_USERS_CALORIE, userActivityList.get(i).getCalories());
+                values.put(KEY_USER_POINTS, userActivityList.get(i).getPoints());
 
                 // Notice how we haven't specified the primary key. SQLite auto increments the primary key column.
                 if (db.insertOrThrow(TABLE_ACTIVITY_USERS, null, values) != -1)

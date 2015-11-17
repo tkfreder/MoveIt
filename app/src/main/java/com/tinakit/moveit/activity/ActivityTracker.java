@@ -1157,12 +1157,13 @@ public class ActivityTracker extends Fragment
             float milesPerHour = miles / hoursElapsed;
 
             //calculate calorie for each participant for their specific activity
-            //update their total calorie count for this activity
+            //update their total calorie count and points for this activity
             for (int j = 0; j < mActivityDetail.getUserActivityList().size(); j++){
 
                 User user = mActivityDetail.getUserActivityList().get(j).getUser();
                 float currentCalorie = mActivityDetail.getUserActivityList().get(j).getCalories();
                 mActivityDetail.getUserActivityList().get(j).setCalories(currentCalorie + getCalorieByActivity(user.getWeight(), minutesElapsed, milesPerHour, mActivityDetail.getUserActivityList().get(j).getActivityType().getActivityTypeId()));
+                mActivityDetail.getUserActivityList().get(j).setPoints(mTotalPoints);
             }
             //calculate bearing
             float bearing = mUnitSplitList.get(i).getLocation().bearingTo(mUnitSplitList.get(i+1).getLocation());

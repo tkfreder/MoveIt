@@ -11,6 +11,7 @@ public class UserActivity implements Parcelable {
     private User mUser;
     private ActivityType mActivityType;
     private float mCalories;
+    private int mPoints;
 
     public UserActivity(User user){
 
@@ -42,6 +43,14 @@ public class UserActivity implements Parcelable {
         mCalories = calories;
     }
 
+    public int getPoints() {
+        return mPoints;
+    }
+
+    public void setPoints(int points) {
+        mPoints = points;
+    }
+
     @Override
     public boolean equals(Object o) {
 
@@ -60,12 +69,11 @@ public class UserActivity implements Parcelable {
     }
 
 
-
-
     protected UserActivity(Parcel in) {
         mUser = (User) in.readValue(User.class.getClassLoader());
         mActivityType = (ActivityType) in.readValue(ActivityType.class.getClassLoader());
         mCalories = in.readFloat();
+        mPoints = in.readInt();
     }
 
     @Override
@@ -78,6 +86,7 @@ public class UserActivity implements Parcelable {
         dest.writeValue(mUser);
         dest.writeValue(mActivityType);
         dest.writeFloat(mCalories);
+        dest.writeInt(mPoints);
     }
 
     @SuppressWarnings("unused")
