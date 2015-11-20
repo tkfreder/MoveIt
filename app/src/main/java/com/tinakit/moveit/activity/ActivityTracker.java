@@ -19,7 +19,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -33,7 +32,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Chronometer;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -1373,8 +1371,10 @@ public class ActivityTracker extends Fragment
     }
 
     private void EditRewards(){
-        Intent intent = new Intent(mFragmentActivity, EditReward.class);
-        startActivity(intent);
+
+        //TODO: replace this with a call to EditRewardFragment
+        //Intent intent = new Intent(mFragmentActivity, EditReward.class);
+        //startActivity(intent);
     }
 
     protected class MultiChooserRecyclerAdapter extends RecyclerView.Adapter<MultiChooserRecyclerAdapter.CustomViewHolder> {

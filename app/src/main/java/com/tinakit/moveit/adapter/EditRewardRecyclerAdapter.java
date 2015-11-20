@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,14 +13,10 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.tinakit.moveit.R;
-import com.tinakit.moveit.activity.EditReward;
-import com.tinakit.moveit.activity.RewardView;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.Reward;
-import com.tinakit.moveit.model.RewardStatusType;
 
 import java.util.List;
 
@@ -79,7 +74,7 @@ public class EditRewardRecyclerAdapter extends RecyclerView.Adapter<EditRewardRe
 
                 //TODO: refresh recyclerview, is there another way to do this besides calling intent on EditReward
                 ((Activity)mContext).finish();
-                Intent intent = new Intent(mContext, EditReward.class);
+                Intent intent = new Intent(mContext, com.tinakit.moveit.activity.EditRewardFragment.class);
                 mContext.startActivity(intent);
             }
         });
