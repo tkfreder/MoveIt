@@ -250,7 +250,7 @@ public class ActivityTracker extends Fragment
 
     protected void addMap(LayoutInflater inflater, ViewGroup container){
 
-        SupportMapFragment mMapFragment = SupportMapFragment.newInstance();
+        mMapFragment = SupportMapFragment.newInstance();
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
         transaction.add(R.id.map_container, mMapFragment).commit();
         mMapFragment.getMapAsync(this);
@@ -842,6 +842,9 @@ public class ActivityTracker extends Fragment
 
         //display counters
         mCounterLayout.setVisibility(View.VISIBLE);
+
+        //hide user activities
+        mRecyclerView.setVisibility(View.GONE);
 
 
     }

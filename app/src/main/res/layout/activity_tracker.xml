@@ -197,10 +197,9 @@
             android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_gravity="center_horizontal"
-            android:paddingTop="15dp"
-
-            android:visibility="gone">
+            android:layout_gravity="bottom|center"
+            android:layout_marginBottom="15dp"
+            android:visibility="visible">
 
             <Button
                 android:id="@+id/startButton"

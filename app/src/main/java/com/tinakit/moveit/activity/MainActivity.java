@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFrag(new ActivityTracker(), "START");
         adapter.addFrag(new ViewStatsFragment(), "COINS");
-        adapter.addFrag(new EditRewardFragment(), "ADD REWARDS");
+        adapter.addFrag(new EditRewardFragment(), "REWARDS");
         //adapter.addFrag(new CoordinatorFragment(), "Coordinator Layout");
         viewPager.setAdapter(adapter);
     }
