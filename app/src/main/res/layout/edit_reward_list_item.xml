@@ -13,12 +13,6 @@
             android:orientation="horizontal"
             android:layout_weight="1">
 
-            <CheckBox
-                android:id="@+id/enabled"
-                android:layout_width="20dp"
-                android:layout_height="wrap_content"
-                android:checked="true"/>
-
             <EditText
                 android:id="@+id/points"
                 android:layout_width="wrap_content"

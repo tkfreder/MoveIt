@@ -35,7 +35,7 @@ public class EditRewardFragment extends Fragment {
 
         //RecyclerView
         // Initialize recycler view
-        mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recycler_view);
+        mRecyclerView = (RecyclerView)rootView.findViewById(R.id.reward_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mFragmentActivity));
         mEditRewardRecyclerAdapter = new EditRewardRecyclerAdapter(mFragmentActivity);
         mRecyclerView.setAdapter(mEditRewardRecyclerAdapter);

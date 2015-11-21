@@ -19,6 +19,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -46,6 +47,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -65,6 +67,7 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.Inflater;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.model.UserActivity;
@@ -234,11 +237,23 @@ public class ActivityTracker extends Fragment
         //recycler view
         initializeRecyclerView(rootView);
 
-        mMapFragment = (SupportMapFragment)getChildFragmentManager().findFragmentById(R.id.map);
-        mMapFragment.getMapAsync(this);
+        //add map
+        addMap(inflater, container);
+
+        //TODO: delete this if addMap() works
+        //mMapFragment = (SupportMapFragment)getChildFragmentManager().findFragmentById(R.id.map);
+        //mMapFragment.getMapAsync(this);
 
         return rootView;
 
+    }
+
+    protected void addMap(LayoutInflater inflater, ViewGroup container){
+
+        SupportMapFragment mMapFragment = SupportMapFragment.newInstance();
+        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+        transaction.add(R.id.map_container, mMapFragment).commit();
+        mMapFragment.getMapAsync(this);
     }
 
     protected void setButtonOnClickListeners(){
@@ -1341,12 +1356,6 @@ public class ActivityTracker extends Fragment
         }
 
         return seconds + (minutes*60) + (hours*3600);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-
-        mFragmentActivity.getMenuInflater().inflate(R.menu.menu_main, menu);
     }
 
     @Override

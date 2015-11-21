@@ -53,11 +53,6 @@
             android:label="@string/reward_view" >
         </activity>
         <activity
-            android:name=".activity.EditRewardFragment"
-            android:label="Edit Rewards" >
-
-        </activity>
-        <activity
             android:name=".activity.MainActivity"
             android:label="@string/app_name" >
 

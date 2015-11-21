@@ -43,7 +43,7 @@ public class ViewStatsFragment extends Fragment {
 
         //RecyclerView
         // Initialize recycler view
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.stats_recycler_view);
         mRecyclerView.setHasFixedSize(true); //child items have fixed dimensions, allows the RecyclerView to optimize better by figuring out the exact height and width of the entire list based on the adapter.
 
 

@@ -58,7 +58,6 @@ public class EditRewardRecyclerAdapter extends RecyclerView.Adapter<EditRewardRe
         // Populate data from Reward data object
         int numPoints = reward.getPoints();
 
-        customViewHolder.enabled.setChecked(reward.isEnabled());
         customViewHolder.points.setText(String.valueOf(numPoints));
         customViewHolder.name.setText(reward.getName());
         customViewHolder.itemView.setTag(reward);
@@ -70,7 +69,7 @@ public class EditRewardRecyclerAdapter extends RecyclerView.Adapter<EditRewardRe
                 Reward reward = (Reward)customViewHolder.itemView.getTag();
 
                 //TODO: call updateReward to DB
-                mDatabaseHelper.updateReward(reward.getRewardId(), customViewHolder.name.getText().toString(), Integer.parseInt(customViewHolder.points.getText().toString()), customViewHolder.enabled.isChecked() ? 1 : 0);
+                mDatabaseHelper.updateReward(reward.getRewardId(), customViewHolder.name.getText().toString(), Integer.parseInt(customViewHolder.points.getText().toString()));
 
                 //TODO: refresh recyclerview, is there another way to do this besides calling intent on EditReward
                 ((Activity)mContext).finish();
@@ -125,7 +124,6 @@ public class EditRewardRecyclerAdapter extends RecyclerView.Adapter<EditRewardRe
 
     public class CustomViewHolder extends RecyclerView.ViewHolder {
 
-        CheckBox enabled;
         EditText points;
         EditText name;
         Button updateButton;
@@ -134,8 +132,7 @@ public class EditRewardRecyclerAdapter extends RecyclerView.Adapter<EditRewardRe
         public CustomViewHolder(View view) {
             super(view);
 
-            this.enabled = (CheckBox)view.findViewById(R.id.enabled);
-            this.points = (EditText) view.findViewById(R.id.points);
+            this.points = (EditText) view.findViewById(R.id.rewardPoints);
             this.name = (EditText) view.findViewById(R.id.name);
             this.updateButton = (Button) view.findViewById(R.id.updateButton);
             this.deleteButton = (ImageView) view.findViewById(R.id.delete);

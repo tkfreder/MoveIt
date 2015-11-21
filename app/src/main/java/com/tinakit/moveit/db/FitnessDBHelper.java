@@ -100,7 +100,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     private static final String KEY_REWARD_ID = "_id";
     private static final String KEY_REWARD_NAME = "rewardName";
     private static final String KEY_REWARD_POINTS = "points";
-    private static final String KEY_REWARD_IS_ENABLED = "isEnabled";
 
     //REWARDUSER TABLE
     private static final String TABLE_REWARDUSER = "RewardUser";
@@ -221,8 +220,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 "(" +
                 KEY_REWARD_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // Define a primary key
                 KEY_REWARD_NAME  + " TEXT, " +
-                KEY_REWARD_POINTS  + " INTEGER, " +
-                KEY_REWARD_IS_ENABLED  + " NUMERIC " +
+                KEY_REWARD_POINTS  + " INTEGER " +
                 ")";
 
         String CREATE_REWARDUSER_TABLE = "CREATE TABLE " + TABLE_REWARDUSER +
@@ -240,9 +238,8 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 " , ru." + KEY_REWARDUSER_USER_ID_FK + " AS " + KEY_REWARDUSER_USER_ID_FK +
                 " , r." + KEY_REWARD_NAME + " AS " + KEY_REWARD_NAME +
                 " FROM " + TABLE_REWARDUSER + " ru" +
-                " LEFT JOIN " + TABLE_REWARDS + " r on ru." + KEY_REWARDUSER_REWARD_ID_FK + " = r._id" +
+                " LEFT JOIN " + TABLE_REWARDS + " r on ru." + KEY_REWARDUSER_REWARD_ID_FK + " = r._id";
                 //" LEFT JOIN " + TABLE_USERS + " u on u._id = ru.userId" +
-                " WHERE r." + KEY_REWARD_IS_ENABLED + " = 1";
 
         String CREATE_VIEW_FIRST_LOCATION_POINTS = "CREATE VIEW " + VIEW_FIRST_LOCATION_POINTS + " AS" +
                 " SELECT " + KEY_ACTIVITY_START_DATE +
@@ -273,11 +270,11 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
         //TODO: DUMMY DATA
         //populate Rewards table
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (1, 'popsicle dessert', 1, 1);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (2, 'trip to Michaels', 3, 1);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (3, 'pancakes for dinner', 5, 1);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (4, 'pick of Sat. outing', 7, 1);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (5, 'Animal Jam points', 10, 1);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (1, 'popsicle dessert', 1);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (2, 'trip to Michaels', 3);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (3, 'pancakes for dinner', 5);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (4, 'pick of Sat. outing', 7);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (5, 'Animal Jam points', 10);");
 
         //TODO: DUMMY DATA
         db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Laura', 0, 50, 'avatar_cat_purple', 0);");
@@ -929,7 +926,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             ContentValues values = new ContentValues();
             values.put(KEY_REWARD_NAME, rewardName);
             values.put(KEY_REWARD_POINTS, points);
-            values.put(KEY_REWARD_IS_ENABLED, 1);
 
             // Notice how we haven't specified the primary key. SQLite auto increments the primary key column.
             db.insertOrThrow(TABLE_REWARDS, null, values);
@@ -996,7 +992,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
             Cursor cursor = db.query(TABLE_REWARDS,
                     new String[]{KEY_REWARD_ID,KEY_REWARD_NAME,KEY_REWARD_POINTS},
-                    KEY_REWARD_IS_ENABLED + " = ?",
+                    null,
                     new String[]{String.valueOf(1)}, null, null, null);
 
             try{
@@ -1032,7 +1028,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         return rewardList;
     }
 
-    public int updateReward(int rewardId, String rewardName, int points, int isEnabled){
+    public int updateReward(int rewardId, String rewardName, int points){
 
         // Create and/or open the database for writing
         //SQLiteDatabase db = getWritableDatabase();
@@ -1047,7 +1043,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             ContentValues values = new ContentValues();
             values.put(KEY_REWARD_NAME, rewardName);
             values.put(KEY_REWARD_POINTS, points);
-            values.put(KEY_REWARD_IS_ENABLED, 1);
 
             rowsAffected = db.update(TABLE_REWARDS, values, KEY_REWARD_ID + "= ? ", new String[]{String.valueOf(rewardId)});
 
