@@ -3,10 +3,14 @@ package com.tinakit.moveit.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -22,7 +26,9 @@ import java.util.List;
 /**
  * Created by Tina on 9/23/2015.
  */
-public class RewardView extends AppCompatActivity {
+public class RewardView extends Fragment {
+
+    FragmentActivity mFragmentActivity;
 
     //UI Widgets
     private TextView mUserName;
@@ -32,51 +38,44 @@ public class RewardView extends AppCompatActivity {
     private TextView mTotalCoins_textview;
     private RewardRecyclerAdapter mRewardRecyclerAdapter;
 
-    FitnessDBHelper mDatabaseHelper;
     User mUser;
 
+    @Nullable
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        //fix the orientation to portrait
-        this.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        setContentView(R.layout.reward_view);
+        mFragmentActivity  = (FragmentActivity)    super.getActivity();
+        mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        View rootView = inflater.inflate(R.layout.reward_view, container, false);
 
         //wire up UI components
-        initialize();
+        mUserName = (TextView)rootView.findViewById(R.id.username);
+        mAvatar = (ImageView)rootView.findViewById(R.id.avatar);
+        mTotalCoins_textview = (TextView)rootView.findViewById(R.id.coinTotal);
+        mMessage = (TextView)rootView.findViewById(R.id.message);
+        mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recycler_view);
 
         //if this is a refresh of the screen, get the userId
-        if (getIntent().getExtras() != null) {
-            if (getIntent().getExtras().containsKey("user")) {
-                mUser = getIntent().getExtras().getParcelable("user");
+        if (getArguments().containsKey("user")){
 
-                displayRewards();
+            mUser = getArguments().getParcelable("user");
 
-            }
+            displayRewards();
         }
 
-    }
-
-    private void initialize(){
-
-        mUserName = (TextView)findViewById(R.id.username);
-        mAvatar = (ImageView)findViewById(R.id.avatar);
-        mTotalCoins_textview = (TextView)findViewById(R.id.coinTotal);
-        mMessage = (TextView)findViewById(R.id.message);
-        mRecyclerView = (RecyclerView)findViewById(R.id.recycler_view);
-        mDatabaseHelper = FitnessDBHelper.getInstance(getApplicationContext());
+        return rootView;
     }
 
     private void displayRewards(){
 
         mUserName.setText(mUser.getUserName());
-        mAvatar.setImageResource(getResources().getIdentifier(mUser.getAvatarFileName(), "drawable", getPackageName()));
+        mAvatar.setImageResource(getResources().getIdentifier(mUser.getAvatarFileName(), "drawable", mFragmentActivity.getPackageName()));
 
         //TODO: check points are rounding in a consistent way throughout code, including updating DB
         mTotalCoins_textview.setText(String.format("%d", mUser.getPoints()));
 
-        List<Reward> rewardList = mDatabaseHelper.getAllRewards();
+        List<Reward> rewardList = FitnessDBHelper.getInstance(mFragmentActivity).getAllRewards();
 
         if (rewardList.size() != 0){
 
@@ -90,8 +89,8 @@ public class RewardView extends AppCompatActivity {
 
         //RecyclerView
         // Initialize recycler view
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRewardRecyclerAdapter = new RewardRecyclerAdapter(this, mUser);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(mFragmentActivity));
+        mRewardRecyclerAdapter = new RewardRecyclerAdapter(mFragmentActivity, mUser);
         mRecyclerView.setAdapter(mRewardRecyclerAdapter);
 
     }

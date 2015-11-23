@@ -21,6 +21,8 @@ import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
 
 import com.tinakit.moveit.R;
+import com.tinakit.moveit.db.FitnessDBHelper;
+import com.tinakit.moveit.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -93,7 +95,22 @@ public class MainActivity extends AppCompatActivity {
     private void setupViewPager(ViewPager viewPager){
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFrag(new ActivityTracker(), "START");
-        adapter.addFrag(new ViewStatsFragment(), "COINS");
+
+        //add user screens
+        FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(this);
+        List<User> userList = databaseHelper.getUsers();
+
+        for (User user : userList){
+
+            Fragment fragment = new RewardView();
+            Bundle args = new Bundle();
+            args.putParcelable("user", user);
+            fragment.setArguments(args);
+
+            adapter.addFrag(fragment, user.getUserName());
+        }
+
+        //adapter.addFrag(new ViewStatsFragment(), "COINS");
         adapter.addFrag(new EditRewardFragment(), "REWARDS");
         //adapter.addFrag(new CoordinatorFragment(), "Coordinator Layout");
         viewPager.setAdapter(adapter);
