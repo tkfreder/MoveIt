@@ -31,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
     private ViewPager viewPager;
+    protected ViewPagerAdapter mViewPagerAdapter;
+    protected int mUserCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +77,14 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
+
+                //if User tab is selected, index of User tabs start at index = 1
+                if (tab.getPosition() > 0 && tab.getPosition() <= mUserCount){
+
+                    //refresh user data
+                    setupViewPager(viewPager);
+                }
+
                 viewPager.setCurrentItem(tab.getPosition());
             }
 
@@ -92,12 +102,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupViewPager(ViewPager viewPager){
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFrag(new ActivityTracker(), "START");
+
+        mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        mViewPagerAdapter.addFrag(new ActivityTracker(), "START");
 
         //add user screens
         FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(this);
         List<User> userList = databaseHelper.getUsers();
+
+        //refresh user count
+        mUserCount = userList.size();
 
         for (User user : userList){
 
@@ -106,11 +120,11 @@ public class MainActivity extends AppCompatActivity {
             args.putParcelable("user", user);
             fragment.setArguments(args);
 
-            adapter.addFrag(fragment, user.getUserName());
+            mViewPagerAdapter.addFrag(fragment, user.getUserName());
         }
 
-        adapter.addFrag(new EditRewardFragment(), "REWARDS");
-        viewPager.setAdapter(adapter);
+        mViewPagerAdapter.addFrag(new EditRewardFragment(), "REWARDS");
+        viewPager.setAdapter(mViewPagerAdapter);
     }
 
     /*
@@ -150,9 +164,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public Fragment getItem(int position) {
-            return mFragmentList.get(position);
-        }
+        public Fragment getItem(int position) { return mFragmentList.get(position);}
 
         @Override
         public int getCount() {

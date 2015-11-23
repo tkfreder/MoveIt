@@ -348,7 +348,6 @@ public class ActivityTracker extends Fragment
 
                 //save activity data to database on separate background thread
                 new SaveToDB().run();
-
                 doStartState(mFragmentActivity.getString(R.string.activity_saved));
 
             }
@@ -386,8 +385,9 @@ public class ActivityTracker extends Fragment
 
     private void doStartState(String message){
 
-        //clear out user activity list
+        //clear out user activity list and unitsplit data
         mActivityDetail = new ActivityDetail();
+        mUnitSplitList = new ArrayList<>();
         mRecyclerViewAdapter.notifyDataSetChanged();
 
         //make map visible
