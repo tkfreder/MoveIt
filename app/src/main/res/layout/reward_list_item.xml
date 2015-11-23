@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent"
+              android:layout_height="wrap_content"
     >
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,7 +24,7 @@
 
     <LinearLayout android:orientation="horizontal"
               android:layout_width="match_parent"
-              android:layout_height="match_parent"
+              android:layout_height="wrap_content"
     >
     <LinearLayout
         android:layout_width="0dp"
@@ -36,12 +36,14 @@
             android:id="@+id/rewardPoints"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/LabelSmallPurple"
+            android:gravity="center_vertical"
+            style="@style/LabelListItemPurple"
             />
 
         <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:gravity="center_vertical"
             android:src="@drawable/gold_coin"/>
     </LinearLayout>
 
@@ -50,7 +52,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_weight="1"
+        android:layout_weight="4"
         style="@style/LabelListItemPurple"/>
 
 
@@ -58,14 +60,14 @@
         android:id="@+id/statusButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+        android:layout_weight="2"
         android:visibility="gone"/>
 
     <TextView
         android:id="@+id/status"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"/>
+        android:layout_weight="2"/>
 
 
     </LinearLayout>

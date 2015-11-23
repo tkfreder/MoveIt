@@ -247,6 +247,7 @@ public class ActivityTracker extends Fragment
 
     }
 
+
     protected void addMap(LayoutInflater inflater, ViewGroup container){
 
         mMapFragment = SupportMapFragment.newInstance();
@@ -900,7 +901,7 @@ public class ActivityTracker extends Fragment
     //  Data methods
     //**********************************************************************************************
 
-    private void saveToDB(FitnessDBHelper databaseHelper, List<UnitSplit> unitSplitList, ActivityDetail activityDetail, int totalPoints ){
+    private void saveToDB(FitnessDBHelper databaseHelper, List<UnitSplit> unitSplitList, ActivityDetail activityDetail, int totalPoints, float distance){
 
         /*
         //save to cache
@@ -917,7 +918,7 @@ public class ActivityTracker extends Fragment
                 , (float) unitSplitList.get(0).getLocation().getLongitude()
                 , activityDetail.getStartDate()
                 , activityDetail.getEndDate()
-                , getDistance(1) //TODO:replace with Enum type
+                , distance //TODO:replace with Enum type
                 , unitSplitList.size() > 1 ? unitSplitList.get(0).getBearing() : 0);
 
         if (activityId != -1){
@@ -1642,7 +1643,7 @@ public class ActivityTracker extends Fragment
 
         public void run() {
 
-            saveToDB(mDatabaseHelper, mUnitSplitList, mActivityDetail, mTotalPoints);
+            saveToDB(mDatabaseHelper, mUnitSplitList, mActivityDetail, mTotalPoints, getDistance(1));
         }
     }
 

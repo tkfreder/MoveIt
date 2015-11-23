@@ -1,11 +1,20 @@
 package com.tinakit.moveit.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
+
+import com.tinakit.moveit.model.ActivityDetail;
+import com.tinakit.moveit.model.BinderServiceConnection;
 
 /**
  * Created by Tina on 10/26/2015.
@@ -22,6 +31,7 @@ import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.fragment.EditRewardFragment;
 import com.tinakit.moveit.fragment.RewardViewFragment;
 import com.tinakit.moveit.model.User;
+import com.tinakit.moveit.service.TrackerService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,10 +39,24 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String LOG = "MAINACTIVITY";
+    private static final boolean DEBUG = true;
+
     private DrawerLayout drawerLayout;
     private ViewPager viewPager;
     protected ViewPagerAdapter mViewPagerAdapter;
     protected int mUserCount;
+    protected int mCurrentTab;
+
+    //BinderServiceConnection
+    BinderServiceConnection mConnection;
+
+    //TrackerService
+    TrackerService mTrackerService;
+
+    //cache
+    ActivityDetail mActivityDetail;
+    List<User> mUserList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,8 +102,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
 
+                //save index of current tab, save in Bundle
+                mCurrentTab = tab.getPosition();
+
                 //if User tab is selected, index of User tabs start at index = 1
-                if (tab.getPosition() > 0 && tab.getPosition() <= mUserCount){
+                if (tab.getPosition() > 0 && tab.getPosition() <= mUserCount) {
 
                     //refresh user data
                     setupViewPager(viewPager);
@@ -118,6 +145,7 @@ public class MainActivity extends AppCompatActivity {
             Fragment fragment = new RewardViewFragment();
             Bundle args = new Bundle();
             args.putParcelable("user", user);
+            args.putInt("tab_index", mCurrentTab);
             fragment.setArguments(args);
 
             mViewPagerAdapter.addFrag(fragment, user.getUserName());
@@ -127,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setAdapter(mViewPagerAdapter);
     }
 
-    /*
+   /*
     private void setupDrawerContent(NavigationView navigationView){
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -155,6 +183,77 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 */
+
+    //**********************************************************************************************
+    //  onStart()
+    //**********************************************************************************************
+
+    @Override
+    protected void onStart() {
+        if (DEBUG) Log.d(LOG, "onStart");
+        super.onStart();
+        mConnection.doBindService(this, new Intent(MainActivity.this, TrackerService.class));
+
+        // Register to receive Intents with actions named DATA_SERVICE_INTENT.
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                mMessageReceiver, new IntentFilter(TrackerService.TRACKER_SERVICE_INTENT));
+    }
+
+    //**********************************************************************************************
+    //  onPause()
+    //**********************************************************************************************
+
+    @Override
+    protected void onPause() {
+        if (DEBUG) Log.d(LOG, "onPause");
+
+        // Unregister since the activity is paused.
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+        super.onPause();
+    }
+
+    //**********************************************************************************************
+    //  onResume()
+    //**********************************************************************************************
+
+    @Override
+    protected void onResume() {
+        if (DEBUG) Log.d(LOG, "onResume");
+
+        super.onResume();
+        // Register to receive Intents with actions named DATA_SERVICE_INTENT.
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(TrackerService.TRACKER_SERVICE_INTENT));
+    }
+
+    //**********************************************************************************************
+    //  BroadcastReceiver mMessageReceiver
+    //**********************************************************************************************
+
+    // Handler for received Intents. This will be called whenever an Intent
+    // with an action named DATA_SERVICE_INTENT is broadcasted.
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String message = intent.getStringExtra("message");
+
+            if (DEBUG) Log.d(LOG, "BroadcastReceiver - onReceive(): message: " + message);
+
+
+            //if this message came from DataService, get the stocklist and previous prices from the Service
+            if(message.equals(TrackerService.ACTIVITY_DETAIL)){
+
+                if(mConnection.isBound()){
+
+                    mActivityDetail = mConnection.mBoundService.getActivityDetail();
+                    mUserList = mConnection.mBoundService.getUserList();
+
+                    mViewPagerAdapter.notifyDataSetChanged();
+                }
+            }
+        }
+    };
+
+
     static class ViewPagerAdapter extends FragmentPagerAdapter {
         private final List<Fragment> mFragmentList = new ArrayList<>();
         private final List<String> mFragmentTitleList = new ArrayList<>();
