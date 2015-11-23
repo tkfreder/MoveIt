@@ -49,7 +49,7 @@
             android:label="@string/edit_activity" >
         </activity>
         <activity
-            android:name=".activity.RewardView"
+            android:name=".fragment.RewardViewFragment"
             android:label="@string/reward_view" >
         </activity>
         <activity

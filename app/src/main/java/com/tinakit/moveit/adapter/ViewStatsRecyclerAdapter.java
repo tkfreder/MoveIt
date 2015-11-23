@@ -12,7 +12,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.tinakit.moveit.R;
-import com.tinakit.moveit.activity.ActivityHistory;
 import com.tinakit.moveit.activity.RewardView;
 import com.tinakit.moveit.model.User;
 

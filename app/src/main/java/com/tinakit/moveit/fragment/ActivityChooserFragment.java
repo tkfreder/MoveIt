@@ -1,4 +1,4 @@
-package com.tinakit.moveit.activity;
+package com.tinakit.moveit.fragment;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tinakit.moveit.R;
+import com.tinakit.moveit.activity.ActivityTracker;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.ActivityType;

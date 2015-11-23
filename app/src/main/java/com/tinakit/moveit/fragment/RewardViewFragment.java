@@ -1,4 +1,4 @@
-package com.tinakit.moveit.activity;
+package com.tinakit.moveit.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * Created by Tina on 9/23/2015.
  */
-public class RewardView extends Fragment {
+public class RewardViewFragment extends Fragment {
 
     FragmentActivity mFragmentActivity;
 

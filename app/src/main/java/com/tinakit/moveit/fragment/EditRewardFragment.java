@@ -1,4 +1,4 @@
-package com.tinakit.moveit.activity;
+package com.tinakit.moveit.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
