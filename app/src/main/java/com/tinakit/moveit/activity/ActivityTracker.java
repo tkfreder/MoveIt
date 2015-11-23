@@ -37,6 +37,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -66,6 +67,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.Inflater;
 
@@ -137,11 +139,11 @@ public class ActivityTracker extends Fragment
     //UI widgets
     protected LinearLayout mCounterLayout;
     private static Button mStartButton;
-    private Button mStopButton;
-    private Button mPauseButton;
-    private Button mSaveButton;
-    private Button mResumeButton;
-    private Button mCancelButton;
+    private static Button mStopButton;
+    private static Button mPauseButton;
+    private static Button mSaveButton;
+    private static Button mResumeButton;
+    private static Button mCancelButton;
     private static LinearLayout mButtonLinearLayout;
     private static Chronometer mChronometer;
     private TextView mDistance;
@@ -240,10 +242,6 @@ public class ActivityTracker extends Fragment
         //add map
         addMap(inflater, container);
 
-        //TODO: delete this if addMap() works
-        //mMapFragment = (SupportMapFragment)getChildFragmentManager().findFragmentById(R.id.map);
-        //mMapFragment.getMapAsync(this);
-
         return rootView;
 
     }
@@ -265,27 +263,21 @@ public class ActivityTracker extends Fragment
         mStartButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
-                //if this is a restart
-                if (mStartButton.getText().equals(getResources().getString(R.string.go))){
 
-                    //set flag to save location data
-                    mSaveLocationData = true;
+                //set flag to save location data
+                mSaveLocationData = true;
 
-                    //get timestamp of start
-                    mActivityDetail.setStartDate(new Date());
+                //get timestamp of start
+                mActivityDetail.setStartDate(new Date());
 
-                    //set visibility
-                    mMapFragment.getView().setVisibility(View.GONE);
+                //set visibility
+                mMapFragment.getView().setVisibility(View.GONE);
 
-                }
-                else {
+                //Restart
+                mCancelButton.setVisibility(View.GONE);
 
-                    //Restart
-                    mCancelButton.setVisibility(View.GONE);
-
-                    //clear out error message
-                    mMessage.setText("");
-                }
+                //clear out error message
+                mMessage.setText("");
 
                 mStartButton.setVisibility(View.GONE);
                 mStopButton.setVisibility(View.VISIBLE);
@@ -312,6 +304,7 @@ public class ActivityTracker extends Fragment
                 //save Activity Detail data
                 if (mUnitSplitList.size() > 1) {
 
+                    mCancelButton.setVisibility(View.VISIBLE);
                     mSaveButton.setVisibility(View.VISIBLE);
 
                     //display number of coins
@@ -352,18 +345,13 @@ public class ActivityTracker extends Fragment
 
             public void onClick(View v) {
 
-                //save location data to database
-                saveToDB();
+                //save activity data to database on separate background thread
+                new SaveToDB().run();
 
-                //destroy current activity
-                mFragmentActivity.finish();
-
-                //display Activity history screen
-                Intent intent = new Intent(mFragmentActivity, MainActivity.class);
-                intent.putExtra("tab_index", 1);
-                startActivity(intent);
+                doStartState(mFragmentActivity.getString(R.string.activity_saved));
 
             }
+
         });
 
         mResumeButton.setOnClickListener(new View.OnClickListener() {
@@ -384,10 +372,46 @@ public class ActivityTracker extends Fragment
             @Override
             public void onClick(View v) {
 
-                //TODO: redirect to the rewards screen when that component is done
-                mFragmentActivity.finish();
+                //TODO: replace with state pattern
+                doStartState(mFragmentActivity.getString(R.string.activity_cancelled));
+
+                //display restart
+                hideAllButtons();
+                mStartButton.setVisibility(View.VISIBLE);
+                mStartButton.setText(mFragmentActivity.getString(R.string.restart));
             }
         });
+    }
+
+    private void doStartState(String message){
+
+        //clear out user activity list
+        mActivityDetail = new ActivityDetail();
+        mRecyclerViewAdapter.notifyDataSetChanged();
+
+        //make map visible
+        mMapFragment.getView().setVisibility(View.VISIBLE);
+        mMapFragment.getMapAsync(this);
+
+        //make start button visible
+        hideAllButtons();
+
+        //counter UI
+        mCounterLayout.setVisibility(View.GONE);
+        resetFields();
+
+        Toast.makeText(mFragmentActivity, message, Toast.LENGTH_SHORT).show();
+    }
+
+    private static void hideAllButtons(){
+
+        mStartButton.setVisibility(View.GONE);
+        mStopButton.setVisibility(View.GONE);
+        mPauseButton.setVisibility(View.GONE);
+        mSaveButton.setVisibility(View.GONE);
+        mResumeButton.setVisibility(View.GONE);
+        mCancelButton.setVisibility(View.GONE);
+
     }
 
     @Override
@@ -843,10 +867,6 @@ public class ActivityTracker extends Fragment
         //display counters
         mCounterLayout.setVisibility(View.VISIBLE);
 
-        //hide user activities
-        mRecyclerView.setVisibility(View.GONE);
-
-
     }
 
     private void stopRun(){
@@ -883,7 +903,7 @@ public class ActivityTracker extends Fragment
     //  Data methods
     //**********************************************************************************************
 
-    private void saveToDB(){
+    private void saveToDB(FitnessDBHelper databaseHelper, List<UnitSplit> unitSplitList, ActivityDetail activityDetail, int totalPoints ){
 
         /*
         //save to cache
@@ -895,39 +915,38 @@ public class ActivityTracker extends Fragment
         mActivityDetailList.add(activityDetail);
 */
 
-
         //save Activity Detail (overall stats)
-        long activityId = mDatabaseHelper.insertActivity((float) mUnitSplitList.get(0).getLocation().getLatitude()
-                , (float) mUnitSplitList.get(0).getLocation().getLongitude()
-                , mActivityDetail.getStartDate()
-                , mActivityDetail.getEndDate()
+        long activityId = databaseHelper.insertActivity((float) unitSplitList.get(0).getLocation().getLatitude()
+                , (float) unitSplitList.get(0).getLocation().getLongitude()
+                , activityDetail.getStartDate()
+                , activityDetail.getEndDate()
                 , getDistance(1) //TODO:replace with Enum type
-                , mUnitSplitList.size() > 1 ? mUnitSplitList.get(0).getBearing() : 0);
+                , unitSplitList.size() > 1 ? unitSplitList.get(0).getBearing() : 0);
 
         if (activityId != -1){
 
             //track participants for this activity: save userIds for this activityId
-            int rowsAffected = mDatabaseHelper.insertActivityUsers(activityId, mActivityDetail.getUserActivityList());
+            int rowsAffected = databaseHelper.insertActivityUsers(activityId, activityDetail.getUserActivityList());
 
-            for ( int i = 0; i < mUnitSplitList.size(); i++) {
+            for ( int i = 0; i < unitSplitList.size(); i++) {
 
-                mDatabaseHelper.insertActivityLocationData(activityId
-                        , mActivityDetail.getStartDate()
-                        , mUnitSplitList.get(i).getLocation().getLatitude()
-                        , mUnitSplitList.get(i).getLocation().getLongitude()
-                        , mUnitSplitList.get(i).getLocation().getAltitude()
-                        , mUnitSplitList.get(i).getLocation().getAccuracy()
-                        , mUnitSplitList.get(i).getBearing()
-                        , mUnitSplitList.get(i).getSpeed());
+                databaseHelper.insertActivityLocationData(activityId
+                        , activityDetail.getStartDate()
+                        , unitSplitList.get(i).getLocation().getLatitude()
+                        , unitSplitList.get(i).getLocation().getLongitude()
+                        , unitSplitList.get(i).getLocation().getAltitude()
+                        , unitSplitList.get(i).getLocation().getAccuracy()
+                        , unitSplitList.get(i).getBearing()
+                        , unitSplitList.get(i).getSpeed());
             }
         }
 
         //update points for each user
-        for (UserActivity userActivity : mActivityDetail.getUserActivityList()){
+        for (UserActivity userActivity : activityDetail.getUserActivityList()){
 
             User user = userActivity.getUser();
-            user.setPoints(mTotalPoints + user.getPoints());
-            mDatabaseHelper.updateUser(user);
+            user.setPoints(totalPoints + user.getPoints());
+            databaseHelper.updateUser(user);
         }
 
     }
@@ -1518,12 +1537,14 @@ public class ActivityTracker extends Fragment
 
     private static void refreshDisplay(){
 
+        hideAllButtons();
+
         //enable or disable buttons if there are participants or not
         //enable button if there is at least one user participating
         if (mActivityDetail.getUserActivityList().size() > 0)
-            mButtonLinearLayout.setVisibility(View.VISIBLE);
+            mStartButton.setVisibility(View.VISIBLE);
         else
-            mButtonLinearLayout.setVisibility(View.GONE);
+            mStartButton.setVisibility(View.GONE);
 
         //fresh the icons in case user list has changed
         mRecyclerViewAdapter.notifyDataSetChanged();
@@ -1617,6 +1638,15 @@ public class ActivityTracker extends Fragment
             return dialog.create();
         }
 
+    }
+
+
+    private class SaveToDB implements Runnable {
+
+        public void run() {
+
+            saveToDB(mDatabaseHelper, mUnitSplitList, mActivityDetail, mTotalPoints);
+        }
     }
 
 }

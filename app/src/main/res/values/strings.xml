@@ -119,5 +119,7 @@
     <string name="ok">OK</string>
     <string name="pick_activity">Pick an activity:</string>
     <string name="not_participating">Not participating</string>
+    <string name="activity_cancelled">Activity cancelled.</string>
+    <string name="activity_saved">Activity saved.</string>
 
 </resources>

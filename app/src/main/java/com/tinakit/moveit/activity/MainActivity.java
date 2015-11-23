@@ -19,6 +19,8 @@ import android.view.MenuItem;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.db.FitnessDBHelper;
+import com.tinakit.moveit.fragment.EditRewardFragment;
+import com.tinakit.moveit.fragment.RewardViewFragment;
 import com.tinakit.moveit.model.User;
 
 import java.util.ArrayList;
@@ -99,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
 
         for (User user : userList){
 
-            Fragment fragment = new RewardView();
+            Fragment fragment = new RewardViewFragment();
             Bundle args = new Bundle();
             args.putParcelable("user", user);
             fragment.setArguments(args);

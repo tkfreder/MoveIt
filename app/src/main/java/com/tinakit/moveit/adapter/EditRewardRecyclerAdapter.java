@@ -72,7 +72,7 @@ public class EditRewardRecyclerAdapter extends RecyclerView.Adapter<EditRewardRe
 
                 //TODO: refresh recyclerview, is there another way to do this besides calling intent on EditReward
                 ((Activity)mContext).finish();
-                Intent intent = new Intent(mContext, com.tinakit.moveit.activity.EditRewardFragment.class);
+                Intent intent = new Intent(mContext, com.tinakit.moveit.fragment.EditRewardFragment.class);
                 mContext.startActivity(intent);
             }
         });

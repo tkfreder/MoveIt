@@ -185,12 +185,12 @@
 
         <TextView
             android:id="@+id/message"
-            android:layout_gravity="center_horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/primary"
             android:textSize="20sp"
-            android:paddingTop="50dp"/>
+            android:layout_gravity="bottom|center"
+            android:layout_marginBottom="75dp"/>
 
         <LinearLayout
             android:id="@+id/buttonLayout"
@@ -199,7 +199,7 @@
             android:orientation="horizontal"
             android:layout_gravity="bottom|center"
             android:layout_marginBottom="15dp"
-            android:visibility="gone">
+            >
 
             <Button
                 android:id="@+id/startButton"
@@ -210,6 +210,7 @@
                 android:text="@string/go"
                 android:background="@color/green"
                 android:textColor="@color/white"
+                android:visibility="gone"
                 />
 
             <Button
@@ -248,6 +249,18 @@
                 />
 
             <Button
+                android:id="@+id/cancelButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_alignParentBottom="true"
+                android:text="@string/cancel"
+                android:visibility="gone"
+                android:background="@color/red"
+                android:textColor="@color/white"
+                />
+
+            <Button
                 android:id="@+id/saveButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -259,17 +272,7 @@
                 android:textColor="@color/white"
                 />
 
-            <Button
-                android:id="@+id/cancelButton"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_alignParentBottom="true"
-                android:text="@string/cancel"
-                android:visibility="gone"
-                android:background="@color/green"
-                android:textColor="@color/white"
-                />
+
 
         </LinearLayout>
     </FrameLayout>

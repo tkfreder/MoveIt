@@ -61,6 +61,10 @@ public class RewardViewFragment extends Fragment {
 
             mUser = getArguments().getParcelable("user");
 
+            //get latest user data
+            FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(mFragmentActivity);
+            mUser = databaseHelper.getUser(mUser.getUserName());
+
             displayRewards();
         }
 
