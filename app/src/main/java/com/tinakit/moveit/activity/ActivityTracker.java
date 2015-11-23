@@ -43,6 +43,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -117,7 +118,7 @@ public class ActivityTracker extends Fragment
     private boolean mIsStatView = false;
 
     //LocationRequest settings
-    private GoogleApiClient mGoogleApiClient;
+    protected static GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private Location mBestReading;
     private static long POLLING_FREQUENCY = 5 * 1000; //10 seconds
@@ -597,7 +598,7 @@ public class ActivityTracker extends Fragment
         //if connection doesn't exist
         if (mGoogleApiClient == null) {
             //create instance of Google Play Services API client
-            buildGoogleApiClient();
+            mGoogleApiClient = buildGoogleApiClient(mFragmentActivity);
         }
 
     }
@@ -618,7 +619,7 @@ public class ActivityTracker extends Fragment
         displayStartMap();
 
         //start getting location data after there is a connection
-        startServices();
+        startServices(mGoogleApiClient, mLocationRequest, this);
 
     }
 
@@ -640,7 +641,7 @@ public class ActivityTracker extends Fragment
         }
     }
 
-    private boolean isConnectedToGoogle(){
+    private static boolean isConnectedToGoogle(){
         return(mGoogleApiClient != null && mGoogleApiClient.isConnected());
     }
 
@@ -779,24 +780,23 @@ public class ActivityTracker extends Fragment
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
-    protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(mFragmentActivity)
+    protected synchronized GoogleApiClient buildGoogleApiClient(Context context) {
+        GoogleApiClient googleApiClient = new GoogleApiClient.Builder(context)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
 
-        mGoogleApiClient.connect();
+        googleApiClient.connect();
 
+        return googleApiClient;
     }
 
     //PERIODIC LOCATION UPDATES
-    protected void startServices() {
+    protected void startServices(GoogleApiClient googleApiClient, LocationRequest locationRequest, LocationListener locationListener ) {
 
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-
+        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, locationListener);
         registerAccelerometer();
-
     }
 
     private boolean hasAccelerometer(){
@@ -806,15 +806,10 @@ public class ActivityTracker extends Fragment
     }
 
     //TODO: rename this method to reflect both operations
-    protected void stopServices() {
+    protected void stopServices(GoogleApiClient googleApiClient, LocationListener locationListener) {
 
-        if (isConnectedToGoogle()){
-
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-
-        }
-
-        unregisterAccelerometer();
+         LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, locationListener);
+         unregisterAccelerometer();
 
     }
 
@@ -860,6 +855,8 @@ public class ActivityTracker extends Fragment
 
         //buildLocationRequest();
 
+        startServices(mGoogleApiClient, mLocationRequest, this);
+
         //chronometer settings, set base time right before starting the chronometer
         mChronometer.setBase(SystemClock.elapsedRealtime());
         mChronometer.start();
@@ -871,7 +868,7 @@ public class ActivityTracker extends Fragment
 
     private void stopRun(){
 
-        stopServices();
+        stopServices(mGoogleApiClient, this);
 
         //stop chronometer
         mChronometer.stop();
