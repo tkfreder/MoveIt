@@ -61,7 +61,7 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
         // Populate data from Reward data object
         int numPoints = reward.getPoints();
 
-        customViewHolder.points.setText(String.valueOf(numPoints));
+        customViewHolder.rewardPoints.setText(String.valueOf(numPoints));
         customViewHolder.name.setText(reward.getName());
         customViewHolder.description.setText(" " + reward.getDescription());
         customViewHolder.itemView.setTag(reward);
@@ -147,7 +147,7 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
 
     public class CustomViewHolder extends RecyclerView.ViewHolder {
 
-        TextView points;
+        TextView rewardPoints;
         TextView name;
         TextView description;
         Button statusButton;
@@ -156,7 +156,7 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
         public CustomViewHolder(View view) {
             super(view);
 
-            this.points = (TextView) view.findViewById(R.id.points);
+            this.rewardPoints = (TextView) view.findViewById(R.id.rewardPoints);
             this.name = (TextView) view.findViewById(R.id.name);
             this.description = (TextView) view.findViewById(R.id.description);
             this.statusButton = (Button) view.findViewById(R.id.statusButton);

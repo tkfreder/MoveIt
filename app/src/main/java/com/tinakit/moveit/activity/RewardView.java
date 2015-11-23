@@ -26,7 +26,6 @@ public class RewardView extends AppCompatActivity {
 
     //UI Widgets
     private TextView mUserName;
-    private Button mStatsButton;
     private RecyclerView mRecyclerView;
     private ImageView mAvatar;
     private TextView mMessage;
@@ -61,14 +60,6 @@ public class RewardView extends AppCompatActivity {
 
     private void initialize(){
 
-        mStatsButton = (Button)findViewById(R.id.statsButton);
-        mStatsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                startActivity(new Intent(getApplicationContext(), ViewStatsFragment.class));
-            }
-        });
         mUserName = (TextView)findViewById(R.id.username);
         mAvatar = (ImageView)findViewById(R.id.avatar);
         mTotalCoins_textview = (TextView)findViewById(R.id.coinTotal);

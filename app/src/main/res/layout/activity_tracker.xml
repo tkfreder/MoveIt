@@ -199,7 +199,7 @@
             android:orientation="horizontal"
             android:layout_gravity="bottom|center"
             android:layout_marginBottom="15dp"
-            android:visibility="visible">
+            android:visibility="gone">
 
             <Button
                 android:id="@+id/startButton"
