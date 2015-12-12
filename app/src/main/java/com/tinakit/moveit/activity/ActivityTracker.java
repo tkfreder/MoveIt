@@ -73,14 +73,13 @@ import java.util.zip.Inflater;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.model.UserActivity;
+import com.tinakit.moveit.service.GoogleApi;
 import com.tinakit.moveit.utility.CalorieCalculator;
 import com.tinakit.moveit.utility.DialogUtility;
 import com.tinakit.moveit.utility.Map;
 import com.tinakit.moveit.utility.UnitConverter;
 
-public class ActivityTracker extends Fragment
-        implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
+public class ActivityTracker extends Fragment implements
         LocationListener, OnMapReadyCallback,
         SensorEventListener {
 
@@ -90,24 +89,12 @@ public class ActivityTracker extends Fragment
 
     //CONSTANTS
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
-    private static final float METER_MILE_CONVERSION = 0.00062137f;
-    private static final float METER_FEET_CONVERSION = 3.28084f;
-    private static final float FEET_COIN_CONVERSION = 0.5f;  //2 feet = 1 coin //TODO: DEBUG
-    private static final float CALORIE_COIN_CONVERSION = 10f; //#coins equal to 1 calorie
-    private static final float USER_WEIGHT = 50f;
+    private static final float FEET_COIN_CONVERSION = 0.5f;  //2 feet = 1 coin
     private static final float USERNAME_FONT_SIZE = 20f;
 
-    //UNITS
-    private static final int MILES = 0;
-    private static final int FEET = 1;
-    private static final int METERS = 2;
-
     //save all location points during location updates
-    private List<Location> mLocationList;
     private List<UnitSplit> mUnitSplitList = new ArrayList<>();
-    private float mCurrentAccuracy;
     private int mTotalPoints = 0;
-
 
     protected static boolean mRequestedService = false;
     long mTimeElapsed = 0; //in seconds
@@ -116,7 +103,6 @@ public class ActivityTracker extends Fragment
     private boolean mIsStatView = false;
 
     //LocationRequest settings
-    protected static GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private Location mBestReading;
     private static long POLLING_FREQUENCY = 5 * 1000; //10 seconds
@@ -127,6 +113,7 @@ public class ActivityTracker extends Fragment
     private boolean mIsTimeLimit = false;
 
     //GOOGLE PLAY SERVICES
+    private GoogleApi mGoogleApi;
     // Request code to use when launching the resolution activity
     private static final int REQUEST_RESOLVE_ERROR = 1001;
     // Unique tag for the error dialog fragment
@@ -153,7 +140,6 @@ public class ActivityTracker extends Fragment
     public static MultiChooserRecyclerAdapter mRecyclerViewAdapter;
 
     //local cache
-    //TODO: possibly use EventBus to pass data between previous screen to this one, instead of using static members
     private FragmentActivity mFragmentActivity;
     public static ActivityDetail mActivityDetail = new ActivityDetail();
     protected static List<ActivityType> mActivityTypeList;
@@ -195,7 +181,9 @@ public class ActivityTracker extends Fragment
 
         //end the activity if Google Play Services is not present
         //redirect user to Google Play Services
-        if (!servicesAvailable()) {
+        mGoogleApi = new GoogleApi(mFragmentActivity);
+
+        if (!mGoogleApi.servicesAvailable()) {
             mFragmentActivity.finish();
         }
 
@@ -585,6 +573,26 @@ public class ActivityTracker extends Fragment
 
     }
 
+
+    //TODO: call this from BroadcastReceiver, when receive message from GoogleApi
+    public void doStartTracker() {
+
+        //TODO:  this isn't always accurate so not sure if it should be used
+        //get the starting point
+        //updateCache(LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient));
+
+        //display map of starting point
+        displayStartMap();
+
+        //start getting location data after there is a connection
+        startServices(mGoogleApi.client(), mLocationRequest, this);
+
+    }
+
+    //**********************************************************************************************
+    //  Location API overridden methods
+    //**********************************************************************************************
+
     //this method should be called once at start of run
     //while stopServices should be called once at end of run
     //do not call buildLocationRequest() and stopServices multiple times, difficult to trach asynchronous process
@@ -595,39 +603,20 @@ public class ActivityTracker extends Fragment
         createLocationRequest();
 
         //if connection doesn't exist
-        if (mGoogleApiClient == null) {
+        if (!mGoogleApi.isConnectedToGoogle()) {
             //create instance of Google Play Services API client
-            mGoogleApiClient = buildGoogleApiClient(mFragmentActivity);
+            mGoogleApi = new GoogleApi(mFragmentActivity);
+            mGoogleApi.buildGoogleApiClient();
         }
-
-    }
-
-    //**********************************************************************************************
-    //  Location API overridden methods
-    //**********************************************************************************************
-
-    @Override
-    public void onConnected(Bundle connectionHint) {
-        if (DEBUG) Log.d(LOG, "GoogleAPIClient Connection successful.");
-
-        //TODO:  this isn't always accurate so not sure if it should be used
-        //get the starting point
-        //updateCache(LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient));
-
-        //display map of starting point
-        displayStartMap();
-
-        //start getting location data after there is a connection
-        startServices(mGoogleApiClient, mLocationRequest, this);
 
     }
 
     private void displayStartMap(){
 
-        if (isMapReady() && isConnectedToGoogle()){
+        if (isMapReady() && mGoogleApi.isConnectedToGoogle()){
 
             mGoogleMap.setContentDescription("Starting point");
-            Location mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            Location mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApi.client());
             LatLng latLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM_STREET_ROUTE));
 
@@ -640,10 +629,6 @@ public class ActivityTracker extends Fragment
         }
     }
 
-    private static boolean isConnectedToGoogle(){
-        return(mGoogleApiClient != null && mGoogleApiClient.isConnected());
-    }
-
     //TODO:  may be able to utilize this to get a more accurate first data point
     //reference:  http://www.adavis.info/2014/09/android-location-updates-with.html?m=1
     private Location bestLastKnownLocation(float minAccuracy, long minTime) {
@@ -652,7 +637,7 @@ public class ActivityTracker extends Fragment
         long bestTime = Long.MIN_VALUE;
 
         // Get the best most recent location currently available
-        Location mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        Location mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApi.client());
 
         if (mCurrentLocation != null) {
             float accuracy = mCurrentLocation.getAccuracy();
@@ -674,66 +659,6 @@ public class ActivityTracker extends Fragment
         }
     }
 
-    @Override
-    public void onConnectionSuspended(int i) {
-        //TODO: do something if connection suspended
-        //let chronometer continue, user should get credit for activity
-    }
-
-    @Override
-    public void onConnectionFailed(com.google.android.gms.common.ConnectionResult result) {
-
-        if (mResolvingError) {
-            // Already attempting to resolve an error.
-            return;
-        } else if (result.hasResolution()) {
-            try {
-                mResolvingError = true;
-                result.startResolutionForResult(mFragmentActivity, REQUEST_RESOLVE_ERROR);
-            } catch (IntentSender.SendIntentException e) {
-                // There was an error with the resolution intent. Try again.
-                mGoogleApiClient.connect();
-            }
-        } else {
-            // Show dialog using GoogleApiAvailability.getErrorDialog()
-            showErrorDialog(result.getErrorCode());
-            mResolvingError = true;
-        }
-    }
-
-    /* Creates a dialog for an error message */
-    private void showErrorDialog(int errorCode) {
-        // Create a fragment for the error dialog
-        ErrorDialogFragment dialogFragment = new ErrorDialogFragment();
-        // Pass the error that should be displayed
-        Bundle args = new Bundle();
-        args.putInt(DIALOG_ERROR, errorCode);
-        dialogFragment.setArguments(args);
-        dialogFragment.show(mFragmentActivity.getSupportFragmentManager(), "errordialog");
-    }
-
-    /* Called from ErrorDialogFragment when the dialog is dismissed. */
-    public void onDialogDismissed() {
-        mResolvingError = false;
-    }
-
-    /* A fragment to display an error dialog */
-    public static class ErrorDialogFragment extends DialogFragment {
-        public ErrorDialogFragment() { }
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Get the error code and retrieve the appropriate dialog
-            int errorCode = this.getArguments().getInt(DIALOG_ERROR);
-            return GoogleApiAvailability.getInstance().getErrorDialog(
-                    this.getActivity(), errorCode, REQUEST_RESOLVE_ERROR);
-        }
-
-        @Override
-        public void onDismiss(DialogInterface dialog) {
-            //((ActivityTracker) getActivity()).onDialogDismissed();
-        }
-    }
 
     @Override
     public void onLocationChanged(Location location) {
@@ -779,6 +704,7 @@ public class ActivityTracker extends Fragment
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
+    /*
     protected synchronized GoogleApiClient buildGoogleApiClient(Context context) {
         GoogleApiClient googleApiClient = new GoogleApiClient.Builder(context)
                 .addConnectionCallbacks(this)
@@ -790,7 +716,7 @@ public class ActivityTracker extends Fragment
 
         return googleApiClient;
     }
-
+*/
     //PERIODIC LOCATION UPDATES
     protected void startServices(GoogleApiClient googleApiClient, LocationRequest locationRequest, LocationListener locationListener ) {
 
@@ -854,7 +780,7 @@ public class ActivityTracker extends Fragment
 
         //buildLocationRequest();
 
-        startServices(mGoogleApiClient, mLocationRequest, this);
+        startServices(mGoogleApi.client(), mLocationRequest, this);
 
         //chronometer settings, set base time right before starting the chronometer
         mChronometer.setBase(SystemClock.elapsedRealtime());
@@ -867,7 +793,7 @@ public class ActivityTracker extends Fragment
 
     private void stopRun(){
 
-        stopServices(mGoogleApiClient, this);
+        stopServices(mGoogleApi.client(), this);
 
         //stop chronometer
         mChronometer.stop();
@@ -1021,7 +947,7 @@ public class ActivityTracker extends Fragment
         //such as through the back button, the check is still performed.
         //end the activity if Google Play Services is not present
         //redirect user to Google Play Services
-        if (!servicesAvailable()) {
+        if (!mGoogleApi.servicesAvailable()) {
             mFragmentActivity.finish();
         }
 
@@ -1273,24 +1199,6 @@ public class ActivityTracker extends Fragment
         return calorie;
     }
 
-    /**
-     * Method to verify google play services on the device, will direct user to Google Play Store if not installed
-     * */
-    private boolean servicesAvailable() {
-        int resultCode = GooglePlayServicesUtil
-                .isGooglePlayServicesAvailable(mFragmentActivity);
-        if (resultCode != ConnectionResult.SUCCESS) {
-            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-                GooglePlayServicesUtil.getErrorDialog(resultCode, mFragmentActivity,
-                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
-            } else {
-                if (DEBUG) Log.d(LOG, "This device does not support Google Play Services.");
-                mFragmentActivity.finish();
-            }
-            return false;
-        }
-        return true;
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -1298,9 +1206,9 @@ public class ActivityTracker extends Fragment
             mResolvingError = false;
             if (resultCode == mFragmentActivity.RESULT_OK) {
                 // Make sure the app is not already connected or attempting to connect
-                if (!mGoogleApiClient.isConnecting() &&
-                        !mGoogleApiClient.isConnected()) {
-                    mGoogleApiClient.connect();
+                if (!mGoogleApi.client().isConnecting() &&
+                        !mGoogleApi.client().isConnected()) {
+                    mGoogleApi.client().connect();
                 }
             }
         }
