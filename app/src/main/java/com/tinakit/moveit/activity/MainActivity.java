@@ -51,6 +51,9 @@ public class MainActivity extends AppCompatActivity {
     //BinderServiceConnection
     BinderServiceConnection mConnection;
 
+    //LocalBroadcaseManager
+    LocalBroadcastManager mLocalBroadcastManager;
+
     //TrackerService
     TrackerService mTrackerService;
 
@@ -170,10 +173,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         if (DEBUG) Log.d(LOG, "onStart");
         super.onStart();
+        mConnection = BinderServiceConnection.getInstance();
         mConnection.doBindService(this, new Intent(MainActivity.this, TrackerService.class));
 
-        // Register to receive Intents with actions named DATA_SERVICE_INTENT.
-        LocalBroadcastManager.getInstance(this).registerReceiver(
+        // Register to receive Intents with actions.
+        mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
+        mLocalBroadcastManager.registerReceiver(
                 mMessageReceiver, new IntentFilter(TrackerService.TRACKER_SERVICE_INTENT));
     }
 
@@ -186,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
         if (DEBUG) Log.d(LOG, "onPause");
 
         // Unregister since the activity is paused.
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+        mLocalBroadcastManager.unregisterReceiver(mMessageReceiver);
         super.onPause();
     }
 
@@ -200,7 +205,19 @@ public class MainActivity extends AppCompatActivity {
 
         super.onResume();
         // Register to receive Intents with actions named DATA_SERVICE_INTENT.
-        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(TrackerService.TRACKER_SERVICE_INTENT));
+        mLocalBroadcastManager.registerReceiver(mMessageReceiver, new IntentFilter(TrackerService.TRACKER_SERVICE_INTENT));
+    }
+
+    //**********************************************************************************************
+    //  onDestroy()
+    //**********************************************************************************************
+
+    @Override
+    protected void onDestroy() {
+        if (DEBUG) Log.d(LOG, "onDestroy");
+
+        mConnection.doUnbindService(this);
+        super.onDestroy();
     }
 
     //**********************************************************************************************
