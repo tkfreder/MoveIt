@@ -59,7 +59,6 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.ActivityType;
-import com.tinakit.moveit.model.ActivityType2;
 import com.tinakit.moveit.model.UnitSplit;
 import com.tinakit.moveit.model.User;
 
@@ -88,7 +87,6 @@ public class ActivityTracker extends Fragment
     //DEBUG
     private static final String LOG = "MAIN_ACTIVITY";
     private static final boolean DEBUG = true;
-    private static final ActivityType2 mActivityType = ActivityType2.RUNNING;
 
     //CONSTANTS
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
@@ -152,7 +150,7 @@ public class ActivityTracker extends Fragment
     private TextView mFeetPerMinute;
     private TextView mMessage;
     protected static RecyclerView mRecyclerView;
-    protected static MultiChooserRecyclerAdapter mRecyclerViewAdapter;
+    public static MultiChooserRecyclerAdapter mRecyclerViewAdapter;
 
     //local cache
     //TODO: possibly use EventBus to pass data between previous screen to this one, instead of using static members
@@ -987,48 +985,6 @@ public class ActivityTracker extends Fragment
 
     }
 
-
-    private void removeOutliers(){
-
-        //assume first and last data points are accurate
-        if (mUnitSplitList.size() >= 4)
-
-        //check for outliers for all other data
-        for (int i = 1; i < mUnitSplitList.size() - 2; i++){
-
-            float distance = mUnitSplitList.get(i).getLocation().distanceTo(mUnitSplitList.get(i+1).getLocation());
-            float time = (mUnitSplitList.get(i+1).getLocation().getTime() - mUnitSplitList.get(i).getLocation().getTime())/1000;
-            float speed = distance/time;
-
-            //compare against world records for this activity
-            //if it exceeds the world records, the data must be inaccurate
-            if ( speed > mActivityType.getMaxSpeed()){
-
-                Log.i(LOG, "Removing location data: Distance: " + distance + ", Time: " + time + "\n");
-                //remove this datapoint
-                mUnitSplitList.remove(i+1);
-
-                //if there are more than 3 datapoints left, re-evaluate the next speed based on the previous and following data points from the one that was removed,
-                //by decrementing.  For example if there are 5 datapoints and the 3rd one was removed, need to reevaluate the speed between datapoint 2 and datapoint 4.
-                if(mUnitSplitList.size() >= 4){
-                    i--;
-                }
-            }
-        }
-
-        /*
-        mLocationList = new ArrayList<>();
-
-        //copy Location data into mLocationList
-        for (UnitSplitCalorie unitSplitCalorie : mUnitSplitCalorieList){
-            mLocationList.add(unitSplitCalorie.getLocation());
-
-        }
-        */
-
-    }
-
-
     //**********************************************************************************************
     //  onStop()
     //**********************************************************************************************
@@ -1076,9 +1032,7 @@ public class ActivityTracker extends Fragment
 
         mTimeElapsed = getSecondsFromChronometer();
 
-        //remove outliers from LocationTimeList, save location data in mLocationList
-        removeOutliers();
-
+        //save location data in mLocationList
         displayCurrent();
     }
 
@@ -1406,7 +1360,7 @@ public class ActivityTracker extends Fragment
         //startActivity(intent);
     }
 
-    protected class MultiChooserRecyclerAdapter extends RecyclerView.Adapter<MultiChooserRecyclerAdapter.CustomViewHolder> {
+    public class MultiChooserRecyclerAdapter extends RecyclerView.Adapter<MultiChooserRecyclerAdapter.CustomViewHolder> {
 
         private List<User> mUserList;
         private List<ActivityType> mActivityTypeList;

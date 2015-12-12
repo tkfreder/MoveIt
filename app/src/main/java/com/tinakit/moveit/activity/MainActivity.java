@@ -81,15 +81,18 @@ public class MainActivity extends AppCompatActivity {
         }
         */
 
+        //ViewPager
         viewPager = (ViewPager)findViewById(R.id.tab_viewpager);
         if (viewPager != null){
             setupViewPager(viewPager);
         }
 
-
+        //TabLayout
         TabLayout tabLayout = (TabLayout)findViewById(R.id.tabLayout);
         tabLayout.setupWithViewPager(viewPager);
 
+
+        //TODO: once TrackerService is implemented, we may not need this part. maybe the current index persists with a notifydatasetchanged
         //set tab index if this is redirected
         //int defaultValue = 0;
         if(getIntent().hasExtra("tab_index")){
@@ -98,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
+        //OnTabSelected Listener
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -105,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
                 //save index of current tab, save in Bundle
                 mCurrentTab = tab.getPosition();
 
+                //TODO: may not need this if block, after TrackerService is implemented
                 //if User tab is selected, index of User tabs start at index = 1
                 if (tab.getPosition() > 0 && tab.getPosition() <= mUserCount) {
 
@@ -126,33 +131,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-    }
-
-    private void setupViewPager(ViewPager viewPager){
-
-        mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-        mViewPagerAdapter.addFrag(new ActivityTracker(), "START");
-
-        //add user screens
-        FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(this);
-        List<User> userList = databaseHelper.getUsers();
-
-        //refresh user count
-        mUserCount = userList.size();
-
-        for (User user : userList){
-
-            Fragment fragment = new RewardViewFragment();
-            Bundle args = new Bundle();
-            args.putParcelable("user", user);
-            args.putInt("tab_index", mCurrentTab);
-            fragment.setArguments(args);
-
-            mViewPagerAdapter.addFrag(fragment, user.getUserName());
-        }
-
-        mViewPagerAdapter.addFrag(new EditRewardFragment(), "REWARDS");
-        viewPager.setAdapter(mViewPagerAdapter);
     }
 
    /*
@@ -240,7 +218,7 @@ public class MainActivity extends AppCompatActivity {
 
 
             //if this message came from DataService, get the stocklist and previous prices from the Service
-            if(message.equals(TrackerService.ACTIVITY_DETAIL)){
+            if(message.equals(TrackerService.TRACKER_SERVICE_UPDATE)){
 
                 if(mConnection.isBound()){
 
@@ -279,6 +257,33 @@ public class MainActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position){
             return mFragmentTitleList.get(position);
         }
+    }
+
+    private void setupViewPager(ViewPager viewPager){
+
+        mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        mViewPagerAdapter.addFrag(new ActivityTracker(), "START");
+
+        //add user screens
+        FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(this);
+        List<User> userList = databaseHelper.getUsers();
+
+        //refresh user count
+        mUserCount = userList.size();
+
+        for (User user : userList){
+
+            Fragment fragment = new RewardViewFragment();
+            Bundle args = new Bundle();
+            args.putParcelable("user", user);
+            args.putInt("tab_index", mCurrentTab);
+            fragment.setArguments(args);
+
+            mViewPagerAdapter.addFrag(fragment, user.getUserName());
+        }
+
+        mViewPagerAdapter.addFrag(new EditRewardFragment(), "REWARDS");
+        viewPager.setAdapter(mViewPagerAdapter);
     }
 
 

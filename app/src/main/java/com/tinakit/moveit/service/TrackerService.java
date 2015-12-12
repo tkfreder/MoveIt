@@ -25,11 +25,11 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
  */
 public class TrackerService  extends Service {
 
-    private static final String LOGTAG = "DATASERVICE";
+    private static final String LOGTAG = "TRACKERSERVICE";
     private static final boolean DEBUG = true;
 
     //messaging tags
-    public static final String ACTIVITY_DETAIL = "TRACKER_SERVICE_ACTIVITY_DETAIL";
+    public static final String TRACKER_SERVICE_UPDATE = "TRACKER_SERVICE_UPDATE";
     public static final String TRACKER_SERVICE_INTENT = "com.tinakit.moveit.TRACKER_SERVICE";
 
     // Track if a client Activity is bound to us.
@@ -179,7 +179,7 @@ public class TrackerService  extends Service {
             }
 
             //notify client new data is ready to be fetched
-            sendMessage(ACTIVITY_DETAIL);
+            sendMessage(TRACKER_SERVICE_UPDATE);
         }
     }
 
