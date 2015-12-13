@@ -74,6 +74,7 @@ import com.tinakit.moveit.service.Accelerometer;
 import com.tinakit.moveit.service.GoogleApi;
 import com.tinakit.moveit.service.LocationApi;
 import com.tinakit.moveit.utility.CalorieCalculator;
+import com.tinakit.moveit.utility.ChronometerUtility;
 import com.tinakit.moveit.utility.DialogUtility;
 import com.tinakit.moveit.utility.Map;
 import com.tinakit.moveit.utility.UnitConverter;
@@ -119,14 +120,17 @@ public class ActivityTracker extends Fragment {
     private static Button mCancelButton;
     private static LinearLayout mButtonLinearLayout;
     private static Chronometer mChronometer;
+    private static ChronometerUtility mChronometerUtility;
     private TextView mDistance;
     private TextView mCoins;
     private TextView mFeetPerMinute;
     private TextView mMessage;
     protected static RecyclerView mRecyclerView;
     public static MultiChooserRecyclerAdapter mRecyclerViewAdapter;
+    private View rootView;
+    private ViewGroup mContainer;
 
-    //local cache
+    // INSTANCE FIELDS
     private FragmentActivity mFragmentActivity;
     public static ActivityDetail mActivityDetail = new ActivityDetail();
     protected static List<ActivityType> mActivityTypeList;
@@ -145,7 +149,10 @@ public class ActivityTracker extends Fragment {
         if (DEBUG) Log.d(LOG, "onCreateView()");
 
         mFragmentActivity  = (FragmentActivity)super.getActivity();
-        View rootView = inflater.inflate(R.layout.activity_tracker, container, false);
+
+        // save inflator and container for MapFragment
+        rootView = inflater.inflate(R.layout.activity_tracker, container, false);
+        mContainer = container;
 
         //fix the orientation to portrait
         mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -154,15 +161,17 @@ public class ActivityTracker extends Fragment {
         //redirect user to Google Play Services
         mGoogleApi = new GoogleApi(mFragmentActivity);
 
-        if (!mGoogleApi.servicesAvailable()) {
+        if (!mGoogleApi.servicesAvailable())
             mFragmentActivity.finish();
-        }
+        else
+            mGoogleApi.buildGoogleApiClient();
 
         //get databaseHelper instance
         mDatabaseHelper = FitnessDBHelper.getInstance(mFragmentActivity);
 
         //connect to Google Play Services
         //buildLocationRequest();
+
         mLocationApi = new LocationApi(mFragmentActivity, mGoogleApi.client());
         mLocationApi.createLocationRequest();
 
@@ -185,6 +194,7 @@ public class ActivityTracker extends Fragment {
         setButtonOnClickListeners();
 
         mChronometer = (Chronometer) rootView.findViewById(R.id.chronometer);
+        mChronometerUtility = new ChronometerUtility (mChronometer);
         mDistance = (TextView) rootView.findViewById(R.id.distance);
         mCoins = (TextView) rootView.findViewById(R.id.coins);
         mFeetPerMinute = (TextView) rootView.findViewById(R.id.feetPerMinute);
@@ -192,9 +202,6 @@ public class ActivityTracker extends Fragment {
 
         //recycler view
         initializeRecyclerView(rootView);
-
-        //add map
-        mMapFragment.addMap(inflater, container);
 
         return rootView;
 
@@ -364,10 +371,10 @@ public class ActivityTracker extends Fragment {
         mSaveLocationData = false;
 
         //stop timer
-        mChronometer.stop();
+        mChronometerUtility.stop();
 
         //save current time
-        mTimeWhenPaused = mChronometer.getBase() - SystemClock.elapsedRealtime();
+        mTimeWhenPaused = mChronometerUtility.elapsedTime();
     }
 
     private void resumeTracking(){
@@ -379,11 +386,10 @@ public class ActivityTracker extends Fragment {
         mAccelerometer.registerAccelerometer();
 
         //reset time to the time when paused
-        mChronometer.setBase(SystemClock.elapsedRealtime() + mTimeWhenPaused);
+        mChronometerUtility.resetTime();
 
         //start timer
-        mChronometer.start();
-    }
+        mChronometerUtility.start();    }
 
 
    private void initializeRecyclerView(View rootView){
@@ -458,23 +464,13 @@ public class ActivityTracker extends Fragment {
         mCoins.setText("0");
         mDistance.setText("0");
         mFeetPerMinute.setText("0");
-        mChronometer.setBase(SystemClock.elapsedRealtime());
-
+        mChronometerUtility.resetTime();
     }
 
-
-    //TODO: call this from BroadcastReceiver, when receive message from GoogleApi
+    // call this when user clicks Start button
     public void doStartTracker() {
 
-        //TODO:  this isn't always accurate so not sure if it should be used
-        //get the starting point
-        //updateCache(LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient));
 
-        //display map of starting point
-        mMapFragment.displayStartMap();
-
-        //start getting location data after there is a connection
-        startServices(mGoogleApi.client());
 
     }
 
@@ -505,11 +501,17 @@ public class ActivityTracker extends Fragment {
         startServices(mGoogleApi.client());
 
         //chronometer settings, set base time right before starting the chronometer
-        mChronometer.setBase(SystemClock.elapsedRealtime());
-        mChronometer.start();
+        mChronometerUtility.resume();
 
         //display counters
         mCounterLayout.setVisibility(View.VISIBLE);
+
+        //TODO:  this isn't always accurate so not sure if it should be used
+        //get the starting point
+        //updateCache(LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient));
+
+        //display map of starting point
+        mMapFragment.displayStartMap();
 
     }
 
@@ -518,10 +520,10 @@ public class ActivityTracker extends Fragment {
         stopServices(mGoogleApi.client());
 
         //stop chronometer
-        mChronometer.stop();
+        mChronometerUtility.stop();
 
         //save elapsed time
-        mTimeElapsed = getSecondsFromChronometer();
+        mTimeElapsed = mChronometerUtility.getTimeByUnits(mChronometer.getText().toString(), 0);
 
     }
 
@@ -608,7 +610,7 @@ public class ActivityTracker extends Fragment {
 
         //save time elapsed
         //get time from Chronometer
-        mTimeElapsed = getSecondsFromChronometer();
+        mTimeElapsed = mChronometerUtility.getTimeByUnits(mChronometer.getText().toString(), 0);
     }
 
 
@@ -660,15 +662,14 @@ public class ActivityTracker extends Fragment {
             // message to indicate Google API Client connection
             if(message.equals(GoogleApi.GOOGLE_API_INTENT)){
 
-                // check if there isn't already a connection
-                if (!mGoogleApi.isConnectedToGoogle()) {
 
-                    //create instance of Google Play Services API client
-                    mGoogleApi = new GoogleApi(mFragmentActivity);
-                    mGoogleApi.buildGoogleApiClient();
-                }
+                //TODO: pending tracker state
+                //show Start button
+                mStartButton.setVisibility(View.VISIBLE);
+                //add map
+                mMapFragment = new MapFragment(getChildFragmentManager(), mGoogleApi);
+                mMapFragment.addMap(rootView, mContainer);
 
-                doStartTracker();
             }
             else if (message.equals(LocationApi.LOCATION_API_INTENT)){
 
@@ -681,7 +682,7 @@ public class ActivityTracker extends Fragment {
                 }
 
                 //TODO: do we still want a time limit?
-                if(getSecondsFromChronometer() > STOP_SERVICE_TIME_LIMIT && !mIsTimeLimit){
+                if(mChronometerUtility.getTimeByUnits(mChronometer.getText().toString(), 0) > STOP_SERVICE_TIME_LIMIT && !mIsTimeLimit){
                     mIsTimeLimit = true;
                     reachedTimeLimit();
                     stopRun();
@@ -741,7 +742,7 @@ public class ActivityTracker extends Fragment {
     private void refreshData(){
 
 
-        mTimeElapsed = getSecondsFromChronometer();
+        mTimeElapsed = mChronometerUtility.getTimeByUnits(mChronometer.getText().toString(), 0);
 
         //save location data in mLocationList
         displayCurrent();
@@ -814,7 +815,8 @@ public class ActivityTracker extends Fragment {
             mActivityDetail.setDistanceInFeet(Math.round(distanceFeet));
 
             //update speed feet/minute
-            float elapsedMinutes = (float)(SystemClock.elapsedRealtime() - mChronometer.getBase())/(1000 * 60);
+            //float elapsedMinutes = (float)(SystemClock.elapsedRealtime() - mChronometer.getBase())/(1000 * 60);
+            int elapsedMinutes = mChronometerUtility.getTimeByUnits(mChronometer.getText().toString(), 1);
             mFeetPerMinute.setText(String.format("%.0f", (float)distanceFeet/elapsedMinutes));
 
             //TODO: move this somewhere else, where business rules are updated, not UI update

@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,21 +37,21 @@ public class MapFragment implements OnMapReadyCallback {
     private static final float ZOOM_STREET_ROUTE = 15.0f;
 
     // INSTANCE FIELDS
-    private Fragment mFragment;
+    private FragmentManager mFragmentManager;
     private GoogleMap mGoogleMap;
     private SupportMapFragment mMapFragment;
     private GoogleApi mGoogleApi;
 
-    public MapFragment(Fragment fragment, GoogleApi googleApi){
+    public MapFragment(FragmentManager fragmentManager, GoogleApi googleApi){
 
-        mFragment = fragment;
+        mFragmentManager = fragmentManager;
         mGoogleApi = googleApi;
     }
 
-    public void addMap(LayoutInflater inflater, ViewGroup container){
+    public void addMap(View view, ViewGroup container){
 
         mMapFragment = SupportMapFragment.newInstance();
-        FragmentTransaction transaction = mFragment.getChildFragmentManager().beginTransaction();
+        FragmentTransaction transaction = mFragmentManager.beginTransaction();
         transaction.add(R.id.map_container, mMapFragment).commit();
         mMapFragment.getMapAsync(this);
     }
