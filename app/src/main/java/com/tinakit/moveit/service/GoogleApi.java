@@ -4,10 +4,12 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -15,6 +17,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.tinakit.moveit.activity.ActivityTracker;
 
 /**
  * Created by Tina on 12/12/2015.
@@ -29,6 +32,7 @@ public class GoogleApi implements GoogleApiClient.ConnectionCallbacks,
     // CONSTANTS
     protected static GoogleApiClient mGoogleApiClient;
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
+    public static final String GOOGLE_API_INTENT = "GOOGLE_API_INTENT";
 
     // instance fields
     private static FragmentActivity mFragmentActivity;
@@ -60,6 +64,10 @@ public class GoogleApi implements GoogleApiClient.ConnectionCallbacks,
         //get the starting point
         //updateCache(LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient));
 
+        Intent intent = new Intent(GOOGLE_API_INTENT);
+        intent.putExtra(GOOGLE_API_INTENT, GOOGLE_API_INTENT);
+        LocalBroadcastManager.getInstance(mFragmentActivity).sendBroadcast(intent);
+
         //TODO:  send broadcast message, register receiver on activitytracker, then call displayStartMap() and startServices() from ActivityTracker from the broadcastreceiver
         //display map of starting point
         //displayStartMap();
@@ -74,20 +82,19 @@ public class GoogleApi implements GoogleApiClient.ConnectionCallbacks,
 
     }
 
-    public synchronized GoogleApiClient buildGoogleApiClient() {
+    public synchronized void buildGoogleApiClient() {
 
-        GoogleApiClient googleApiClient = new GoogleApiClient.Builder(mFragmentActivity)
+        mGoogleApiClient = new GoogleApiClient.Builder(mFragmentActivity)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
 
-        googleApiClient.connect();
-
-        return googleApiClient;
+        mGoogleApiClient.connect();
     }
 
     public boolean isConnectedToGoogle(){
+
         return(mGoogleApiClient != null && mGoogleApiClient.isConnected());
     }
 

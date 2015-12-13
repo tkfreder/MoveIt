@@ -2,9 +2,11 @@ package com.tinakit.moveit.activity;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.graphics.Color;
 import android.hardware.Sensor;
@@ -20,6 +22,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -39,17 +42,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -67,9 +65,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.zip.Inflater;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.model.UserActivity;
@@ -88,7 +84,6 @@ public class ActivityTracker extends Fragment implements
     private static final boolean DEBUG = true;
 
     //CONSTANTS
-    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
     private static final float FEET_COIN_CONVERSION = 0.5f;  //2 feet = 1 coin
     private static final float USERNAME_FONT_SIZE = 20f;
 
@@ -602,13 +597,6 @@ public class ActivityTracker extends Fragment implements
         //create instance of LocationRequest
         createLocationRequest();
 
-        //if connection doesn't exist
-        if (!mGoogleApi.isConnectedToGoogle()) {
-            //create instance of Google Play Services API client
-            mGoogleApi = new GoogleApi(mFragmentActivity);
-            mGoogleApi.buildGoogleApiClient();
-        }
-
     }
 
     private void displayStartMap(){
@@ -704,19 +692,6 @@ public class ActivityTracker extends Fragment implements
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
-    /*
-    protected synchronized GoogleApiClient buildGoogleApiClient(Context context) {
-        GoogleApiClient googleApiClient = new GoogleApiClient.Builder(context)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-
-        googleApiClient.connect();
-
-        return googleApiClient;
-    }
-*/
     //PERIODIC LOCATION UPDATES
     protected void startServices(GoogleApiClient googleApiClient, LocationRequest locationRequest, LocationListener locationListener ) {
 
@@ -909,6 +884,9 @@ public class ActivityTracker extends Fragment implements
         if (DEBUG) Log.d(LOG, "onStart");
         super.onStart();
 
+        LocalBroadcastManager.getInstance(mFragmentActivity).registerReceiver(mMessageReceiver, new IntentFilter(GoogleApi.GOOGLE_API_INTENT));
+
+
     }
 
     //**********************************************************************************************
@@ -921,6 +899,35 @@ public class ActivityTracker extends Fragment implements
     }
 
     //**********************************************************************************************
+    //  BroadcastReceiver mMessageReceiver
+    //**********************************************************************************************
+
+    // Handler for received Intents. This will be called whenever an Intent
+    // with an action named GOOGLE_API_INTENT is broadcasted.
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String message = intent.getStringExtra(GoogleApi.GOOGLE_API_INTENT);
+
+            if (DEBUG) Log.d(LOG, "BroadcastReceiver - onReceive(): message: " + message);
+
+            // message to indicate Google API Client connection
+            if(message.equals(GoogleApi.GOOGLE_API_INTENT)){
+
+                // check if there isn't already a connection
+                if (!mGoogleApi.isConnectedToGoogle()) {
+
+                    //create instance of Google Play Services API client
+                    mGoogleApi = new GoogleApi(mFragmentActivity);
+                    mGoogleApi.buildGoogleApiClient();
+                }
+
+                doStartTracker();
+            }
+        }
+    };
+
+    //**********************************************************************************************
     //  onPause() - Activity is partially obscured by another app but still partially visible and not the activity in focus
     //**********************************************************************************************
 
@@ -931,6 +938,7 @@ public class ActivityTracker extends Fragment implements
         //do nothing, we want to continue to collect location data until user clicks Stop button
         //other apps may run concurrently, such as music player
 
+        LocalBroadcastManager.getInstance(mFragmentActivity).unregisterReceiver(mMessageReceiver);
         super.onPause();
     }
 
@@ -942,6 +950,8 @@ public class ActivityTracker extends Fragment implements
     public void onResume() {
         if (DEBUG) Log.d(LOG, "onResume");
         super.onResume();
+
+        LocalBroadcastManager.getInstance(mFragmentActivity).registerReceiver(mMessageReceiver, new IntentFilter(GoogleApi.GOOGLE_API_INTENT));
 
         //ensures that if the user returns to the running app through some other means,
         //such as through the back button, the check is still performed.
