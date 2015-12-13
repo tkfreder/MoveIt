@@ -69,6 +69,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.model.UserActivity;
+import com.tinakit.moveit.service.Accelerometer;
 import com.tinakit.moveit.service.GoogleApi;
 import com.tinakit.moveit.service.LocationApi;
 import com.tinakit.moveit.utility.CalorieCalculator;
@@ -77,8 +78,7 @@ import com.tinakit.moveit.utility.Map;
 import com.tinakit.moveit.utility.UnitConverter;
 
 public class ActivityTracker extends Fragment implements
-        OnMapReadyCallback,
-        SensorEventListener {
+        OnMapReadyCallback{
 
     //DEBUG
     private static final String LOG = "MAIN_ACTIVITY";
@@ -102,6 +102,7 @@ public class ActivityTracker extends Fragment implements
 
     // APIs
     private LocationApi mLocationApi;
+    private Accelerometer mAccelerometer;
 
     //GOOGLE PLAY SERVICES
     private GoogleApi mGoogleApi;
@@ -144,15 +145,18 @@ public class ActivityTracker extends Fragment implements
     //database
     FitnessDBHelper mDatabaseHelper;
 
+    /*
     //ACCELEROMETER
     private SensorManager mSensorManager;
     private Sensor sensorAccelerometer;
     private int ACCELEROMETER_DELAY = 60 * 30; //in seconds
     ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
+
     private long lastUpdate = 0;
     private float last_x, last_y, last_z;
     private static final float SHAKE_THRESHOLD = 0.5f;
+    */
 
     @Nullable
     @Override
@@ -181,6 +185,9 @@ public class ActivityTracker extends Fragment implements
         //buildLocationRequest();
         mLocationApi = new LocationApi(mFragmentActivity);
         mLocationApi.createLocationRequest();
+
+        // accelerometer
+        mAccelerometer = new Accelerometer(mFragmentActivity);
 
         //check  savedInstanceState not null
         mResolvingError = savedInstanceState != null
@@ -381,46 +388,6 @@ public class ActivityTracker extends Fragment implements
 
     }
 
-    @Override
-    public void onSensorChanged(SensorEvent sensorEvent) {
-
-        Sensor mySensor = sensorEvent.sensor;
-
-        if (mySensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            float x = sensorEvent.values[0];
-            float y = sensorEvent.values[1];
-            float z = sensorEvent.values[2];
-
-            long curTime = System.currentTimeMillis();
-
-            if ((curTime - lastUpdate) > 100) {
-                long diffTime = (curTime - lastUpdate);
-                lastUpdate = curTime;
-
-                float speed = Math.abs(x + y + z - last_x - last_y - last_z)/ diffTime * 10000;
-
-                //check for inactivity, below shake threshold
-                if (speed < SHAKE_THRESHOLD) {
-
-                    playSound();
-
-                    pauseTracking();
-
-                    //disable accelerometer listener until user clicks on confirm dialog
-                    //unregisterAccelerometer();
-
-                    //display warning message that no movement has been detected
-                    DialogUtility.displayAlertDialog(mFragmentActivity, getResources().getString(R.string.warning), getResources().getString(R.string.no_movement), getResources().getString(R.string.ok));
-
-                }
-
-                last_x = x;
-                last_y = y;
-                last_z = z;
-            }
-        }
-    }
-
     private void pauseTracking(){
 
         //set the flag to not save location data
@@ -439,18 +406,13 @@ public class ActivityTracker extends Fragment implements
         mSaveLocationData = true;
 
         //start accelerometer listener, after a delay of ACCELEROMETER_DELAY
-        registerAccelerometer();
+        mAccelerometer.registerAccelerometer();
 
         //reset time to the time when paused
         mChronometer.setBase(SystemClock.elapsedRealtime() + mTimeWhenPaused);
 
         //start timer
         mChronometer.start();
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
     }
 
     @Override
@@ -655,57 +617,26 @@ public class ActivityTracker extends Fragment implements
     protected void startServices(GoogleApiClient googleApiClient) {
 
         mLocationApi.requestLocationUpdates(googleApiClient);
-        registerAccelerometer();
+        mAccelerometer.registerAccelerometer();
     }
 
+    /*
     private boolean hasAccelerometer(){
 
         mSensorManager = (SensorManager) mFragmentActivity.getSystemService(Context.SENSOR_SERVICE);
         return mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null;
     }
+    */
 
     //TODO: rename this method to reflect both operations
     protected void stopServices(GoogleApiClient googleApiClient) {
 
          mLocationApi.removeLocationUpdates(googleApiClient);
-         unregisterAccelerometer();
+         mAccelerometer.unregisterAccelerometer();
 
     }
 
-    private void registerAccelerometer(){
-
-        if (hasAccelerometer()) {
-            // success! we have an accelerometer
-
-            executor.schedule(new Runnable(){
-
-                @Override
-                public void run(){
-
-                    //mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-                    sensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-                    mSensorManager.registerListener(ActivityTracker.this, sensorAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-                }
-            }, ACCELEROMETER_DELAY, TimeUnit.SECONDS);
-
-        }
-
-    }
-
-    private void unregisterAccelerometer(){
-
-        //unregister accelerometer
-        if(sensorAccelerometer != null){
-            mSensorManager.unregisterListener(this);
-
-            if (!executor.isTerminated())
-                executor.shutdownNow();
-
-        }
-
-    }
-
-    //**********************************************************************************************
+       //**********************************************************************************************
     //  Control methods
     //**********************************************************************************************
 
@@ -900,6 +831,18 @@ public class ActivityTracker extends Fragment implements
                     stopRun();
                 }
             }
+            else if (message.equals(Accelerometer.ACCELEROMETER_INTENT)){
+
+                playSound();
+
+                pauseTracking();
+
+                //disable accelerometer listener
+                mAccelerometer.unregisterAccelerometer();
+
+                //display warning message that no movement has been detected
+                DialogUtility.displayAlertDialog(mFragmentActivity, getResources().getString(R.string.warning), getResources().getString(R.string.no_movement), getResources().getString(R.string.ok));
+            }
         }
     };
 
@@ -957,7 +900,7 @@ public class ActivityTracker extends Fragment implements
         if (DEBUG) Log.d(LOG, "onDestroy");
         super.onDestroy();
 
-        unregisterAccelerometer();
+        mAccelerometer.unregisterAccelerometer();
     }
 
     //**********************************************************************************************
