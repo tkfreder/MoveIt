@@ -67,9 +67,6 @@ public class Accelerometer implements SensorEventListener{
                     Intent intent = new Intent(ACCELEROMETER_INTENT);
                     intent.putExtra(ACCELEROMETER_INTENT, ACCELEROMETER_INTENT);
                     LocalBroadcastManager.getInstance(mFragmentActivity).sendBroadcast(intent);
-
-
-
                 }
 
                 last_x = x;

@@ -55,6 +55,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.tinakit.moveit.db.FitnessDBHelper;
+import com.tinakit.moveit.fragment.MapFragment;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.ActivityType;
 import com.tinakit.moveit.model.UnitSplit;
@@ -77,8 +78,7 @@ import com.tinakit.moveit.utility.DialogUtility;
 import com.tinakit.moveit.utility.Map;
 import com.tinakit.moveit.utility.UnitConverter;
 
-public class ActivityTracker extends Fragment implements
-        OnMapReadyCallback{
+public class ActivityTracker extends Fragment {
 
     //DEBUG
     private static final String LOG = "MAIN_ACTIVITY";
@@ -97,12 +97,10 @@ public class ActivityTracker extends Fragment implements
     private static long STOP_SERVICE_TIME_LIMIT = 30 * 60 * 1000 * 60; // 30 minutes in seconds
     private boolean mIsTimeLimit = false;
 
-    //state flags
-    private boolean mIsStatView = false;
-
     // APIs
     private LocationApi mLocationApi;
     private Accelerometer mAccelerometer;
+    private MapFragment mMapFragment;
 
     //GOOGLE PLAY SERVICES
     private GoogleApi mGoogleApi;
@@ -137,26 +135,8 @@ public class ActivityTracker extends Fragment implements
     private static Bundle mBundle;
     private static int mSelectedActivityTypeIndex;
 
-    // map variables
-    private static final float ZOOM_STREET_ROUTE = 15.0f;
-    private GoogleMap mGoogleMap;
-    private SupportMapFragment mMapFragment;
-
     //database
     FitnessDBHelper mDatabaseHelper;
-
-    /*
-    //ACCELEROMETER
-    private SensorManager mSensorManager;
-    private Sensor sensorAccelerometer;
-    private int ACCELEROMETER_DELAY = 60 * 30; //in seconds
-    ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-
-
-    private long lastUpdate = 0;
-    private float last_x, last_y, last_z;
-    private static final float SHAKE_THRESHOLD = 0.5f;
-    */
 
     @Nullable
     @Override
@@ -183,7 +163,7 @@ public class ActivityTracker extends Fragment implements
 
         //connect to Google Play Services
         //buildLocationRequest();
-        mLocationApi = new LocationApi(mFragmentActivity);
+        mLocationApi = new LocationApi(mFragmentActivity, mGoogleApi.client());
         mLocationApi.createLocationRequest();
 
         // accelerometer
@@ -214,19 +194,10 @@ public class ActivityTracker extends Fragment implements
         initializeRecyclerView(rootView);
 
         //add map
-        addMap(inflater, container);
+        mMapFragment.addMap(inflater, container);
 
         return rootView;
 
-    }
-
-
-    protected void addMap(LayoutInflater inflater, ViewGroup container){
-
-        mMapFragment = SupportMapFragment.newInstance();
-        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-        transaction.add(R.id.map_container, mMapFragment).commit();
-        mMapFragment.getMapAsync(this);
     }
 
     protected void setButtonOnClickListeners(){
@@ -245,7 +216,7 @@ public class ActivityTracker extends Fragment implements
                 mActivityDetail.setStartDate(new Date());
 
                 //set visibility
-                mMapFragment.getView().setVisibility(View.GONE);
+                mMapFragment.setVisibility(View.GONE);
 
                 //Restart
                 mCancelButton.setVisibility(View.GONE);
@@ -364,8 +335,7 @@ public class ActivityTracker extends Fragment implements
         mRecyclerViewAdapter.notifyDataSetChanged();
 
         //make map visible
-        mMapFragment.getView().setVisibility(View.VISIBLE);
-        mMapFragment.getMapAsync(this);
+        mMapFragment.makeMap();
 
         //make start button visible
         hideAllButtons();
@@ -415,30 +385,8 @@ public class ActivityTracker extends Fragment implements
         mChronometer.start();
     }
 
-    @Override
-    public void onMapReady(GoogleMap map) {
 
-        mGoogleMap = map;
-
-        displayStartMap();
-
-    }
-
-    private boolean isMapReady(){
-
-        return mGoogleMap != null;
-    }
-
-    /*
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean(STATE_RESOLVING_ERROR, mResolvingError);
-    }
-
-  */
-
-    private void initializeRecyclerView(View rootView){
+   private void initializeRecyclerView(View rootView){
 
         mBundle = new Bundle();
 
@@ -523,112 +471,23 @@ public class ActivityTracker extends Fragment implements
         //updateCache(LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient));
 
         //display map of starting point
-        displayStartMap();
+        mMapFragment.displayStartMap();
 
         //start getting location data after there is a connection
         startServices(mGoogleApi.client());
 
     }
 
-    //**********************************************************************************************
-    //  Location API overridden methods
-    //**********************************************************************************************
-
-    private void displayStartMap(){
-
-        if (isMapReady() && mGoogleApi.isConnectedToGoogle()){
-
-            mGoogleMap.setContentDescription("Starting point");
-            Location mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApi.client());
-            LatLng latLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
-            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM_STREET_ROUTE));
-
-            //start marker
-            mGoogleMap.addMarker(new MarkerOptions()
-                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-                            .position(latLng)
-                            .title("start")
-            );
-        }
-    }
-
-    //TODO:  may be able to utilize this to get a more accurate first data point
-    //reference:  http://www.adavis.info/2014/09/android-location-updates-with.html?m=1
-    private Location bestLastKnownLocation(float minAccuracy, long minTime) {
-        Location bestResult = null;
-        float bestAccuracy = Float.MAX_VALUE;
-        long bestTime = Long.MIN_VALUE;
-
-        // Get the best most recent location currently available
-        Location mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApi.client());
-
-        if (mCurrentLocation != null) {
-            float accuracy = mCurrentLocation.getAccuracy();
-            long time = mCurrentLocation.getTime();
-
-            if (accuracy < bestAccuracy) {
-                bestResult = mCurrentLocation;
-                bestAccuracy = accuracy;
-                bestTime = time;
-            }
-        }
-
-        // Return best reading or null
-        if (bestAccuracy > minAccuracy || bestTime < minTime) {
-            return null;
-        }
-        else {
-            return bestResult;
-        }
-    }
-
-/*
-    @Override
-    public void onLocationChanged(Location location) {
-        if (DEBUG) Log.d(LOG, "onLocationChanged");
-
-        if (DEBUG) Log.d(LOG, "Accuracy: " + location.getAccuracy());
-
-
-        //only track data when it has high level of accuracy && not Pause mode
-        if (isAccurate(location) && mSaveLocationData){
-            //update cache
-            updateCache(location);
-
-            refreshData();
-        }
-
-        //TODO: do we still want a time limit?
-        if(getSecondsFromChronometer() > STOP_SERVICE_TIME_LIMIT && !mIsTimeLimit){
-            mIsTimeLimit = true;
-            reachedTimeLimit();
-            stopRun();
-        }
-
-    }
-*/
-    //**********************************************************************************************
-    //  Location helper methods
+   //**********************************************************************************************
+    //  service helper methods
     //**********************************************************************************************
 
-
-
-    //PERIODIC LOCATION UPDATES
     protected void startServices(GoogleApiClient googleApiClient) {
 
         mLocationApi.requestLocationUpdates(googleApiClient);
         mAccelerometer.registerAccelerometer();
     }
 
-    /*
-    private boolean hasAccelerometer(){
-
-        mSensorManager = (SensorManager) mFragmentActivity.getSystemService(Context.SENSOR_SERVICE);
-        return mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null;
-    }
-    */
-
-    //TODO: rename this method to reflect both operations
     protected void stopServices(GoogleApiClient googleApiClient) {
 
          mLocationApi.removeLocationUpdates(googleApiClient);
@@ -636,14 +495,12 @@ public class ActivityTracker extends Fragment implements
 
     }
 
-       //**********************************************************************************************
+    //**********************************************************************************************
     //  Control methods
     //**********************************************************************************************
 
     private void startRun(){
         mRequestedService = true;
-
-        //buildLocationRequest();
 
         startServices(mGoogleApi.client());
 
@@ -747,7 +604,6 @@ public class ActivityTracker extends Fragment implements
 
         UnitSplit unitSplit = new UnitSplit(location);
 
-
         mUnitSplitList.add(unitSplit);
 
         //save time elapsed
@@ -758,7 +614,7 @@ public class ActivityTracker extends Fragment implements
 
     private void displayResults(){
 
-        displayMap(mUnitSplitList);
+        mMapFragment.displayMap(mUnitSplitList, getDistance(1));
 
         //TODO:  why does sound get truncated?
         playSound();
@@ -1018,50 +874,7 @@ public class ActivityTracker extends Fragment implements
         }
     }
 
-    private void displayMap(List<UnitSplit> unitSplitList){
 
-        if (mGoogleMap != null){
-
-            //ensure map is visible
-            mMapFragment.getView().setVisibility(View.VISIBLE);
-
-            //clear out existing markers if any
-            mGoogleMap.clear();
-
-            // Override the default content description on the view, for accessibility mode.
-            // Ideally this string would be localised.
-            mGoogleMap.setContentDescription("Google Map with polylines.");
-
-            ArrayList<LatLng> locationList = new ArrayList<>();
-            for ( UnitSplit unitSplit : unitSplitList) {
-                locationList.add(new LatLng(unitSplit.getLocation().getLatitude(), unitSplit.getLocation().getLongitude()));
-            }
-
-            mGoogleMap.addPolyline((new PolylineOptions().addAll(locationList).color(Color.BLUE)));
-            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                    new LatLng(locationList.get(0).latitude, locationList.get(0).longitude), Map.getZoomByDistance(getDistance(1))));
-
-            //render markers
-            addMarkersToMap(locationList.get(0), locationList.get(locationList.size() - 1));
-        }
-
-    }
-
-    private void addMarkersToMap(LatLng start, LatLng end) {
-
-        //start marker
-        mGoogleMap.addMarker(new MarkerOptions()
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-                .position(start)
-                .title("start")
-                );
-
-        //start marker
-        mGoogleMap.addMarker(new MarkerOptions()
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-                .position(end)
-                .title("end"));
-    }
 
     private float getDistance(int units){
 

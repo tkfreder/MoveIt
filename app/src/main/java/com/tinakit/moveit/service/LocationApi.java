@@ -26,6 +26,7 @@ public class LocationApi implements LocationListener {
     // instance variables
     private FragmentActivity mFragmentActivity;
     private Location mLocation;
+    private GoogleApiClient mGoogleApiClient;
 
     //LocationRequest settings
     private LocationRequest mLocationRequest;
@@ -38,9 +39,10 @@ public class LocationApi implements LocationListener {
     private boolean mIsTimeLimit = false;
 
 
-    public LocationApi(FragmentActivity fragmentActivity){
+    public LocationApi(FragmentActivity fragmentActivity, GoogleApiClient googleApiClient){
 
         mFragmentActivity = fragmentActivity;
+        mGoogleApiClient = googleApiClient;
     }
 
 
@@ -100,6 +102,36 @@ public class LocationApi implements LocationListener {
             return true;
         else
             return false;
+    }
+
+    //TODO:  may be able to utilize this to get a more accurate first data point
+    //reference:  http://www.adavis.info/2014/09/android-location-updates-with.html?m=1
+    private Location bestLastKnownLocation(float minAccuracy, long minTime) {
+        Location bestResult = null;
+        float bestAccuracy = Float.MAX_VALUE;
+        long bestTime = Long.MIN_VALUE;
+
+        // Get the best most recent location currently available
+        Location mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+        if (mCurrentLocation != null) {
+            float accuracy = mCurrentLocation.getAccuracy();
+            long time = mCurrentLocation.getTime();
+
+            if (accuracy < bestAccuracy) {
+                bestResult = mCurrentLocation;
+                bestAccuracy = accuracy;
+                bestTime = time;
+            }
+        }
+
+        // Return best reading or null
+        if (bestAccuracy > minAccuracy || bestTime < minTime) {
+            return null;
+        }
+        else {
+            return bestResult;
+        }
     }
 
 }
