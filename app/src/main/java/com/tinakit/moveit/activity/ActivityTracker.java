@@ -70,13 +70,14 @@ import java.util.concurrent.TimeUnit;
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.model.UserActivity;
 import com.tinakit.moveit.service.GoogleApi;
+import com.tinakit.moveit.service.LocationApi;
 import com.tinakit.moveit.utility.CalorieCalculator;
 import com.tinakit.moveit.utility.DialogUtility;
 import com.tinakit.moveit.utility.Map;
 import com.tinakit.moveit.utility.UnitConverter;
 
 public class ActivityTracker extends Fragment implements
-        LocationListener, OnMapReadyCallback,
+        OnMapReadyCallback,
         SensorEventListener {
 
     //DEBUG
@@ -93,27 +94,19 @@ public class ActivityTracker extends Fragment implements
 
     protected static boolean mRequestedService = false;
     long mTimeElapsed = 0; //in seconds
+    private static long STOP_SERVICE_TIME_LIMIT = 30 * 60 * 1000 * 60; // 30 minutes in seconds
+    private boolean mIsTimeLimit = false;
 
     //state flags
     private boolean mIsStatView = false;
 
-    //LocationRequest settings
-    private LocationRequest mLocationRequest;
-    private Location mBestReading;
-    private static long POLLING_FREQUENCY = 5 * 1000; //10 seconds
-    private static long FASTEST_POLLING_FREQUENCY = 5 * 1000; //5 second
-    private static long DISPLACEMENT = 1; //meters //displacement takes precedent over interval/fastestInterval
-    private static long STOP_SERVICE_TIME_LIMIT = 30 * 60 * 1000 * 60; // 30 minutes in seconds
-    private static final long LOCATION_ACCURACY = 10; //within # meter accuracy //TODO: change this for better accuracy
-    private boolean mIsTimeLimit = false;
+    // APIs
+    private LocationApi mLocationApi;
 
     //GOOGLE PLAY SERVICES
     private GoogleApi mGoogleApi;
     // Request code to use when launching the resolution activity
     private static final int REQUEST_RESOLVE_ERROR = 1001;
-    // Unique tag for the error dialog fragment
-    private static final String DIALOG_ERROR = "dialog_error";
-    // Bool to track whether the app is already resolving an error
     private boolean mResolvingError = false;
     private static final String STATE_RESOLVING_ERROR = "resolving_error";
 
@@ -143,6 +136,7 @@ public class ActivityTracker extends Fragment implements
     private static Bundle mBundle;
     private static int mSelectedActivityTypeIndex;
 
+    // map variables
     private static final float ZOOM_STREET_ROUTE = 15.0f;
     private GoogleMap mGoogleMap;
     private SupportMapFragment mMapFragment;
@@ -172,8 +166,6 @@ public class ActivityTracker extends Fragment implements
         //fix the orientation to portrait
         mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-
-
         //end the activity if Google Play Services is not present
         //redirect user to Google Play Services
         mGoogleApi = new GoogleApi(mFragmentActivity);
@@ -186,20 +178,13 @@ public class ActivityTracker extends Fragment implements
         mDatabaseHelper = FitnessDBHelper.getInstance(mFragmentActivity);
 
         //connect to Google Play Services
-        buildLocationRequest();
+        //buildLocationRequest();
+        mLocationApi = new LocationApi(mFragmentActivity);
+        mLocationApi.createLocationRequest();
 
         //check  savedInstanceState not null
         mResolvingError = savedInstanceState != null
                 && savedInstanceState.getBoolean(STATE_RESOLVING_ERROR, false);
-
-
-        //TODO:  how to handle admin page?
-        /*
-        //display admin menu, if user is admin
-        if (mUser.isAdmin()) {
-            findViewById(R.id.action_rewards).setVisibility(View.VISIBLE);
-        }
-        */
 
         //wire up UI widgets
         mCounterLayout = (LinearLayout)rootView.findViewById(R.id.counterLayout);
@@ -245,7 +230,6 @@ public class ActivityTracker extends Fragment implements
 
         mStartButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-
 
                 //set flag to save location data
                 mSaveLocationData = true;
@@ -580,24 +564,13 @@ public class ActivityTracker extends Fragment implements
         displayStartMap();
 
         //start getting location data after there is a connection
-        startServices(mGoogleApi.client(), mLocationRequest, this);
+        startServices(mGoogleApi.client());
 
     }
 
     //**********************************************************************************************
     //  Location API overridden methods
     //**********************************************************************************************
-
-    //this method should be called once at start of run
-    //while stopServices should be called once at end of run
-    //do not call buildLocationRequest() and stopServices multiple times, difficult to trach asynchronous process
-    //use flag mSaveLocationData to determine whether to save data.  during Pause, set mSaveLocationData to false
-    private void buildLocationRequest() {
-
-        //create instance of LocationRequest
-        createLocationRequest();
-
-    }
 
     private void displayStartMap(){
 
@@ -647,7 +620,7 @@ public class ActivityTracker extends Fragment implements
         }
     }
 
-
+/*
     @Override
     public void onLocationChanged(Location location) {
         if (DEBUG) Log.d(LOG, "onLocationChanged");
@@ -671,31 +644,17 @@ public class ActivityTracker extends Fragment implements
         }
 
     }
-
+*/
     //**********************************************************************************************
     //  Location helper methods
     //**********************************************************************************************
 
-    private boolean isAccurate(Location location){
 
-        if (location.getAccuracy() < LOCATION_ACCURACY)
-            return true;
-        else
-            return false;
-    }
 
     //PERIODIC LOCATION UPDATES
-    protected void createLocationRequest() {
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(POLLING_FREQUENCY);//get location updates every x seconds
-        mLocationRequest.setFastestInterval(FASTEST_POLLING_FREQUENCY);//not to exceed location updates every x seconds
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-    }
+    protected void startServices(GoogleApiClient googleApiClient) {
 
-    //PERIODIC LOCATION UPDATES
-    protected void startServices(GoogleApiClient googleApiClient, LocationRequest locationRequest, LocationListener locationListener ) {
-
-        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, locationListener);
+        mLocationApi.requestLocationUpdates(googleApiClient);
         registerAccelerometer();
     }
 
@@ -706,9 +665,9 @@ public class ActivityTracker extends Fragment implements
     }
 
     //TODO: rename this method to reflect both operations
-    protected void stopServices(GoogleApiClient googleApiClient, LocationListener locationListener) {
+    protected void stopServices(GoogleApiClient googleApiClient) {
 
-         LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, locationListener);
+         mLocationApi.removeLocationUpdates(googleApiClient);
          unregisterAccelerometer();
 
     }
@@ -755,7 +714,7 @@ public class ActivityTracker extends Fragment implements
 
         //buildLocationRequest();
 
-        startServices(mGoogleApi.client(), mLocationRequest, this);
+        startServices(mGoogleApi.client());
 
         //chronometer settings, set base time right before starting the chronometer
         mChronometer.setBase(SystemClock.elapsedRealtime());
@@ -768,7 +727,7 @@ public class ActivityTracker extends Fragment implements
 
     private void stopRun(){
 
-        stopServices(mGoogleApi.client(), this);
+        stopServices(mGoogleApi.client());
 
         //stop chronometer
         mChronometer.stop();
@@ -923,6 +882,23 @@ public class ActivityTracker extends Fragment implements
                 }
 
                 doStartTracker();
+            }
+            else if (message.equals(LocationApi.LOCATION_API_INTENT)){
+
+                //only track data when it has high level of accuracy && not Pause mode
+                if (mSaveLocationData){
+                    //update cache
+                    updateCache(mLocationApi.location());
+
+                    refreshData();
+                }
+
+                //TODO: do we still want a time limit?
+                if(getSecondsFromChronometer() > STOP_SERVICE_TIME_LIMIT && !mIsTimeLimit){
+                    mIsTimeLimit = true;
+                    reachedTimeLimit();
+                    stopRun();
+                }
             }
         }
     };
