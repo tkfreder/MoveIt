@@ -207,10 +207,7 @@ public class ActivityChooser  extends AppCompatActivity {
                     //no change, don't do anything
                 }
             });
-
         }
-
-
     }
 
     @Override
