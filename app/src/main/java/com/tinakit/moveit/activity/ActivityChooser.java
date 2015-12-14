@@ -9,8 +9,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -18,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.ArrayAdapter;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.db.FitnessDBHelper;
@@ -28,6 +31,8 @@ import com.tinakit.moveit.model.UserActivity;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import fr.ganfra.materialspinner.MaterialSpinner;
 
 /**
  * Created by Tina on 12/13/2015.
@@ -40,7 +45,6 @@ public class ActivityChooser  extends AppCompatActivity {
     protected Bundle mBundle;
     protected static List<ActivityType> mActivityTypeList;
     public static ActivityDetail mActivityDetail = new ActivityDetail();
-    private static int mSelectedActivityTypeIndex;
 
     //database
     FitnessDBHelper mDatabaseHelper;
@@ -49,6 +53,8 @@ public class ActivityChooser  extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chooser);
+        setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
 
         //get databaseHelper instance
         mDatabaseHelper = FitnessDBHelper.getInstance(this);
@@ -105,14 +111,14 @@ public class ActivityChooser  extends AppCompatActivity {
 
             ImageView avatar;
             TextView userName;
-            RadioGroup activityRadioGroup;
+            MaterialSpinner activitySpinner;
 
             public CustomViewHolder(View view) {
 
                 super(view);
                 this.avatar = (ImageView)view.findViewById(R.id.avatar);
                 this.userName = (TextView)view.findViewById(R.id.userName);
-                this.activityRadioGroup = (RadioGroup)view.findViewById(R.id.activityRadioGroup);
+                this.activitySpinner = (MaterialSpinner)view.findViewById(R.id.activitySpinner);
 
             }
         }
@@ -137,66 +143,78 @@ public class ActivityChooser  extends AppCompatActivity {
             customViewHolder.userName.setText(user.getUserName());
 
             // set tag on radio group
-            customViewHolder.activityRadioGroup.setTag(user);
+            customViewHolder.activitySpinner.setTag(user);
 
-            RadioButton[] radioButton = new RadioButton[mActivityTypeList.size()];
-            customViewHolder.activityRadioGroup.setOrientation(RadioGroup.HORIZONTAL);
 
-            for(int j=0; j < mActivityTypeList.size(); j++){
-                radioButton[j]  = new RadioButton(mContext);
-                radioButton[j].setButtonDrawable(getResources().getIdentifier(mActivityTypeList.get(j).getIconFileName() + "_48", "drawable", getPackageName()));
-                radioButton[j].setTag(mActivityTypeList.get(j));
-                radioButton[j].setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+            /*
+            //add non-participant option to ActivityTypeList
+            ActivityType activityType = new ActivityType();
+            activityType.setActivityName("Not participating");
+            activityType.setIconFileName("non_participant");
+            mActivityTypeList.add(new ActivityType());
+            */
 
-                        RadioGroup radioGroup = (RadioGroup) v.getParent();
-                        User user = (User) radioGroup.getTag();
-                        UserActivity userActivity = new UserActivity(user);
-                        userActivity.setActivityType((ActivityType) v.getTag());
 
-                        // if the user already exists, remove it, add new activity type for this user
-                        if (mUserActivityList.contains(userActivity)) {
+            String[] activityList = new String[mActivityTypeList.size() + 1];
+
+            //add non-participating option
+            activityList[0] = "Not participating";
+
+            for ( int j = 0; j < mActivityTypeList.size(); j++){
+
+                activityList[j + 1] = mActivityTypeList.get(j).getActivityName();
+            }
+
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(mContext, android.R.layout.simple_spinner_item, activityList);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            customViewHolder.activitySpinner.setAdapter(adapter);
+
+            customViewHolder.activitySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                    User user = (User) parent.getTag();
+                    UserActivity userActivity = new UserActivity(user);
+                    userActivity.setActivityType(mActivityTypeList.get(position));
+
+
+                    // if non-participant was chosen, remove this user from UserActivityList if user is on the list
+                    if (position == 0){
+
+                        // if user exists on participant list, remove the user
+                        if (mUserActivityList.contains(userActivity)){
 
                             mUserActivityList.remove(mUserActivityList.indexOf(userActivity));
-                            mUserActivityList.add(userActivity);
 
                             //update bundle
                             mBundle.putParcelableArrayList("userActivityList", mUserActivityList);
                         }
                     }
-                });
-
-                customViewHolder.activityRadioGroup.addView(radioButton[j]);
-            }
-
-            // add non-participant option
-            RadioButton radioButtonLast = new RadioButton(mContext);
-            radioButtonLast.setButtonDrawable(getResources().getIdentifier("non_participant" + "_48", "drawable", getPackageName()));
-            radioButtonLast.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    RadioGroup radioGroup = (RadioGroup) v.getParent();
-                    User user = (User) radioGroup.getTag();
-                    UserActivity userActivity = new UserActivity(user);
-
-                    // if user exists on participant list, remove the user
-                    if (mUserActivityList.contains(userActivity)){
+                    // if the user already exists, remove it, add new activity type for this user
+                    else if (mUserActivityList.contains(userActivity)) {
 
                         mUserActivityList.remove(mUserActivityList.indexOf(userActivity));
+                        mUserActivityList.add(userActivity);
 
                         //update bundle
                         mBundle.putParcelableArrayList("userActivityList", mUserActivityList);
                     }
+                }
 
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                    //no change, don't do anything
                 }
             });
 
-            customViewHolder.activityRadioGroup.addView(radioButtonLast);
         }
 
 
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
+    }
 }
