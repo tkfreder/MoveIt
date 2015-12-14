@@ -1,4 +1,4 @@
-package com.tinakit.moveit.activity;
+package com.tinakit.moveit.fragment;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
