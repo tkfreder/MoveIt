@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 
+import com.tinakit.moveit.fragment.ActivityChooser;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.BinderServiceConnection;
 
@@ -96,8 +97,6 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout)findViewById(R.id.tabLayout);
         tabLayout.setupWithViewPager(viewPager);
 
-
-        //TODO: once TrackerService is implemented, we may not need this part. maybe the current index persists with a notifydatasetchanged
         //set tab index if this is redirected
         //int defaultValue = 0;
         if(getIntent().hasExtra("tab_index")){
@@ -281,7 +280,7 @@ public class MainActivity extends AppCompatActivity {
     private void setupViewPager(ViewPager viewPager){
 
         mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-        mViewPagerAdapter.addFrag(new ActivityTracker(), "START");
+        mViewPagerAdapter.addFrag(new ActivityChooser(), "START");
 
         //add user screens
         FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(this);
@@ -304,6 +303,8 @@ public class MainActivity extends AppCompatActivity {
         mViewPagerAdapter.addFrag(new EditRewardFragment(), "REWARDS");
         viewPager.setAdapter(mViewPagerAdapter);
     }
+
+
 
 
     @Override

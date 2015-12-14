@@ -1,13 +1,17 @@
-package com.tinakit.moveit.activity;
+package com.tinakit.moveit.fragment;
 
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,30 +41,37 @@ import fr.ganfra.materialspinner.MaterialSpinner;
 /**
  * Created by Tina on 12/13/2015.
  */
-public class ActivityChooser  extends AppCompatActivity {
+public class ActivityChooser  extends Fragment {
+
 
     protected static RecyclerView mRecyclerView;
     public static MultiChooserRecyclerAdapter mRecyclerViewAdapter;
-
-    protected Bundle mBundle;
     protected static List<ActivityType> mActivityTypeList;
+    protected Bundle mBundle;
     public static ActivityDetail mActivityDetail = new ActivityDetail();
+    protected FragmentActivity mFragmentActivity;
+    private View rootView;
+
 
     //database
     FitnessDBHelper mDatabaseHelper;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chooser);
-        setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mFragmentActivity  = (FragmentActivity)super.getActivity();
 
+        // save inflator and container for MapFragment
+        rootView = inflater.inflate(R.layout.activity_chooser, container, false);
+
+        mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         //get databaseHelper instance
-        mDatabaseHelper = FitnessDBHelper.getInstance(this);
+        mDatabaseHelper = FitnessDBHelper.getInstance(mFragmentActivity);
 
         initializeRecyclerView();
 
+        return rootView;
     }
 
     private void initializeRecyclerView(){
@@ -73,15 +84,13 @@ public class ActivityChooser  extends AppCompatActivity {
 
         //RecyclerView
         // Initialize recycler view
-        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true); //child items have fixed dimensions, allows the RecyclerView to optimize better by figuring out the exact height and width of the entire list based on the adapter.
 
-        // The number of Columns
-        //mRecyclerView.setLayoutManager(new GridLayoutManager(mFragmentActivity, 2));
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mFragmentActivity);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(linearLayoutManager);
-        mRecyclerViewAdapter = new MultiChooserRecyclerAdapter(this, userList, mActivityTypeList);
+        mRecyclerViewAdapter = new MultiChooserRecyclerAdapter(mFragmentActivity, userList, mActivityTypeList);
         mRecyclerView.setAdapter(mRecyclerViewAdapter);
 
     }
@@ -139,21 +148,11 @@ public class ActivityChooser  extends AppCompatActivity {
             User user = mUserList.get(i);
 
             // Populate data from ActivityType data object
-            customViewHolder.avatar.setImageResource(getResources().getIdentifier(user.getAvatarFileName(), "drawable", getPackageName()));
+            customViewHolder.avatar.setImageResource(getResources().getIdentifier(user.getAvatarFileName(), "drawable", mFragmentActivity.getPackageName()));
             customViewHolder.userName.setText(user.getUserName());
 
             // set tag on radio group
             customViewHolder.activitySpinner.setTag(user);
-
-
-            /*
-            //add non-participant option to ActivityTypeList
-            ActivityType activityType = new ActivityType();
-            activityType.setActivityName("Not participating");
-            activityType.setIconFileName("non_participant");
-            mActivityTypeList.add(new ActivityType());
-            */
-
 
             String[] activityList = new String[mActivityTypeList.size() + 1];
 

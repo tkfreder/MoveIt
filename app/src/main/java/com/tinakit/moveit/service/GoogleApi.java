@@ -15,7 +15,6 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-import com.tinakit.moveit.activity.ActivityTracker;
 
 /**
  * Created by Tina on 12/12/2015.

@@ -1,72 +1,39 @@
 package com.tinakit.moveit.fragment;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.IntentSender;
-import android.graphics.Color;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.location.Location;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.Chronometer;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolylineOptions;
 import com.tinakit.moveit.db.FitnessDBHelper;
-import com.tinakit.moveit.fragment.MapFragment;
 import com.tinakit.moveit.model.ActivityDetail;
-import com.tinakit.moveit.model.ActivityType;
 import com.tinakit.moveit.model.UnitSplit;
 import com.tinakit.moveit.model.User;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.model.UserActivity;
@@ -76,10 +43,9 @@ import com.tinakit.moveit.service.LocationApi;
 import com.tinakit.moveit.utility.CalorieCalculator;
 import com.tinakit.moveit.utility.ChronometerUtility;
 import com.tinakit.moveit.utility.DialogUtility;
-import com.tinakit.moveit.utility.Map;
 import com.tinakit.moveit.utility.UnitConverter;
 
-public class ActivityTracker extends Fragment {
+public class ActivityTracker extends AppCompatActivity {
 
     //DEBUG
     private static final String LOG = "MAIN_ACTIVITY";
@@ -125,58 +91,48 @@ public class ActivityTracker extends Fragment {
     private TextView mCoins;
     private TextView mFeetPerMinute;
     private TextView mMessage;
-    //protected static RecyclerView mRecyclerView;
-    //public static MultiChooserRecyclerAdapter mRecyclerViewAdapter;
     private View rootView;
     private ViewGroup mContainer;
 
     // INSTANCE FIELDS
-    private FragmentActivity mFragmentActivity;
     public static ActivityDetail mActivityDetail = new ActivityDetail();
-    //protected static List<ActivityType> mActivityTypeList;
     private long mTimeWhenPaused;
     private boolean mSaveLocationData = false;
     private static Bundle mBundle;
-    //private static int mSelectedActivityTypeIndex;
 
     //database
     FitnessDBHelper mDatabaseHelper;
 
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         if (DEBUG) Log.d(LOG, "onCreateView()");
 
-        mFragmentActivity  = (FragmentActivity)super.getActivity();
-
-        // save inflator and container for MapFragment
-        rootView = inflater.inflate(R.layout.activity_tracker, container, false);
-        mContainer = container;
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_tracker);
 
         //fix the orientation to portrait
-        mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+       setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         //end the activity if Google Play Services is not present
         //redirect user to Google Play Services
-        mGoogleApi = new GoogleApi(mFragmentActivity);
+        mGoogleApi = new GoogleApi(this);
 
         if (!mGoogleApi.servicesAvailable())
-            mFragmentActivity.finish();
+            finish();
         else
             mGoogleApi.buildGoogleApiClient();
 
         //get databaseHelper instance
-        mDatabaseHelper = FitnessDBHelper.getInstance(mFragmentActivity);
+        mDatabaseHelper = FitnessDBHelper.getInstance(this);
 
         //connect to Google Play Services
         //buildLocationRequest();
 
-        mLocationApi = new LocationApi(mFragmentActivity, mGoogleApi.client());
+        mLocationApi = new LocationApi(this, mGoogleApi.client());
         mLocationApi.createLocationRequest();
 
         // accelerometer
-        mAccelerometer = new Accelerometer(mFragmentActivity);
+        mAccelerometer = new Accelerometer(this);
 
         //check  savedInstanceState not null
         mResolvingError = savedInstanceState != null
@@ -202,8 +158,6 @@ public class ActivityTracker extends Fragment {
 
         //recycler view
         //initializeRecyclerView(rootView);
-
-        return rootView;
 
     }
 
@@ -299,7 +253,7 @@ public class ActivityTracker extends Fragment {
 
                 //save activity data to database on separate background thread
                 new SaveToDB().run();
-                doStartState(mFragmentActivity.getString(R.string.activity_saved));
+                doStartState(getString(R.string.activity_saved));
 
             }
 
@@ -324,12 +278,12 @@ public class ActivityTracker extends Fragment {
             public void onClick(View v) {
 
                 //TODO: replace with state pattern
-                doStartState(mFragmentActivity.getString(R.string.activity_cancelled));
+                doStartState(getString(R.string.activity_cancelled));
 
                 //display restart
                 hideAllButtons();
                 mStartButton.setVisibility(View.VISIBLE);
-                mStartButton.setText(mFragmentActivity.getString(R.string.restart));
+                mStartButton.setText(getString(R.string.restart));
             }
         });
     }
@@ -351,7 +305,7 @@ public class ActivityTracker extends Fragment {
         mCounterLayout.setVisibility(View.GONE);
         resetFields();
 
-        Toast.makeText(mFragmentActivity, message, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
     private static void hideAllButtons(){
@@ -432,19 +386,19 @@ public class ActivityTracker extends Fragment {
             //add user check boxes
             for (int i = 0; i < mActivityDetail.getUserActivityList().size(); i++) {
 
-                LinearLayout linearLayout = new LinearLayout(mFragmentActivity);
+                LinearLayout linearLayout = new LinearLayout(this);
                 linearLayout.setOrientation(LinearLayout.HORIZONTAL);
                 linearLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
 
                 //username
-                TextView textView = new TextView(mFragmentActivity);
+                TextView textView = new TextView(this);
                 textView.setTextColor(getResources().getColor(R.color.white));
                 textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, USERNAME_FONT_SIZE);
                 textView.setText(mActivityDetail.getUserActivityList().get(i).getUser().getUserName());
 
                 //activity type icon
-                ImageView imageView = new ImageView(mFragmentActivity);
-                imageView.setImageResource(getResources().getIdentifier(mActivityDetail.getUserActivityList().get(i).getActivityType().getActivityName() + "_icon_small", "drawable", mFragmentActivity.getPackageName()));
+                ImageView imageView = new ImageView(this);
+                imageView.setImageResource(getResources().getIdentifier(mActivityDetail.getUserActivityList().get(i).getActivityType().getActivityName() + "_icon_small", "drawable", getPackageName()));
                 imageView.setLayoutParams(new LinearLayout.LayoutParams(100, 100));
 
                 //add checkbox and textview to linear layout
@@ -530,7 +484,7 @@ public class ActivityTracker extends Fragment {
     private void playSound(){
 
         MediaPlayer mp;
-        mp = MediaPlayer.create(mFragmentActivity, R.raw.cat_meow);
+        mp = MediaPlayer.create(this, R.raw.cat_meow);
         mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
             @Override
@@ -632,7 +586,7 @@ public class ActivityTracker extends Fragment {
         if (DEBUG) Log.d(LOG, "onStart");
         super.onStart();
 
-        LocalBroadcastManager.getInstance(mFragmentActivity).registerReceiver(mMessageReceiver, new IntentFilter(GoogleApi.GOOGLE_API_INTENT));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(GoogleApi.GOOGLE_API_INTENT));
 
 
     }
@@ -667,7 +621,7 @@ public class ActivityTracker extends Fragment {
                 //show Start button
                 mStartButton.setVisibility(View.VISIBLE);
                 //add map
-                mMapFragment = new MapFragment(getChildFragmentManager(), mGoogleApi);
+                mMapFragment = new MapFragment(getSupportFragmentManager(), mGoogleApi);
                 mMapFragment.addMap(rootView, mContainer);
 
             }
@@ -698,7 +652,7 @@ public class ActivityTracker extends Fragment {
                 mAccelerometer.unregisterAccelerometer();
 
                 //display warning message that no movement has been detected
-                DialogUtility.displayAlertDialog(mFragmentActivity, getResources().getString(R.string.warning), getResources().getString(R.string.no_movement), getResources().getString(R.string.ok));
+                DialogUtility.displayAlertDialog(context, getResources().getString(R.string.warning), getResources().getString(R.string.no_movement), getResources().getString(R.string.ok));
             }
         }
     };
@@ -714,7 +668,7 @@ public class ActivityTracker extends Fragment {
         //do nothing, we want to continue to collect location data until user clicks Stop button
         //other apps may run concurrently, such as music player
 
-        LocalBroadcastManager.getInstance(mFragmentActivity).unregisterReceiver(mMessageReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
         super.onPause();
     }
 
@@ -727,14 +681,14 @@ public class ActivityTracker extends Fragment {
         if (DEBUG) Log.d(LOG, "onResume");
         super.onResume();
 
-        LocalBroadcastManager.getInstance(mFragmentActivity).registerReceiver(mMessageReceiver, new IntentFilter(GoogleApi.GOOGLE_API_INTENT));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(GoogleApi.GOOGLE_API_INTENT));
 
         //ensures that if the user returns to the running app through some other means,
         //such as through the back button, the check is still performed.
         //end the activity if Google Play Services is not present
         //redirect user to Google Play Services
         if (!mGoogleApi.servicesAvailable()) {
-            mFragmentActivity.finish();
+            finish();
         }
 
     }
@@ -774,7 +728,7 @@ public class ActivityTracker extends Fragment {
     }
 
     private void displayAlertDialog(String title, String message){
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mFragmentActivity);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
         // set title
         alertDialogBuilder.setTitle(title);
@@ -948,7 +902,7 @@ public class ActivityTracker extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_RESOLVE_ERROR) {
             mResolvingError = false;
-            if (resultCode == mFragmentActivity.RESULT_OK) {
+            if (resultCode == this.RESULT_OK) {
                 // Make sure the app is not already connected or attempting to connect
                 if (!mGoogleApi.client().isConnecting() &&
                         !mGoogleApi.client().isConnected()) {
