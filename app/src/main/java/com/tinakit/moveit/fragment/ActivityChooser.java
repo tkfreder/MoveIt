@@ -1,32 +1,25 @@
 package com.tinakit.moveit.fragment;
 
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.CheckBox;
-import android.widget.ImageButton;
+import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.ArrayAdapter;
 
 import com.tinakit.moveit.R;
+import com.tinakit.moveit.activity.ActivityTracker;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.ActivityType;
@@ -44,14 +37,16 @@ import fr.ganfra.materialspinner.MaterialSpinner;
 public class ActivityChooser  extends Fragment {
 
 
-    protected static RecyclerView mRecyclerView;
-    public static MultiChooserRecyclerAdapter mRecyclerViewAdapter;
     protected static List<ActivityType> mActivityTypeList;
     protected Bundle mBundle;
     public static ActivityDetail mActivityDetail = new ActivityDetail();
     protected FragmentActivity mFragmentActivity;
     private View rootView;
 
+    // UI COMPONENTS
+    protected RecyclerView mRecyclerView;
+    public static MultiChooserRecyclerAdapter mRecyclerViewAdapter;
+    protected Button mNextButton;
 
     //database
     FitnessDBHelper mDatabaseHelper;
@@ -60,8 +55,6 @@ public class ActivityChooser  extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mFragmentActivity  = (FragmentActivity)super.getActivity();
-
-        // save inflator and container for MapFragment
         rootView = inflater.inflate(R.layout.activity_chooser, container, false);
 
         mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -71,7 +64,21 @@ public class ActivityChooser  extends Fragment {
 
         initializeRecyclerView();
 
+        setActionListeners();
+
         return rootView;
+    }
+
+    private void setActionListeners(){
+
+        mNextButton = (Button)rootView.findViewById(R.id.nextButton);
+        mNextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                startActivity(new Intent(mFragmentActivity, ActivityTracker.class));
+            }
+        });
     }
 
     private void initializeRecyclerView(){

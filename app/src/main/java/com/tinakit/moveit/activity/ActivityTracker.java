@@ -1,4 +1,4 @@
-package com.tinakit.moveit.fragment;
+package com.tinakit.moveit.activity;
 
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.tinakit.moveit.db.FitnessDBHelper;
+import com.tinakit.moveit.fragment.MapFragment;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.UnitSplit;
 import com.tinakit.moveit.model.User;
@@ -91,7 +92,6 @@ public class ActivityTracker extends AppCompatActivity {
     private TextView mCoins;
     private TextView mFeetPerMinute;
     private TextView mMessage;
-    private View rootView;
     private ViewGroup mContainer;
 
     // INSTANCE FIELDS
@@ -139,22 +139,22 @@ public class ActivityTracker extends AppCompatActivity {
                 && savedInstanceState.getBoolean(STATE_RESOLVING_ERROR, false);
 
         //wire up UI widgets
-        mCounterLayout = (LinearLayout)rootView.findViewById(R.id.counterLayout);
-        mStartButton = (Button) rootView.findViewById(R.id.startButton);
-        mStopButton = (Button) rootView.findViewById(R.id.stopButton);
-        mPauseButton = (Button) rootView.findViewById(R.id.pauseButton);
-        mSaveButton = (Button) rootView.findViewById(R.id.saveButton);
-        mResumeButton = (Button) rootView.findViewById(R.id.resumeButton);
-        mCancelButton = (Button)rootView.findViewById(R.id.cancelButton);
-        mButtonLinearLayout = (LinearLayout)rootView.findViewById(R.id.buttonLayout);
+        mCounterLayout = (LinearLayout)findViewById(R.id.counterLayout);
+        mStartButton = (Button) findViewById(R.id.startButton);
+        mStopButton = (Button) findViewById(R.id.stopButton);
+        mPauseButton = (Button) findViewById(R.id.pauseButton);
+        mSaveButton = (Button) findViewById(R.id.saveButton);
+        mResumeButton = (Button) findViewById(R.id.resumeButton);
+        mCancelButton = (Button)findViewById(R.id.cancelButton);
+        mButtonLinearLayout = (LinearLayout)findViewById(R.id.buttonLayout);
         setButtonOnClickListeners();
 
-        mChronometer = (Chronometer) rootView.findViewById(R.id.chronometer);
+        mChronometer = (Chronometer) findViewById(R.id.chronometer);
         mChronometerUtility = new ChronometerUtility (mChronometer);
-        mDistance = (TextView) rootView.findViewById(R.id.distance);
-        mCoins = (TextView) rootView.findViewById(R.id.coins);
-        mFeetPerMinute = (TextView) rootView.findViewById(R.id.feetPerMinute);
-        mMessage = (TextView) rootView.findViewById(R.id.message);
+        mDistance = (TextView) findViewById(R.id.distance);
+        mCoins = (TextView) findViewById(R.id.coins);
+        mFeetPerMinute = (TextView) findViewById(R.id.feetPerMinute);
+        mMessage = (TextView) findViewById(R.id.message);
 
         //recycler view
         //initializeRecyclerView(rootView);
@@ -622,7 +622,7 @@ public class ActivityTracker extends AppCompatActivity {
                 mStartButton.setVisibility(View.VISIBLE);
                 //add map
                 mMapFragment = new MapFragment(getSupportFragmentManager(), mGoogleApi);
-                mMapFragment.addMap(rootView, mContainer);
+                mMapFragment.addMap(mContainer);
 
             }
             else if (message.equals(LocationApi.LOCATION_API_INTENT)){
