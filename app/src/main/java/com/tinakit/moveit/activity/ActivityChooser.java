@@ -73,7 +73,7 @@ public class ActivityChooser  extends AppCompatActivity {
         // The number of Columns
         //mRecyclerView.setLayoutManager(new GridLayoutManager(mFragmentActivity, 2));
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerViewAdapter = new MultiChooserRecyclerAdapter(this, userList, mActivityTypeList);
         mRecyclerView.setAdapter(mRecyclerViewAdapter);
@@ -103,23 +103,25 @@ public class ActivityChooser  extends AppCompatActivity {
 
         public class CustomViewHolder extends RecyclerView.ViewHolder {
 
-            protected ImageView avatar;
-            protected TextView userName;
-            protected RadioGroup activityRadioGroup;
+            ImageView avatar;
+            TextView userName;
+            RadioGroup activityRadioGroup;
 
             public CustomViewHolder(View view) {
 
                 super(view);
-                this.avatar = (ImageView)findViewById(R.id.avatar);
-                this.userName = (TextView)findViewById(R.id.userName);
-                this.activityRadioGroup = (RadioGroup)findViewById(R.id.activityRadioGroup);
+                this.avatar = (ImageView)view.findViewById(R.id.avatar);
+                this.userName = (TextView)view.findViewById(R.id.userName);
+                this.activityRadioGroup = (RadioGroup)view.findViewById(R.id.activityRadioGroup);
 
             }
         }
 
         @Override
         public MultiChooserRecyclerAdapter.CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-            View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.multi_activity_chooser_item, null);
+
+            //View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.participant_activity_list_item, null);
+            View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.participant_activity_list_item, viewGroup, false);
 
             CustomViewHolder viewHolder = new CustomViewHolder(view);
             return viewHolder;
@@ -137,12 +139,12 @@ public class ActivityChooser  extends AppCompatActivity {
             // set tag on radio group
             customViewHolder.activityRadioGroup.setTag(user);
 
-             final RadioButton[] radioButton = new RadioButton[mActivityTypeList.size()];
+            RadioButton[] radioButton = new RadioButton[mActivityTypeList.size()];
             customViewHolder.activityRadioGroup.setOrientation(RadioGroup.HORIZONTAL);
 
-            for(int j=0; i < mActivityTypeList.size(); i++){
+            for(int j=0; j < mActivityTypeList.size(); j++){
                 radioButton[j]  = new RadioButton(mContext);
-                radioButton[j].setButtonDrawable(getResources().getIdentifier(mActivityTypeList.get(j).getIconFileName(), "drawable", getPackageName()));
+                radioButton[j].setButtonDrawable(getResources().getIdentifier(mActivityTypeList.get(j).getIconFileName() + "_48", "drawable", getPackageName()));
                 radioButton[j].setTag(mActivityTypeList.get(j));
                 radioButton[j].setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -154,7 +156,7 @@ public class ActivityChooser  extends AppCompatActivity {
                         userActivity.setActivityType((ActivityType) v.getTag());
 
                         // if the user already exists, remove it, add new activity type for this user
-                        if (mUserActivityList.contains(userActivity)){
+                        if (mUserActivityList.contains(userActivity)) {
 
                             mUserActivityList.remove(mUserActivityList.indexOf(userActivity));
                             mUserActivityList.add(userActivity);
@@ -166,12 +168,11 @@ public class ActivityChooser  extends AppCompatActivity {
                 });
 
                 customViewHolder.activityRadioGroup.addView(radioButton[j]);
-
             }
 
             // add non-participant option
             RadioButton radioButtonLast = new RadioButton(mContext);
-            radioButtonLast.setText("Non-participant");
+            radioButtonLast.setButtonDrawable(getResources().getIdentifier("non_participant" + "_48", "drawable", getPackageName()));
             radioButtonLast.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -194,6 +195,8 @@ public class ActivityChooser  extends AppCompatActivity {
 
             customViewHolder.activityRadioGroup.addView(radioButtonLast);
         }
+
+
     }
 
 }
