@@ -125,19 +125,19 @@ public class ActivityTracker extends Fragment {
     private TextView mCoins;
     private TextView mFeetPerMinute;
     private TextView mMessage;
-    protected static RecyclerView mRecyclerView;
-    public static MultiChooserRecyclerAdapter mRecyclerViewAdapter;
+    //protected static RecyclerView mRecyclerView;
+    //public static MultiChooserRecyclerAdapter mRecyclerViewAdapter;
     private View rootView;
     private ViewGroup mContainer;
 
     // INSTANCE FIELDS
     private FragmentActivity mFragmentActivity;
     public static ActivityDetail mActivityDetail = new ActivityDetail();
-    protected static List<ActivityType> mActivityTypeList;
+    //protected static List<ActivityType> mActivityTypeList;
     private long mTimeWhenPaused;
     private boolean mSaveLocationData = false;
     private static Bundle mBundle;
-    private static int mSelectedActivityTypeIndex;
+    //private static int mSelectedActivityTypeIndex;
 
     //database
     FitnessDBHelper mDatabaseHelper;
@@ -201,7 +201,7 @@ public class ActivityTracker extends Fragment {
         mMessage = (TextView) rootView.findViewById(R.id.message);
 
         //recycler view
-        initializeRecyclerView(rootView);
+        //initializeRecyclerView(rootView);
 
         return rootView;
 
@@ -339,7 +339,7 @@ public class ActivityTracker extends Fragment {
         //clear out user activity list and unitsplit data
         mActivityDetail = new ActivityDetail();
         mUnitSplitList = new ArrayList<>();
-        mRecyclerViewAdapter.notifyDataSetChanged();
+        //mRecyclerViewAdapter.notifyDataSetChanged();
 
         //make map visible
         mMapFragment.makeMap();
@@ -391,7 +391,7 @@ public class ActivityTracker extends Fragment {
         //start timer
         mChronometerUtility.start();    }
 
-
+/*
    private void initializeRecyclerView(View rootView){
 
         mBundle = new Bundle();
@@ -414,7 +414,7 @@ public class ActivityTracker extends Fragment {
         mRecyclerView.setAdapter(mRecyclerViewAdapter);
 
     }
-
+*/
     private void createUserActivityList(){
 
         //get user list
@@ -1012,132 +1012,7 @@ public class ActivityTracker extends Fragment {
         //startActivity(intent);
     }
 
-    public class MultiChooserRecyclerAdapter extends RecyclerView.Adapter<MultiChooserRecyclerAdapter.CustomViewHolder> {
 
-        private List<User> mUserList;
-        private List<ActivityType> mActivityTypeList;
-
-
-        public MultiChooserRecyclerAdapter(List<User> userList, List<ActivityType> activityTypeList) {
-
-            mUserList = userList;
-            mActivityTypeList = activityTypeList;
-        }
-
-        @Override
-        public int getItemCount() {
-            return (null != mUserList ? mUserList.size() : 0);
-        }
-
-        public class CustomViewHolder extends RecyclerView.ViewHolder {
-
-            ///protected ImageView avatar;
-            protected CheckBox userCheckBox;
-            protected TextView username;
-            protected ImageButton activityIcon;
-
-
-            public CustomViewHolder(View view) {
-
-                super(view);
-                //this.avatar = (ImageView) view.findViewById(R.id.avatar);
-                this.userCheckBox = (CheckBox)view.findViewById(R.id.userCheckBox);
-                this.username = (TextView)view.findViewById(R.id.username);
-                this.activityIcon = (ImageButton)view.findViewById(R.id.activityIcon);
-
-            }
-        }
-
-        @Override
-        public MultiChooserRecyclerAdapter.CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-            View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.multi_activity_chooser_item, null);
-
-            CustomViewHolder viewHolder = new CustomViewHolder(view);
-            return viewHolder;
-        }
-
-        @Override
-        public void onBindViewHolder(MultiChooserRecyclerAdapter.CustomViewHolder customViewHolder, int i) {
-
-            User user = mUserList.get(i);
-
-            // Populate data from ActivityType data object
-            //customViewHolder.avatar.setImageResource(mContext.getResources().getIdentifier(user.getAvatarFileName(), "drawable", mContext.getPackageName()));
-            customViewHolder.username.setText(user.getUserName());
-
-            //TODO: remove this after image listener is implemented
-            //set tag on checkbox
-            customViewHolder.userCheckBox.setTag(user);
-
-            //set click listener and tag on imageview
-            customViewHolder.activityIcon.setTag(user);
-            customViewHolder.activityIcon.setLayoutParams(new LinearLayout.LayoutParams(100, 100));
-
-            //default icon
-            customViewHolder.activityIcon.setBackgroundResource(getResources().getIdentifier("checkbox_icon_small", "drawable", mFragmentActivity.getPackageName()));
-
-            //if user list is not empty
-            if (mActivityDetail.getUserActivityList().size() > 0){
-
-                //user is on the list of participants
-                UserActivity userActivity = new UserActivity(user);
-                if (mActivityDetail.getUserActivityList().contains(userActivity)){
-
-                    customViewHolder.userCheckBox.setChecked(true);
-                    int index = mActivityDetail.getUserActivityList().indexOf(new UserActivity(user));
-                    customViewHolder.activityIcon.setVisibility(View.VISIBLE);
-                    customViewHolder.activityIcon.setBackgroundResource(getResources().getIdentifier(mActivityDetail.getUserActivityList().get(index).getActivityType().getActivityName() + "_icon_small", "drawable", mFragmentActivity.getPackageName()));
-                }
-            }
-
-            //set onclicklistener for image
-            customViewHolder.activityIcon.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    User user = (User) v.getTag();
-                    //save user in Bundle
-                    mBundle.putParcelable("currentUser", user);
-
-                    //display Activity Chooser popup
-
-                    ActivityChoiceDialogFragment activityChoiceDialogFragment = new ActivityChoiceDialogFragment();
-                    activityChoiceDialogFragment.show(getFragmentManager(), "Activity Chooser");
-
-                }
-            });
-
-            //TODO: remove this after implementing onclicklistener on image
-            /*
-            customViewHolder.userCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-                    User user = (User) buttonView.getTag();
-                    //save user in Bundle
-                    mBundle.putParcelable("currentUser", user);
-
-                    if (isChecked) {
-
-                        ActivityChoiceDialogFragment activityChoiceDialogFragment = new ActivityChoiceDialogFragment();
-                        activityChoiceDialogFragment.show(getFragmentManager(), "Activity Chooser");
-
-                    } else {
-
-                        UserActivity userActivity = new UserActivity(user);
-
-                        if (mActivityDetail.getUserActivityList().contains(userActivity)) {
-
-                            mActivityDetail.getUserActivityList().remove((mActivityDetail.getUserActivityList().indexOf(userActivity)));
-
-                            refreshDisplay();
-                        }
-                    }
-                }
-            });
-            */
-        }
-    }
 
     private static void refreshDisplay(){
 
@@ -1151,98 +1026,12 @@ public class ActivityTracker extends Fragment {
             mStartButton.setVisibility(View.GONE);
 
         //fresh the icons in case user list has changed
-        mRecyclerViewAdapter.notifyDataSetChanged();
+        //mRecyclerViewAdapter.notifyDataSetChanged();
 
     }
 
 
-    public static class ActivityChoiceDialogFragment extends DialogFragment
-    {
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState)
-        {
-            android.support.v7.app.AlertDialog.Builder dialog = new android.support.v7.app.AlertDialog.Builder(getActivity());
 
-            dialog.setTitle(R.string.pick_activity);
-
-            List<String> activityTypeStringList = new ArrayList<>();
-
-            //create a string array
-            for (ActivityType activityType : mActivityTypeList)
-                activityTypeStringList.add(activityType.getActivityName());
-
-            //add the non-participant option at the end
-            activityTypeStringList.add(getResources().getString(R.string.not_participating));
-
-            dialog.setSingleChoiceItems(activityTypeStringList.toArray(new String[activityTypeStringList.size()]), -1,
-                    new DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                            mSelectedActivityTypeIndex = which;
-
-                        }
-                    })
-                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-
-                            User user = (User) mBundle.getParcelable("currentUser");
-                            UserActivity userActivity = new UserActivity(user);
-
-                            //get the index if user exists on the list
-                            int index = mActivityDetail.getUserActivityList().indexOf(userActivity);
-
-                            //if the user selected an activity type (not including non-participating)
-                            if (mSelectedActivityTypeIndex < mActivityTypeList.size())
-                                //save the activity type in the UserActivity
-                                userActivity.setActivityType(mActivityTypeList.get(mSelectedActivityTypeIndex));
-
-                            //if the user list is empty
-                            if (mActivityDetail.getUserActivityList().size() == 0) {
-                                //if activity type is a valid activity type - not non-participating, add the user
-                                if (mSelectedActivityTypeIndex != mActivityTypeList.size())
-                                    mActivityDetail.getUserActivityList().add(userActivity);
-
-                            }
-                            //the user list is not empty
-                            else {
-
-                                //if the user exists on the list
-                                if (index != -1) {
-
-                                    //the user selected non-participating
-                                    if (mSelectedActivityTypeIndex == mActivityTypeList.size()) {
-
-                                        //remove the user on the list
-                                        mActivityDetail.getUserActivityList().remove(index);
-                                    }
-                                    //otherwise, update the user's activity
-                                    else
-                                        mActivityDetail.getUserActivityList().set(index, userActivity);
-                                }
-                                //the user is not on the list and if user did not select non-participating, add the user
-                                else if (mSelectedActivityTypeIndex != mActivityTypeList.size())
-                                    mActivityDetail.getUserActivityList().add(userActivity);
-                            }
-
-                            refreshDisplay();
-
-                        }
-                    })
-
-                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-                            //don't do anything
-                        }
-                    });
-
-            return dialog.create();
-        }
-
-    }
 
 
     private class SaveToDB implements Runnable {
