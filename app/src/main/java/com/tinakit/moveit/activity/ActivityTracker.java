@@ -156,9 +156,6 @@ public class ActivityTracker extends AppCompatActivity {
         mFeetPerMinute = (TextView) findViewById(R.id.feetPerMinute);
         mMessage = (TextView) findViewById(R.id.message);
 
-        //recycler view
-        //initializeRecyclerView(rootView);
-
     }
 
     protected void setButtonOnClickListeners(){
@@ -293,7 +290,6 @@ public class ActivityTracker extends AppCompatActivity {
         //clear out user activity list and unitsplit data
         mActivityDetail = new ActivityDetail();
         mUnitSplitList = new ArrayList<>();
-        //mRecyclerViewAdapter.notifyDataSetChanged();
 
         //make map visible
         mMapFragment.makeMap();
@@ -344,74 +340,6 @@ public class ActivityTracker extends AppCompatActivity {
 
         //start timer
         mChronometerUtility.start();    }
-
-/*
-   private void initializeRecyclerView(View rootView){
-
-        mBundle = new Bundle();
-
-        // Get userlist
-        List<User> userList = mDatabaseHelper.getUsers();
-        mActivityTypeList = mDatabaseHelper.getActivityTypes();
-
-        //RecyclerView
-        // Initialize recycler view
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
-        mRecyclerView.setHasFixedSize(true); //child items have fixed dimensions, allows the RecyclerView to optimize better by figuring out the exact height and width of the entire list based on the adapter.
-
-        // The number of Columns
-        //mRecyclerView.setLayoutManager(new GridLayoutManager(mFragmentActivity, 2));
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mFragmentActivity);
-        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        mRecyclerView.setLayoutManager(linearLayoutManager);
-        mRecyclerViewAdapter = new MultiChooserRecyclerAdapter(userList, mActivityTypeList);
-        mRecyclerView.setAdapter(mRecyclerViewAdapter);
-
-    }
-*/
-    private void createUserActivityList(){
-
-        //get user list
-        List<User> userList = new ArrayList<>();
-        userList = mDatabaseHelper.getUsers();
-
-
-        //get userActivityList out of bundle
-        //Bundle bundle  = getIntent().getExtras();
-        if (mBundle.containsKey("userActivityList")) {
-
-            mActivityDetail.setUserActivityList(new ArrayList(mBundle.getParcelableArrayList("userActivityList")));
-
-
-            //add user check boxes
-            for (int i = 0; i < mActivityDetail.getUserActivityList().size(); i++) {
-
-                LinearLayout linearLayout = new LinearLayout(this);
-                linearLayout.setOrientation(LinearLayout.HORIZONTAL);
-                linearLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
-
-                //username
-                TextView textView = new TextView(this);
-                textView.setTextColor(getResources().getColor(R.color.white));
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, USERNAME_FONT_SIZE);
-                textView.setText(mActivityDetail.getUserActivityList().get(i).getUser().getUserName());
-
-                //activity type icon
-                ImageView imageView = new ImageView(this);
-                imageView.setImageResource(getResources().getIdentifier(mActivityDetail.getUserActivityList().get(i).getActivityType().getActivityName() + "_icon_small", "drawable", getPackageName()));
-                imageView.setLayoutParams(new LinearLayout.LayoutParams(100, 100));
-
-                //add checkbox and textview to linear layout
-                linearLayout.addView(textView);
-                linearLayout.addView(imageView);
-
-                //add linear layout to parent linear layout
-                //mUserCheckBoxLayout.addView(linearLayout);
-
-
-            }
-        }
-    }
 
     private void resetFields(){
 
@@ -978,10 +906,6 @@ public class ActivityTracker extends AppCompatActivity {
             mStartButton.setVisibility(View.VISIBLE);
         else
             mStartButton.setVisibility(View.GONE);
-
-        //fresh the icons in case user list has changed
-        //mRecyclerViewAdapter.notifyDataSetChanged();
-
     }
 
 
