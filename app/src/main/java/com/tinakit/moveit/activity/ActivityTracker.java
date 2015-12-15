@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.location.Location;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -94,7 +95,7 @@ public class ActivityTracker extends AppCompatActivity {
 
     // INSTANCE FIELDS
     private ActivityDetail mActivityDetail;
-    private long mTimeWhenPaused;
+    private long mTimeWhenStopped;
     private boolean mSaveLocationData = false;
 
     //database
@@ -171,7 +172,6 @@ public class ActivityTracker extends AppCompatActivity {
         mCancelButton = (Button)findViewById(R.id.cancelButton);
         mButtonLinearLayout = (LinearLayout)findViewById(R.id.buttonLayout);
         mChronometer = (Chronometer) findViewById(R.id.chronometer);
-        mChronometerUtility = new ChronometerUtility (mChronometer);
         mDistance = (TextView) findViewById(R.id.distance);
         mCoins = (TextView) findViewById(R.id.coins);
         mFeetPerMinute = (TextView) findViewById(R.id.feetPerMinute);
@@ -329,7 +329,7 @@ public class ActivityTracker extends AppCompatActivity {
         mChronometerUtility.stop();
 
         //save current time
-        mTimeWhenPaused = mChronometerUtility.elapsedTime();
+        mTimeWhenStopped = mChronometerUtility.getTime() - SystemClock.elapsedRealtime();
     }
 
     private void resumeTracking(){
@@ -340,11 +340,9 @@ public class ActivityTracker extends AppCompatActivity {
         //start accelerometer listener, after a delay of ACCELEROMETER_DELAY
         mAccelerometer.registerAccelerometer();
 
-        //reset time to the time when paused
-        mChronometerUtility.resetTime();
-
-        //chronometer settings, set base time right before starting the chronometer
-        mChronometerUtility.resume();    }
+        //chronometer settings, set base time to time when paused ChronometerUtility.elapsedTime()
+        mChronometerUtility.resume(mTimeWhenStopped);
+    }
 
     //**********************************************************************************************
     //  service helper methods
@@ -373,7 +371,8 @@ public class ActivityTracker extends AppCompatActivity {
 
         startServices(mGoogleApi.client());
 
-        //start timer
+        //initialize ChronometerUtility, start timer
+        mChronometerUtility = new ChronometerUtility (mChronometer);
         mChronometerUtility.start();
 
         //display counters
@@ -394,7 +393,7 @@ public class ActivityTracker extends AppCompatActivity {
         mChronometerUtility.stop();
 
         //save elapsed time
-        mTimeElapsed = mChronometerUtility.getTimeByUnits(mChronometer.getText().toString(), 0);
+        mTimeElapsed = Math.round(mChronometerUtility.getTimeByUnits(mChronometer.getText().toString(), 0));
 
     }
 
@@ -470,7 +469,7 @@ public class ActivityTracker extends AppCompatActivity {
 
         //save time elapsed
         //get time from Chronometer
-        mTimeElapsed = mChronometerUtility.getTimeByUnits(mChronometer.getText().toString(), 0);
+        mTimeElapsed = Math.round(mChronometerUtility.getTimeByUnits(mChronometer.getText().toString(), 0));
     }
 
 
@@ -608,7 +607,7 @@ public class ActivityTracker extends AppCompatActivity {
     private void refreshData(){
 
 
-        mTimeElapsed = mChronometerUtility.getTimeByUnits(mChronometer.getText().toString(), 0);
+        mTimeElapsed = Math.round(mChronometerUtility.getTimeByUnits(mChronometer.getText().toString(), 0));
 
         //save location data in mLocationList
         displayCurrent();
@@ -682,8 +681,8 @@ public class ActivityTracker extends AppCompatActivity {
 
             //update speed feet/minute
             //float elapsedMinutes = (float)(SystemClock.elapsedRealtime() - mChronometer.getBase())/(1000 * 60);
-            int elapsedMinutes = mChronometerUtility.getTimeByUnits(mChronometer.getText().toString(), 1);
-            float speed = (float)distanceFeet/elapsedMinutes;
+            float elapsedMinutes = mChronometerUtility.getTimeByUnits(mChronometer.getText().toString(), 1);
+            float speed = distanceFeet/elapsedMinutes;
             if (speed > 0)
                 mFeetPerMinute.setText(String.format("%.0f", speed));
             else

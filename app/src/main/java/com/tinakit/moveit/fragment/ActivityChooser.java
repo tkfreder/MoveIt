@@ -101,7 +101,7 @@ public class ActivityChooser  extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mFragmentActivity);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(linearLayoutManager);
-        mRecyclerViewAdapter = new MultiChooserRecyclerAdapter(mFragmentActivity, userList, mActivityTypeList);
+        mRecyclerViewAdapter = new MultiChooserRecyclerAdapter(mFragmentActivity, userList);
         mRecyclerView.setAdapter(mRecyclerViewAdapter);
 
     }
@@ -110,14 +110,25 @@ public class ActivityChooser  extends Fragment {
 
         private Context mContext;
         private List<User> mUserList;
-        private List<ActivityType> mActivityTypeList;
+        String[] activityList;
 
 
-        public MultiChooserRecyclerAdapter(Context context, List<User> userList, List<ActivityType> activityTypeList) {
+        public MultiChooserRecyclerAdapter(Context context, List<User> userList) {
 
             mContext = context;
             mUserList = userList;
-            mActivityTypeList = activityTypeList;
+
+            //initialize string array for ActivityType list
+            activityList = new String[mActivityTypeList.size() + 1];
+
+            //add non-participating option
+            activityList[0] = "Not participating";
+
+            for ( int j = 0; j < mActivityTypeList.size(); j++){
+
+                activityList[j + 1] = mActivityTypeList.get(j).getActivityName();
+            }
+
         }
 
         @Override
@@ -163,15 +174,6 @@ public class ActivityChooser  extends Fragment {
             // set tag on radio group
             customViewHolder.activitySpinner.setTag(user);
 
-            String[] activityList = new String[mActivityTypeList.size() + 1];
-
-            //add non-participating option
-            activityList[0] = "Not participating";
-
-            for ( int j = 0; j < mActivityTypeList.size(); j++){
-
-                activityList[j + 1] = mActivityTypeList.get(j).getActivityName();
-            }
 
             ArrayAdapter<String> adapter = new ArrayAdapter<String>(mContext, android.R.layout.simple_spinner_item, activityList);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -183,8 +185,6 @@ public class ActivityChooser  extends Fragment {
 
                     User user = (User) parent.getTag();
                     UserActivity userActivity = new UserActivity(user);
-                    userActivity.setActivityType(mActivityTypeList.get(position));
-
 
 
                     // if non-participant was chosen, remove this user from UserActivityList if user is on the list
@@ -199,12 +199,20 @@ public class ActivityChooser  extends Fragment {
                     // if the user already exists, remove it, add new activity type for this user
                     else if (mUserActivityList.size() > 0 && mUserActivityList.contains(userActivity)) {
 
+                        //add the activitytype if it's not "non-participating"
+                        //decrement index in order to compensate for addition of "Not participating" option at index = 0, see line 169
+                        userActivity.setActivityType(mActivityTypeList.get(position - 1));
                         mUserActivityList.remove(mUserActivityList.indexOf(userActivity));
                         mUserActivityList.add(userActivity);
                     }
                     // if user does not already exist, add the user to the list
-                    else
+                    else{
+
+                        //add the activitytype if it's not "non-participating"
+                        //decrement index in order to compensate for addition of "Not participating" option at index = 0, see line 169
+                        userActivity.setActivityType(mActivityTypeList.get(position - 1));
                         mUserActivityList.add(userActivity);
+                    }
 
                     // enable/disable Next Button
                     setButtonState(mUserActivityList);

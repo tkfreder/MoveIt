@@ -19,6 +19,7 @@ public class ChronometerUtility {
 
     public void start(){
 
+        mChronometer.setBase(SystemClock.elapsedRealtime());
         mChronometer.start();
 
     }
@@ -27,14 +28,15 @@ public class ChronometerUtility {
         mChronometer.stop();
     }
 
-    public long elapsedTime(){
+    public long getTime(){
 
-        return mChronometer.getBase() - SystemClock.elapsedRealtime();
+        return mChronometer.getBase();
     }
 
-    public void resume(){
+    public void resume(long timeWhenStopped){
 
-        mChronometer.setBase(SystemClock.elapsedRealtime() + elapsedTime());
+        //mChronometer.setBase(SystemClock.elapsedRealtime() + elapsedTime());
+        mChronometer.setBase(SystemClock.elapsedRealtime() + timeWhenStopped);
         mChronometer.start();
 
     }
@@ -45,7 +47,7 @@ public class ChronometerUtility {
 
     }
 
-    public static int getTimeByUnits(String timeString, int units){
+    public static float getTimeByUnits(String timeString, int units){
 
         String string = timeString;
 
@@ -71,18 +73,17 @@ public class ChronometerUtility {
 
             //seconds
             case 0:
-                return Math.round(seconds + (minutes*60f) + (hours*3600f));
+                return seconds + (minutes*60f) + (hours*3600f);
             //minutes
             case 1:
-                return Math.round(seconds/60f + minutes + (hours * 60));
+                return seconds/60f + minutes + (hours * 60f);
 
             //hours
             case 2:
-                return Math.round(seconds/3600f + minutes/60f + hours);
+                return seconds/3600f + minutes/60f + hours;
 
-            //seconds
             default:
-                return Math.round(seconds + (minutes*60f) + (hours*3600f));
+                return 0.0f;
         }
     }
 }
