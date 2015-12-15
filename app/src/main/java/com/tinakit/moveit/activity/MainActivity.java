@@ -56,25 +56,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-
-/*
-        Toolbar toolbar = (Toolbar)findViewById(R.id.mToolbar);
-        setSupportActionBar(toolbar);
-
-
-        final ActionBar ab = getSupportActionBar();
-        ab.setHomeAsUpIndicator(R.drawable.ic_menu);
-        ab.setDisplayHomeAsUpEnabled(true);
-
-
-        drawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
-
-        NavigationView navView = (NavigationView) findViewById(R.id.navigation_view);
-        if (navView != null){
-            setupDrawerContent(navView);
-        }
-        */
-
         //ViewPager
         viewPager = (ViewPager)findViewById(R.id.tab_viewpager);
         if (viewPager != null){
@@ -124,35 +105,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
-
-   /*
-    private void setupDrawerContent(NavigationView navigationView){
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(MenuItem menuItem) {
-                menuItem.setChecked(true);
-
-                switch (menuItem.getItemId()) {
-                    case R.id.drawer_labels:
-                        viewPager.setCurrentItem(0);
-                        break;
-                    case R.id.drawer_fab:
-                        viewPager.setCurrentItem(1);
-                        break;
-                    case R.id.drawer_snackbar:
-                        viewPager.setCurrentItem(2);
-                        break;
-                    case R.id.drawer_coordinator:
-                        viewPager.setCurrentItem(3);
-                        break;
-                }
-
-                drawerLayout.closeDrawers();
-                return true;
-            }
-        });
-    }
-*/
 
     //**********************************************************************************************
     //  onStart()
@@ -252,9 +204,6 @@ public class MainActivity extends AppCompatActivity {
         mViewPagerAdapter.addFrag(new EditRewardFragment(), "REWARDS");
         viewPager.setAdapter(mViewPagerAdapter);
     }
-
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
