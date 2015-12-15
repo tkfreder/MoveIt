@@ -86,7 +86,7 @@ public class Accelerometer implements SensorEventListener{
         return mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null;
     }
 
-    public void registerAccelerometer(){
+    public void start(){
 
         if (hasAccelerometer()) {
             // success! we have an accelerometer
@@ -106,7 +106,7 @@ public class Accelerometer implements SensorEventListener{
 
     }
 
-    public void unregisterAccelerometer(){
+    public void stop(){
 
         //unregister accelerometer
         if(sensorAccelerometer != null){

@@ -10,12 +10,13 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.tinakit.moveit.LifeCycle;
 import com.tinakit.moveit.activity.ActivityTracker;
 
 /**
  * Created by Tina on 12/12/2015.
  */
-public class LocationApi implements LocationListener {
+public class LocationApi implements LocationListener, LifeCycle {
 
     // DEBUG
     private static final boolean DEBUG = false;
@@ -42,6 +43,8 @@ public class LocationApi implements LocationListener {
 
         mFragmentActivity = fragmentActivity;
         mGoogleApiClient = googleApiClient;
+
+        initialize();
     }
 
 
@@ -53,27 +56,6 @@ public class LocationApi implements LocationListener {
     public Location location(){
 
         return mLocation;
-    }
-
-    //this method should be called once at start of run
-    //while stopServices should be called once at end of run
-    //do not call buildLocationRequest() and stopServices multiple times, difficult to trach asynchronous process
-    //use flag mSaveLocationData to determine whether to save data.  during Pause, set mSaveLocationData to false
-    public void createLocationRequest() {
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(POLLING_FREQUENCY);//get location updates every x seconds
-        mLocationRequest.setFastestInterval(FASTEST_POLLING_FREQUENCY);//not to exceed location updates every x seconds
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-    }
-
-    public void requestLocationUpdates(GoogleApiClient googleApiClient){
-
-        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, mLocationRequest, this);
-
-    }
-
-    public void removeLocationUpdates(GoogleApiClient googleApiClient){
-        LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
     }
 
     @Override
@@ -101,6 +83,45 @@ public class LocationApi implements LocationListener {
             return true;
         else
             return false;
+    }
+
+    public void initialize() {
+
+        //this method should be called once at start of run
+        //while stopServices should be called once at end of run
+        //do not call buildLocationRequest() and stopServices multiple times, difficult to trach asynchronous process
+        //use flag mSaveLocationData to determine whether to save data.  during Pause, set mSaveLocationData to false
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(POLLING_FREQUENCY);//get location updates every x seconds
+        mLocationRequest.setFastestInterval(FASTEST_POLLING_FREQUENCY);//not to exceed location updates every x seconds
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+
+    @Override
+    public void start() {
+
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+
+    }
+
+    @Override
+    public void pause() {
+
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+
+    }
+
+    @Override
+    public void resume() {
+
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+
+    }
+
+    @Override
+    public void stop() {
+
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
     }
 
     //TODO:  may be able to utilize this to get a more accurate first data point

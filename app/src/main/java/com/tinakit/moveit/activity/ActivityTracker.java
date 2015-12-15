@@ -52,7 +52,7 @@ public class ActivityTracker extends AppCompatActivity {
     private static final boolean DEBUG = true;
 
     //CONSTANTS
-    private static final float FEET_COIN_CONVERSION = 0.5f;  //2 feet = 1 coin
+    private static final float FEET_COIN_CONVERSION = 0.05f;  //20 feet = 1 coin
     public static final String ACTIVITY_TRACKER_BROADCAST_RECEIVER = "TRACKER_RECEIVER";
 
     //save all location points during location updates
@@ -138,15 +138,14 @@ public class ActivityTracker extends AppCompatActivity {
         else
             mGoogleApi.buildGoogleApiClient();
 
-
-
+        // location listener
         mLocationApi = new LocationApi(this, mGoogleApi.client());
-        mLocationApi.createLocationRequest();
+        mLocationApi.initialize();
 
         // accelerometer
         mAccelerometer = new Accelerometer(this);
 
-        //check  savedInstanceState not null
+        //check savedInstanceState not null
         mResolvingError = savedInstanceState != null
                 && savedInstanceState.getBoolean(STATE_RESOLVING_ERROR, false);
     }
@@ -180,14 +179,16 @@ public class ActivityTracker extends AppCompatActivity {
         setButtonOnClickListeners();
     }
 
-    protected void setButtonOnClickListeners(){
+    //**********************************************************************************************
+    //  setButtonOnClickListeners
+    //**********************************************************************************************
 
-        //**********************************************************************************************
-        //  onClickListeners
-        //**********************************************************************************************
+    protected void setButtonOnClickListeners(){
 
         mStartButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+
+                startRun();
 
                 //set flag to save location data
                 mSaveLocationData = true;
@@ -208,13 +209,14 @@ public class ActivityTracker extends AppCompatActivity {
                 mStopButton.setVisibility(View.VISIBLE);
                 mPauseButton.setVisibility(View.VISIBLE);
 
-                startRun();
             }
         });
 
         mStopButton.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
+
+                stopRun();
 
                 //get timestamp of end
                 mActivityDetail.setEndDate(new Date());
@@ -223,8 +225,6 @@ public class ActivityTracker extends AppCompatActivity {
                 mStopButton.setVisibility(View.GONE);
                 mPauseButton.setVisibility(View.GONE);
                 mResumeButton.setVisibility(View.GONE);
-
-                stopRun();
 
                 //save Activity Detail data
                 if (mUnitSplitList.size() > 1) {
@@ -270,9 +270,11 @@ public class ActivityTracker extends AppCompatActivity {
 
             public void onClick(View v) {
 
+                finishTracking(getString(R.string.activity_saved));
+
                 //save activity data to database on separate background thread
                 new SaveToDB().run();
-                doStartState(getString(R.string.activity_saved));
+
 
             }
 
@@ -296,28 +298,9 @@ public class ActivityTracker extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                //TODO: replace with state pattern
-                doStartState(getString(R.string.activity_cancelled));
+                finishTracking(getString(R.string.activity_cancelled));
             }
         });
-    }
-
-    private void doStartState(String message){
-
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-        finish();
-        startActivity(new Intent(this, MainActivity.class));
-    }
-
-    private static void hideAllButtons(){
-
-        mStartButton.setVisibility(View.GONE);
-        mStopButton.setVisibility(View.GONE);
-        mPauseButton.setVisibility(View.GONE);
-        mSaveButton.setVisibility(View.GONE);
-        mResumeButton.setVisibility(View.GONE);
-        mCancelButton.setVisibility(View.GONE);
-
     }
 
     private void pauseTracking(){
@@ -344,22 +327,11 @@ public class ActivityTracker extends AppCompatActivity {
         mChronometerUtility.resume(mTimeWhenStopped);
     }
 
-    //**********************************************************************************************
-    //  service helper methods
-    //**********************************************************************************************
+    private void finishTracking(String message){
 
-    protected void startServices(GoogleApiClient googleApiClient) {
-
-        mLocationApi.requestLocationUpdates(googleApiClient);
-        mAccelerometer.registerAccelerometer();
-
-    }
-
-    protected void stopServices(GoogleApiClient googleApiClient) {
-
-         mLocationApi.removeLocationUpdates(googleApiClient);
-         mAccelerometer.unregisterAccelerometer();
-
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        finish();
+        startActivity(new Intent(this, MainActivity.class));
     }
 
     //**********************************************************************************************
@@ -367,9 +339,16 @@ public class ActivityTracker extends AppCompatActivity {
     //**********************************************************************************************
 
     private void startRun(){
+
         mRequestedService = true;
 
-        startServices(mGoogleApi.client());
+        //startServices(mGoogleApi.client());
+        mLocationApi.start();
+        mAccelerometer.start();
+
+        //register api intents with BroadcastReceiver
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(LocationApi.LOCATION_API_INTENT));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(Accelerometer.ACCELEROMETER_INTENT));
 
         //initialize ChronometerUtility, start timer
         mChronometerUtility = new ChronometerUtility (mChronometer);
@@ -387,7 +366,12 @@ public class ActivityTracker extends AppCompatActivity {
 
     private void stopRun(){
 
-        stopServices(mGoogleApi.client());
+        //stopServices(mGoogleApi.client());
+        mLocationApi.stop();
+        mAccelerometer.stop();
+
+        // unregister intents with BroadcastReceiver
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
 
         //stop chronometer
         mChronometerUtility.stop();
@@ -491,7 +475,7 @@ public class ActivityTracker extends AppCompatActivity {
         if (DEBUG) Log.d(LOG, "onStart");
         super.onStart();
 
-        registerIntents();
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(GoogleApi.GOOGLE_API_INTENT));
     }
 
     //**********************************************************************************************
@@ -519,9 +503,7 @@ public class ActivityTracker extends AppCompatActivity {
             // message to indicate Google API Client connection
             if(message.equals(GoogleApi.GOOGLE_API_INTENT)){
 
-
-                //TODO: pending tracker state
-                //show Start button
+                // only show Start button after connecting to Google Api Client
                 mStartButton.setVisibility(View.VISIBLE);
 
                 //add map
@@ -561,13 +543,6 @@ public class ActivityTracker extends AppCompatActivity {
         }
     };
 
-    private void registerIntents(){
-
-        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(GoogleApi.GOOGLE_API_INTENT));
-        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(LocationApi.LOCATION_API_INTENT));
-        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(Accelerometer.ACCELEROMETER_INTENT));
-    }
-
     //**********************************************************************************************
     //  onPause() - Activity is partially obscured by another app but still partially visible and not the activity in focus
     //**********************************************************************************************
@@ -576,10 +551,8 @@ public class ActivityTracker extends AppCompatActivity {
     public void onPause() {
         if (DEBUG) Log.d(LOG, "onPause");
 
-        //do nothing, we want to continue to collect location data until user clicks Stop button
+        //maintain Location tracking, we want to continue to collect location data until user clicks Stop button
         //other apps may run concurrently, such as music player
-
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
         super.onPause();
     }
 
@@ -591,8 +564,6 @@ public class ActivityTracker extends AppCompatActivity {
     public void onResume() {
         if (DEBUG) Log.d(LOG, "onResume");
         super.onResume();
-
-        registerIntents();
 
         //ensures that if the user returns to the running app through some other means,
         //such as through the back button, the check is still performed.
