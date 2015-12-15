@@ -106,20 +106,27 @@ public class ActivityTracker extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tracker);
-
-        //fix the orientation to portrait
-       setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
-
-        mActivityDetail = new ActivityDetail();
+        setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // get UserActivityList from intent
-        if (getIntent().hasExtra(ActivityChooser.USER_ACTIVITY_LIST)){
+        if (!getIntent().hasExtra(ActivityChooser.USER_ACTIVITY_LIST)) {
 
-            ArrayList<UserActivity> userActivityList = getIntent().getParcelableArrayListExtra(ActivityChooser.USER_ACTIVITY_LIST);
-            mActivityDetail.setUserActivityList(userActivityList);
-
+            //redirect back to ActivityChooser to get UserActivityList
+            startActivity(new Intent(this, MainActivity.class));
         }
+
+        else {
+
+            initializeUI();
+
+            initializeData();
+
+            bindApi(savedInstanceState);
+        }
+
+    }
+
+    protected void bindApi(@Nullable Bundle savedInstanceState ){
 
         //end the activity if Google Play Services is not present
         //redirect user to Google Play Services
@@ -130,11 +137,7 @@ public class ActivityTracker extends AppCompatActivity {
         else
             mGoogleApi.buildGoogleApiClient();
 
-        //get databaseHelper instance
-        mDatabaseHelper = FitnessDBHelper.getInstance(this);
 
-        //connect to Google Play Services
-        //buildLocationRequest();
 
         mLocationApi = new LocationApi(this, mGoogleApi.client());
         mLocationApi.createLocationRequest();
@@ -145,8 +148,20 @@ public class ActivityTracker extends AppCompatActivity {
         //check  savedInstanceState not null
         mResolvingError = savedInstanceState != null
                 && savedInstanceState.getBoolean(STATE_RESOLVING_ERROR, false);
+    }
 
-        //wire up UI widgets
+    protected void initializeData(){
+
+        //get databaseHelper instance
+        mDatabaseHelper = FitnessDBHelper.getInstance(this);
+
+        mActivityDetail = new ActivityDetail();
+        ArrayList<UserActivity> userActivityList = getIntent().getParcelableArrayListExtra(ActivityChooser.USER_ACTIVITY_LIST);
+        mActivityDetail.setUserActivityList(userActivityList);
+    }
+
+    protected void initializeUI(){
+
         mCounterLayout = (LinearLayout)findViewById(R.id.counterLayout);
         mStartButton = (Button) findViewById(R.id.startButton);
         mStopButton = (Button) findViewById(R.id.stopButton);
@@ -155,8 +170,6 @@ public class ActivityTracker extends AppCompatActivity {
         mResumeButton = (Button) findViewById(R.id.resumeButton);
         mCancelButton = (Button)findViewById(R.id.cancelButton);
         mButtonLinearLayout = (LinearLayout)findViewById(R.id.buttonLayout);
-        setButtonOnClickListeners();
-
         mChronometer = (Chronometer) findViewById(R.id.chronometer);
         mChronometerUtility = new ChronometerUtility (mChronometer);
         mDistance = (TextView) findViewById(R.id.distance);
@@ -164,6 +177,7 @@ public class ActivityTracker extends AppCompatActivity {
         mFeetPerMinute = (TextView) findViewById(R.id.feetPerMinute);
         mMessage = (TextView) findViewById(R.id.message);
 
+        setButtonOnClickListeners();
     }
 
     protected void setButtonOnClickListeners(){
@@ -329,16 +343,8 @@ public class ActivityTracker extends AppCompatActivity {
         //reset time to the time when paused
         mChronometerUtility.resetTime();
 
-        //start timer
-        mChronometerUtility.start();    }
-
-    private void resetFields(){
-
-        mCoins.setText("0");
-        mDistance.setText("0");
-        mFeetPerMinute.setText("0");
-        mChronometerUtility.resetTime();
-    }
+        //chronometer settings, set base time right before starting the chronometer
+        mChronometerUtility.resume();    }
 
     //**********************************************************************************************
     //  service helper methods
@@ -367,15 +373,13 @@ public class ActivityTracker extends AppCompatActivity {
 
         startServices(mGoogleApi.client());
 
-        //chronometer settings, set base time right before starting the chronometer
-        mChronometerUtility.resume();
+        //start timer
+        mChronometerUtility.start();
 
         //display counters
         mCounterLayout.setVisibility(View.VISIBLE);
 
-        //TODO:  this isn't always accurate so not sure if it should be used
-        //get the starting point
-        //updateCache(LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient));
+        //TODO:  START STEP COUNTING UNTIL FIRST LOCATION API CONNECTION IS MADE AND PERIODS OF LOST CONNECTION
 
         //display map of starting point
         mMapFragment.displayStartMap();
@@ -402,7 +406,6 @@ public class ActivityTracker extends AppCompatActivity {
 
             @Override
             public void onCompletion(MediaPlayer mp) {
-                // TODO Auto-generated method stub
                 mp.reset();
                 mp.release();
                 mp=null;
@@ -418,22 +421,12 @@ public class ActivityTracker extends AppCompatActivity {
 
     private void saveToDB(FitnessDBHelper databaseHelper, List<UnitSplit> unitSplitList, ActivityDetail activityDetail, int totalPoints, float distance){
 
-        /*
-        //save to cache
-        ActivityDetail activityDetail = new ActivityDetail();
-        activityDetail.setStartLocation(new LatLng(mUnitSplitCalorieList.get(0).getLocation().getLatitude(),mUnitSplitCalorieList.get(0).getLocation().getLongitude()));
-        activityDetail.setDistanceInFeet(getDistance(1));
-        activityDetail.setBearing(mUnitSplitCalorieList.size() > 1 ? mUnitSplitCalorieList.get(0).getBearing() : 0);
-
-        mActivityDetailList.add(activityDetail);
-*/
-
         //save Activity Detail (overall stats)
         long activityId = databaseHelper.insertActivity((float) unitSplitList.get(0).getLocation().getLatitude()
                 , (float) unitSplitList.get(0).getLocation().getLongitude()
                 , activityDetail.getStartDate()
                 , activityDetail.getEndDate()
-                , distance //TODO:replace with Enum type
+                , distance
                 , unitSplitList.size() > 1 ? unitSplitList.get(0).getBearing() : 0);
 
         if (activityId != -1){
@@ -531,6 +524,7 @@ public class ActivityTracker extends AppCompatActivity {
                 //TODO: pending tracker state
                 //show Start button
                 mStartButton.setVisibility(View.VISIBLE);
+
                 //add map
                 mMapFragment = new MapFragment(getSupportFragmentManager(), mGoogleApi);
                 mMapFragment.addMap(mContainer);
@@ -834,32 +828,6 @@ public class ActivityTracker extends AppCompatActivity {
         }
     }
 
-
-    public static int getSecondsFromChronometer(){
-
-        String string = mChronometer.getText().toString();
-
-        String [] parts = string.split(":");
-
-        // Wrong format, no value for you.
-        if(parts.length < 2 || parts.length > 3)
-            return 0;
-
-        int seconds = 0, minutes = 0, hours = 0;
-
-        if(parts.length == 2){
-            seconds = Integer.parseInt(parts[1]);
-            minutes = Integer.parseInt(parts[0]);
-        }
-        else if(parts.length == 3){
-            seconds = Integer.parseInt(parts[2]);
-            minutes = Integer.parseInt(parts[1]);
-            hours = Integer.parseInt(parts[1]);
-        }
-
-        return seconds + (minutes*60) + (hours*3600);
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -887,23 +855,6 @@ public class ActivityTracker extends AppCompatActivity {
         //Intent intent = new Intent(mFragmentActivity, EditReward.class);
         //startActivity(intent);
     }
-
-
-
-    private void refreshDisplay(){
-
-        hideAllButtons();
-
-        //enable or disable buttons if there are participants or not
-        //enable button if there is at least one user participating
-        if (mActivityDetail.getUserActivityList().size() > 0)
-            mStartButton.setVisibility(View.VISIBLE);
-        else
-            mStartButton.setVisibility(View.GONE);
-    }
-
-
-
 
 
     private class SaveToDB implements Runnable {

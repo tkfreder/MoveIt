@@ -25,8 +25,7 @@ import java.util.List;
 public class EditRewardRecyclerAdapter extends RecyclerView.Adapter<EditRewardRecyclerAdapter.CustomViewHolder>  {
 
     private Context mContext;
-    //TODO: make private after building DB
-    public static List<Reward> mRewardList;
+    private List<Reward> mRewardList;
     FitnessDBHelper mDatabaseHelper;
     Reward mReward;
 
@@ -131,7 +130,7 @@ public class EditRewardRecyclerAdapter extends RecyclerView.Adapter<EditRewardRe
         public CustomViewHolder(View view) {
             super(view);
 
-            this.points = (EditText) view.findViewById(R.id.rewardPoints);
+            this.points = (EditText) view.findViewById(R.id.points);
             this.name = (EditText) view.findViewById(R.id.name);
             this.updateButton = (Button) view.findViewById(R.id.updateButton);
             this.deleteButton = (ImageView) view.findViewById(R.id.delete);
