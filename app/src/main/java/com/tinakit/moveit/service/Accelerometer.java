@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.tinakit.moveit.R;
+import com.tinakit.moveit.activity.ActivityTracker;
 import com.tinakit.moveit.utility.DialogUtility;
 
 import java.util.concurrent.Executors;
@@ -65,7 +66,7 @@ public class Accelerometer implements SensorEventListener{
 
                     // send message to indicate there is new location data
                     Intent intent = new Intent(ACCELEROMETER_INTENT);
-                    intent.putExtra(ACCELEROMETER_INTENT, ACCELEROMETER_INTENT);
+                    intent.putExtra(ActivityTracker.ACTIVITY_TRACKER_BROADCAST_RECEIVER, ACCELEROMETER_INTENT);
                     LocalBroadcastManager.getInstance(mFragmentActivity).sendBroadcast(intent);
                 }
 

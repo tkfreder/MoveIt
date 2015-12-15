@@ -2,10 +2,12 @@ package com.tinakit.moveit.fragment;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -37,11 +39,13 @@ import fr.ganfra.materialspinner.MaterialSpinner;
 public class ActivityChooser  extends Fragment {
 
 
+    // CONSTANTS
+    public static final String USER_ACTIVITY_LIST = "USER_ACTIVITY_LIST";
     protected static List<ActivityType> mActivityTypeList;
-    protected Bundle mBundle;
     public static ActivityDetail mActivityDetail = new ActivityDetail();
     protected FragmentActivity mFragmentActivity;
     private View rootView;
+    ArrayList<UserActivity> mUserActivityList = new ArrayList<>();
 
     // UI COMPONENTS
     protected RecyclerView mRecyclerView;
@@ -76,14 +80,14 @@ public class ActivityChooser  extends Fragment {
             @Override
             public void onClick(View v) {
 
-                startActivity(new Intent(mFragmentActivity, ActivityTracker.class));
+                Intent intent = new Intent(mFragmentActivity, ActivityTracker.class);
+                intent.putParcelableArrayListExtra(USER_ACTIVITY_LIST, mUserActivityList);
+                startActivity(intent);
             }
         });
     }
 
     private void initializeRecyclerView(){
-
-        mBundle = new Bundle();
 
         // Get userlist
         List<User> userList = mDatabaseHelper.getUsers();
@@ -107,7 +111,6 @@ public class ActivityChooser  extends Fragment {
         private Context mContext;
         private List<User> mUserList;
         private List<ActivityType> mActivityTypeList;
-        private ArrayList<UserActivity> mUserActivityList;
 
 
         public MultiChooserRecyclerAdapter(Context context, List<User> userList, List<ActivityType> activityTypeList) {
@@ -115,7 +118,6 @@ public class ActivityChooser  extends Fragment {
             mContext = context;
             mUserList = userList;
             mActivityTypeList = activityTypeList;
-            mUserActivityList = new ArrayList<>();
         }
 
         @Override
@@ -184,27 +186,28 @@ public class ActivityChooser  extends Fragment {
                     userActivity.setActivityType(mActivityTypeList.get(position));
 
 
+
                     // if non-participant was chosen, remove this user from UserActivityList if user is on the list
                     if (position == 0){
 
                         // if user exists on participant list, remove the user
-                        if (mUserActivityList.contains(userActivity)){
+                        if (mUserActivityList.size() > 0 && mUserActivityList.contains(userActivity)){
 
                             mUserActivityList.remove(mUserActivityList.indexOf(userActivity));
-
-                            //update bundle
-                            mBundle.putParcelableArrayList("userActivityList", mUserActivityList);
                         }
                     }
                     // if the user already exists, remove it, add new activity type for this user
-                    else if (mUserActivityList.contains(userActivity)) {
+                    else if (mUserActivityList.size() > 0 && mUserActivityList.contains(userActivity)) {
 
                         mUserActivityList.remove(mUserActivityList.indexOf(userActivity));
                         mUserActivityList.add(userActivity);
-
-                        //update bundle
-                        mBundle.putParcelableArrayList("userActivityList", mUserActivityList);
                     }
+                    // if user does not already exist, add the user to the list
+                    else
+                        mUserActivityList.add(userActivity);
+
+                    // enable/disable Next Button
+                    setButtonState(mUserActivityList);
                 }
 
                 @Override
@@ -213,6 +216,21 @@ public class ActivityChooser  extends Fragment {
                     //no change, don't do anything
                 }
             });
+        }
+    }
+
+    private void setButtonState(List<UserActivity> userActivityList){
+
+        //check if at least one user is participating, show Next button
+        if (userActivityList.size() > 0){
+
+            mNextButton.setEnabled(true);
+            mNextButton.setBackgroundColor(ContextCompat.getColor(mFragmentActivity, R.color.green));
+        }
+        else{
+
+            mNextButton.setEnabled(false);
+            mNextButton.setBackgroundColor(ContextCompat.getColor(mFragmentActivity, R.color.grey));
         }
     }
 

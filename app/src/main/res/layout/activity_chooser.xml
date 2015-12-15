@@ -20,8 +20,10 @@
         android:layout_gravity="bottom|center"
         android:layout_marginBottom="15dp"
         android:text="@string/next"
-        android:background="@color/green"
+        android:background="@color/grey"
         android:textColor="@color/white"
+        android:enabled="false"
+
         />
 
 </FrameLayout>

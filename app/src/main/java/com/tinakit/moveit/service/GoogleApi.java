@@ -15,6 +15,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.tinakit.moveit.activity.ActivityTracker;
 
 /**
  * Created by Tina on 12/12/2015.
@@ -62,7 +63,7 @@ public class GoogleApi implements GoogleApiClient.ConnectionCallbacks,
         //updateCache(LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient));
 
         Intent intent = new Intent(GOOGLE_API_INTENT);
-        intent.putExtra(GOOGLE_API_INTENT, GOOGLE_API_INTENT);
+        intent.putExtra(ActivityTracker.ACTIVITY_TRACKER_BROADCAST_RECEIVER, GOOGLE_API_INTENT);
         LocalBroadcastManager.getInstance(mFragmentActivity).sendBroadcast(intent);
 
         //TODO:  send broadcast message, register receiver on activitytracker, then call displayStartMap() and startServices() from ActivityTracker from the broadcastreceiver

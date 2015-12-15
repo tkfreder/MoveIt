@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.tinakit.moveit.db.FitnessDBHelper;
+import com.tinakit.moveit.fragment.ActivityChooser;
 import com.tinakit.moveit.fragment.MapFragment;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.UnitSplit;
@@ -55,6 +56,7 @@ public class ActivityTracker extends AppCompatActivity {
     //CONSTANTS
     private static final float FEET_COIN_CONVERSION = 0.5f;  //2 feet = 1 coin
     private static final float USERNAME_FONT_SIZE = 20f;
+    public static final String ACTIVITY_TRACKER_BROADCAST_RECEIVER = "TRACKER_RECEIVER";
 
     //save all location points during location updates
     private List<UnitSplit> mUnitSplitList = new ArrayList<>();
@@ -95,10 +97,9 @@ public class ActivityTracker extends AppCompatActivity {
     private ViewGroup mContainer;
 
     // INSTANCE FIELDS
-    public static ActivityDetail mActivityDetail = new ActivityDetail();
+    private ActivityDetail mActivityDetail;
     private long mTimeWhenPaused;
     private boolean mSaveLocationData = false;
-    private static Bundle mBundle;
 
     //database
     FitnessDBHelper mDatabaseHelper;
@@ -112,6 +113,16 @@ public class ActivityTracker extends AppCompatActivity {
 
         //fix the orientation to portrait
        setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+
+        mActivityDetail = new ActivityDetail();
+        // get UserActivityList from bundle
+        if (getIntent().hasExtra(ActivityChooser.USER_ACTIVITY_LIST)){
+
+            ArrayList<UserActivity> userActivityList = getIntent().getParcelableArrayListExtra(ActivityChooser.USER_ACTIVITY_LIST);
+            mActivityDetail.setUserActivityList(userActivityList);
+
+        }
 
         //end the activity if Google Play Services is not present
         //redirect user to Google Play Services
@@ -364,6 +375,7 @@ public class ActivityTracker extends AppCompatActivity {
 
         mLocationApi.requestLocationUpdates(googleApiClient);
         mAccelerometer.registerAccelerometer();
+
     }
 
     protected void stopServices(GoogleApiClient googleApiClient) {
@@ -514,9 +526,7 @@ public class ActivityTracker extends AppCompatActivity {
         if (DEBUG) Log.d(LOG, "onStart");
         super.onStart();
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(GoogleApi.GOOGLE_API_INTENT));
-
-
+        registerIntents();
     }
 
     //**********************************************************************************************
@@ -537,7 +547,7 @@ public class ActivityTracker extends AppCompatActivity {
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String message = intent.getStringExtra(GoogleApi.GOOGLE_API_INTENT);
+            String message = intent.getStringExtra(ACTIVITY_TRACKER_BROADCAST_RECEIVER);
 
             if (DEBUG) Log.d(LOG, "BroadcastReceiver - onReceive(): message: " + message);
 
@@ -585,6 +595,13 @@ public class ActivityTracker extends AppCompatActivity {
         }
     };
 
+    private void registerIntents(){
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(GoogleApi.GOOGLE_API_INTENT));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(LocationApi.LOCATION_API_INTENT));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(Accelerometer.ACCELEROMETER_INTENT));
+    }
+
     //**********************************************************************************************
     //  onPause() - Activity is partially obscured by another app but still partially visible and not the activity in focus
     //**********************************************************************************************
@@ -609,7 +626,7 @@ public class ActivityTracker extends AppCompatActivity {
         if (DEBUG) Log.d(LOG, "onResume");
         super.onResume();
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(GoogleApi.GOOGLE_API_INTENT));
+        registerIntents();
 
         //ensures that if the user returns to the running app through some other means,
         //such as through the back button, the check is still performed.
@@ -896,7 +913,7 @@ public class ActivityTracker extends AppCompatActivity {
 
 
 
-    private static void refreshDisplay(){
+    private void refreshDisplay(){
 
         hideAllButtons();
 

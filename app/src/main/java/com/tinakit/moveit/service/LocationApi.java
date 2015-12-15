@@ -10,6 +10,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.tinakit.moveit.activity.ActivityTracker;
 
 /**
  * Created by Tina on 12/12/2015.
@@ -91,7 +92,7 @@ public class LocationApi implements LocationListener {
 
             // send message to indicate there is new location data
             Intent intent = new Intent(LOCATION_API_INTENT);
-            intent.putExtra(LOCATION_API_INTENT, LOCATION_API_INTENT);
+            intent.putExtra(ActivityTracker.ACTIVITY_TRACKER_BROADCAST_RECEIVER, LOCATION_API_INTENT);
             LocalBroadcastManager.getInstance(mFragmentActivity).sendBroadcast(intent);
         }
     }

@@ -30,8 +30,6 @@ public class ChronometerUtility {
     public long elapsedTime(){
 
         return mChronometer.getBase() - SystemClock.elapsedRealtime();
-        //return SystemClock.elapsedRealtime() - mChronometer.getBase();
-
     }
 
     public void resume(){
