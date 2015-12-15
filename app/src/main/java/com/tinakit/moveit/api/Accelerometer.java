@@ -1,6 +1,5 @@
-package com.tinakit.moveit.service;
+package com.tinakit.moveit.api;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
@@ -10,9 +9,7 @@ import android.hardware.SensorManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.LocalBroadcastManager;
 
-import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.ActivityTracker;
-import com.tinakit.moveit.utility.DialogUtility;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;

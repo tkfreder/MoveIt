@@ -1,4 +1,4 @@
-package com.tinakit.moveit.service;
+package com.tinakit.moveit.api;
 
 import android.content.Intent;
 import android.location.Location;

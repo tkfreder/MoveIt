@@ -36,9 +36,9 @@ import java.util.List;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.model.UserActivity;
-import com.tinakit.moveit.service.Accelerometer;
-import com.tinakit.moveit.service.GoogleApi;
-import com.tinakit.moveit.service.LocationApi;
+import com.tinakit.moveit.api.Accelerometer;
+import com.tinakit.moveit.api.GoogleApi;
+import com.tinakit.moveit.api.LocationApi;
 import com.tinakit.moveit.utility.CalorieCalculator;
 import com.tinakit.moveit.utility.ChronometerUtility;
 import com.tinakit.moveit.utility.DialogUtility;
@@ -340,14 +340,7 @@ public class ActivityTracker extends AppCompatActivity {
         mChronometerUtility.resetTime();
     }
 
-    // call this when user clicks Start button
-    public void doStartTracker() {
-
-
-
-    }
-
-   //**********************************************************************************************
+    //**********************************************************************************************
     //  service helper methods
     //**********************************************************************************************
 
@@ -696,7 +689,11 @@ public class ActivityTracker extends AppCompatActivity {
             //update speed feet/minute
             //float elapsedMinutes = (float)(SystemClock.elapsedRealtime() - mChronometer.getBase())/(1000 * 60);
             int elapsedMinutes = mChronometerUtility.getTimeByUnits(mChronometer.getText().toString(), 1);
-            mFeetPerMinute.setText(String.format("%.0f", (float)distanceFeet/elapsedMinutes));
+            float speed = (float)distanceFeet/elapsedMinutes;
+            if (speed > 0)
+                mFeetPerMinute.setText(String.format("%.0f", speed));
+            else
+                mFeetPerMinute.setText("0.0");
 
             //TODO: move this somewhere else, where business rules are updated, not UI update
             //update the UnitSplitCalorie list with calorie and speed values

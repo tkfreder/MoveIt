@@ -3,7 +3,6 @@ package com.tinakit.moveit.activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -15,7 +14,6 @@ import android.view.Menu;
 
 import com.tinakit.moveit.fragment.ActivityChooser;
 import com.tinakit.moveit.model.ActivityDetail;
-import com.tinakit.moveit.model.BinderServiceConnection;
 
 /**
  * Created by Tina on 10/26/2015.
@@ -32,7 +30,7 @@ import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.fragment.EditRewardFragment;
 import com.tinakit.moveit.fragment.RewardViewFragment;
 import com.tinakit.moveit.model.User;
-import com.tinakit.moveit.service.TrackerService;
+import com.tinakit.moveit.api.TrackerService;
 
 import java.util.ArrayList;
 import java.util.List;

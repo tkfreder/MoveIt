@@ -1,4 +1,4 @@
-package com.tinakit.moveit.service;
+package com.tinakit.moveit.api;
 
 import android.app.Service;
 import android.content.Intent;

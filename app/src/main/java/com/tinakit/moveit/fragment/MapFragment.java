@@ -2,15 +2,11 @@ package com.tinakit.moveit.fragment;
 
 import android.graphics.Color;
 import android.location.Location;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -22,7 +18,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.model.UnitSplit;
-import com.tinakit.moveit.service.GoogleApi;
+import com.tinakit.moveit.api.GoogleApi;
 import com.tinakit.moveit.utility.Map;
 
 import java.util.ArrayList;

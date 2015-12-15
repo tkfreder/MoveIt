@@ -7,7 +7,7 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.tinakit.moveit.service.TrackerService;
+import com.tinakit.moveit.api.TrackerService;
 
 /**
  * Created by Tina on 11/23/2015.
