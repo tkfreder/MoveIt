@@ -30,7 +30,6 @@ import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.fragment.EditRewardFragment;
 import com.tinakit.moveit.fragment.RewardViewFragment;
 import com.tinakit.moveit.model.User;
-import com.tinakit.moveit.api.TrackerService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,15 +45,6 @@ public class MainActivity extends AppCompatActivity {
     protected ViewPagerAdapter mViewPagerAdapter;
     protected int mUserCount;
     protected int mCurrentTab;
-
-    //BinderServiceConnection
-    //BinderServiceConnection mConnection;
-
-    //LocalBroadcaseManager
-    //LocalBroadcastManager mLocalBroadcastManager;
-
-    //TrackerService
-    TrackerService mTrackerService;
 
     //cache
     ActivityDetail mActivityDetail;
@@ -172,13 +162,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         if (DEBUG) Log.d(LOG, "onStart");
         super.onStart();
-        //mConnection = BinderServiceConnection.getInstance();
-        //mConnection.doBindService(this, new Intent(MainActivity.this, TrackerService.class));
-
-        // Register to receive Intents with actions.
-        //mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
-        //mLocalBroadcastManager.registerReceiver(
-        //        mMessageReceiver, new IntentFilter(TrackerService.TRACKER_SERVICE_INTENT));
     }
 
     //**********************************************************************************************
@@ -189,8 +172,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         if (DEBUG) Log.d(LOG, "onPause");
 
-        // Unregister since the activity is paused.
-        //mLocalBroadcastManager.unregisterReceiver(mMessageReceiver);
         super.onPause();
     }
 
@@ -203,8 +184,7 @@ public class MainActivity extends AppCompatActivity {
         if (DEBUG) Log.d(LOG, "onResume");
 
         super.onResume();
-        // Register to receive Intents with actions named DATA_SERVICE_INTENT.
-        //mLocalBroadcastManager.registerReceiver(mMessageReceiver, new IntentFilter(TrackerService.TRACKER_SERVICE_INTENT));
+
     }
 
     //**********************************************************************************************
@@ -215,38 +195,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         if (DEBUG) Log.d(LOG, "onDestroy");
 
-        //mConnection.doUnbindService(this);
         super.onDestroy();
     }
-
-    //**********************************************************************************************
-    //  BroadcastReceiver mMessageReceiver
-    //**********************************************************************************************
-
-    // Handler for received Intents. This will be called whenever an Intent
-    // with an action named DATA_SERVICE_INTENT is broadcasted.
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String message = intent.getStringExtra("message");
-
-            if (DEBUG) Log.d(LOG, "BroadcastReceiver - onReceive(): message: " + message);
-
-/*
-            //if this message came from DataService, get the stocklist and previous prices from the Service
-            if(message.equals(TrackerService.TRACKER_SERVICE_UPDATE)){
-
-                if(mConnection.isBound()){
-
-                    mActivityDetail = mConnection.mBoundService.getActivityDetail();
-                    mUserList = mConnection.mBoundService.getUserList();
-
-                    mViewPagerAdapter.notifyDataSetChanged();
-                }
-            }
-            */
-        }
-    };
 
 
     static class ViewPagerAdapter extends FragmentPagerAdapter {
