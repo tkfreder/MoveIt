@@ -32,11 +32,9 @@ public class LocationApi implements LocationListener {
     //LocationRequest settings
     private LocationRequest mLocationRequest;
     private Location mBestReading;
-    private static long POLLING_FREQUENCY = 5 * 1000; //10 seconds
-    private static long FASTEST_POLLING_FREQUENCY = 5 * 1000; //5 second
-    private static long DISPLACEMENT = 1; //meters //displacement takes precedent over interval/fastestInterval
-    private static long STOP_SERVICE_TIME_LIMIT = 30 * 60 * 1000 * 60; // 30 minutes in seconds
-    private static final long LOCATION_ACCURACY = 10; //within # meter accuracy //TODO: change this for better accuracy
+    private static long POLLING_FREQUENCY = 5 * 1000; // in milliseconds
+    private static long FASTEST_POLLING_FREQUENCY = 5 * 1000; // in milliseconds
+    private static final long LOCATION_ACCURACY = 10; //within # meter accuracy
     private boolean mIsTimeLimit = false;
 
 

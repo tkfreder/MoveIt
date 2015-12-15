@@ -10,17 +10,14 @@ import android.location.Location;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Chronometer;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -55,7 +52,6 @@ public class ActivityTracker extends AppCompatActivity {
 
     //CONSTANTS
     private static final float FEET_COIN_CONVERSION = 0.5f;  //2 feet = 1 coin
-    private static final float USERNAME_FONT_SIZE = 20f;
     public static final String ACTIVITY_TRACKER_BROADCAST_RECEIVER = "TRACKER_RECEIVER";
 
     //save all location points during location updates
@@ -116,7 +112,8 @@ public class ActivityTracker extends AppCompatActivity {
 
 
         mActivityDetail = new ActivityDetail();
-        // get UserActivityList from bundle
+
+        // get UserActivityList from intent
         if (getIntent().hasExtra(ActivityChooser.USER_ACTIVITY_LIST)){
 
             ArrayList<UserActivity> userActivityList = getIntent().getParcelableArrayListExtra(ActivityChooser.USER_ACTIVITY_LIST);
@@ -287,32 +284,15 @@ public class ActivityTracker extends AppCompatActivity {
 
                 //TODO: replace with state pattern
                 doStartState(getString(R.string.activity_cancelled));
-
-                //display restart
-                hideAllButtons();
-                mStartButton.setVisibility(View.VISIBLE);
-                mStartButton.setText(getString(R.string.restart));
             }
         });
     }
 
     private void doStartState(String message){
 
-        //clear out user activity list and unitsplit data
-        mActivityDetail = new ActivityDetail();
-        mUnitSplitList = new ArrayList<>();
-
-        //make map visible
-        mMapFragment.makeMap();
-
-        //make start button visible
-        hideAllButtons();
-
-        //counter UI
-        mCounterLayout.setVisibility(View.GONE);
-        resetFields();
-
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        finish();
+        startActivity(new Intent(this, MainActivity.class));
     }
 
     private static void hideAllButtons(){
