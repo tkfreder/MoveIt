@@ -20,4 +20,34 @@ public class UnitConverter{
         return meters * 3.28084f;
     }
 
+    public static float convertMillisecondsToUnits(long milliseconds, TimeUnits toUnits){
+
+        float toValue = 0.0f;
+
+        switch (toUnits){
+
+            case SECONDS:
+                toValue = milliseconds / 1000;
+                break;
+
+            case MINUTES:
+                toValue = milliseconds / (1000 * 60);
+                break;
+
+            case HOURS:
+                toValue = milliseconds / (1000 * 60 * 60);
+                break;
+        }
+
+        return toValue;
+
+    }
+
+    public enum TimeUnits{
+
+        SECONDS,
+        MINUTES,
+        HOURS
+    }
+
 }

@@ -66,7 +66,6 @@ public class ActivityChooser  extends Fragment {
         //get databaseHelper instance
         mDatabaseHelper = FitnessDBHelper.getInstance(mFragmentActivity);
 
-        initializeRecyclerView();
 
         setActionListeners();
 

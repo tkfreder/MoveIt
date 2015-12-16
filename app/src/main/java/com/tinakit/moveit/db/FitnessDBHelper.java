@@ -63,7 +63,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     //ACTIVITIES TABLE
     private static final String TABLE_ACTIVITIES = "Activities";
     private static final String KEY_ACTIVITY_ID = "_id";
-    private static final String KEY_ACTIVITY_USER_ID_FK = "userId";
+    //private static final String KEY_ACTIVITY_USER_ID_FK = "userId";
     private static final String KEY_ACTIVITY_START_LATITUDE = "startLatitude";  //redundant from ACTIVITY_LOCATION_DATA, the latitude of the first location data
     private static final String KEY_ACTIVITY_START_LONGITUDE = "startLongitude"; //redundant from ACTIVITY_LOCATION_DATA, the longitude of the first location data
     private static final String KEY_ACTIVITY_START_DATE = "startDate"; //redundant from ACTIVITY_LOCATION_DATA, the start datetime of the first location data, milliseconds have passed since January 1, 1970, 00:00:00 GMT
@@ -112,6 +112,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     //VIEWS
     private static final String VIEW_REWARDSTATUS_USER = "RewardStatusUser";
     private static final String VIEW_FIRST_LOCATION_POINTS = "FirstLocationPoints";
+    private static final String VIEW_ACTIVITY_USERS_DETAIL = "ActivityUsersDetail";
 
     private static Context mContext;
     private SQLiteDatabase db;
@@ -250,6 +251,23 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 " FROM " + TABLE_ACTIVITIES  + " d" +
                 " INNER JOIN " + TABLE_ACTIVITY_USERS + " a on a." + KEY_ACTIVITY_USERS_ACTIVITY_ID + " = d." + KEY_ACTIVITY_ID;
 
+        String CREATE_VIEW_ACTIVITY_USERS_DETAIL = "CREATE VIEW " + VIEW_ACTIVITY_USERS_DETAIL + " AS" +
+                " SELECT d." + KEY_ACTIVITY_START_DATE +
+                ",d." + KEY_ACTIVITY_END_DATE +
+                ",d." + KEY_ACTIVITY_START_LATITUDE +
+                ",d." + KEY_ACTIVITY_START_LONGITUDE +
+                ",a." + KEY_ACTIVITY_USERS_CALORIE +
+                ",a." + KEY_ACTIVITY_USERS_POINTS +
+                ",u." + KEY_USER_NAME +
+                ",u." + KEY_USER_AVATAR_FILENAME +
+                ",t." + KEY_ACTIVITY_TYPE_NAME +
+                ",t." + KEY_ACTIVITY_TYPE_ICON_FILENAME +
+                ",a." + KEY_ACTIVITY_USERS_ACTIVITY_ID + " AS " + KEY_ACTIVITY_USERS_ACTIVITY_ID +
+                " FROM " + TABLE_ACTIVITIES  + " d" +
+                " INNER JOIN " + TABLE_ACTIVITY_USERS + " a on a." + KEY_ACTIVITY_USERS_ACTIVITY_ID + " = d." + KEY_ACTIVITY_ID +
+                " INNER JOIN " + TABLE_USERS + " u on u." + KEY_ACTIVITY_USERS_ID + " = a." + KEY_ACTIVITY_USERS_USER_ID +
+                " INNER JOIN " + TABLE_ACTIVITY_TYPE + " t on t." + KEY_ACTIVITY_TYPE_ID + " = a." + KEY_ACTIVITY_USERS_ACTIVITY_TYPE_ID_FK;
+
         db.execSQL(CREATE_USERS_TABLE);
         db.execSQL(CREATE_ACTIVITY_USERS_TABLE);
         db.execSQL(CREATE_ACTIVITY_TYPE_TABLE);
@@ -259,6 +277,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_REWARDUSER_TABLE);
         db.execSQL(CREATE_VIEW_REWARDSTATUSUSER);
         db.execSQL(CREATE_VIEW_FIRST_LOCATION_POINTS);
+        db.execSQL(CREATE_VIEW_ACTIVITY_USERS_DETAIL);
 
         //populate ActivityType table
         db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 'walk', 4.6, '1995 world record, walking speed meters/second', 1,'walk',1);");
@@ -328,6 +347,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_REWARDUSER);
             db.execSQL("DROP VIEW IF EXISTS " + VIEW_REWARDSTATUS_USER);
             db.execSQL("DROP VIEF IF EXISTS " + VIEW_FIRST_LOCATION_POINTS);
+            db.execSQL("DROP VIEF IF EXISTS " + VIEW_ACTIVITY_USERS_DETAIL);
             onCreate(db);
 
         }
@@ -628,9 +648,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
         long activityId = -1;
 
-        // Create and/or open the database for writing
-        //SQLiteDatabase db = getWritableDatabase();
-
         // It's a good idea to wrap our insert in a transaction. This helps with performance and ensures
         // consistency of the database.
         db.beginTransaction();
@@ -708,10 +725,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         return activityDetail;
     }
 
-    public List<ActivityDetail> getActivityDetailList(User user){
-
-        // Create and/or open the database for writing
-        //SQLiteDatabase db = getReadableDatabase();
+    public List<ActivityDetail> getActivityDetailList(){
 
         //initialize ActivityType list
         List<ActivityDetail> activityDetailList = new ArrayList<>();
@@ -720,19 +734,50 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
             Cursor cursor = db.query(TABLE_ACTIVITIES,
                     new String[]{KEY_ACTIVITY_ID,KEY_ACTIVITY_START_DATE,KEY_ACTIVITY_END_DATE},
-                    KEY_ACTIVITY_USER_ID_FK + " = ?",
-                    new String[]{String.valueOf(user.getUserId())}, null, null, KEY_ACTIVITY_ID);
+                    null, null, null, null, KEY_ACTIVITY_ID);
 
             try{
 
                 if (cursor.moveToFirst())
                 {
+                    int previousActivityId = 0;;
+                    List<UserActivity> userActivityList = null;
+                    ActivityDetail activityDetail = null;
+
                     do{
-                        ActivityDetail activityDetail = new ActivityDetail();
-                        activityDetail.setActivityId(cursor.getInt(cursor.getColumnIndex(KEY_ACTIVITY_ID)));
-                        activityDetail.setStartDate(new SimpleDateFormat(DATE_FORMAT).parse(cursor.getString(cursor.getColumnIndex(KEY_ACTIVITY_START_DATE))));
-                        activityDetail.setEndDate(new SimpleDateFormat(DATE_FORMAT).parse(cursor.getString(cursor.getColumnIndex(KEY_ACTIVITY_END_DATE))));
-                        activityDetailList.add(activityDetail);
+                        int activityId = cursor.getInt(cursor.getColumnIndex(KEY_ACTIVITY_ID));
+
+                        //start of new record
+                        if (previousActivityId != activityId){
+
+                            // finished populating userActivityList
+                            if (userActivityList.size() > 0){
+                                activityDetailList.add(activityDetail);
+                            }
+
+                            userActivityList = new ArrayList<>();
+                            activityDetail = new ActivityDetail();
+                            activityDetail.setUserActivityList(userActivityList);
+                            activityDetail.setActivityId(activityId);
+                            activityDetail.setStartDate(new SimpleDateFormat(DATE_FORMAT).parse(cursor.getString(cursor.getColumnIndex(KEY_ACTIVITY_START_DATE))));
+                            activityDetail.setEndDate(new SimpleDateFormat(DATE_FORMAT).parse(cursor.getString(cursor.getColumnIndex(KEY_ACTIVITY_END_DATE))));
+
+                        }
+
+                        //build User
+                        User user = new User();
+                        user.setUserName(cursor.getString(cursor.getColumnIndex(KEY_USER_NAME)));
+                        user.setAvatarFileName(cursor.getString(cursor.getColumnIndex(KEY_USER_AVATAR_FILENAME)));
+
+                        //build UserActivity
+                        UserActivity userActivity = new UserActivity(user);
+                        ActivityType activityType = new ActivityType();
+                        activityType.setActivityName(cursor.getString(cursor.getColumnIndex(KEY_ACTIVITY_TYPE_NAME)));
+                        activityType.setIconFileName(cursor.getString(cursor.getColumnIndex(KEY_ACTIVITY_TYPE_ICON_FILENAME)));
+                        userActivity.setActivityType(activityType);
+                        userActivityList.add(userActivity);
+
+                        previousActivityId = activityId;
 
                     } while(cursor.moveToNext());}
 

@@ -97,6 +97,7 @@ public class ActivityTracker extends AppCompatActivity {
     private ActivityDetail mActivityDetail;
     private long mTimeWhenStopped;
     private boolean mSaveLocationData = false;
+    private boolean mHasMapFragment = false;
 
     //database
     FitnessDBHelper mDatabaseHelper;
@@ -321,7 +322,7 @@ public class ActivityTracker extends AppCompatActivity {
         mSaveLocationData = true;
 
         //start accelerometer listener, after a delay of ACCELEROMETER_DELAY
-        mAccelerometer.registerAccelerometer();
+        mAccelerometer.start();
 
         //chronometer settings, set base time to time when paused ChronometerUtility.elapsedTime()
         mChronometerUtility.resume(mTimeWhenStopped);
@@ -506,9 +507,12 @@ public class ActivityTracker extends AppCompatActivity {
                 // only show Start button after connecting to Google Api Client
                 mStartButton.setVisibility(View.VISIBLE);
 
-                //add map
-                mMapFragment = new MapFragment(getSupportFragmentManager(), mGoogleApi);
-                mMapFragment.addMap(mContainer);
+                //add map once
+                if (mHasMapFragment == false){
+                    mMapFragment = new MapFragment(getSupportFragmentManager(), mGoogleApi);
+                    mMapFragment.addMap(mContainer);
+                    mHasMapFragment = true;
+                }
 
             }
             else if (message.equals(LocationApi.LOCATION_API_INTENT)){
@@ -535,7 +539,7 @@ public class ActivityTracker extends AppCompatActivity {
                 pauseTracking();
 
                 //disable accelerometer listener
-                mAccelerometer.unregisterAccelerometer();
+                mAccelerometer.stop();
 
                 //display warning message that no movement has been detected
                 DialogUtility.displayAlertDialog(context, getResources().getString(R.string.warning), getResources().getString(R.string.no_movement), getResources().getString(R.string.ok));
@@ -593,7 +597,7 @@ public class ActivityTracker extends AppCompatActivity {
         if (DEBUG) Log.d(LOG, "onDestroy");
         super.onDestroy();
 
-        mAccelerometer.unregisterAccelerometer();
+        mAccelerometer.stop();
     }
 
     //**********************************************************************************************

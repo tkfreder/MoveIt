@@ -15,17 +15,14 @@ import android.os.Parcel;
 public class ActivityDetail implements Parcelable {
 
     private int mActivityId;
-    private List<UserActivity> mUserActivityList;
+    private List<UserActivity> mUserActivityList = new ArrayList<>();;
     private LatLng mStartLocation;
     private Date mStartDate;  //"YYYY-MM-DD HH:MM:SS.SSS"
     private Date mEndDate;  //"YYYY-MM-DD HH:MM:SS.SSS"
     private float mDistanceInFeet;
     private float mBearing;
 
-    public ActivityDetail(){
-
-        mUserActivityList = new ArrayList<>();
-    }
+    public ActivityDetail(){}
 
     public int getActivityId() {
         return mActivityId;
@@ -38,6 +35,11 @@ public class ActivityDetail implements Parcelable {
     public List<UserActivity> getUserActivityList(){
 
         return mUserActivityList;
+    }
+
+    public void addUserActivity(UserActivity userActivity){
+
+        mUserActivityList.add(userActivity);
     }
 
     public void setUserActivityList(List<UserActivity> userActivityList){

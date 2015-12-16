@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 
 import com.tinakit.moveit.fragment.ActivityChooser;
+import com.tinakit.moveit.fragment.ActivityHistory;
 import com.tinakit.moveit.model.ActivityDetail;
 
 /**
@@ -180,10 +181,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager){
 
+        // FIRST TAB
         mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         mViewPagerAdapter.addFrag(new ActivityChooser(), "START");
 
-        //add user screens
+        // SECOND TAB
+        mViewPagerAdapter.addFrag(new ActivityHistory(), "ACTIVITIES");
+
+
+        // USER TABS
         FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(this);
         List<User> userList = databaseHelper.getUsers();
 
