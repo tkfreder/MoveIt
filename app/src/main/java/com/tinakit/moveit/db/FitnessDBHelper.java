@@ -252,16 +252,16 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 " INNER JOIN " + TABLE_ACTIVITY_USERS + " a on a." + KEY_ACTIVITY_USERS_ACTIVITY_ID + " = d." + KEY_ACTIVITY_ID;
 
         String CREATE_VIEW_ACTIVITY_USERS_DETAIL = "CREATE VIEW " + VIEW_ACTIVITY_USERS_DETAIL + " AS" +
-                " SELECT d." + KEY_ACTIVITY_START_DATE +
-                ",d." + KEY_ACTIVITY_END_DATE +
-                ",d." + KEY_ACTIVITY_START_LATITUDE +
-                ",d." + KEY_ACTIVITY_START_LONGITUDE +
-                ",a." + KEY_ACTIVITY_USERS_CALORIE +
-                ",a." + KEY_ACTIVITY_USERS_POINTS +
-                ",u." + KEY_USER_NAME +
-                ",u." + KEY_USER_AVATAR_FILENAME +
-                ",t." + KEY_ACTIVITY_TYPE_NAME +
-                ",t." + KEY_ACTIVITY_TYPE_ICON_FILENAME +
+                " SELECT d." + KEY_ACTIVITY_START_DATE + " AS " + KEY_ACTIVITY_START_DATE +
+                ",d." + KEY_ACTIVITY_END_DATE + " AS " + KEY_ACTIVITY_END_DATE +
+                ",d." + KEY_ACTIVITY_START_LATITUDE + " AS " + KEY_ACTIVITY_START_LATITUDE +
+                ",d." + KEY_ACTIVITY_START_LONGITUDE + " AS " + KEY_ACTIVITY_START_LONGITUDE +
+                ",a." + KEY_ACTIVITY_USERS_CALORIE + " AS " + KEY_ACTIVITY_USERS_CALORIE +
+                ",a." + KEY_ACTIVITY_USERS_POINTS + " AS " + KEY_ACTIVITY_USERS_POINTS +
+                ",u." + KEY_USER_NAME + " AS " + KEY_USER_NAME +
+                ",u." + KEY_USER_AVATAR_FILENAME + " AS " + KEY_USER_AVATAR_FILENAME +
+                ",t." + KEY_ACTIVITY_TYPE_NAME + " AS " + KEY_ACTIVITY_TYPE_NAME +
+                ",t." + KEY_ACTIVITY_TYPE_ICON_FILENAME + " AS " + KEY_ACTIVITY_TYPE_ICON_FILENAME +
                 ",a." + KEY_ACTIVITY_USERS_ACTIVITY_ID + " AS " + KEY_ACTIVITY_USERS_ACTIVITY_ID +
                 " FROM " + TABLE_ACTIVITIES  + " d" +
                 " INNER JOIN " + TABLE_ACTIVITY_USERS + " a on a." + KEY_ACTIVITY_USERS_ACTIVITY_ID + " = d." + KEY_ACTIVITY_ID +
@@ -280,12 +280,12 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_VIEW_ACTIVITY_USERS_DETAIL);
 
         //populate ActivityType table
-        db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 'walk', 4.6, '1995 world record, walking speed meters/second', 1,'walk',1);");
-        db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 'run', 12.4, '2009 world record, running speed meters/second', 2,'run', 1);");
-        db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 'scooter', 5.0, 'estimate based on 20 km/h, world record does not exist', 3,'scooter', 1);");
-        db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 'bike', 74.7,'1985 world record, cycling speed meters/second',4,'bike', 1);");
-        db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 'hike', 4.6,'1995 world record, walking speed meters/second', 5,'hike', 1);");
-        db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 'swim', 2.3,'1990 world record, swimming speed meters/second', 6,'swim', 1);");
+        db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 'walk', 4.6, '1995 world record, walking speed meters/second', 1,'walk_48',1);");
+        db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 'run', 12.4, '2009 world record, running speed meters/second', 2,'run_48', 1);");
+        db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 'scooter', 5.0, 'estimate based on 20 km/h, world record does not exist', 3,'scooter_48', 1);");
+        db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 'bike', 74.7,'1985 world record, cycling speed meters/second',4,'bike_48', 1);");
+        db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 'hike', 4.6,'1995 world record, walking speed meters/second', 5,'hike_48', 1);");
+        //db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 'swim', 2.3,'1990 world record, swimming speed meters/second', 6,'swim_48', 1);");
 
         //TODO: DUMMY DATA
         //populate Rewards table
@@ -725,37 +725,50 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         return activityDetail;
     }
 
-    public List<ActivityDetail> getActivityDetailList(){
+    public ArrayList<ActivityDetail> getActivityDetailList(){
 
         //initialize ActivityType list
-        List<ActivityDetail> activityDetailList = new ArrayList<>();
+        ArrayList<ActivityDetail> activityDetailList = new ArrayList<>();
 
         try {
 
-            Cursor cursor = db.query(TABLE_ACTIVITIES,
-                    new String[]{KEY_ACTIVITY_ID,KEY_ACTIVITY_START_DATE,KEY_ACTIVITY_END_DATE},
-                    null, null, null, null, KEY_ACTIVITY_ID);
+            Cursor cursor = db.query(VIEW_ACTIVITY_USERS_DETAIL,
+                    new String[]{KEY_ACTIVITY_START_DATE
+                        ,KEY_ACTIVITY_END_DATE
+                        ,KEY_ACTIVITY_START_LATITUDE
+                        ,KEY_ACTIVITY_START_LONGITUDE
+                        ,KEY_ACTIVITY_USERS_CALORIE
+                        ,KEY_ACTIVITY_USERS_POINTS
+                        ,KEY_USER_NAME
+                        ,KEY_USER_AVATAR_FILENAME
+                        ,KEY_ACTIVITY_TYPE_NAME
+                        ,KEY_ACTIVITY_TYPE_ICON_FILENAME
+                        ,KEY_ACTIVITY_USERS_ACTIVITY_ID},
+                    null, null, null, null, KEY_ACTIVITY_USERS_ACTIVITY_ID);
 
-            try{
 
-                if (cursor.moveToFirst())
-                {
-                    int previousActivityId = 0;;
+
+            try {
+
+                if (cursor.moveToFirst()) {
+                    int previousActivityId = 0;
+
                     List<UserActivity> userActivityList = null;
                     ActivityDetail activityDetail = null;
 
-                    do{
-                        int activityId = cursor.getInt(cursor.getColumnIndex(KEY_ACTIVITY_ID));
+                    do {
+                        int activityId = cursor.getInt(cursor.getColumnIndex(KEY_ACTIVITY_USERS_ACTIVITY_ID));
 
                         //start of new record
-                        if (previousActivityId != activityId){
+                        if (previousActivityId != activityId) {
+
+                            userActivityList = new ArrayList<>();
 
                             // finished populating userActivityList
-                            if (userActivityList.size() > 0){
+                            if (userActivityList.size() > 0) {
                                 activityDetailList.add(activityDetail);
                             }
 
-                            userActivityList = new ArrayList<>();
                             activityDetail = new ActivityDetail();
                             activityDetail.setUserActivityList(userActivityList);
                             activityDetail.setActivityId(activityId);
@@ -779,7 +792,12 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
                         previousActivityId = activityId;
 
-                    } while(cursor.moveToNext());}
+                    } while (cursor.moveToNext());
+
+                    //this adds the last activityDetail that was populated
+                    activityDetailList.add(activityDetail);
+                }
+
 
             }catch(Exception exception) {
 

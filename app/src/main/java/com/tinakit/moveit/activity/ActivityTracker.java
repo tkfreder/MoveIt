@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.fragment.ActivityChooser;
+import com.tinakit.moveit.fragment.ActivityHistory;
 import com.tinakit.moveit.fragment.MapFragment;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.UnitSplit;
@@ -52,7 +53,7 @@ public class ActivityTracker extends AppCompatActivity {
     private static final boolean DEBUG = true;
 
     //CONSTANTS
-    private static final float FEET_COIN_CONVERSION = 0.05f;  //20 feet = 1 coin
+    private static final float FEET_COIN_CONVERSION = 1.0f;//0.05f;  //20 feet = 1 coin
     public static final String ACTIVITY_TRACKER_BROADCAST_RECEIVER = "TRACKER_RECEIVER";
 
     //save all location points during location updates
@@ -113,8 +114,7 @@ public class ActivityTracker extends AppCompatActivity {
         // get UserActivityList from intent
         if (!getIntent().hasExtra(ActivityChooser.USER_ACTIVITY_LIST)) {
 
-            //redirect back to ActivityChooser to get UserActivityList
-            startActivity(new Intent(this, MainActivity.class));
+            startActivity(new Intent(this, ActivityChooser.class));
         }
 
         else {

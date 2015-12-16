@@ -1,6 +1,7 @@
 package com.tinakit.moveit.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -33,10 +34,14 @@ import fr.ganfra.materialspinner.MaterialSpinner;
  */
 public class ActivityHistory extends Fragment {
 
+    // CONSTANTS
+    public static final String ACTIVITY_HISTORY = "ACTIVIY_HISTORY";
+
     //INSTANCE FIELDS
     FragmentActivity mFragmentActivity;
     FitnessDBHelper mDatabaseHelper;
     ActivityHistoryRecyclerAdapter mActivityHistoryRecyclerAdapter;
+    private List<ActivityDetail> mActivityDetailList;
 
 
     // UI COMPONENTS
@@ -56,12 +61,35 @@ public class ActivityHistory extends Fragment {
 
         initializeRecyclerView();
 
+        fetchData();
+
         return rootView;
+    }
+
+    private void fetchData(){
+
+        // get UserActivityList from intent
+
+        Bundle bundle = this.getArguments();
+        if (bundle.containsKey(ACTIVITY_HISTORY)){
+
+            mActivityDetailList = bundle.getParcelableArrayList(ACTIVITY_HISTORY);
+
+            // if this is the first time, there will be data in the bundle
+            if (mActivityDetailList == null){
+
+                // fetch directly from the database
+                mActivityDetailList = mDatabaseHelper.getActivityDetailList();
+            }
+        }
+
     }
 
     private void initializeRecyclerView(){
 
-        //RecyclerView
+
+        //List<ActivityDetail> activityDetailList = mDatabaseHelper.getActivityDetailList();
+
         // Initialize recycler view
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true); //child items have fixed dimensions, allows the RecyclerView to optimize better by figuring out the exact height and width of the entire list based on the adapter.
@@ -69,7 +97,7 @@ public class ActivityHistory extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mFragmentActivity);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(linearLayoutManager);
-        mActivityHistoryRecyclerAdapter = new ActivityHistoryRecyclerAdapter(mFragmentActivity);
+        mActivityHistoryRecyclerAdapter = new ActivityHistoryRecyclerAdapter(mFragmentActivity, mActivityDetailList);
         mRecyclerView.setAdapter(mActivityHistoryRecyclerAdapter);
 
     }
@@ -77,12 +105,12 @@ public class ActivityHistory extends Fragment {
     public class ActivityHistoryRecyclerAdapter extends RecyclerView.Adapter<ActivityHistoryRecyclerAdapter.CustomViewHolder> {
 
         private Context mContext;
-        private List<ActivityDetail> mActivityDetailList;
 
-        public ActivityHistoryRecyclerAdapter(Context context) {
+
+        public ActivityHistoryRecyclerAdapter(Context context, List<ActivityDetail> activityDetailList) {
 
             mContext = context;
-            mActivityDetailList = mDatabaseHelper.getActivityDetailList();
+            mActivityDetailList = activityDetailList;
         }
 
         @Override
@@ -110,8 +138,7 @@ public class ActivityHistory extends Fragment {
         @Override
         public ActivityHistoryRecyclerAdapter.CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
 
-            //View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.participant_activity_list_item, null);
-            View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.participant_activity_list_item, viewGroup, false);
+            View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.activity_history_list_item, viewGroup, false);
 
             CustomViewHolder viewHolder = new CustomViewHolder(view);
             return viewHolder;
@@ -123,7 +150,9 @@ public class ActivityHistory extends Fragment {
             ActivityDetail activityDetail = mActivityDetailList.get(i);
 
             customViewHolder.date.setText(DateUtility.getDateFormattedRecent(activityDetail.getStartDate(), 7));
-            customViewHolder.minutesElapsed.setText(String.valueOf(UnitConverter.convertMillisecondsToUnits(activityDetail.getEndDate().getTime() - activityDetail.getStartDate().getTime(), UnitConverter.TimeUnits.MINUTES)));
+            float minutes = UnitConverter.convertMillisecondsToUnits(activityDetail.getEndDate().getTime() - activityDetail.getStartDate().getTime(), UnitConverter.TimeUnits.MINUTES);
+            String minutesElapsed = String.valueOf(minutes);
+            customViewHolder.minutesElapsed.setText(minutesElapsed);
 
             for (UserActivity userActivity : activityDetail.getUserActivityList()){
 
@@ -135,6 +164,7 @@ public class ActivityHistory extends Fragment {
                 activityIcon.setImageResource(getResources().getIdentifier(userActivity.getActivityType().getIconFileName(), "drawable", mFragmentActivity.getPackageName()));
                 customViewHolder.activityLinearLayout.addView(activityIcon);
             }
+
         }
     }
 }

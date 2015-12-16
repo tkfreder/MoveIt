@@ -1,35 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="match_parent"
+              android:orientation="horizontal">
 
     <TextView
         android:id="@+id/date"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="2"
+        android:layout_weight="1"
+        style="@style/LabelListItemPurple"
         />
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:orientation="horizontal">
         <TextView
-            android:id="@+id/minutesElapsed"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"/>
+        android:id="@+id/minutesElapsed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/LabelListItemPurple"/>
 
-        <ImageView
-            android:scaleType="fitCenter"
-            android:layout_width="match_parent"
-            android:layout_height="20dp"
-            android:src="@drawable/gold_coin"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="min."
+            style="@style/LabelListItemPurple"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="3"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_weight="4">
         <LinearLayout
             android:id="@+id/userLinearLayout"
             android:layout_width="match_parent"
@@ -43,4 +46,4 @@
             android:orientation="horizontal"
             />
     </LinearLayout>
-</FrameLayout>
+</LinearLayout>

@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     protected int mCurrentTab;
 
     //cache
-    ActivityDetail mActivityDetail;
+    ArrayList<ActivityDetail> mActivityDetailList;
     List<User> mUserList;
 
     @Override
@@ -56,6 +56,25 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        initializeUI();
+
+        fetchData();
+
+
+
+    }
+
+    private void fetchData(){
+
+        FitnessDBHelper mDatabaseHelper = FitnessDBHelper.getInstance(this);
+
+        //data for ActivityHistory
+        mActivityDetailList = mDatabaseHelper.getActivityDetailList();
+
+    }
+
+    private void initializeUI(){
 
         //ViewPager
         viewPager = (ViewPager)findViewById(R.id.tab_viewpager);
@@ -186,8 +205,11 @@ public class MainActivity extends AppCompatActivity {
         mViewPagerAdapter.addFrag(new ActivityChooser(), "START");
 
         // SECOND TAB
-        mViewPagerAdapter.addFrag(new ActivityHistory(), "ACTIVITIES");
-
+        Fragment ActivityHistoryFragment = new ActivityHistory();
+        Bundle bundle = new Bundle();
+        bundle.putParcelableArrayList(ActivityHistory.ACTIVITY_HISTORY, mActivityDetailList);
+        ActivityHistoryFragment.setArguments(bundle);
+        mViewPagerAdapter.addFrag(ActivityHistoryFragment, "HISTORY");
 
         // USER TABS
         FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(this);
