@@ -762,7 +762,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                         //start of new record
                         if (previousActivityId != activityId) {
 
-                            // finished populating userActivityList
+                            // finished populating userActivityList from previous iteration, now add it to the list
                             if (activityDetail.getUserActivityList().size() > 0) {
                                 activityDetailList.add(activityDetail);
                                 activityDetail = new ActivityDetail();

@@ -47,6 +47,7 @@ public class ActivityHistory extends Fragment {
     // UI COMPONENTS
     View rootView;
     RecyclerView mRecyclerView;
+    TextView mNoActivities;
 
     @Nullable
     @Override
@@ -59,7 +60,7 @@ public class ActivityHistory extends Fragment {
         //get databaseHelper instance
         mDatabaseHelper = FitnessDBHelper.getInstance(mFragmentActivity);
 
-        initializeRecyclerView();
+        initializeUI();
 
         fetchData();
 
@@ -80,15 +81,29 @@ public class ActivityHistory extends Fragment {
 
                 // fetch directly from the database
                 mActivityDetailList = mDatabaseHelper.getActivityDetailList();
+
+                if (mActivityDetailList.size() == 0)
+                    mNoActivities.setVisibility(View.VISIBLE);
+                else
+                    mNoActivities.setVisibility(View.GONE);
+
             }
         }
+        // display no-activities message
+        else{
+            mNoActivities.setVisibility(View.VISIBLE);
+        }
+
 
     }
 
-    private void initializeRecyclerView(){
+    private void initializeUI(){
 
 
         //List<ActivityDetail> activityDetailList = mDatabaseHelper.getActivityDetailList();
+
+        //noActivities TextView
+        mNoActivities = (TextView)rootView.findViewById(R.id.noActivities);
 
         // Initialize recycler view
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
@@ -123,7 +138,6 @@ public class ActivityHistory extends Fragment {
             TextView date;
             TextView minutesElapsed;
             LinearLayout userLinearLayout;
-            LinearLayout activityLinearLayout;
 
             public CustomViewHolder(View view) {
 
@@ -131,7 +145,6 @@ public class ActivityHistory extends Fragment {
                 this.date = (TextView)view.findViewById(R.id.date);
                 this.minutesElapsed = (TextView)view.findViewById(R.id.minutesElapsed);
                 this.userLinearLayout = (LinearLayout)view.findViewById(R.id.userLinearLayout);
-                this.activityLinearLayout = (LinearLayout)view.findViewById(R.id.activityLinearLayout);
             }
         }
 
@@ -160,9 +173,6 @@ public class ActivityHistory extends Fragment {
                 avatar.setImageResource(getResources().getIdentifier(userActivity.getUser().getAvatarFileName(), "drawable", mFragmentActivity.getPackageName()));
                 customViewHolder.userLinearLayout.addView(avatar);
 
-                ImageView activityIcon = new ImageView(mContext);
-                activityIcon.setImageResource(getResources().getIdentifier(userActivity.getActivityType().getIconFileName(), "drawable", mFragmentActivity.getPackageName()));
-                customViewHolder.activityLinearLayout.addView(activityIcon);
             }
 
         }
