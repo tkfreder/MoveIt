@@ -1,5 +1,6 @@
 package com.tinakit.moveit.activity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -53,17 +54,18 @@ public class ActivityTracker extends AppCompatActivity {
     private static final boolean DEBUG = true;
 
     //CONSTANTS
-    private static final float FEET_COIN_CONVERSION = 1.0f;//0.05f;  //20 feet = 1 coin
     public static final String ACTIVITY_TRACKER_BROADCAST_RECEIVER = "TRACKER_RECEIVER";
+    public static final int ACTIVITY_TRACKER_STARTED = 1;
+    private static final float FEET_COIN_CONVERSION = 1.0f;//0.05f;  //20 feet = 1 coin
+    private static long STOP_SERVICE_TIME_LIMIT = 30 * 60 * 1000 * 60; // 30 minutes in seconds
 
     //save all location points during location updates
     private List<UnitSplit> mUnitSplitList = new ArrayList<>();
     private int mTotalPoints = 0;
-
     protected static boolean mRequestedService = false;
-    long mTimeElapsed = 0; //in seconds
-    private static long STOP_SERVICE_TIME_LIMIT = 30 * 60 * 1000 * 60; // 30 minutes in seconds
+    private long mTimeElapsed = 0; //in seconds
     private boolean mIsTimeLimit = false;
+    private Intent mIntent;
 
     // APIs
     private LocationApi mLocationApi;
@@ -111,13 +113,9 @@ public class ActivityTracker extends AppCompatActivity {
         setContentView(R.layout.activity_tracker);
         setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        // get UserActivityList from intent
-        if (!getIntent().hasExtra(ActivityChooser.USER_ACTIVITY_LIST)) {
-
-            startActivity(new Intent(this, ActivityChooser.class));
-        }
-
-        else {
+        // check whether previous screen was ActivityChooser
+        mIntent = getIntent();
+        if (mIntent.hasExtra(ActivityChooser.USER_ACTIVITY_LIST)) {
 
             initializeUI();
 
@@ -156,9 +154,14 @@ public class ActivityTracker extends AppCompatActivity {
         //get databaseHelper instance
         mDatabaseHelper = FitnessDBHelper.getInstance(this);
 
+        // get user list from intent
         mActivityDetail = new ActivityDetail();
         ArrayList<UserActivity> userActivityList = getIntent().getParcelableArrayListExtra(ActivityChooser.USER_ACTIVITY_LIST);
         mActivityDetail.setUserActivityList(userActivityList);
+
+        // will clear out values in ActivityChooser, once start run, refer to startRun()
+        // clear out Intent values for UserActivityList
+        getIntent().putParcelableArrayListExtra(ActivityChooser.USER_ACTIVITY_LIST, null);
     }
 
     protected void initializeUI(){
@@ -188,6 +191,9 @@ public class ActivityTracker extends AppCompatActivity {
 
         mStartButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+
+                // finish ActivityChooser
+                setResult(ACTIVITY_TRACKER_STARTED, mIntent);
 
                 startRun();
 

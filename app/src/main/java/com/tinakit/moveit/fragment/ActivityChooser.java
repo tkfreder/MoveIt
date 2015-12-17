@@ -41,11 +41,14 @@ public class ActivityChooser  extends Fragment {
 
     // CONSTANTS
     public static final String USER_ACTIVITY_LIST = "USER_ACTIVITY_LIST";
+
+    // local cache
     protected static List<ActivityType> mActivityTypeList;
     public static ActivityDetail mActivityDetail = new ActivityDetail();
     protected FragmentActivity mFragmentActivity;
     private View rootView;
     ArrayList<UserActivity> mUserActivityList = new ArrayList<>();
+    List<UserActivity> mUserActivityList_previous;
 
     // UI COMPONENTS
     protected RecyclerView mRecyclerView;
@@ -66,7 +69,7 @@ public class ActivityChooser  extends Fragment {
         //get databaseHelper instance
         mDatabaseHelper = FitnessDBHelper.getInstance(mFragmentActivity);
 
-        initializeRecyclerView();
+        initializeUI();
 
         setActionListeners();
 
@@ -82,16 +85,25 @@ public class ActivityChooser  extends Fragment {
 
                 Intent intent = new Intent(mFragmentActivity, ActivityTracker.class);
                 intent.putParcelableArrayListExtra(USER_ACTIVITY_LIST, mUserActivityList);
-                startActivity(intent);
+
+                //using startActivityForResult, allow an event in ActivityTracker to finish this activity
+                startActivityForResult(intent, ActivityTracker.ACTIVITY_TRACKER_STARTED);
             }
         });
     }
 
-    private void initializeRecyclerView(){
+    private void initializeUI(){
 
         // Get userlist
         List<User> userList = mDatabaseHelper.getUsers();
         mActivityTypeList = mDatabaseHelper.getActivityTypes();
+
+        // Get cached values for user list, if any
+        if (mFragmentActivity.getIntent().hasExtra(ActivityChooser.USER_ACTIVITY_LIST)) {
+
+            mUserActivityList_previous = mFragmentActivity.getIntent().getParcelableArrayListExtra(ActivityChooser.USER_ACTIVITY_LIST);
+
+        }
 
         //RecyclerView
         // Initialize recycler view
@@ -101,7 +113,7 @@ public class ActivityChooser  extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mFragmentActivity);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(linearLayoutManager);
-        mRecyclerViewAdapter = new MultiChooserRecyclerAdapter(mFragmentActivity, userList);
+        mRecyclerViewAdapter = new MultiChooserRecyclerAdapter(mFragmentActivity, userList, mUserActivityList_previous);
         mRecyclerView.setAdapter(mRecyclerViewAdapter);
 
     }
@@ -110,13 +122,16 @@ public class ActivityChooser  extends Fragment {
 
         private Context mContext;
         private List<User> mUserList;
-        String[] activityList;
+        private String[] activityList;
+        private List<UserActivity> mUserActivityList_previous;
 
 
-        public MultiChooserRecyclerAdapter(Context context, List<User> userList) {
+
+        public MultiChooserRecyclerAdapter(Context context, List<User> userList, List<UserActivity> userActivityList_previous) {
 
             mContext = context;
             mUserList = userList;
+            mUserActivityList_previous = userActivityList_previous;
 
             //initialize string array for ActivityType list
             activityList = new String[mActivityTypeList.size() + 1];
@@ -166,6 +181,7 @@ public class ActivityChooser  extends Fragment {
         public void onBindViewHolder(MultiChooserRecyclerAdapter.CustomViewHolder customViewHolder, int i) {
 
             User user = mUserList.get(i);
+            String activityTypeName = "";
 
             // Populate data from ActivityType data object
             customViewHolder.avatar.setImageResource(getResources().getIdentifier(user.getAvatarFileName(), "drawable", mFragmentActivity.getPackageName()));
@@ -179,6 +195,19 @@ public class ActivityChooser  extends Fragment {
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             customViewHolder.activitySpinner.setAdapter(adapter);
 
+            if (mUserActivityList_previous != null && mUserActivityList_previous.contains(new UserActivity(user))){
+
+                int index = mUserActivityList_previous.indexOf(new UserActivity(user));
+                activityTypeName = mUserActivityList_previous.get(index).getActivityType().getActivityName();
+
+                //set ActivityType if exists for this user
+                if (!activityTypeName.equals("")){
+                    int position = adapter.getPosition(activityTypeName);
+                    customViewHolder.activitySpinner.setSelection(position);
+                }
+            }
+
+
             customViewHolder.activitySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -188,10 +217,10 @@ public class ActivityChooser  extends Fragment {
 
 
                     // if non-participant was chosen, remove this user from UserActivityList if user is on the list
-                    if (position == 0){
+                    if (position == 0) {
 
                         // if user exists on participant list, remove the user
-                        if (mUserActivityList.size() > 0 && mUserActivityList.contains(userActivity)){
+                        if (mUserActivityList.size() > 0 && mUserActivityList.contains(userActivity)) {
 
                             mUserActivityList.remove(mUserActivityList.indexOf(userActivity));
                         }
@@ -206,7 +235,7 @@ public class ActivityChooser  extends Fragment {
                         mUserActivityList.add(userActivity);
                     }
                     // if user does not already exist, add the user to the list
-                    else{
+                    else {
 
                         //add the activitytype if it's not "non-participating"
                         //decrement index in order to compensate for addition of "Not participating" option at index = 0, see line 169

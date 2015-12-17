@@ -197,6 +197,8 @@ public class MainActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position){
             return mFragmentTitleList.get(position);
         }
+
+
     }
 
     private void setupViewPager(ViewPager viewPager){
@@ -232,6 +234,8 @@ public class MainActivity extends AppCompatActivity {
 
         mViewPagerAdapter.addFrag(new EditRewardFragment(), "REWARDS");
         viewPager.setAdapter(mViewPagerAdapter);
+
+
     }
 
     @Override
@@ -265,5 +269,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == ActivityTracker.ACTIVITY_TRACKER_STARTED)
+            finish();
     }
 }
