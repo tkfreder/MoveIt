@@ -753,8 +753,8 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 if (cursor.moveToFirst()) {
                     int previousActivityId = 0;
 
-                    List<UserActivity> userActivityList = null;
-                    ActivityDetail activityDetail = null;
+                    //List<UserActivity> userActivityList = new ArrayList<>();
+                    ActivityDetail activityDetail = new ActivityDetail();
 
                     do {
                         int activityId = cursor.getInt(cursor.getColumnIndex(KEY_ACTIVITY_USERS_ACTIVITY_ID));
@@ -762,15 +762,13 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                         //start of new record
                         if (previousActivityId != activityId) {
 
-                            userActivityList = new ArrayList<>();
-
                             // finished populating userActivityList
-                            if (userActivityList.size() > 0) {
+                            if (activityDetail.getUserActivityList().size() > 0) {
                                 activityDetailList.add(activityDetail);
+                                activityDetail = new ActivityDetail();
                             }
 
-                            activityDetail = new ActivityDetail();
-                            activityDetail.setUserActivityList(userActivityList);
+                            //activityDetail.setUserActivityList(userActivityList);
                             activityDetail.setActivityId(activityId);
                             activityDetail.setStartDate(new SimpleDateFormat(DATE_FORMAT).parse(cursor.getString(cursor.getColumnIndex(KEY_ACTIVITY_START_DATE))));
                             activityDetail.setEndDate(new SimpleDateFormat(DATE_FORMAT).parse(cursor.getString(cursor.getColumnIndex(KEY_ACTIVITY_END_DATE))));
@@ -788,7 +786,8 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                         activityType.setActivityName(cursor.getString(cursor.getColumnIndex(KEY_ACTIVITY_TYPE_NAME)));
                         activityType.setIconFileName(cursor.getString(cursor.getColumnIndex(KEY_ACTIVITY_TYPE_ICON_FILENAME)));
                         userActivity.setActivityType(activityType);
-                        userActivityList.add(userActivity);
+                        //userActivityList.add(userActivity);
+                        activityDetail.addUserActivity(userActivity);
 
                         previousActivityId = activityId;
 

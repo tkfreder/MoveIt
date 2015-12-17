@@ -62,8 +62,6 @@ public class MainActivity extends AppCompatActivity {
 
         fetchData();
 
-
-
     }
 
     private void fetchData(){
