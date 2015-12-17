@@ -31,6 +31,7 @@ import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.fragment.EditRewardFragment;
 import com.tinakit.moveit.fragment.RewardViewFragment;
 import com.tinakit.moveit.model.User;
+import com.tinakit.moveit.tab.SlidingTabLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,8 +84,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //TabLayout
-        TabLayout tabLayout = (TabLayout)findViewById(R.id.tabLayout);
-        tabLayout.setupWithViewPager(viewPager);
+        //TabLayout tabLayout = (TabLayout)findViewById(R.id.tabLayout);
+        //tabLayout.setupWithViewPager(viewPager);
+        SlidingTabLayout slidingTabLayout = (SlidingTabLayout)findViewById(R.id.tabLayout);
+        slidingTabLayout.setViewPager(viewPager);
 
         //set tab index if this is redirected
         //int defaultValue = 0;
@@ -93,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
             viewPager.setCurrentItem((int)getIntent().getExtras().get("tab_index"));
         }
 
-
+/*
         //OnTabSelected Listener
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -123,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
+*/
     }
 
     //**********************************************************************************************
