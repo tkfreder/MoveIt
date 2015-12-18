@@ -50,12 +50,14 @@ import com.tinakit.moveit.utility.UnitConverter;
 public class ActivityTracker extends AppCompatActivity {
 
     //DEBUG
-    private static final String LOG = "MAIN_ACTIVITY";
+    private static final String LOG = "ACTIVITY_TRACKER";
     private static final boolean DEBUG = true;
 
     //CONSTANTS
     public static final String ACTIVITY_TRACKER_BROADCAST_RECEIVER = "TRACKER_RECEIVER";
-    public static final int ACTIVITY_TRACKER_STARTED = 1;
+    public static final String ACTIVITY_TRACKER_STARTED = "ACTIVITY_TRACKER_STARTED";
+    public static final String ACTIVITY_TRACKER_INTENT = "ACTIVITY_TRACKER_INTENT";
+
     private static final float FEET_COIN_CONVERSION = 1.0f;//0.05f;  //20 feet = 1 coin
     private static long STOP_SERVICE_TIME_LIMIT = 30 * 60 * 1000 * 60; // 30 minutes in seconds
 
@@ -159,9 +161,6 @@ public class ActivityTracker extends AppCompatActivity {
         ArrayList<UserActivity> userActivityList = getIntent().getParcelableArrayListExtra(ActivityChooser.USER_ACTIVITY_LIST);
         mActivityDetail.setUserActivityList(userActivityList);
 
-        // will clear out values in ActivityChooser, once start run, refer to startRun()
-        // clear out Intent values for UserActivityList
-        getIntent().putParcelableArrayListExtra(ActivityChooser.USER_ACTIVITY_LIST, null);
     }
 
     protected void initializeUI(){
@@ -192,8 +191,12 @@ public class ActivityTracker extends AppCompatActivity {
         mStartButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
-                // finish ActivityChooser
-                setResult(ACTIVITY_TRACKER_STARTED, mIntent);
+                // close MainActivity so ActivityChooser values are not saved
+                // once tracking is saved or cancelled, MainActivity will be called
+                // send message to indicate there is new location data
+                Intent intent = new Intent(ACTIVITY_TRACKER_INTENT);
+                intent.putExtra(MainActivity.MAIN_ACTIVITY_BROADCAST_RECEIVER, ACTIVITY_TRACKER_INTENT);
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 
                 startRun();
 

@@ -3,17 +3,23 @@ package com.tinakit.moveit.activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 //import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 
+import com.tinakit.moveit.api.Accelerometer;
+import com.tinakit.moveit.api.GoogleApi;
+import com.tinakit.moveit.api.LocationApi;
 import com.tinakit.moveit.fragment.ActivityChooser;
 import com.tinakit.moveit.fragment.ActivityHistory;
+import com.tinakit.moveit.fragment.MapFragment;
 import com.tinakit.moveit.model.ActivityDetail;
 
 /**
@@ -25,6 +31,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 
 import android.view.MenuItem;
+import android.view.View;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.db.FitnessDBHelper;
@@ -32,6 +39,7 @@ import com.tinakit.moveit.fragment.EditRewardFragment;
 import com.tinakit.moveit.fragment.RewardViewFragment;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.tab.SlidingTabLayout;
+import com.tinakit.moveit.utility.DialogUtility;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String LOG = "MAINACTIVITY";
     private static final boolean DEBUG = true;
+    public static final String MAIN_ACTIVITY_BROADCAST_RECEIVER = "MAIN_ACTIVITY_BROADCAST_RECEIVER";
 
     private DrawerLayout drawerLayout;
     private ViewPager viewPager;
@@ -135,6 +144,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         if (DEBUG) Log.d(LOG, "onStart");
         super.onStart();
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(ActivityTracker.ACTIVITY_TRACKER_INTENT));
+
+
     }
 
     //**********************************************************************************************
@@ -271,10 +284,25 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    //**********************************************************************************************
+    //  BroadcastReceiver mMessageReceiver
+    //**********************************************************************************************
 
-        if (requestCode == ActivityTracker.ACTIVITY_TRACKER_STARTED)
-            finish();
-    }
+    // Handler for received Intents. This will be called whenever an Intent
+    // with an action named GOOGLE_API_INTENT is broadcasted.
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String message = intent.getStringExtra(MAIN_ACTIVITY_BROADCAST_RECEIVER);
+            if (DEBUG) Log.d(LOG, "BroadcastReceiver - onReceive(): message: " + message);
+
+            if(message.equals(ActivityTracker.ACTIVITY_TRACKER_INTENT)){
+
+                // when Tracker has started, close this Activity
+                finish();
+            }
+
+        }
+    };
+
 }

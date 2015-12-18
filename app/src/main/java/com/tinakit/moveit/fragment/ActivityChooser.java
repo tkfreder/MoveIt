@@ -85,9 +85,7 @@ public class ActivityChooser  extends Fragment {
 
                 Intent intent = new Intent(mFragmentActivity, ActivityTracker.class);
                 intent.putParcelableArrayListExtra(USER_ACTIVITY_LIST, mUserActivityList);
-
-                //using startActivityForResult, allow an event in ActivityTracker to finish this activity
-                startActivityForResult(intent, ActivityTracker.ACTIVITY_TRACKER_STARTED);
+                startActivity(intent);
             }
         });
     }
@@ -97,13 +95,6 @@ public class ActivityChooser  extends Fragment {
         // Get userlist
         List<User> userList = mDatabaseHelper.getUsers();
         mActivityTypeList = mDatabaseHelper.getActivityTypes();
-
-        // Get cached values for user list, if any
-        if (mFragmentActivity.getIntent().hasExtra(ActivityChooser.USER_ACTIVITY_LIST)) {
-
-            mUserActivityList_previous = mFragmentActivity.getIntent().getParcelableArrayListExtra(ActivityChooser.USER_ACTIVITY_LIST);
-
-        }
 
         //RecyclerView
         // Initialize recycler view
@@ -195,19 +186,6 @@ public class ActivityChooser  extends Fragment {
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             customViewHolder.activitySpinner.setAdapter(adapter);
 
-            if (mUserActivityList_previous != null && mUserActivityList_previous.contains(new UserActivity(user))){
-
-                int index = mUserActivityList_previous.indexOf(new UserActivity(user));
-                activityTypeName = mUserActivityList_previous.get(index).getActivityType().getActivityName();
-
-                //set ActivityType if exists for this user
-                if (!activityTypeName.equals("")){
-                    int position = adapter.getPosition(activityTypeName);
-                    customViewHolder.activitySpinner.setSelection(position);
-                }
-            }
-
-
             customViewHolder.activitySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -275,4 +253,5 @@ public class ActivityChooser  extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         return super.onOptionsItemSelected(item);
     }
+
 }
