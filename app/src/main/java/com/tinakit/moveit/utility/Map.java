@@ -35,9 +35,9 @@ public class Map {
             return 6.0f;
     }
 
-    public static String getStreetName(Context context, LatLng location){
+    public static String getLocationDetailByParams(Context context, LatLng location, int detailType){
 
-        String streetName = "";
+        String detail = "";
 
         try{
 
@@ -48,15 +48,24 @@ public class Map {
             geocoder = new Geocoder(context, Locale.getDefault());
             addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
 
-            streetName = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+            switch (detailType){
 
-            //remove numbers
-            streetName = streetName.replaceAll("\\d","");
+                case 0:
+                    String streetName = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+                    //remove numbers
+                    detail = streetName.replaceAll("\\d","");
+                    break;
+
+                case 1:
+                    detail = addresses.get(0).getLocality();
+                    break;
+            }
+
 
         } catch (Exception e){
             e.printStackTrace();
         }
 
-        return streetName;
+        return detail;
     }
 }

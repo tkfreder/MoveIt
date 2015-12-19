@@ -700,6 +700,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 {
                     activityDetail = new ActivityDetail();
                     activityDetail.setActivityId(cursor.getInt(cursor.getColumnIndex(KEY_ACTIVITY_ID)));
+                    Location location = new Location("PROVIDER_PLACEHOLDER");
                     activityDetail.setStartLocation(new LatLng(cursor.getFloat(cursor.getColumnIndex(KEY_ACTIVITY_START_LATITUDE)), cursor.getFloat(cursor.getColumnIndex(KEY_ACTIVITY_START_LONGITUDE))));
                     activityDetail.setStartDate(new SimpleDateFormat(DATE_FORMAT).parse(cursor.getString(cursor.getColumnIndex(KEY_ACTIVITY_START_DATE))));
                     activityDetail.setEndDate(new SimpleDateFormat(DATE_FORMAT).parse(cursor.getString(cursor.getColumnIndex(KEY_ACTIVITY_END_DATE))));
@@ -772,7 +773,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                             activityDetail.setActivityId(activityId);
                             activityDetail.setStartDate(new SimpleDateFormat(DATE_FORMAT).parse(cursor.getString(cursor.getColumnIndex(KEY_ACTIVITY_START_DATE))));
                             activityDetail.setEndDate(new SimpleDateFormat(DATE_FORMAT).parse(cursor.getString(cursor.getColumnIndex(KEY_ACTIVITY_END_DATE))));
-
+                            activityDetail.setStartLocation(new LatLng(cursor.getDouble(cursor.getColumnIndex((KEY_ACTIVITY_START_LATITUDE))),cursor.getDouble(cursor.getColumnIndex((KEY_ACTIVITY_START_LONGITUDE)))));
                         }
 
                         //build User

@@ -23,6 +23,7 @@ import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.model.UserActivity;
 import com.tinakit.moveit.utility.DateUtility;
+import com.tinakit.moveit.utility.Map;
 import com.tinakit.moveit.utility.UnitConverter;
 
 import java.util.List;
@@ -137,6 +138,7 @@ public class ActivityHistory extends Fragment {
 
             TextView date;
             TextView minutesElapsed;
+            TextView place;
             LinearLayout userLinearLayout;
 
             public CustomViewHolder(View view) {
@@ -144,6 +146,7 @@ public class ActivityHistory extends Fragment {
                 super(view);
                 this.date = (TextView)view.findViewById(R.id.date);
                 this.minutesElapsed = (TextView)view.findViewById(R.id.minutesElapsed);
+                this.place = (TextView)view.findViewById(R.id.place);
                 this.userLinearLayout = (LinearLayout)view.findViewById(R.id.userLinearLayout);
             }
         }
@@ -166,6 +169,8 @@ public class ActivityHistory extends Fragment {
             float minutes = UnitConverter.convertMillisecondsToUnits(activityDetail.getEndDate().getTime() - activityDetail.getStartDate().getTime(), UnitConverter.TimeUnits.MINUTES);
             String minutesElapsed = String.valueOf(minutes);
             customViewHolder.minutesElapsed.setText(minutesElapsed);
+
+            customViewHolder.place.setText(Map.getLocationDetailByParams(mContext, activityDetail.getStartLocation(), 0));
 
             for (UserActivity userActivity : activityDetail.getUserActivityList()){
 
