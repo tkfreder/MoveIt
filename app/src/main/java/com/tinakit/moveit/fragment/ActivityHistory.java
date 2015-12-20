@@ -37,12 +37,14 @@ public class ActivityHistory extends Fragment {
 
     // CONSTANTS
     public static final String ACTIVITY_HISTORY = "ACTIVIY_HISTORY";
+    private static final int APPROX_SIZE_AVATAR_IMAGES = 250;
 
     //INSTANCE FIELDS
-    FragmentActivity mFragmentActivity;
-    FitnessDBHelper mDatabaseHelper;
-    ActivityHistoryRecyclerAdapter mActivityHistoryRecyclerAdapter;
+    private FragmentActivity mFragmentActivity;
+    private FitnessDBHelper mDatabaseHelper;
+    private ActivityHistoryRecyclerAdapter mActivityHistoryRecyclerAdapter;
     private List<ActivityDetail> mActivityDetailList;
+    private List<User> mUserList;
 
 
     // UI COMPONENTS
@@ -94,6 +96,10 @@ public class ActivityHistory extends Fragment {
         else{
             mNoActivities.setVisibility(View.VISIBLE);
         }
+
+        // get number of users
+
+        mUserList = mDatabaseHelper.getUsers();
 
 
     }
@@ -167,14 +173,18 @@ public class ActivityHistory extends Fragment {
 
             customViewHolder.date.setText(DateUtility.getDateFormattedRecent(activityDetail.getStartDate(), 7));
             float minutes = UnitConverter.convertMillisecondsToUnits(activityDetail.getEndDate().getTime() - activityDetail.getStartDate().getTime(), UnitConverter.TimeUnits.MINUTES);
-            String minutesElapsed = String.valueOf(minutes);
+            String minutesElapsed = String.valueOf(Math.round(minutes));
             customViewHolder.minutesElapsed.setText(minutesElapsed);
 
             customViewHolder.place.setText(Map.getLocationDetailByParams(mContext, activityDetail.getStartLocation(), 0));
 
+            int imageSize = APPROX_SIZE_AVATAR_IMAGES / mUserList.size();
+
             for (UserActivity userActivity : activityDetail.getUserActivityList()){
 
                 ImageView avatar = new ImageView(mContext);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(imageSize,imageSize);
+                avatar.setLayoutParams(params);
                 avatar.setImageResource(getResources().getIdentifier(userActivity.getUser().getAvatarFileName(), "drawable", mFragmentActivity.getPackageName()));
                 customViewHolder.userLinearLayout.addView(avatar);
 

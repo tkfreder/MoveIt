@@ -17,7 +17,7 @@ public class DateUtility {
 
         Date weekAgo = calendar.getTime();
         if (date.after(weekAgo)){
-            return new SimpleDateFormat("EEEE").format(date);
+            return new SimpleDateFormat("EEE").format(date);//EEE, short version of day of the week
         }
         //otherwise, display the date of the activity
         else {
