@@ -18,6 +18,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.tinakit.moveit.R;
+import com.tinakit.moveit.activity.MainActivity;
+import com.tinakit.moveit.activity.RewardView;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.ActivityType;
@@ -158,11 +160,10 @@ public class UserStats extends Fragment {
                 public void onClick(View v) {
 
                     Bundle bundle = new Bundle();
-                    Button button = (Button)v.getParent();
-                    User user = (User)button.getTag();
+                    User user = (User)v.getTag();
                     bundle.putParcelable("user", user);
 
-                    Intent intent = new Intent();
+                    Intent intent = new Intent(mFragmentActivity, RewardView.class);
                     intent.putExtra(USER_STATS_LIST,  bundle);
                     startActivity(intent);
 

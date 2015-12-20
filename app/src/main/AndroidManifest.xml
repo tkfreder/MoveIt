@@ -38,6 +38,10 @@
             android:name=".activity.ActivityTracker">
 
         </activity>
+        <activity
+            android:name=".activity.RewardView">
+
+        </activity>
 
         <activity android:name=".utility.AndroidDatabaseManager"
                   android:theme="@style/Theme.AppCompat.Light"/>

@@ -13,7 +13,7 @@ import android.widget.TextView;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.db.FitnessDBHelper;
-import com.tinakit.moveit.fragment.RewardViewFragment;
+import com.tinakit.moveit.activity.RewardView;
 import com.tinakit.moveit.model.Reward;
 import com.tinakit.moveit.model.RewardStatusType;
 import com.tinakit.moveit.model.User;
@@ -98,7 +98,7 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
 
                 //TODO: is there another way to refresh the screen, ie notifydatasethaschanged?
                 ((Activity)mContext).finish();
-                Intent intent = new Intent(mContext, RewardViewFragment.class);
+                Intent intent = new Intent(mContext, RewardView.class);
                 Bundle bundle = new Bundle();
                 bundle.putParcelable("user", mUser);
                 intent.putExtras(bundle);

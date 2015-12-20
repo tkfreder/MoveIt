@@ -4,9 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 //import android.support.v4.content.LocalBroadcastManager;
@@ -16,33 +14,24 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 
-import com.tinakit.moveit.api.Accelerometer;
-import com.tinakit.moveit.api.GoogleApi;
-import com.tinakit.moveit.api.LocationApi;
 import com.tinakit.moveit.fragment.ActivityChooser;
 import com.tinakit.moveit.fragment.ActivityHistory;
-import com.tinakit.moveit.fragment.MapFragment;
 import com.tinakit.moveit.fragment.UserStats;
 import com.tinakit.moveit.model.ActivityDetail;
 
 /**
  * Created by Tina on 10/26/2015.
  */
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 
 import android.view.MenuItem;
-import android.view.View;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.db.FitnessDBHelper;
-import com.tinakit.moveit.fragment.EditRewardFragment;
-import com.tinakit.moveit.fragment.RewardViewFragment;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.tab.SlidingTabLayout;
-import com.tinakit.moveit.utility.DialogUtility;
 
 import java.util.ArrayList;
 import java.util.List;
