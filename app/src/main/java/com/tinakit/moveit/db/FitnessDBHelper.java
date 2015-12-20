@@ -387,12 +387,12 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public List<User> getUsers()
+    public ArrayList<User> getUsers()
     {
         // Create and/or open the database for writing
         //SQLiteDatabase db = getReadableDatabase();
 
-        List<User> userList = new ArrayList<>();
+        ArrayList<User> userList = new ArrayList<>();
 
         try {
 

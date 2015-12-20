@@ -62,6 +62,8 @@ public class UserStats extends Fragment {
 
         initializeUI();
 
+        fetchData();
+
         return rootView;
     }
 
@@ -117,14 +119,14 @@ public class UserStats extends Fragment {
         public class CustomViewHolder extends RecyclerView.ViewHolder {
 
             ImageView avatar;
-            TextView coinTotal;
+            TextView points;
             Button viewReward;
 
             public CustomViewHolder(View view) {
 
                 super(view);
                 this.avatar = (ImageView)view.findViewById(R.id.avatar);
-                this.coinTotal = (TextView)view.findViewById(R.id.coinTotal);
+                this.points = (TextView)view.findViewById(R.id.points);
                 this.viewReward = (Button)view.findViewById(R.id.viewReward);
 
             }
@@ -146,7 +148,7 @@ public class UserStats extends Fragment {
 
             // Populate data from ActivityType data object
             customViewHolder.avatar.setImageResource(getResources().getIdentifier(user.getAvatarFileName(), "drawable", mFragmentActivity.getPackageName()));
-            customViewHolder.coinTotal.setText(user.getPoints());
+            customViewHolder.points.setText(String.valueOf(user.getPoints()));
 
             // set tag on radio group
             customViewHolder.viewReward.setTag(user);

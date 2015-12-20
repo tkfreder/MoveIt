@@ -20,6 +20,7 @@ import com.tinakit.moveit.api.LocationApi;
 import com.tinakit.moveit.fragment.ActivityChooser;
 import com.tinakit.moveit.fragment.ActivityHistory;
 import com.tinakit.moveit.fragment.MapFragment;
+import com.tinakit.moveit.fragment.UserStats;
 import com.tinakit.moveit.model.ActivityDetail;
 
 /**
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
     //cache
     ArrayList<ActivityDetail> mActivityDetailList;
-    List<User> mUserList;
+    ArrayList<User> mUserList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +80,9 @@ public class MainActivity extends AppCompatActivity {
 
         //data for ActivityHistory
         mActivityDetailList = mDatabaseHelper.getActivityDetailList();
+
+        // get user data
+        mUserList = mDatabaseHelper.getUsers();
 
     }
 
@@ -211,7 +215,6 @@ public class MainActivity extends AppCompatActivity {
             return mFragmentTitleList.get(position);
         }
 
-
     }
 
     private void setupViewPager(ViewPager viewPager){
@@ -227,27 +230,16 @@ public class MainActivity extends AppCompatActivity {
         ActivityHistoryFragment.setArguments(bundle);
         mViewPagerAdapter.addFrag(ActivityHistoryFragment, "HISTORY");
 
-        // USER TABS
-        FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(this);
-        List<User> userList = databaseHelper.getUsers();
+        // THIRD TAB
+        Fragment UserStatsFragment = new UserStats();
+        bundle = new Bundle();
+        bundle.putParcelableArrayList(UserStats.USER_STATS_LIST, mUserList);
+        UserStatsFragment.setArguments(bundle);
+        mViewPagerAdapter.addFrag(UserStatsFragment, "USERS");
 
-        //refresh user count
-        mUserCount = userList.size();
-
-        for (User user : userList){
-
-            Fragment fragment = new RewardViewFragment();
-            Bundle args = new Bundle();
-            args.putParcelable("user", user);
-            args.putInt("tab_index", mCurrentTab);
-            fragment.setArguments(args);
-
-            mViewPagerAdapter.addFrag(fragment, user.getUserName());
-        }
-
-        mViewPagerAdapter.addFrag(new EditRewardFragment(), "REWARDS");
+        // FOURTH TAB
+        //mViewPagerAdapter.addFrag(new EditRewardFragment(), "REWARDS");
         viewPager.setAdapter(mViewPagerAdapter);
-
 
     }
 
