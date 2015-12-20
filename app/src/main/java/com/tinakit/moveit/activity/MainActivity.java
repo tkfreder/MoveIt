@@ -4,7 +4,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 //import android.support.v4.content.LocalBroadcastManager;
@@ -57,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     protected ViewPagerAdapter mViewPagerAdapter;
     protected int mUserCount;
     protected int mCurrentTab;
+    private FitnessDBHelper mDatabaseHelper;
 
     //cache
     ArrayList<ActivityDetail> mActivityDetailList;
@@ -68,15 +71,19 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        initializeUI();
+        // instantiate databaseHelper
+        mDatabaseHelper = FitnessDBHelper.getInstance(this);
 
+        // get data before initializing UI, need data to pass to ViewPager
         fetchData();
+
+        initializeUI();
 
     }
 
     private void fetchData(){
 
-        FitnessDBHelper mDatabaseHelper = FitnessDBHelper.getInstance(this);
+        //FitnessDBHelper mDatabaseHelper = FitnessDBHelper.getInstance(this);
 
         //data for ActivityHistory
         mActivityDetailList = mDatabaseHelper.getActivityDetailList();

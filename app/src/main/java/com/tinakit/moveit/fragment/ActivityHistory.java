@@ -92,10 +92,6 @@ public class ActivityHistory extends Fragment {
 
             }
         }
-        // display no-activities message
-        else{
-            mNoActivities.setVisibility(View.VISIBLE);
-        }
 
         // get number of users
 

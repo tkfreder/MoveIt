@@ -57,6 +57,7 @@ public class ActivityTracker extends AppCompatActivity {
     public static final String ACTIVITY_TRACKER_BROADCAST_RECEIVER = "TRACKER_RECEIVER";
     public static final String ACTIVITY_TRACKER_STARTED = "ACTIVITY_TRACKER_STARTED";
     public static final String ACTIVITY_TRACKER_INTENT = "ACTIVITY_TRACKER_INTENT";
+    private static final String COIN_AUDIO_FILENAME = "cha_ching";
 
     private static final float FEET_COIN_CONVERSION = 1.0f;//0.05f;  //20 feet = 1 coin
     private static long STOP_SERVICE_TIME_LIMIT = 30 * 60 * 1000 * 60; // 30 minutes in seconds
@@ -394,7 +395,7 @@ public class ActivityTracker extends AppCompatActivity {
     private void playSound(){
 
         MediaPlayer mp;
-        mp = MediaPlayer.create(this, R.raw.cat_meow);
+        mp = MediaPlayer.create(this, getResources().getIdentifier(COIN_AUDIO_FILENAME, "raw", getPackageName()));//R.raw.cat_meow);
         mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
             @Override
