@@ -3,7 +3,7 @@ package com.tinakit.moveit.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.bignerdranch.expandablerecyclerview.Model.ParentObject;
+import com.bignerdranch.expandablerecyclerview.Model.ParentListItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by Tina on 7/2/2015.
  */
-public class User  implements Parcelable, ParentObject {
+public class User  implements Parcelable, ParentListItem {
 
     private int mUserId;
     private String mUserName;
@@ -20,7 +20,7 @@ public class User  implements Parcelable, ParentObject {
     private String mAvatarFileName;
     private int mPoints;
     private boolean mIsParticipant;
-    private List<Object> mChildrenList;
+    private List<Reward> mChildrenList;
 
     public User(){}
 
@@ -81,13 +81,13 @@ public class User  implements Parcelable, ParentObject {
     }
 
     @Override
-    public List<Object> getChildObjectList() {
+    public List<Reward> getChildItemList() {
         return null;
     }
 
     @Override
-    public void setChildObjectList(List<Object> list) {
-
+    public boolean isInitiallyExpanded() {
+        return false;
     }
 
     @Override
@@ -105,7 +105,6 @@ public class User  implements Parcelable, ParentObject {
     public int hashCode() {
         return mUserName != null ? mUserName.hashCode() : 0;
     }
-
         protected User(Parcel in) {
             mUserId = in.readInt();
             mUserName = in.readString();
@@ -115,8 +114,8 @@ public class User  implements Parcelable, ParentObject {
             mPoints = in.readInt();
             mIsParticipant = in.readByte() != 0x00;
             if (in.readByte() == 0x01) {
-                mChildrenList = new ArrayList<Object>();
-                in.readList(mChildrenList, Object.class.getClassLoader());
+                mChildrenList = new ArrayList<Reward>();
+                in.readList(mChildrenList, Reward.class.getClassLoader());
             } else {
                 mChildrenList = null;
             }

@@ -1,9 +1,12 @@
 package com.tinakit.moveit.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by Tina on 9/23/2015.
  */
-public class Reward {
+public class Reward implements Parcelable {
 
     private int mRewardId;
     private String mName;
@@ -61,4 +64,41 @@ public class Reward {
     public void setRewardStatusType(RewardStatusType rewardStatusType) {
         mRewardStatusType = rewardStatusType;
     }
+
+    protected Reward(Parcel in) {
+        mRewardId = in.readInt();
+        mName = in.readString();
+        mPoints = in.readInt();
+        mDescription = in.readString();
+        mEnabled = in.readByte() != 0x00;
+        mRewardStatusType = (RewardStatusType) in.readValue(RewardStatusType.class.getClassLoader());
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(mRewardId);
+        dest.writeString(mName);
+        dest.writeInt(mPoints);
+        dest.writeString(mDescription);
+        dest.writeByte((byte) (mEnabled ? 0x01 : 0x00));
+        dest.writeValue(mRewardStatusType);
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Reward> CREATOR = new Parcelable.Creator<Reward>() {
+        @Override
+        public Reward createFromParcel(Parcel in) {
+            return new Reward(in);
+        }
+
+        @Override
+        public Reward[] newArray(int size) {
+            return new Reward[size];
+        }
+    };
 }

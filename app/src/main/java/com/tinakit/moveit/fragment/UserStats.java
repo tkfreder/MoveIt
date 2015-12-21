@@ -16,14 +16,19 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bignerdranch.expandablerecyclerview.Adapter.ExpandableRecyclerAdapter;
+import com.bignerdranch.expandablerecyclerview.Model.ParentListItem;
 import com.bignerdranch.expandablerecyclerview.ViewHolder.ChildViewHolder;
 import com.bignerdranch.expandablerecyclerview.ViewHolder.ParentViewHolder;
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.RewardView;
 import com.tinakit.moveit.db.FitnessDBHelper;
+import com.tinakit.moveit.model.Reward;
+import com.tinakit.moveit.model.RewardStatusType;
 import com.tinakit.moveit.model.User;
 
 import java.util.List;
+import java.util.zip.Inflater;
 
 /**
  * Created by Tina on 12/19/2015.
@@ -40,7 +45,7 @@ public class UserStats extends Fragment {
 
     // UI COMPONENTS
     protected RecyclerView mRecyclerView;
-    public static UserStatsRecyclerAdapter mRecyclerViewAdapter;
+    public static UserStatsExpandableAdapter mUserStatsExpandableAdapter;
 
     //database
     FitnessDBHelper mDatabaseHelper;
@@ -91,21 +96,82 @@ public class UserStats extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mFragmentActivity);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(linearLayoutManager);
-        mRecyclerViewAdapter = new UserStatsRecyclerAdapter(mFragmentActivity, mUserList);
-        mRecyclerView.setAdapter(mRecyclerViewAdapter);
+        mUserStatsExpandableAdapter = new UserStatsExpandableAdapter(mFragmentActivity, mUserList);
+        mRecyclerView.setAdapter(mUserStatsExpandableAdapter);
 
     }
 
-    public class UserStatsRecyclerAdapter extends RecyclerView.Adapter<UserStatsRecyclerAdapter.RewardParentViewHolder> {
+    public class UserStatsExpandableAdapter extends ExpandableRecyclerAdapter<UserStatsExpandableAdapter.RewardParentViewHolder, UserStatsExpandableAdapter.RewardChildViewHolder> {
 
         private Context mContext;
         private List<User> mUserList;
+        private LayoutInflater mInflater;
+        private User mCurrentUser;
 
-        public UserStatsRecyclerAdapter(Context context, List<User> userList) {
 
-            mContext = context;
+        public UserStatsExpandableAdapter(Context context, List<User> userList) {
+            super(userList);
+            mInflater = LayoutInflater.from(context);
             mUserList = userList;
         }
+
+
+        @Override
+        public RewardParentViewHolder onCreateParentViewHolder(ViewGroup viewGroup) {
+
+            View view = mInflater.inflate(R.layout.stat_list_item_parent, viewGroup, false);
+            return new RewardParentViewHolder(view);
+        }
+
+        @Override
+        public RewardChildViewHolder onCreateChildViewHolder(ViewGroup viewGroup) {
+
+            View view = mInflater.inflate(R.layout.stat_list_item_child, viewGroup, false);
+            return new RewardChildViewHolder(view);
+        }
+
+        @Override
+        public void onBindParentViewHolder(RewardParentViewHolder rewardParentViewHolder, int i, ParentListItem parentListItem) {
+
+            User user = (User) parentListItem;
+            mCurrentUser = user;
+
+            rewardParentViewHolder.avatar.setImageResource(getResources().getIdentifier(user.getAvatarFileName(), "drawable", mFragmentActivity.getPackageName()));
+            rewardParentViewHolder.points.setText(String.valueOf(user.getPoints()));
+
+        }
+
+        @Override
+        public void onBindChildViewHolder(RewardChildViewHolder rewardChildViewHolder, int i, Object object) {
+
+            Reward reward = (Reward)object;
+
+            rewardChildViewHolder.rewardPoints.setText(String.valueOf(reward.getPoints()));
+            rewardChildViewHolder.name.setText(reward.getName());
+
+            //if user has enough points, enable this button
+            if (reward.getPoints() <= mCurrentUser.getPoints() && reward.getRewardStatusType() == RewardStatusType.AVAILABLE) {
+                rewardChildViewHolder.statusButton.setText("Get It");
+                rewardChildViewHolder.statusButton.setTag(reward);
+                rewardChildViewHolder.statusButton.setVisibility(View.VISIBLE);
+
+
+            } else if (reward.getRewardStatusType() == RewardStatusType.PENDING) {
+
+                rewardChildViewHolder.statusButton.setText("Cancel");
+                rewardChildViewHolder.statusButton.setTag(reward);
+                rewardChildViewHolder.statusButton.setVisibility(View.VISIBLE);
+                rewardChildViewHolder.status.setText("in progress");
+
+            } else if (reward.getRewardStatusType() == RewardStatusType.DENIED) {
+
+                rewardChildViewHolder.statusButton.setEnabled(false);
+                rewardChildViewHolder.statusButton.setTag(reward);
+                rewardChildViewHolder.status.setText("Mommy said no to this.");
+            }
+        }
+
+
 
         @Override
         public int getItemCount() {
@@ -114,9 +180,9 @@ public class UserStats extends Fragment {
 
         public class RewardParentViewHolder extends ParentViewHolder {
 
-            protected ImageView avatar;
-            protected TextView points;
-            protected ImageButton expandArrow;
+            public ImageView avatar;
+            public TextView points;
+            public ImageButton expandArrow;
 
             public RewardParentViewHolder(View view) {
 
@@ -129,10 +195,10 @@ public class UserStats extends Fragment {
 
         public class RewardChildViewHolder extends ChildViewHolder {
 
-            protected TextView rewardPoints;
-            protected TextView name;
-            protected Button statusButton;
-            protected TextView status;
+            public TextView rewardPoints;
+            public TextView name;
+            public Button statusButton;
+            public TextView status;
 
             public RewardChildViewHolder (View view) {
 
@@ -143,46 +209,5 @@ public class UserStats extends Fragment {
                 this.status = (TextView)view.findViewById(R.id.status);
             }
         }
-
-        @Override
-        public UserStatsRecyclerAdapter.RewardParentViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-
-            View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.stat_list_item_parent, viewGroup, false);
-
-            RewardParentViewHolder viewHolder = new RewardParentViewHolder(view);
-            return viewHolder;
-        }
-
-        @Override
-        public void onBindViewHolder(UserStatsRecyclerAdapter.RewardParentViewHolder customViewHolder, int i) {
-
-            User user = mUserList.get(i);
-
-            // Populate data from ActivityType data object
-            customViewHolder.avatar.setImageResource(getResources().getIdentifier(user.getAvatarFileName(), "drawable", mFragmentActivity.getPackageName()));
-            customViewHolder.points.setText(String.valueOf(user.getPoints()));
-
-            // set tag on radio group
-            //customViewHolder.viewReward.setTag(user);
-/*
-            customViewHolder.viewReward.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    Bundle bundle = new Bundle();
-                    User user = (User)v.getTag();
-                    bundle.putParcelable("user", user);
-
-                    Intent intent = new Intent(mFragmentActivity, RewardView.class);
-                    intent.putExtra(USER_STATS_LIST,  bundle);
-                    startActivity(intent);
-
-                }
-            });
-
-            */
-        }
     }
-
-
 }
