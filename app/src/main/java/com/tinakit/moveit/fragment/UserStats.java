@@ -12,9 +12,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bignerdranch.expandablerecyclerview.ViewHolder.ChildViewHolder;
+import com.bignerdranch.expandablerecyclerview.ViewHolder.ParentViewHolder;
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.RewardView;
 import com.tinakit.moveit.db.FitnessDBHelper;
@@ -93,7 +96,7 @@ public class UserStats extends Fragment {
 
     }
 
-    public class UserStatsRecyclerAdapter extends RecyclerView.Adapter<UserStatsRecyclerAdapter.CustomViewHolder> {
+    public class UserStatsRecyclerAdapter extends RecyclerView.Adapter<UserStatsRecyclerAdapter.RewardParentViewHolder> {
 
         private Context mContext;
         private List<User> mUserList;
@@ -109,33 +112,49 @@ public class UserStats extends Fragment {
             return (null != mUserList ? mUserList.size() : 0);
         }
 
-        public class CustomViewHolder extends RecyclerView.ViewHolder {
+        public class RewardParentViewHolder extends ParentViewHolder {
 
-            ImageView avatar;
-            TextView points;
-            //Button viewReward;
+            protected ImageView avatar;
+            protected TextView points;
+            protected ImageButton expandArrow;
 
-            public CustomViewHolder(View view) {
+            public RewardParentViewHolder(View view) {
 
                 super(view);
                 this.avatar = (ImageView)view.findViewById(R.id.avatar);
                 this.points = (TextView)view.findViewById(R.id.points);
-                //this.viewReward = (Button)view.findViewById(R.id.viewReward);
+                this.expandArrow = (ImageButton)view.findViewById(R.id.expandArrow);
+            }
+        }
 
+        public class RewardChildViewHolder extends ChildViewHolder {
+
+            protected TextView rewardPoints;
+            protected TextView name;
+            protected Button statusButton;
+            protected TextView status;
+
+            public RewardChildViewHolder (View view) {
+
+                super(view);
+                this.rewardPoints = (TextView)view.findViewById(R.id.rewardPoints);
+                this.name = (TextView)view.findViewById(R.id.name);
+                this.statusButton = (Button)view.findViewById(R.id.statusButton);
+                this.status = (TextView)view.findViewById(R.id.status);
             }
         }
 
         @Override
-        public UserStatsRecyclerAdapter.CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+        public UserStatsRecyclerAdapter.RewardParentViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
 
             View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.stat_list_item_parent, viewGroup, false);
 
-            CustomViewHolder viewHolder = new CustomViewHolder(view);
+            RewardParentViewHolder viewHolder = new RewardParentViewHolder(view);
             return viewHolder;
         }
 
         @Override
-        public void onBindViewHolder(UserStatsRecyclerAdapter.CustomViewHolder customViewHolder, int i) {
+        public void onBindViewHolder(UserStatsRecyclerAdapter.RewardParentViewHolder customViewHolder, int i) {
 
             User user = mUserList.get(i);
 
