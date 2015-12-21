@@ -231,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
         bundle = new Bundle();
         bundle.putParcelableArrayList(UserStats.USER_STATS_LIST, mUserList);
         UserStatsFragment.setArguments(bundle);
-        mViewPagerAdapter.addFrag(UserStatsFragment, "USERS");
+        mViewPagerAdapter.addFrag(UserStatsFragment, "REWARDS");
 
         // FOURTH TAB
         //mViewPagerAdapter.addFrag(new EditRewardFragment(), "REWARDS");

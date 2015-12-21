@@ -45,7 +45,7 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
     @Override
     public RewardRecyclerAdapter.CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
 
-            View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.reward_list_item, viewGroup, false);
+            View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.stat_list_item_child, viewGroup, false);
 
             CustomViewHolder viewHolder = new CustomViewHolder(view);
             return viewHolder;

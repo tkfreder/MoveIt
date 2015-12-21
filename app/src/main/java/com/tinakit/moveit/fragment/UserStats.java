@@ -11,25 +11,16 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.tinakit.moveit.R;
-import com.tinakit.moveit.activity.MainActivity;
 import com.tinakit.moveit.activity.RewardView;
 import com.tinakit.moveit.db.FitnessDBHelper;
-import com.tinakit.moveit.model.ActivityDetail;
-import com.tinakit.moveit.model.ActivityType;
 import com.tinakit.moveit.model.User;
-import com.tinakit.moveit.model.UserActivity;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import fr.ganfra.materialspinner.MaterialSpinner;
 
 /**
  * Created by Tina on 12/19/2015.
@@ -122,14 +113,14 @@ public class UserStats extends Fragment {
 
             ImageView avatar;
             TextView points;
-            Button viewReward;
+            //Button viewReward;
 
             public CustomViewHolder(View view) {
 
                 super(view);
                 this.avatar = (ImageView)view.findViewById(R.id.avatar);
                 this.points = (TextView)view.findViewById(R.id.points);
-                this.viewReward = (Button)view.findViewById(R.id.viewReward);
+                //this.viewReward = (Button)view.findViewById(R.id.viewReward);
 
             }
         }
@@ -137,7 +128,7 @@ public class UserStats extends Fragment {
         @Override
         public UserStatsRecyclerAdapter.CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
 
-            View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.stat_list_item, viewGroup, false);
+            View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.stat_list_item_parent, viewGroup, false);
 
             CustomViewHolder viewHolder = new CustomViewHolder(view);
             return viewHolder;
@@ -153,8 +144,8 @@ public class UserStats extends Fragment {
             customViewHolder.points.setText(String.valueOf(user.getPoints()));
 
             // set tag on radio group
-            customViewHolder.viewReward.setTag(user);
-
+            //customViewHolder.viewReward.setTag(user);
+/*
             customViewHolder.viewReward.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -169,6 +160,8 @@ public class UserStats extends Fragment {
 
                 }
             });
+
+            */
         }
     }
 
