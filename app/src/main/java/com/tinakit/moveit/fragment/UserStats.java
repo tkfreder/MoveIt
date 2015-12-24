@@ -2,6 +2,7 @@ package com.tinakit.moveit.fragment;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -22,6 +23,8 @@ import com.bignerdranch.expandablerecyclerview.ViewHolder.ChildViewHolder;
 import com.bignerdranch.expandablerecyclerview.ViewHolder.ParentViewHolder;
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.RewardView;
+import com.tinakit.moveit.adapter.view_holder.RewardChildViewHolder;
+import com.tinakit.moveit.adapter.view_holder.RewardParentViewHolder;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.Reward;
 import com.tinakit.moveit.model.RewardStatusType;
@@ -101,7 +104,7 @@ public class UserStats extends Fragment {
 
     }
 
-    public class UserStatsExpandableAdapter extends ExpandableRecyclerAdapter<UserStatsExpandableAdapter.RewardParentViewHolder, UserStatsExpandableAdapter.RewardChildViewHolder> {
+    public class UserStatsExpandableAdapter extends ExpandableRecyclerAdapter<RewardParentViewHolder, RewardChildViewHolder> {
 
         private Context mContext;
         private List<User> mUserList;
@@ -111,6 +114,7 @@ public class UserStats extends Fragment {
 
         public UserStatsExpandableAdapter(Context context, List<User> userList) {
             super(userList);
+            mContext = context;
             mInflater = LayoutInflater.from(context);
             mUserList = userList;
         }
@@ -135,9 +139,7 @@ public class UserStats extends Fragment {
 
             User user = (User) parentListItem;
             mCurrentUser = user;
-
-            rewardParentViewHolder.avatar.setImageResource(getResources().getIdentifier(user.getAvatarFileName(), "drawable", mFragmentActivity.getPackageName()));
-            rewardParentViewHolder.points.setText(String.valueOf(user.getPoints()));
+            rewardParentViewHolder.bind(mContext, mFragmentActivity, user);
 
         }
 
@@ -145,69 +147,18 @@ public class UserStats extends Fragment {
         public void onBindChildViewHolder(RewardChildViewHolder rewardChildViewHolder, int i, Object object) {
 
             Reward reward = (Reward)object;
-
-            rewardChildViewHolder.rewardPoints.setText(String.valueOf(reward.getPoints()));
-            rewardChildViewHolder.name.setText(reward.getName());
-
-            //if user has enough points, enable this button
-            if (reward.getPoints() <= mCurrentUser.getPoints() && reward.getRewardStatusType() == RewardStatusType.AVAILABLE) {
-                rewardChildViewHolder.statusButton.setText("Get It");
-                rewardChildViewHolder.statusButton.setTag(reward);
-                rewardChildViewHolder.statusButton.setVisibility(View.VISIBLE);
-
-
-            } else if (reward.getRewardStatusType() == RewardStatusType.PENDING) {
-
-                rewardChildViewHolder.statusButton.setText("Cancel");
-                rewardChildViewHolder.statusButton.setTag(reward);
-                rewardChildViewHolder.statusButton.setVisibility(View.VISIBLE);
-                rewardChildViewHolder.status.setText("in progress");
-
-            } else if (reward.getRewardStatusType() == RewardStatusType.DENIED) {
-
-                rewardChildViewHolder.statusButton.setEnabled(false);
-                rewardChildViewHolder.statusButton.setTag(reward);
-                rewardChildViewHolder.status.setText("Mommy said no to this.");
-            }
+            rewardChildViewHolder.bind(mCurrentUser, reward);
         }
-
-
 
         @Override
         public int getItemCount() {
             return (null != mUserList ? mUserList.size() : 0);
         }
 
-        public class RewardParentViewHolder extends ParentViewHolder {
 
-            public ImageView avatar;
-            public TextView points;
-            public ImageButton expandArrow;
 
-            public RewardParentViewHolder(View view) {
 
-                super(view);
-                this.avatar = (ImageView)view.findViewById(R.id.avatar);
-                this.points = (TextView)view.findViewById(R.id.points);
-                this.expandArrow = (ImageButton)view.findViewById(R.id.expandArrow);
-            }
-        }
 
-        public class RewardChildViewHolder extends ChildViewHolder {
 
-            public TextView rewardPoints;
-            public TextView name;
-            public Button statusButton;
-            public TextView status;
-
-            public RewardChildViewHolder (View view) {
-
-                super(view);
-                this.rewardPoints = (TextView)view.findViewById(R.id.rewardPoints);
-                this.name = (TextView)view.findViewById(R.id.name);
-                this.statusButton = (Button)view.findViewById(R.id.statusButton);
-                this.status = (TextView)view.findViewById(R.id.status);
-            }
-        }
     }
 }

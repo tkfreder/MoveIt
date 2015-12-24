@@ -20,7 +20,7 @@ public class User  implements Parcelable, ParentListItem {
     private String mAvatarFileName;
     private int mPoints;
     private boolean mIsParticipant;
-    private List<Reward> mChildrenList;
+    private List<Reward> mRewardList;
 
     public User(){}
 
@@ -82,7 +82,7 @@ public class User  implements Parcelable, ParentListItem {
 
     @Override
     public List<Reward> getChildItemList() {
-        return null;
+        return mRewardList;
     }
 
     @Override
@@ -114,10 +114,10 @@ public class User  implements Parcelable, ParentListItem {
             mPoints = in.readInt();
             mIsParticipant = in.readByte() != 0x00;
             if (in.readByte() == 0x01) {
-                mChildrenList = new ArrayList<Reward>();
-                in.readList(mChildrenList, Reward.class.getClassLoader());
+                mRewardList = new ArrayList<Reward>();
+                in.readList(mRewardList, Reward.class.getClassLoader());
             } else {
-                mChildrenList = null;
+                mRewardList = null;
             }
         }
 
@@ -135,11 +135,11 @@ public class User  implements Parcelable, ParentListItem {
             dest.writeString(mAvatarFileName);
             dest.writeInt(mPoints);
             dest.writeByte((byte) (mIsParticipant ? 0x01 : 0x00));
-            if (mChildrenList == null) {
+            if (mRewardList == null) {
                 dest.writeByte((byte) (0x00));
             } else {
                 dest.writeByte((byte) (0x01));
-                dest.writeList(mChildrenList);
+                dest.writeList(mRewardList);
             }
         }
 
