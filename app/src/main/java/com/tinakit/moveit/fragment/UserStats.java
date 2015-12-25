@@ -23,6 +23,7 @@ import com.bignerdranch.expandablerecyclerview.ViewHolder.ChildViewHolder;
 import com.bignerdranch.expandablerecyclerview.ViewHolder.ParentViewHolder;
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.RewardView;
+import com.tinakit.moveit.adapter.UserStatsExpandableAdapter;
 import com.tinakit.moveit.adapter.view_holder.RewardChildViewHolder;
 import com.tinakit.moveit.adapter.view_holder.RewardParentViewHolder;
 import com.tinakit.moveit.db.FitnessDBHelper;
@@ -36,7 +37,7 @@ import java.util.zip.Inflater;
 /**
  * Created by Tina on 12/19/2015.
  */
-public class UserStats extends Fragment {
+public class UserStats extends Fragment{
 
     // CONSTANTS
     public static final String USER_STATS_LIST = "USER_STATS_LIST";
@@ -87,6 +88,9 @@ public class UserStats extends Fragment {
                 mUserList = mDatabaseHelper.getUsers();
             }
         }
+
+        mUserStatsExpandableAdapter = new UserStatsExpandableAdapter(getContext(), mFragmentActivity, mUserList);
+        mRecyclerView.setAdapter(mUserStatsExpandableAdapter);
     }
 
     private void initializeUI(){
@@ -99,66 +103,5 @@ public class UserStats extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mFragmentActivity);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(linearLayoutManager);
-        mUserStatsExpandableAdapter = new UserStatsExpandableAdapter(mFragmentActivity, mUserList);
-        mRecyclerView.setAdapter(mUserStatsExpandableAdapter);
-
-    }
-
-    public class UserStatsExpandableAdapter extends ExpandableRecyclerAdapter<RewardParentViewHolder, RewardChildViewHolder> {
-
-        private Context mContext;
-        private List<User> mUserList;
-        private LayoutInflater mInflater;
-        private User mCurrentUser;
-
-
-        public UserStatsExpandableAdapter(Context context, List<User> userList) {
-            super(userList);
-            mContext = context;
-            mInflater = LayoutInflater.from(context);
-            mUserList = userList;
-        }
-
-
-        @Override
-        public RewardParentViewHolder onCreateParentViewHolder(ViewGroup viewGroup) {
-
-            View view = mInflater.inflate(R.layout.stat_list_item_parent, viewGroup, false);
-            return new RewardParentViewHolder(view);
-        }
-
-        @Override
-        public RewardChildViewHolder onCreateChildViewHolder(ViewGroup viewGroup) {
-
-            View view = mInflater.inflate(R.layout.stat_list_item_child, viewGroup, false);
-            return new RewardChildViewHolder(view);
-        }
-
-        @Override
-        public void onBindParentViewHolder(RewardParentViewHolder rewardParentViewHolder, int i, ParentListItem parentListItem) {
-
-            User user = (User) parentListItem;
-            mCurrentUser = user;
-            rewardParentViewHolder.bind(mContext, mFragmentActivity, user);
-
-        }
-
-        @Override
-        public void onBindChildViewHolder(RewardChildViewHolder rewardChildViewHolder, int i, Object object) {
-
-            Reward reward = (Reward)object;
-            rewardChildViewHolder.bind(mCurrentUser, reward);
-        }
-
-        @Override
-        public int getItemCount() {
-            return (null != mUserList ? mUserList.size() : 0);
-        }
-
-
-
-
-
-
     }
 }

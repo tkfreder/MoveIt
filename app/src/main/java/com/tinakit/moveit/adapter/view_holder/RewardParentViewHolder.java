@@ -38,6 +38,7 @@ public class RewardParentViewHolder extends ParentViewHolder {
         this.expandArrow = (ImageButton)view.findViewById(R.id.expandArrow);
     }
 
+
     public void bind(Context context, Activity activity, User user){
 
         avatar.setImageResource(context.getResources().getIdentifier(user.getAvatarFileName(), "drawable", activity.getPackageName()));

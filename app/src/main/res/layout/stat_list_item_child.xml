@@ -7,8 +7,9 @@
     >
     <RelativeLayout
         android:id="@+id/pointsLayout"
+        android:layout_width="0dp"
         app:layout_widthPercent="20%"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:gravity="center"
         android:layout_centerInParent="true"
         >
@@ -38,6 +39,7 @@
 
     <Button
         android:id="@+id/statusButton"
+        android:layout_width="0dp"
         app:layout_widthPercent="20%"
         android:layout_height="wrap_content"
         android:visibility="gone"
@@ -46,6 +48,7 @@
 
     <TextView
         android:id="@+id/status"
+        android:layout_width="0dp"
         app:layout_widthPercent="20%"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"/>

@@ -7,10 +7,12 @@
 
     <ImageView
         android:id="@+id/avatar"
+        android:layout_width="0dp"
         app:layout_widthPercent="15%"
         android:layout_height="wrap_content"/>
     <RelativeLayout
         android:id="@+id/pointsLayout"
+        android:layout_width="0dp"
         app:layout_widthPercent="30%"
         android:layout_height="match_parent"
         android:gravity="center"

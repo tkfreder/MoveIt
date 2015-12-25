@@ -21,6 +21,8 @@ public class User  implements Parcelable, ParentListItem {
     private int mPoints;
     private boolean mIsParticipant;
     private List<Reward> mRewardList;
+    private boolean mInitiallyExpanded;
+
 
     public User(){}
 
