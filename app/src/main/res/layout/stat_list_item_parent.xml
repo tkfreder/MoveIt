@@ -14,7 +14,7 @@
         android:id="@+id/pointsLayout"
         android:layout_width="0dp"
         app:layout_widthPercent="30%"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:gravity="center"
         android:layout_centerInParent="true"
         android:layout_toRightOf="@+id/avatar"
@@ -37,12 +37,12 @@
                 android:layout_toEndOf="@+id/points"/>
     </RelativeLayout>
 
-    <ImageButton
-        android:id="@+id/expandArrow"
+    <Button
+        android:id="@+id/rewardButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_margin="8dp"
-        android:src="@android:drawable/arrow_down_float"/>
+        android:text="@string/rewards"/>
 
 </android.support.percent.PercentRelativeLayout>

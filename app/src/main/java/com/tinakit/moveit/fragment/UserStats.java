@@ -24,6 +24,7 @@ import com.bignerdranch.expandablerecyclerview.ViewHolder.ParentViewHolder;
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.RewardView;
 import com.tinakit.moveit.adapter.UserStatsExpandableAdapter;
+import com.tinakit.moveit.adapter.UserStatsRecyclerAdapter;
 import com.tinakit.moveit.adapter.view_holder.RewardChildViewHolder;
 import com.tinakit.moveit.adapter.view_holder.RewardParentViewHolder;
 import com.tinakit.moveit.db.FitnessDBHelper;
@@ -49,7 +50,7 @@ public class UserStats extends Fragment{
 
     // UI COMPONENTS
     protected RecyclerView mRecyclerView;
-    public static UserStatsExpandableAdapter mUserStatsExpandableAdapter;
+    protected UserStatsRecyclerAdapter mUserStatsRecyclerAdapter;
 
     //database
     FitnessDBHelper mDatabaseHelper;
@@ -67,12 +68,12 @@ public class UserStats extends Fragment{
 
         initializeUI();
 
-        fetchData();
+        fetchData(inflater);
 
         return rootView;
     }
 
-    private void fetchData(){
+    private void fetchData(LayoutInflater layoutInflater){
 
         // get UserActivityList from intent
 
@@ -89,8 +90,15 @@ public class UserStats extends Fragment{
             }
         }
 
-        mUserStatsExpandableAdapter = new UserStatsExpandableAdapter(getContext(), mFragmentActivity, mUserList);
-        mRecyclerView.setAdapter(mUserStatsExpandableAdapter);
+        //set RewardList for each user
+        for (User user : mUserList){
+
+            //set the reward list for each user
+            user.setChildItemList(mDatabaseHelper.getUserRewards(user.getUserId()));
+        }
+
+        mUserStatsRecyclerAdapter = new UserStatsRecyclerAdapter(layoutInflater.getContext(), mFragmentActivity, mUserList);
+        mRecyclerView.setAdapter(mUserStatsRecyclerAdapter);
     }
 
     private void initializeUI(){
@@ -104,4 +112,5 @@ public class UserStats extends Fragment{
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(linearLayoutManager);
     }
+
 }

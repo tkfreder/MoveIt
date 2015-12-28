@@ -1,9 +1,11 @@
 package com.tinakit.moveit.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,6 +17,7 @@ import android.widget.TextView;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.db.FitnessDBHelper;
+import com.tinakit.moveit.fragment.UserStats;
 import com.tinakit.moveit.model.Reward;
 import com.tinakit.moveit.model.RewardStatusType;
 import com.tinakit.moveit.model.User;
@@ -30,7 +33,6 @@ public class RewardView  extends AppCompatActivity {
     private User mUser;
 
     //UI Widgets
-    private TextView mUserName;
     private RecyclerView mRecyclerView;
     private ImageView mAvatar;
     private TextView mMessage;
@@ -52,7 +54,6 @@ public class RewardView  extends AppCompatActivity {
     private void initializeUI(){
 
         //wire up UI components
-        mUserName = (TextView)findViewById(R.id.username);
         mAvatar = (ImageView)findViewById(R.id.avatar);
         mTotalCoins_textview = (TextView)findViewById(R.id.coinTotal);
         mMessage = (TextView)findViewById(R.id.message);
@@ -70,7 +71,8 @@ public class RewardView  extends AppCompatActivity {
             // if this is the first time, there will be data in the bundle
             if (mUser == null){
 
-                // TODO: redirect to UserStats screen
+                // redirect to UserStats screen
+                Intent intent = new Intent(this, UserStats.class);
             }
             else {
 
@@ -83,7 +85,6 @@ public class RewardView  extends AppCompatActivity {
 
     private void displayRewards(){
 
-        mUserName.setText(mUser.getUserName());
         mAvatar.setImageResource(getResources().getIdentifier(mUser.getAvatarFileName(), "drawable", getPackageName()));
 
         //TODO: check points are rounding in a consistent way throughout code, including updating DB
@@ -103,7 +104,8 @@ public class RewardView  extends AppCompatActivity {
 
         //RecyclerView
         // Initialize recycler view
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        //mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         mRewardRecyclerAdapter = new RewardRecyclerAdapter(this, mUser);
         mRecyclerView.setAdapter(mRewardRecyclerAdapter);
 
@@ -147,7 +149,7 @@ public class RewardView  extends AppCompatActivity {
 
             customViewHolder.rewardPoints.setText(String.valueOf(numPoints));
             customViewHolder.name.setText(reward.getName());
-            customViewHolder.description.setText(" " + reward.getDescription());
+            //customViewHolder.description.setText(" " + reward.getDescription());
             customViewHolder.itemView.setTag(reward);
 
             customViewHolder.statusButton.setOnClickListener(new View.OnClickListener() {
@@ -236,7 +238,7 @@ public class RewardView  extends AppCompatActivity {
 
             TextView rewardPoints;
             TextView name;
-            TextView description;
+            //TextView description;
             Button statusButton;
             TextView status;
 
@@ -245,7 +247,6 @@ public class RewardView  extends AppCompatActivity {
 
                 this.rewardPoints = (TextView) view.findViewById(R.id.rewardPoints);
                 this.name = (TextView) view.findViewById(R.id.name);
-                this.description = (TextView) view.findViewById(R.id.description);
                 this.statusButton = (Button) view.findViewById(R.id.statusButton);
                 this.status = (TextView) view.findViewById(R.id.status);
 

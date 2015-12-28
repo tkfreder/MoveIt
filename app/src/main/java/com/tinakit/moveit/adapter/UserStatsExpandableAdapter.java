@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bignerdranch.expandablerecyclerview.Adapter.ExpandableRecyclerAdapter;
+import com.tinakit.moveit.adapter.ExpandableRecyclerAdapter;
 import com.bignerdranch.expandablerecyclerview.Model.ParentListItem;
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.adapter.view_holder.RewardChildViewHolder;
@@ -34,6 +34,8 @@ public class UserStatsExpandableAdapter extends ExpandableRecyclerAdapter<Reward
         mActivity = activity;
         mInflater = LayoutInflater.from(context);
         mUserList = userList;
+
+
     }
 
 
@@ -56,7 +58,7 @@ public class UserStatsExpandableAdapter extends ExpandableRecyclerAdapter<Reward
 
         User user = (User) parentListItem;
         mCurrentUser = user;
-        rewardParentViewHolder.bind(mContext, mActivity, user);
+        rewardParentViewHolder.bind(mContext.getResources().getIdentifier(user.getAvatarFileName(), "drawable", mActivity.getPackageName()), user);
 
     }
 

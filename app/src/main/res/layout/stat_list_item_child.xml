@@ -1,61 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.percent.PercentRelativeLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="150dp"
+    android:gravity="center">
     >
     <RelativeLayout
-        android:id="@+id/pointsLayout"
-        android:layout_width="0dp"
-        app:layout_widthPercent="20%"
+        android:id="@+id/coinLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_centerInParent="true"
-        >
+        android:gravity="center">
 
         <TextView
             android:id="@+id/rewardPoints"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
             style="@style/LabelListItemPurple"
             />
 
         <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:gravity="center_vertical"
-            android:src="@drawable/gold_coin"/>
+            android:id="@+id/goldCoin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="2dp"
+            android:src="@drawable/gold_coin_24"
+            android:layout_toRightOf="@+id/rewardPoints"
+            android:layout_toEndOf="@+id/rewardPoints"/>
     </RelativeLayout>
+
 
     <TextView
         android:id="@+id/name"
-        app:layout_widthPercent="40%"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/LabelListItemPurple"
-        android:layout_toRightOf="@+id/pointsLayout"
-        android:layout_toEndOf="@+id/pointsLayout"/>
+        android:paddingLeft="4dp"
+        android:layout_below="@+id/coinLayout"/>
 
     <Button
         android:id="@+id/statusButton"
-        android:layout_width="0dp"
-        app:layout_widthPercent="20%"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        android:layout_toRightOf="@+id/name"
-        android:layout_toEndOf="@+id/name"/>
+        android:layout_below="@+id/name"/>
 
     <TextView
         android:id="@+id/status"
-        android:layout_width="0dp"
-        app:layout_widthPercent="20%"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"/>
+        android:layout_below="@+id/statusButton"/>
 
-    <TextView
-    android:id="@+id/description"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-        android:visibility="gone"/>
-</android.support.percent.PercentRelativeLayout>
+</RelativeLayout>

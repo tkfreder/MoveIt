@@ -9,7 +9,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bignerdranch.expandablerecyclerview.ViewHolder.ParentViewHolder;
+import com.tinakit.moveit.adapter.view_holder.ParentViewHolder;
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.model.Reward;
 import com.tinakit.moveit.model.RewardStatusType;
@@ -35,13 +35,13 @@ public class RewardParentViewHolder extends ParentViewHolder {
         super(view);
         this.avatar = (ImageView)view.findViewById(R.id.avatar);
         this.points = (TextView)view.findViewById(R.id.points);
-        this.expandArrow = (ImageButton)view.findViewById(R.id.expandArrow);
+        //this.expandArrow = (ImageButton)view.findViewById(R.id.expandArrow);
     }
 
 
-    public void bind(Context context, Activity activity, User user){
+    public void bind(int resourceId, User user){
 
-        avatar.setImageResource(context.getResources().getIdentifier(user.getAvatarFileName(), "drawable", activity.getPackageName()));
+        avatar.setImageResource(resourceId);
         points.setText(String.valueOf(user.getPoints()));
     }
 
@@ -59,6 +59,7 @@ public class RewardParentViewHolder extends ParentViewHolder {
         }
     }
 
+    /*
     @Override
     public void onExpansionToggled(boolean expanded) {
         super.onExpansionToggled(expanded);
@@ -74,4 +75,5 @@ public class RewardParentViewHolder extends ParentViewHolder {
         rotateAnimation.setFillAfter(true);
         expandArrow.startAnimation(rotateAnimation);
     }
+    */
 }

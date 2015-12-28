@@ -156,7 +156,7 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
 
             this.rewardPoints = (TextView) view.findViewById(R.id.rewardPoints);
             this.name = (TextView) view.findViewById(R.id.name);
-            this.description = (TextView) view.findViewById(R.id.description);
+            //this.description = (TextView) view.findViewById(R.id.description);
             this.statusButton = (Button) view.findViewById(R.id.statusButton);
             this.status = (TextView) view.findViewById(R.id.status);
 

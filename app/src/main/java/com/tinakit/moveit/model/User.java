@@ -87,9 +87,17 @@ public class User  implements Parcelable, ParentListItem {
         return mRewardList;
     }
 
+    public void setChildItemList(List<Reward> childItemList) {
+        mRewardList = childItemList;
+    }
+
     @Override
     public boolean isInitiallyExpanded() {
-        return false;
+        return true;
+    }
+
+    public void setInitiallyExpanded(boolean initiallyExpanded) {
+        mInitiallyExpanded = initiallyExpanded;
     }
 
     @Override
