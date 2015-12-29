@@ -7,7 +7,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
-//import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -46,8 +45,6 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private ViewPager viewPager;
     protected ViewPagerAdapter mViewPagerAdapter;
-    protected int mUserCount;
-    protected int mCurrentTab;
     private FitnessDBHelper mDatabaseHelper;
 
     //cache
@@ -148,6 +145,9 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
+    //**********************************************************************************************
+    //  ViewPagerAdapter
+    //**********************************************************************************************
 
     static class ViewPagerAdapter extends FragmentPagerAdapter {
         private final List<Fragment> mFragmentList = new ArrayList<>();
@@ -177,6 +177,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //**********************************************************************************************
+    //  setUpViewPager()
+    //**********************************************************************************************
     private void setupViewPager(ViewPager viewPager){
 
         // FIRST TAB
@@ -203,12 +206,20 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //**********************************************************************************************
+    //  onCreateOptionsMenu()
+    //**********************************************************************************************
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
+
+    //**********************************************************************************************
+    //  onOptionsItemSelected()
+    //**********************************************************************************************
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -240,8 +251,7 @@ public class MainActivity extends AppCompatActivity {
     //  BroadcastReceiver mMessageReceiver
     //**********************************************************************************************
 
-    // Handler for received Intents. This will be called whenever an Intent
-    // with an action named GOOGLE_API_INTENT is broadcasted.
+    // Handler for received Intents sent by various Fragments and Activities from the app
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
