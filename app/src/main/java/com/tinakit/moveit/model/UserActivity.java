@@ -6,7 +6,7 @@ import android.os.Parcel;
 /**
  * Created by Tina on 11/7/2015.
  */
-public class UserActivity implements Parcelable {
+public class UserActivity implements Parcelable, Comparable<UserActivity> {
 
     private User mUser;
     private ActivityType mActivityType;
@@ -66,6 +66,11 @@ public class UserActivity implements Parcelable {
     @Override
     public int hashCode() {
         return mUser != null ? mUser.hashCode() : 0;
+    }
+
+    public int compareTo(UserActivity userActivity) {
+        int userId = this.getUser().getUserId();
+        return (userId - userActivity.getUser().getUserId());
     }
 
 

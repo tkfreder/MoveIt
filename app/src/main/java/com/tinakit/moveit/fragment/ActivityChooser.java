@@ -29,6 +29,7 @@ import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.model.UserActivity;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import fr.ganfra.materialspinner.MaterialSpinner;
@@ -83,7 +84,9 @@ public class ActivityChooser  extends Fragment {
             @Override
             public void onClick(View v) {
 
+                //sort the UserActivityList before saving it
                 Intent intent = new Intent(mFragmentActivity, ActivityTracker.class);
+                Collections.sort(mUserActivityList);
                 intent.putParcelableArrayListExtra(USER_ACTIVITY_LIST, mUserActivityList);
                 startActivity(intent);
             }

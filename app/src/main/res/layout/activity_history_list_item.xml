@@ -1,19 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:orientation="horizontal">
+<android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="50dp">
+
     <TextView
         android:id="@+id/date"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/LabelListItemPurple"
-        android:layout_weight="1"
+        app:layout_widthPercent="15%"
         />
-    <LinearLayout
-        android:layout_width="0dp"
+
+    <RelativeLayout
+        android:id="@+id/timeLayout"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1">
+        app:layout_widthPercent="15%"
+        android:layout_toRightOf="@+id/date"
+        android:layout_toEndOf="@+id/date"
+        android:paddingLeft="4dp">
         <TextView
             android:id="@+id/minutesElapsed"
             android:layout_width="wrap_content"
@@ -25,23 +31,29 @@
             android:layout_height="wrap_content"
             android:text="min"
             style="@style/LabelListItemPurple"
-            android:paddingLeft="2dp"/>
+            android:paddingLeft="2dp"
+            android:layout_toRightOf="@+id/minutesElapsed"
+            android:layout_toEndOf="@+id/minutesElapsed"/>
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <TextView
-            android:id="@+id/place"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            style="@style/LabelListItemPurple"
-        android:layout_weight="3"
+        android:id="@+id/place"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/LabelListItemPurple"
+        android:layout_toRightOf="@+id/timeLayout"
+        android:layout_toEndOf="@+id/timeLayout"
+        app:layout_widthPercent="40%"
             />
 
     <LinearLayout
         android:id="@+id/userLinearLayout"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_weight="3">
+        android:layout_toRightOf="@+id/place"
+        android:layout_toEndOf="@+id/place"
+        app:layout_widthPercent="30%">
     </LinearLayout>
-</LinearLayout>
+</android.support.percent.PercentRelativeLayout>
