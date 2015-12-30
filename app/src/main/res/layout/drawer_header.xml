@@ -23,6 +23,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
         android:text="Username"
+        android:visibility="gone"
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"/>
     <TextView
         android:id="@+id/email"
@@ -33,6 +34,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginBottom="16dp"
         android:text="username@mymail.com"
+        android:visibility="gone"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
 
 </RelativeLayout>

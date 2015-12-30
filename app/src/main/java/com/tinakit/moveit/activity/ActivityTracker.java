@@ -812,35 +812,6 @@ public class ActivityTracker extends AppCompatActivity {
         }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-
-        switch (item.getItemId()) {
-            case R.id.action_rewards:
-                EditRewards();
-                return true;
-            case R.id.action_settings:
-                //TODO:  openSettings();
-                return true;
-
-            default:
-        }
-
-        return super.onOptionsItemSelected(item);
-
-    }
-
-    private void EditRewards(){
-
-        //TODO: replace this with a call to EditRewardFragment
-        //Intent intent = new Intent(mFragmentActivity, EditReward.class);
-        //startActivity(intent);
-    }
-
-
     private class SaveToDB implements Runnable {
 
         public void run() {

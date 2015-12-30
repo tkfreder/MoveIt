@@ -3,18 +3,6 @@
     <group
         android:checkableBehavior="single">
 
-        <item
-            android:id="@+id/drawer_start"
-            android:title="@string/start"/>
-
-        <item
-            android:id="@+id/drawer_stats"
-            android:title="@string/stats"/>
-
-        <item
-            android:id="@+id/drawer_rewards"
-            android:title="@string/rewards"/>
-
     </group>
 
 </menu>

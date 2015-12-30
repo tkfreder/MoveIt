@@ -14,6 +14,7 @@
     <string name="again">Let\'s do it again!</string>
     <string name="start">Start</string>
     <string name="stats">Stats</string>
+    <string name="settings">Settings</string>
     <string name="rewards">Rewards</string>
     <string name="time_limit">Time Limit</string>
     <string name="reached_time_limit_30_minutes">You have reached the time limit of 30 minutes.</string>
@@ -96,6 +97,16 @@
         <item>125</item>
         <item>150</item>
     </string-array>
+
+    <!-- Navigation Drawer -->
+    <string-array name="navigation_drawer_menu_array">
+        <item>Start</item>
+        <item>User Profiles</item>
+        <item>Settings</item>
+    </string-array>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+
     <string name="title_activity_sensor_api">SensorAPI</string>
 
     <string name="title_activity_fused_location_api">FusedLocationApi</string>
@@ -121,5 +132,6 @@
     <string name="not_participating">Not participating</string>
     <string name="activity_cancelled">Activity cancelled.</string>
     <string name="activity_saved">Activity saved.</string>
+    <string name="user_profiles">User Profiles</string>
 
 </resources>
