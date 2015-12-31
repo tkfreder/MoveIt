@@ -272,57 +272,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //**********************************************************************************************
-    //  onOptionsItemSelected()
-    //**********************************************************************************************
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        Intent intent;
-
-        // user profile menus
-        if (id == R.id.action_user_profiles) {
-
-            for (int i = 0; i < mUserList.size(); i++){
-
-                if(mUserList.get(i).getUserName().equals(item.getTitle().toString())){
-
-                    intent = new Intent(this, UserProfile.class);
-                    Bundle bundle = new Bundle();
-                    bundle.putParcelable("user", mUserList.get(i));
-                    intent.putExtra("user", bundle);
-                    startActivity(intent);
-
-                    break;
-
-                }
-            }
-            return true;
-        }
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        switch (id){
-            case android.R.id.home:
-                if (mDrawerLayout.isDrawerOpen(GravityCompat.START)){
-                    mDrawerLayout.closeDrawer(GravityCompat.START);
-                } else {
-                    mDrawerLayout.openDrawer(GravityCompat.START);
-                }
-
-                return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    //**********************************************************************************************
     //  BroadcastReceiver mMessageReceiver
     //**********************************************************************************************
 
