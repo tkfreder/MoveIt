@@ -272,27 +272,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //**********************************************************************************************
-    //  onCreateOptionsMenu()
-    //**********************************************************************************************
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-
-        SubMenu subMenu = menu.findItem(R.id.action_user_profiles).getSubMenu();
-
-        //delete placeholder submenu
-        subMenu.clear();
-
-        for (User user : mUserList){
-
-            subMenu.addSubMenu(user.getUserName());
-        }
-        return true;
-    }
-
-    //**********************************************************************************************
     //  onOptionsItemSelected()
     //**********************************************************************************************
 
