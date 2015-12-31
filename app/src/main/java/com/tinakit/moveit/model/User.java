@@ -129,6 +129,7 @@ public class User  implements Parcelable, ParentListItem {
             } else {
                 mRewardList = null;
             }
+            mInitiallyExpanded = in.readByte() != 0x00;
         }
 
         @Override
@@ -151,6 +152,7 @@ public class User  implements Parcelable, ParentListItem {
                 dest.writeByte((byte) (0x01));
                 dest.writeList(mRewardList);
             }
+            dest.writeByte((byte) (mInitiallyExpanded ? 0x01 : 0x00));
         }
 
         @SuppressWarnings("unused")

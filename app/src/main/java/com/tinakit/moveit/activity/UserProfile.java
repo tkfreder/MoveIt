@@ -1,45 +1,52 @@
 package com.tinakit.moveit.activity;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.util.AttributeSet;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 
 import com.tinakit.moveit.R;
+import com.tinakit.moveit.adapter.UserStatsRecyclerAdapter;
 import com.tinakit.moveit.db.FitnessDBHelper;
+import com.tinakit.moveit.model.User;
+
+import java.util.List;
 
 /**
  * Created by Tina on 12/29/2015.
  */
-public class UserProfile extends Fragment {
+public class UserProfile extends AppCompatActivity {
 
-    protected FragmentActivity mFragmentActivity;
-    private View rootView;
+
+    // cache
+    List<User> mUserList;
 
     //database
     FitnessDBHelper mDatabaseHelper;
 
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        mFragmentActivity  = (FragmentActivity)super.getActivity();
-        rootView = inflater.inflate(R.layout.activity_chooser, container, false);
+        setContentView(R.layout.recycler_view);
 
-        mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        mDatabaseHelper = FitnessDBHelper.getInstance(this);
 
-        //get databaseHelper instance
-        mDatabaseHelper = FitnessDBHelper.getInstance(mFragmentActivity);
+        // fetch directly from the database
+        mUserList = mDatabaseHelper.getUsers();
 
-        //initializeUI();
 
-        //setActionListeners();
+        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        mRecyclerView.setHasFixedSize(true); //child items have fixed dimensions, allows the RecyclerView to optimize better by figuring out the exact height and width of the entire list based on the adapter.
 
-        return rootView;
-    }
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        mRecyclerView.setLayoutManager(linearLayoutManager);
+
+        UserStatsRecyclerAdapter mUserStatsRecyclerAdapter = new UserStatsRecyclerAdapter(this, this, mUserList);
+        mRecyclerView.setAdapter(mUserStatsRecyclerAdapter);
+
+        }
 }

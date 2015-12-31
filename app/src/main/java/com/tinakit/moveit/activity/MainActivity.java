@@ -159,10 +159,25 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
                         menuItem.setChecked(true);
+
+                        callMenuItemAction(menuItem.getItemId());
                         mDrawerLayout.closeDrawers();
                         return true;
                     }
                 });
+    }
+
+    private void callMenuItemAction(int id){
+
+        switch(id){
+
+            case R.id.action_user_profiles:
+            case R.id.nav_user_profiles:
+                Intent intent = new Intent(this, UserProfile.class);
+                startActivity(intent);
+                break;
+
+        }
     }
 
     //**********************************************************************************************
@@ -257,6 +272,9 @@ public class MainActivity extends AppCompatActivity {
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
         }
+
+        callMenuItemAction(item.getItemId());
+
         return super.onOptionsItemSelected(item);
     }
 

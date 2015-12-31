@@ -18,8 +18,6 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <service android:name=".api.TrackerService" android:exported="false"/>
-
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
@@ -34,14 +32,10 @@
 
         </activity>
 
-        <activity
-            android:name=".activity.ActivityTracker">
+        <activity android:name=".activity.ActivityTracker"/>
+        <activity android:name=".activity.RewardView"/>
+        <activity android:name=".activity.UserProfile"/>
 
-        </activity>
-        <activity
-            android:name=".activity.RewardView">
-
-        </activity>
 
         <activity android:name=".utility.AndroidDatabaseManager"
                   android:theme="@style/Theme.AppCompat.Light"/>
