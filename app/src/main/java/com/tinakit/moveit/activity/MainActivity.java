@@ -180,10 +180,15 @@ public class MainActivity extends AppCompatActivity {
                 mSlidingTabLayout.setVisibility(View.GONE);
                 mViewPager.setVisibility(View.GONE);
 
-                UserProfile userProfile= new UserProfile ();
-                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                transaction.add(R.id.fragmentContainer, userProfile, UserProfile.USER_PROFILE_TAG);
-                transaction.commit();
+                // check whether UserProfile is already visible
+                UserProfile userProfile = (UserProfile)getSupportFragmentManager().findFragmentByTag(UserProfile.USER_PROFILE_TAG);
+                if (userProfile == null){
+
+                    userProfile= new UserProfile ();
+                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                    transaction.add(R.id.fragmentContainer, userProfile, UserProfile.USER_PROFILE_TAG);
+                    transaction.commit();
+                }
 
                 //Intent intent = new Intent(this, UserProfile.class);
                 //startActivity(intent);
@@ -191,6 +196,7 @@ public class MainActivity extends AppCompatActivity {
 
             case R.id.nav_start:
 
+                closeUserProfile();
                 mViewPager.setCurrentItem(0);
                 break;
 
@@ -199,6 +205,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+
+        closeUserProfile();
+    }
+
+    private void closeUserProfile(){
 
         UserProfile userProfile = (UserProfile)getSupportFragmentManager().findFragmentByTag(UserProfile.USER_PROFILE_TAG);
         if (userProfile!= null && userProfile.isVisible()) {
