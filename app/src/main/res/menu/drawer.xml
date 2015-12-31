@@ -2,12 +2,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <group
-        android:checkableBehavior="single">
+        android:checkableBehavior="single"
+        >
         <item
-            android:id="@+id/nav_home"
+            android:id="@+id/nav_start"
             app:itemIconTint="@android:color/black"
             android:icon="@drawable/start_24"
-            android:title="Home" />
+            android:title="@string/start" />
         <item
             android:id="@+id/nav_user_profiles"
             app:itemIconTint="@android:color/black"

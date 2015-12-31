@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-
     <!-- Your normal content view -->
     <include layout="@layout/tab_layout"/>
 
@@ -26,7 +25,8 @@
         android:layout_gravity="left|start"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/drawer_header"
-        app:menu="@menu/drawer">
+        app:menu="@menu/drawer"
+        app:itemBackground="@drawable/activated_background">
 
     </android.support.design.widget.NavigationView>
 </android.support.v4.widget.DrawerLayout>

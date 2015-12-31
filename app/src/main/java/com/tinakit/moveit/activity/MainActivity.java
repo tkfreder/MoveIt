@@ -154,14 +154,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void setupDrawerContent(NavigationView navigationView){
+    private void setupDrawerContent(final NavigationView navigationView){
 
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
                         menuItem.setChecked(true);
-
                         callMenuItemAction(menuItem.getItemId());
                         mDrawerLayout.closeDrawers();
                         return true;
@@ -188,6 +187,11 @@ public class MainActivity extends AppCompatActivity {
 
                 //Intent intent = new Intent(this, UserProfile.class);
                 //startActivity(intent);
+                break;
+
+            case R.id.nav_start:
+
+                mViewPager.setCurrentItem(0);
                 break;
 
         }

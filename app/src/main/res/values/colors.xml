@@ -10,6 +10,8 @@
     <color name="accent">#FFED50</color>
     <color name="window_background">#FFFFFF</color>
     <color name="grey">#D3D3D3</color>
+    <color name="activated_color">#fff2e5</color>
+    <color name="pressed_color">#ffd9b3</color>
 
 
 </resources>
