@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -55,12 +56,6 @@ public class MainActivity extends AppCompatActivity {
 
     // Navigation Drawer
     private DrawerLayout mDrawerLayout;
-    private ListView mDrawerList;
-    private ActionBarDrawerToggle mDrawerToggle;
-    private String[] mDrawerMenuItems;
-    private CharSequence mDrawerTitle;
-    private CharSequence mTitle;
-    private NavigationView mNavigationView;
 
     private ViewPager viewPager;
     protected ViewPagerAdapter mViewPagerAdapter;
@@ -114,6 +109,16 @@ public class MainActivity extends AppCompatActivity {
 
     private void initializeUI(){
 
+        // Toolbar
+        setSupportActionBar((Toolbar)findViewById(R.id.toolBar));
+
+        // Actionbar
+        final ActionBar actionBar = getSupportActionBar();
+
+        // enable ActionBar app icon to behave as action to toggle nav drawer
+        actionBar.setHomeAsUpIndicator(R.drawable.hamburger_icon);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
         // Navigation Drawer
         initializeNavigationDrawer();
 
@@ -128,7 +133,6 @@ public class MainActivity extends AppCompatActivity {
         slidingTabLayout.setViewPager(viewPager);
 
         //set tab index if this is redirected
-        //int defaultValue = 0;
         if(getIntent().hasExtra("tab_index")){
 
             viewPager.setCurrentItem((int)getIntent().getExtras().get("tab_index"));
@@ -137,121 +141,28 @@ public class MainActivity extends AppCompatActivity {
 
     private void initializeNavigationDrawer(){
 
-        mTitle = mDrawerTitle = getTitle();
-        mDrawerMenuItems = getResources().getStringArray(R.array.navigation_drawer_menu_array);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        //mDrawerList = (ListView) findViewById(R.id.list_view_inside_nav);
-        mNavigationView = (NavigationView)findViewById(R.id.navigation_view);
+        NavigationView navigationView = (NavigationView)findViewById(R.id.navigation_view);
 
-        mNavigationView.setNavigationItemSelectedListener(
+        if (navigationView != null){
+
+            setupDrawerContent(navigationView);
+        }
+
+
+    }
+
+    private void setupDrawerContent(NavigationView navigationView){
+
+        navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        // Handle menu item clicks here.
+                        menuItem.setChecked(true);
                         mDrawerLayout.closeDrawers();
                         return true;
                     }
                 });
-
-        // add menu items to Navigation Drawer
-        Menu m = mNavigationView.getMenu();
-
-        // copy menu items from string resource
-        String[] myResArray = getResources().getStringArray(R.array.navigation_drawer_menu_array);
-        List<String> menuItemList = Arrays.asList(myResArray);
-
-        SubMenu userProfileMenu = m.addSubMenu(getResources().getString(R.string.user_profiles));
-
-        for (String menuName : menuItemList){
-
-            userProfileMenu.add(menuName);
-        }
-
-        // set a custom shadow that overlays the main content when the drawer opens
-        //mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-
-        // set up the drawer's list view with items and click listener
-        //mDrawerList.setAdapter(new ArrayAdapter<String>(this,
-        //        R.layout.drawer_list_item, mDrawerMenuItems));
-        //mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
-
-        // enable ActionBar app icon to behave as action to toggle nav drawer
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.hamburger_icon);
-
-        // ActionBarDrawerToggle ties together the the proper interactions
-        // between the sliding drawer and the action bar app icon
-        mDrawerToggle = new ActionBarDrawerToggle(
-                this,                  /* host Activity */
-                mDrawerLayout,         /* DrawerLayout object */
-                new Toolbar(this),  /* nav drawer image to replace 'Up' caret */
-                R.string.drawer_open,  /* "open drawer" description for accessibility */
-                R.string.drawer_close  /* "close drawer" description for accessibility */
-        ) {
-            public void onDrawerClosed(View view) {
-                getSupportActionBar().setTitle(mTitle);
-                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-            }
-
-            public void onDrawerOpened(View drawerView) {
-                getSupportActionBar().setTitle(mDrawerTitle);
-                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-            }
-        };
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-
-        if (mSavedInstanceState == null) {
-            selectItem(0);
-        }
-    }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        // Sync the toggle state after onRestoreInstanceState has occurred.
-        mDrawerToggle.syncState();
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        mDrawerToggle.onConfigurationChanged(newConfig);
-    }
-
-
-
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView parent, View view, int position, long id) {
-            selectItem(position);
-        }
-    }
-
-    /** Swaps fragments in the main content view */
-    private void selectItem(int position) {
-
-        // Create a new fragment and specify the planet to show based on position
-        Fragment fragment = new UserProfile();
-
-        // Insert the fragment by replacing any existing fragment
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.main_content, fragment)
-                .commit();
-
-        // Highlight the selected item, update the title, and close the drawer
-        //mDrawerList.setItemChecked(position, true);
-        setTitle(mDrawerMenuItems[position]);
-        //mDrawerLayout.closeDrawer(mDrawerList);
-        mDrawerLayout.closeDrawers();
-
-    }
-
-    @Override
-    public void setTitle(CharSequence title) {
-        mTitle = title;
-        getSupportActionBar().setTitle(mTitle);
     }
 
     //**********************************************************************************************
@@ -392,10 +303,6 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         Intent intent;
-
-        if (mDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
 
         // user profile menus
         if (id == R.id.action_user_profiles) {

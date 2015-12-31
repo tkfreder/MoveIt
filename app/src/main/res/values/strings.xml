@@ -98,15 +98,6 @@
         <item>150</item>
     </string-array>
 
-    <!-- Navigation Drawer -->
-    <string-array name="navigation_drawer_menu_array">
-        <item>Start</item>
-        <item>User Profiles</item>
-        <item>Settings</item>
-    </string-array>
-    <string name="drawer_open">Open navigation drawer</string>
-    <string name="drawer_close">Close navigation drawer</string>
-
     <string name="title_activity_sensor_api">SensorAPI</string>
 
     <string name="title_activity_fused_location_api">FusedLocationApi</string>
