@@ -34,8 +34,6 @@
 
         <activity android:name=".activity.ActivityTracker"/>
         <activity android:name=".activity.RewardView"/>
-        <activity android:name=".activity.UserProfile"/>
-
 
         <activity android:name=".utility.AndroidDatabaseManager"
                   android:theme="@style/Theme.AppCompat.Light"/>

@@ -4,11 +4,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
@@ -20,6 +20,7 @@ import android.view.Menu;
 
 import com.tinakit.moveit.fragment.ActivityChooser;
 import com.tinakit.moveit.fragment.ActivityHistory;
+import com.tinakit.moveit.fragment.UserProfile;
 import com.tinakit.moveit.fragment.UserStats;
 import com.tinakit.moveit.model.ActivityDetail;
 
@@ -28,12 +29,8 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.RelativeLayout;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.db.FitnessDBHelper;
@@ -41,7 +38,6 @@ import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.tab.SlidingTabLayout;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -57,8 +53,10 @@ public class MainActivity extends AppCompatActivity {
     // Navigation Drawer
     private DrawerLayout mDrawerLayout;
 
-    private ViewPager viewPager;
+    private ViewPager mViewPager;
     protected ViewPagerAdapter mViewPagerAdapter;
+    SlidingTabLayout mSlidingTabLayout;
+
     private FitnessDBHelper mDatabaseHelper;
 
     //cache
@@ -119,23 +117,26 @@ public class MainActivity extends AppCompatActivity {
         actionBar.setHomeAsUpIndicator(R.drawable.hamburger_icon);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
+        // SlidingTabLayout
+        mSlidingTabLayout = (SlidingTabLayout)findViewById(R.id.tabLayout);
+
         // Navigation Drawer
         initializeNavigationDrawer();
 
         //ViewPager
-        viewPager = (ViewPager)findViewById(R.id.tab_viewpager);
-        if (viewPager != null){
-            setupViewPager(viewPager);
+        mViewPager = (ViewPager)findViewById(R.id.tab_viewpager);
+        if (mViewPager != null){
+            setupViewPager(mViewPager);
         }
 
         //TabLayout
         SlidingTabLayout slidingTabLayout = (SlidingTabLayout)findViewById(R.id.tabLayout);
-        slidingTabLayout.setViewPager(viewPager);
+        slidingTabLayout.setViewPager(mViewPager);
 
         //set tab index if this is redirected
         if(getIntent().hasExtra("tab_index")){
 
-            viewPager.setCurrentItem((int)getIntent().getExtras().get("tab_index"));
+            mViewPager.setCurrentItem((int)getIntent().getExtras().get("tab_index"));
         }
     }
 
@@ -174,10 +175,32 @@ public class MainActivity extends AppCompatActivity {
 
             case R.id.action_user_profiles:
             case R.id.nav_user_profiles:
-                Intent intent = new Intent(this, UserProfile.class);
-                startActivity(intent);
+
+                //TODO: replace SlidingTabLayout and ViewPager with UserProfile fragment
+                //http://stackoverflow.com/questions/30518710/slidingtablayout-replace-with-fragment
+                mSlidingTabLayout.setVisibility(View.GONE);
+                mViewPager.setVisibility(View.GONE);
+
+                UserProfile userProfile= new UserProfile ();
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.add(R.id.fragmentContainer, userProfile, UserProfile.USER_PROFILE_TAG);
+                transaction.commit();
+
+                //Intent intent = new Intent(this, UserProfile.class);
+                //startActivity(intent);
                 break;
 
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        UserProfile userProfile = (UserProfile)getSupportFragmentManager().findFragmentByTag(UserProfile.USER_PROFILE_TAG);
+        if (userProfile!= null && userProfile.isVisible()) {
+            mSlidingTabLayout.setVisibility(View.VISIBLE);
+            mViewPager.setVisibility(View.VISIBLE);
+            getSupportFragmentManager().beginTransaction().remove(userProfile).commit();
         }
     }
 
