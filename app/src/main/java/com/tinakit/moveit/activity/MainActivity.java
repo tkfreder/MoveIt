@@ -143,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         NavigationView navigationView = (NavigationView)findViewById(R.id.navigation_view);
+        navigationView.setItemIconTintList(null);
 
         if (navigationView != null){
 
