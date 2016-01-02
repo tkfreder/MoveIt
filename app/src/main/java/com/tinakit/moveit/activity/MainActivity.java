@@ -20,6 +20,7 @@ import android.view.Menu;
 
 import com.tinakit.moveit.fragment.ActivityChooser;
 import com.tinakit.moveit.fragment.ActivityHistory;
+import com.tinakit.moveit.fragment.PickAvatar;
 import com.tinakit.moveit.fragment.UserProfile;
 import com.tinakit.moveit.fragment.UserStats;
 import com.tinakit.moveit.model.ActivityDetail;
@@ -177,8 +178,11 @@ public class MainActivity extends AppCompatActivity {
 
                 //TODO: replace SlidingTabLayout and ViewPager with UserProfile fragment
                 //http://stackoverflow.com/questions/30518710/slidingtablayout-replace-with-fragment
-                mSlidingTabLayout.setVisibility(View.GONE);
-                mViewPager.setVisibility(View.GONE);
+
+                //make sure you set title first, as the closeFragments depends on the desired screen
+                getSupportActionBar().setTitle(getResources().getString(R.string.user_profiles));
+                closeFragments();
+                displayTabLayout(View.GONE);
 
                 // check whether UserProfile is already visible
                 UserProfile userProfile = (UserProfile)getSupportFragmentManager().findFragmentByTag(UserProfile.USER_PROFILE_TAG);
@@ -188,6 +192,8 @@ public class MainActivity extends AppCompatActivity {
                     FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                     transaction.add(R.id.fragmentContainer, userProfile, UserProfile.USER_PROFILE_TAG);
                     transaction.commit();
+
+
                 }
 
                 //Intent intent = new Intent(this, UserProfile.class);
@@ -196,9 +202,30 @@ public class MainActivity extends AppCompatActivity {
 
             case R.id.nav_start:
 
-                closeUserProfile();
+                //make sure you set title first, as the closeFragments depends on the desired screen
+                getSupportActionBar().setTitle(getResources().getString(R.string.start));
+
+                closeFragments();
+
+                displayTabLayout(View.VISIBLE);
                 mViewPager.setCurrentItem(0);
+
+
+
+
                 break;
+
+            case R.id.nav_settings:
+            case R.id.action_settings:
+
+                //make sure you set title first, as the closeFragments depends on the desired screen
+                getSupportActionBar().setTitle(getResources().getString(R.string.settings));
+
+                displayTabLayout(View.GONE);
+
+                closeFragments();
+
+
 
         }
     }
@@ -206,17 +233,52 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
 
-        closeUserProfile();
+        closeFragments();
     }
 
-    private void closeUserProfile(){
+    private void closeFragments(){
 
-        UserProfile userProfile = (UserProfile)getSupportFragmentManager().findFragmentByTag(UserProfile.USER_PROFILE_TAG);
-        if (userProfile!= null && userProfile.isVisible()) {
-            mSlidingTabLayout.setVisibility(View.VISIBLE);
-            mViewPager.setVisibility(View.VISIBLE);
-            getSupportFragmentManager().beginTransaction().remove(userProfile).commit();
+        // if the desired screen is User Profiles, close other fragments that might be currently displayed
+        if (getSupportActionBar().getTitle().equals(getResources().getString(R.string.user_profiles))){
+
+            /*
+            EditReward editReward = (EditReward)getSupportFragmentManager().findFragmentByTag(EditReward.EDIT_REWARD_TAG);
+            if (editReward!= null && editReward.isVisible()) {
+                getSupportFragmentManager().beginTransaction().remove(editReward).commit();
+            }
+            */
         }
+
+        else if (getSupportActionBar().getTitle().equals(getResources().getString(R.string.rewards))){
+
+            UserProfile userProfile = (UserProfile)getSupportFragmentManager().findFragmentByTag(UserProfile.USER_PROFILE_TAG);
+            if (userProfile!= null && userProfile.isVisible()) {
+                getSupportFragmentManager().beginTransaction().remove(userProfile).commit();
+            }
+        }
+
+        else if (getSupportActionBar().getTitle().equals(getResources().getString(R.string.start))){
+
+            /*
+            EditReward editReward = (EditReward)getSupportFragmentManager().findFragmentByTag(EditReward.EDIT_REWARD_TAG);
+            if (editReward!= null && editReward.isVisible()) {
+                getSupportFragmentManager().beginTransaction().remove(editReward).commit();
+            }
+*/
+            UserProfile userProfile = (UserProfile)getSupportFragmentManager().findFragmentByTag(UserProfile.USER_PROFILE_TAG);
+            if (userProfile!= null && userProfile.isVisible()) {
+                getSupportFragmentManager().beginTransaction().remove(userProfile).commit();
+            }
+        }
+
+
+    }
+
+    private void displayTabLayout(int visibility){
+
+        mSlidingTabLayout.setVisibility(visibility);
+        mViewPager.setVisibility(visibility);
+
     }
 
     //**********************************************************************************************
@@ -363,5 +425,14 @@ public class MainActivity extends AppCompatActivity {
 
         }
     };
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // get current fragment in container
+        UserProfile userProfile = (UserProfile)getSupportFragmentManager().findFragmentByTag(UserProfile.USER_PROFILE_TAG);
+        userProfile.onActivityResult(requestCode, resultCode, data);
+    }
 
 }

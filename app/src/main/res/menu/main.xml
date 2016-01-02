@@ -23,8 +23,13 @@ limitations under the License.
           android:orderInCategory="100"
           app:showAsAction="never" />
 
+    <item android:id="@+id/action_rewards"
+        android:title="@string/rewards"
+        android:orderInCategory="101"
+        app:showAsAction="never" />
+
     <item android:id="@+id/action_settings"
         android:title="@string/settings"
-        android:orderInCategory="101"
+        android:orderInCategory="102"
         app:showAsAction="never" />
 </menu>

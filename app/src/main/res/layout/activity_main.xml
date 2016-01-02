@@ -9,12 +9,6 @@
     <!-- Your normal content view -->
     <include layout="@layout/tab_layout"/>
 
-    <!-- Fragment container -->
-    <FrameLayout
-        android:id="@+id/fragmentContainer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
     <!-- Your drawer view. This can be any view, LinearLayout
      is just an example. As we have set fitSystemWindows=true
      this will be displayed under the status bar. -->

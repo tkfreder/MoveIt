@@ -98,6 +98,17 @@
         <item>150</item>
     </string-array>
 
+    <!-- avatar filenames -->
+    <string-array name="avatar_images">
+        <item>avatar_cat_blue</item>
+        <item>avatar_cat_green</item>
+        <item>avatar_cat_orange</item>
+        <item>avatar_cat_pink</item>
+        <item>avatar_cat_purple</item>
+        <item>avatar_cat_red</item>
+        <item>avatar_cat_yellow</item>
+    </string-array>
+
     <string name="title_activity_sensor_api">SensorAPI</string>
 
     <string name="title_activity_fused_location_api">FusedLocationApi</string>
@@ -124,5 +135,9 @@
     <string name="activity_cancelled">Activity cancelled.</string>
     <string name="activity_saved">Activity saved.</string>
     <string name="user_profiles">User Profiles</string>
+    <string name="weight_lbs">Weight (lbs)</string>
+    <string name="update">Update</string>
+    <string name="browse">Browse</string>
+    <string name="choose_avatar">Choose Avatar</string>
 
 </resources>

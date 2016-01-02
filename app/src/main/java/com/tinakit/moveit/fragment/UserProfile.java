@@ -1,5 +1,6 @@
 package com.tinakit.moveit.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.tinakit.moveit.R;
+import com.tinakit.moveit.adapter.EditUserRecyclerAdapter;
 import com.tinakit.moveit.adapter.UserStatsRecyclerAdapter;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.User;
@@ -29,7 +31,9 @@ public class UserProfile extends Fragment {
     // cache
     protected FragmentActivity mFragmentActivity;
     private View rootView;
-    List<User> mUserList;
+    protected EditUserRecyclerAdapter mEditUserRecyclerAdapter;
+    private List<User> mUserList;
+    private User mUser;
 
     //database
     FitnessDBHelper mDatabaseHelper;
@@ -57,10 +61,26 @@ public class UserProfile extends Fragment {
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(linearLayoutManager);
 
-        UserStatsRecyclerAdapter mUserStatsRecyclerAdapter = new UserStatsRecyclerAdapter(getActivity(), mFragmentActivity, mUserList);
-        mRecyclerView.setAdapter(mUserStatsRecyclerAdapter);
+        mEditUserRecyclerAdapter = new EditUserRecyclerAdapter(getActivity(), mFragmentActivity, mUserList);
+        mRecyclerView.setAdapter(mEditUserRecyclerAdapter);
 
 
         return rootView;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PickAvatar.PICK_AVATAR_REQUEST_CODE){
+            if (resultCode == mFragmentActivity.RESULT_OK) {
+                mUser = data.getParcelableExtra(PickAvatar.PICK_AVATAR_KEY_USER);
+                mUserList.set(mUserList.indexOf(mUser), mUser);
+
+                // refresh recyclerview with new user list data
+                mEditUserRecyclerAdapter.setList(mUserList);
+                mEditUserRecyclerAdapter.notifyDataSetChanged();
+            }
+        }
     }
 }

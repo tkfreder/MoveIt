@@ -15,6 +15,11 @@
             android:icon="@drawable/user_profile_24"
             android:title="Users" />
         <item
+            android:id="@+id/nav_rewards"
+            app:itemIconTint="@android:color/black"
+            android:icon="@drawable/reward_24"
+            android:title="Rewards" />
+        <item
             android:id="@+id/nav_settings"
             app:itemIconTint="@android:color/black"
             android:icon="@drawable/settings_24"

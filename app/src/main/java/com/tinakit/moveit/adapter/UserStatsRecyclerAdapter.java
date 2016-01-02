@@ -26,9 +26,6 @@ public class UserStatsRecyclerAdapter extends RecyclerView.Adapter<UserStatsRecy
     private Context mContext;
     private FragmentActivity mActivity;
     private List<User> mUserList;
-    //private List<Reward> mRewardList;
-    //FitnessDBHelper mDatabaseHelper;
-    //Reward mReward;
 
 
     public UserStatsRecyclerAdapter(Context context, FragmentActivity activity, List<User> userList) {
@@ -51,11 +48,7 @@ public class UserStatsRecyclerAdapter extends RecyclerView.Adapter<UserStatsRecy
     @Override
     public void onBindViewHolder(final UserStatsRecyclerAdapter.CustomViewHolder customViewHolder, int i) {
 
-        //Reward reward = mRewardList.get(i);
         User user = mUserList.get(i);
-
-        // Populate data from Reward data object
-        //int numPoints = reward.getPoints();
 
         customViewHolder.avatar.setImageResource(mContext.getResources().getIdentifier(user.getAvatarFileName(), "drawable", mActivity.getPackageName()));
         customViewHolder.points.setText(String.valueOf(user.getPoints()));
@@ -68,8 +61,6 @@ public class UserStatsRecyclerAdapter extends RecyclerView.Adapter<UserStatsRecy
 
                 User user = (User) customViewHolder.itemView.getTag();
 
-                //TODO: refresh recyclerview, is there another way to do this besides calling intent on EditReward
-                //((Activity)mContext).finish();
                 Intent intent = new Intent(mContext, RewardView.class);
                 Bundle bundle = new Bundle();
                 bundle.putParcelable("user", user);
