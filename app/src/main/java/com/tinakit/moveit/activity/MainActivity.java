@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
@@ -20,7 +19,6 @@ import android.view.Menu;
 
 import com.tinakit.moveit.fragment.ActivityChooser;
 import com.tinakit.moveit.fragment.ActivityHistory;
-import com.tinakit.moveit.fragment.PickAvatar;
 import com.tinakit.moveit.fragment.UserProfile;
 import com.tinakit.moveit.fragment.UserStats;
 import com.tinakit.moveit.model.ActivityDetail;
@@ -31,7 +29,6 @@ import android.support.v4.widget.DrawerLayout;
 
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.RelativeLayout;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.db.FitnessDBHelper;
@@ -428,7 +425,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
 
         // get current fragment in container
         UserProfile userProfile = (UserProfile)getSupportFragmentManager().findFragmentByTag(UserProfile.USER_PROFILE_TAG);

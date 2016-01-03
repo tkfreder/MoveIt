@@ -1,5 +1,6 @@
 package com.tinakit.moveit.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,15 +9,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.MainActivity;
-import com.tinakit.moveit.activity.RewardView;
-import com.tinakit.moveit.fragment.PickAvatar;
-import com.tinakit.moveit.model.Reward;
+import com.tinakit.moveit.activity.PickAvatar;
 import com.tinakit.moveit.model.User;
 
 import java.util.List;
@@ -24,15 +21,15 @@ import java.util.List;
 /**
  * Created by Tina on 1/1/2016.
  */
-public class PickAvatarRecyclerAvatar  extends RecyclerView.Adapter<PickAvatarRecyclerAvatar.CustomViewHolder>  {
+public class PickAvatarRecyclerAdapter extends RecyclerView.Adapter<PickAvatarRecyclerAdapter.CustomViewHolder>  {
 
     private Context mContext;
-    private FragmentActivity mActivity;
+    private Activity mActivity;
     private List<String> mAvatarFileList;
     private User mUser;
 
 
-    public PickAvatarRecyclerAvatar(Context context, FragmentActivity activity, List<String> avatarFileList, User user) {
+    public PickAvatarRecyclerAdapter(Context context, Activity activity, List<String> avatarFileList, User user) {
 
         mContext = context;
         mActivity = activity;
@@ -43,7 +40,7 @@ public class PickAvatarRecyclerAvatar  extends RecyclerView.Adapter<PickAvatarRe
 
 
     @Override
-    public PickAvatarRecyclerAvatar.CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+    public PickAvatarRecyclerAdapter.CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
 
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.avatar_list_item, viewGroup, false);
 
@@ -51,11 +48,13 @@ public class PickAvatarRecyclerAvatar  extends RecyclerView.Adapter<PickAvatarRe
         return viewHolder;
     }
     @Override
-    public void onBindViewHolder(final PickAvatarRecyclerAvatar.CustomViewHolder customViewHolder, int i) {
+    public void onBindViewHolder(final PickAvatarRecyclerAdapter.CustomViewHolder customViewHolder, int i) {
 
         String avatarFileName = mAvatarFileList.get(i);
 
         customViewHolder.avatar.setImageResource(mContext.getResources().getIdentifier(avatarFileName, "drawable", mActivity.getPackageName()));
+        //customViewHolder.avatar.setImageResource(getResources().getIdentifier(user.getAvatarFileName(), "drawable", mFragmentActivity.getPackageName()));
+
         customViewHolder.avatar.setTag(avatarFileName);
 
         customViewHolder.avatar.setOnClickListener(new View.OnClickListener() {
@@ -70,6 +69,7 @@ public class PickAvatarRecyclerAvatar  extends RecyclerView.Adapter<PickAvatarRe
                 bundle.putParcelable(PickAvatar.PICK_AVATAR_KEY_USER, mUser);
                 intent.putExtras(bundle);
                 mActivity.setResult(mActivity.RESULT_OK, intent);
+                mActivity.finish();
             }
         });
 

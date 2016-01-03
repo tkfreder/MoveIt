@@ -7,28 +7,19 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
-import android.widget.TextView;
 
 import com.tinakit.moveit.R;
-import com.tinakit.moveit.activity.RewardView;
 import com.tinakit.moveit.db.FitnessDBHelper;
-import com.tinakit.moveit.fragment.PickAvatar;
+import com.tinakit.moveit.activity.PickAvatar;
 import com.tinakit.moveit.fragment.UserProfile;
 import com.tinakit.moveit.model.User;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -94,8 +85,6 @@ public class EditUserRecyclerAdapter extends RecyclerView.Adapter<EditUserRecycl
                 Intent intent = new Intent(mContext, PickAvatar.class);
                 intent.putExtras(args);
                 mActivity.startActivityForResult(intent,AVATAR_FILENAME);
-
-                mActivity.getActionBar().setTitle(mContext.getResources().getString(R.string.choose_avatar));
             }
         });
 
@@ -126,7 +115,7 @@ public class EditUserRecyclerAdapter extends RecyclerView.Adapter<EditUserRecycl
                     transaction.add(R.id.fragmentContainer, userProfile, UserProfile.USER_PROFILE_TAG);
                     transaction.commit();
 
-                    mActivity.getActionBar().setTitle(mContext.getResources().getString(R.string.user_profiles));
+                    //mActivity.getActionBar().setTitle(mContext.getResources().getString(R.string.user_profiles));
                 }
             }
         });
