@@ -68,13 +68,8 @@ public class EditUserRecyclerAdapter extends RecyclerView.Adapter<EditUserRecycl
         customViewHolder.weight.setText(String.valueOf(Math.round(user.getWeight())));
         customViewHolder.avatar.setImageResource(mContext.getResources().getIdentifier(user.getAvatarFileName(), "drawable", mActivity.getPackageName()));
 
-        customViewHolder.avatarButton.setTag(user);
-
-        // populate list with filenames
-        //List<String> avatarFileNames = Arrays.asList(mContext.getResources().getStringArray(R.array.avatar_images));
-
-
-        customViewHolder.avatarButton.setOnClickListener(new View.OnClickListener() {
+        customViewHolder.avatar.setTag(user);
+        customViewHolder.avatar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -133,7 +128,6 @@ public class EditUserRecyclerAdapter extends RecyclerView.Adapter<EditUserRecycl
         protected CheckBox isAdmin;
         protected EditText weight;
         protected ImageView avatar;
-        protected Button avatarButton;
         protected Button updateButton;
 
         public CustomViewHolder(View view) {
@@ -143,7 +137,6 @@ public class EditUserRecyclerAdapter extends RecyclerView.Adapter<EditUserRecycl
             this.isAdmin = (CheckBox)view.findViewById(R.id.isAdmin);
             this.weight = (EditText)view.findViewById(R.id.weight);
             this.avatar = (ImageView) view.findViewById(R.id.avatar);
-            this.avatarButton = (Button) view.findViewById(R.id.avatarButton);
             this.updateButton = (Button) view.findViewById(R.id.updateButton);
         }
     }

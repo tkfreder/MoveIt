@@ -163,7 +163,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 "(" +
                 KEY_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // Define a primary key
                 KEY_USER_NAME + " TEXT, " +
-                KEY_USER_IS_ADMIN  + " NUMERIC, " +
+                KEY_USER_IS_ADMIN  + " INTEGER, " +
                 KEY_USER_WEIGHT  + " REAL, " +
                 KEY_USER_AVATAR_FILENAME + " TEXT, " +
                 KEY_USER_POINTS + " INTEGER" +
@@ -299,7 +299,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Laura', 0, 50, 'avatar_cat_purple', 0);");
         db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Lucy', 0, 40, 'avatar_cat_blue', 0);");
         db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Alec', 0, 175, 'avatar_cat_green', 0);");
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Tina', 0, 100, 'avatar_cat_red', 0);");
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Tina', 1, 100, 'avatar_cat_red', 0);");
 
         //TODO: DUMMY DATA
         //TODO:  when adding User or Reward, ensure that RewardStatus gets populated with available rewards for that user
@@ -408,7 +408,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                         User user = new User();
                         user.setUserId(cursor.getInt(cursor.getColumnIndex(KEY_USER_ID)));
                         user.setUserName(cursor.getString(cursor.getColumnIndex(KEY_USER_NAME)));
-                        user.setIsAdmin(cursor.getInt(cursor.getColumnIndex(KEY_USER_IS_ADMIN)) > 0 ? true : false);
+                        user.setIsAdmin(cursor.getInt(cursor.getColumnIndex(KEY_USER_IS_ADMIN)) == 1 ? true : false);
                         user.setWeight(cursor.getFloat(cursor.getColumnIndex(KEY_USER_WEIGHT)));
                         user.setAvatarFileName(cursor.getString(cursor.getColumnIndex(KEY_USER_AVATAR_FILENAME)));
                         user.setPoints(cursor.getInt(cursor.getColumnIndex(KEY_USER_POINTS)));

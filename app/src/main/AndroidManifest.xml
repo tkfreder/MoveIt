@@ -35,7 +35,6 @@
         <activity android:name=".activity.ActivityTracker"/>
         <activity android:name=".activity.RewardView"/>
         <activity android:name=".activity.PickAvatar"/>
-
         <activity android:name=".utility.AndroidDatabaseManager"
                   android:theme="@style/Theme.AppCompat.Light"/>
     </application>
