@@ -107,6 +107,7 @@
         <item>avatar_cat_purple</item>
         <item>avatar_cat_red</item>
         <item>avatar_cat_yellow</item>
+        <item>avatar_angel</item>
     </string-array>
 
     <string name="title_activity_sensor_api">SensorAPI</string>

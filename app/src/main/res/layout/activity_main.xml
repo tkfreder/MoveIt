@@ -19,7 +19,7 @@
         android:layout_gravity="left|start"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/drawer_header"
-        app:menu="@menu/drawer"
+        app:menu="@menu/menu_drawer"
         app:itemBackground="@drawable/activated_background">
 
     </android.support.design.widget.NavigationView>
