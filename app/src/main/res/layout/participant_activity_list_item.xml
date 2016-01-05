@@ -23,7 +23,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="3"
-        app:ms_baseColor="@color/primary"
-        app:ms_highlightColor="@color/accent"/>
+        app:ms_baseColor="@color/primary_color"
+        app:ms_highlightColor="@color/accent_color"/>
 
 </LinearLayout>
