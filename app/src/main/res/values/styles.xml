@@ -16,6 +16,13 @@
         <item name="android:windowBackground">@color/window_background</item>
         <item name="android:activatedBackgroundIndicator">@drawable/activated_background</item>
     </style>
+
+    <style name="CustomToolbarTheme" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:background">?attr/colorPrimaryDark</item>
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColorSecondary">@color/white</item>
+    </style>
+
     <style name="HeaderFont">
         <item name="android:textSize">40sp</item>
         <item name="android:textColor">#551a8b</item>
