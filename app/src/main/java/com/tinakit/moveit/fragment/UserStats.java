@@ -23,7 +23,8 @@ import java.util.List;
 public class UserStats extends Fragment{
 
     // CONSTANTS
-    public static final String USER_STATS_LIST = "USER_STATS_LIST";
+    public static final String USER_STATS_TAG = "USER_STATS_TAG";
+    public static final String USER_STATS_LIST_KEY = "USER_STATS_LIST";
 
     // local cache
     protected static List<User> mUserList;
@@ -60,16 +61,13 @@ public class UserStats extends Fragment{
         // get UserActivityList from intent
 
         Bundle bundle = this.getArguments();
-        if (bundle.containsKey(USER_STATS_LIST)){
+        if (bundle != null && bundle.containsKey(USER_STATS_LIST_KEY)){
 
-            mUserList = bundle.getParcelableArrayList(USER_STATS_LIST);
-
-            // if this is the first time, there will be data in the bundle
-            if (mUserList == null){
-
-                // fetch directly from the database
-                mUserList = mDatabaseHelper.getUsers();
-            }
+            mUserList = bundle.getParcelableArrayList(USER_STATS_LIST_KEY);
+        }
+        else{
+            // fetch directly from the database
+            mUserList = mDatabaseHelper.getUsers();
         }
 
         //set RewardList for each user

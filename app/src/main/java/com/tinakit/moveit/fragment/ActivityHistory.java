@@ -36,7 +36,8 @@ import fr.ganfra.materialspinner.MaterialSpinner;
 public class ActivityHistory extends Fragment {
 
     // CONSTANTS
-    public static final String ACTIVITY_HISTORY = "ACTIVIY_HISTORY";
+    public static final String ACTIVITY_HISTORY_TAG = "ACTIVIY_HISTORY_TAG";
+    public static final String ACTIVITY_HISTORY_KEY = "ACTIVIY_HISTORY_KEY";
     private static final int APPROX_SIZE_AVATAR_IMAGES = 250;
 
     //INSTANCE FIELDS
@@ -75,22 +76,22 @@ public class ActivityHistory extends Fragment {
         // get UserActivityList from intent
 
         Bundle bundle = this.getArguments();
-        if (bundle.containsKey(ACTIVITY_HISTORY)){
+        if (bundle != null && bundle.containsKey(ACTIVITY_HISTORY_KEY)){
 
-            mActivityDetailList = bundle.getParcelableArrayList(ACTIVITY_HISTORY);
+            mActivityDetailList = bundle.getParcelableArrayList(ACTIVITY_HISTORY_KEY);
 
-            // if this is the first time, there will be data in the bundle
-            if (mActivityDetailList == null){
 
-                // fetch directly from the database
-                mActivityDetailList = mDatabaseHelper.getActivityDetailList();
+        }
+        else{
 
-                if (mActivityDetailList.size() == 0)
-                    mNoActivities.setVisibility(View.VISIBLE);
-                else
-                    mNoActivities.setVisibility(View.GONE);
+            // if this is the first time, fetch directly from the database
+            mActivityDetailList = mDatabaseHelper.getActivityDetailList();
 
-            }
+            if (mActivityDetailList.size() == 0)
+                mNoActivities.setVisibility(View.VISIBLE);
+            else
+                mNoActivities.setVisibility(View.GONE);
+
         }
 
         // get number of users
