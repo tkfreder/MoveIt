@@ -172,7 +172,6 @@ public class MainActivity extends AppCompatActivity {
 
         switch(id){
 
-            case R.id.action_user_profiles:
             case R.id.nav_user_profiles:
 
                 //TODO: replace SlidingTabLayout and ViewPager with UserProfile fragment
