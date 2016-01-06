@@ -1,17 +1,16 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             tools:context="com.tinakit.moveit.fragment.ActivityChooserFragment"
-             android:padding="@dimen/activity_vertical_margin">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+     xmlns:tools="http://schemas.android.com/tools"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     tools:context="com.tinakit.moveit.fragment.ActivityChooserFragment"
+     android:padding="@dimen/activity_vertical_margin"
+     android:orientation="vertical">
 
         <android.support.v7.widget.RecyclerView
             xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true" />
-
+            android:layout_height="wrap_content"/>
     <Button
         android:id="@+id/nextButton"
         android:layout_width="300dp"
@@ -23,7 +22,20 @@
         android:background="@color/grey"
         android:textColor="@color/white"
         android:enabled="false"
+        android:layout_alignParentBottom="true"
 
         />
 
-</FrameLayout>
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/map_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+
+    </FrameLayout>
+
+</LinearLayout>
