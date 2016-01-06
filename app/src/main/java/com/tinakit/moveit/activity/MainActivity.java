@@ -110,16 +110,16 @@ public class MainActivity extends AppCompatActivity {
         final ActionBar actionBar = getSupportActionBar();
 
         // enable ActionBar app icon to behave as action to toggle nav drawer
-        actionBar.setHomeAsUpIndicator(R.drawable.hamburger_icon);
+        actionBar.setHomeAsUpIndicator(R.drawable.ic_hamburger);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         // Navigation Drawer
         initializeNavigationDrawer();
 
         //put a Fragment in the FragmentManager, so just need to call replace when click on nav items
-        // display Rewards screen first
-        UserStats userStats = new UserStats();
-        getSupportFragmentManager().beginTransaction().add(R.id.fragmentContainer, userStats).commit();
+        // display ActivityChooser screen first
+        ActivityChooser activityChooser = new ActivityChooser();
+        getSupportFragmentManager().beginTransaction().add(R.id.fragmentContainer, activityChooser).commit();
 
 
     }
@@ -205,6 +205,15 @@ public class MainActivity extends AppCompatActivity {
 
                 getSupportActionBar().setTitle(getResources().getString(R.string.start));
                 //TODO: redirect to ActivityTracker, change ActivityTracker to a fragment
+
+                // check whether UserProfile is already visible
+                ActivityChooser activityChooser = (ActivityChooser)getSupportFragmentManager().findFragmentByTag(ActivityChooser.ACTIVITY_CHOOSER_TAG);
+                if (activityChooser == null){
+
+                    activityChooser= new ActivityChooser ();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, activityChooser).commit();
+                }
+
 
                 break;
 

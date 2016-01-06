@@ -41,7 +41,8 @@ public class ActivityChooser  extends Fragment {
 
 
     // CONSTANTS
-    public static final String USER_ACTIVITY_LIST = "USER_ACTIVITY_LIST";
+    public static final String ACTIVITY_CHOOSER_TAG= "ACTIVITY_CHOOSER_TAG";
+    public static final String USER_ACTIVITY_LIST_KEY = "USER_ACTIVITY_LIST_KEY";
 
     // local cache
     protected static List<ActivityType> mActivityTypeList;
@@ -87,7 +88,7 @@ public class ActivityChooser  extends Fragment {
                 //sort the UserActivityList before saving it
                 Intent intent = new Intent(mFragmentActivity, ActivityTracker.class);
                 Collections.sort(mUserActivityList);
-                intent.putParcelableArrayListExtra(USER_ACTIVITY_LIST, mUserActivityList);
+                intent.putParcelableArrayListExtra(USER_ACTIVITY_LIST_KEY, mUserActivityList);
                 startActivity(intent);
             }
         });

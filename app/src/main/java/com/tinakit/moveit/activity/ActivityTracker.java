@@ -118,7 +118,7 @@ public class ActivityTracker extends AppCompatActivity {
 
         // check whether previous screen was ActivityChooser
         mIntent = getIntent();
-        if (mIntent.hasExtra(ActivityChooser.USER_ACTIVITY_LIST)) {
+        if (mIntent.hasExtra(ActivityChooser.USER_ACTIVITY_LIST_KEY)) {
 
             initializeUI();
 
@@ -159,7 +159,7 @@ public class ActivityTracker extends AppCompatActivity {
 
         // get user list from intent
         mActivityDetail = new ActivityDetail();
-        ArrayList<UserActivity> userActivityList = getIntent().getParcelableArrayListExtra(ActivityChooser.USER_ACTIVITY_LIST);
+        ArrayList<UserActivity> userActivityList = getIntent().getParcelableArrayListExtra(ActivityChooser.USER_ACTIVITY_LIST_KEY);
         mActivityDetail.setUserActivityList(userActivityList);
 
     }
