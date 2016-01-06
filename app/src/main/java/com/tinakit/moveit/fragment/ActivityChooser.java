@@ -1,5 +1,6 @@
 package com.tinakit.moveit.fragment;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -10,6 +11,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,11 +24,15 @@ import android.widget.ArrayAdapter;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.ActivityTracker;
+import com.tinakit.moveit.api.Accelerometer;
+import com.tinakit.moveit.api.GoogleApi;
+import com.tinakit.moveit.api.LocationApi;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.ActivityType;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.model.UserActivity;
+import com.tinakit.moveit.utility.DialogUtility;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,14 +57,36 @@ public class ActivityChooser  extends Fragment {
     private View rootView;
     ArrayList<UserActivity> mUserActivityList = new ArrayList<>();
     List<UserActivity> mUserActivityList_previous;
+    private static ActivityChooser mActivityChooser;
+
+    // API
+    private MapFragment mMapFragment;
+    private GoogleApi mGoogleApi;
 
     // UI COMPONENTS
     protected RecyclerView mRecyclerView;
     public static MultiChooserRecyclerAdapter mRecyclerViewAdapter;
     protected Button mNextButton;
+    private ViewGroup mContainer;
 
     //database
     FitnessDBHelper mDatabaseHelper;
+
+    public static final ActivityChooser newInstance(GoogleApi googleApi){
+
+        if (mActivityChooser == null){
+
+            mActivityChooser = new ActivityChooser();
+            mActivityChooser.setGoogleApi(googleApi);
+        }
+
+        return mActivityChooser;
+    }
+
+    private void setGoogleApi(GoogleApi googleApi){
+
+        mGoogleApi = googleApi;
+    }
 
     @Nullable
     @Override
@@ -110,6 +138,12 @@ public class ActivityChooser  extends Fragment {
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerViewAdapter = new MultiChooserRecyclerAdapter(mFragmentActivity, userList, mUserActivityList_previous);
         mRecyclerView.setAdapter(mRecyclerViewAdapter);
+
+        mMapFragment = new MapFragment(getActivity().getSupportFragmentManager(), mGoogleApi);
+        mMapFragment.addMap(R.id.map_container, mContainer);
+
+        //display map of starting point
+        //mMapFragment.displayStartMap();
 
     }
 
@@ -257,5 +291,4 @@ public class ActivityChooser  extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         return super.onOptionsItemSelected(item);
     }
-
 }

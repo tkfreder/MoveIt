@@ -371,7 +371,8 @@ public class ActivityTracker extends AppCompatActivity {
         //TODO:  START STEP COUNTING UNTIL FIRST LOCATION API CONNECTION IS MADE AND PERIODS OF LOST CONNECTION
 
         //display map of starting point
-        mMapFragment.displayStartMap();
+        //mMapFragment.displayStartMap();
+
 
     }
 
@@ -502,8 +503,7 @@ public class ActivityTracker extends AppCompatActivity {
     //  BroadcastReceiver mMessageReceiver
     //**********************************************************************************************
 
-    // Handler for received Intents. This will be called whenever an Intent
-    // with an action named GOOGLE_API_INTENT is broadcasted.
+    // Handler for received Intents.
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -520,7 +520,7 @@ public class ActivityTracker extends AppCompatActivity {
                 //add map once
                 if (mHasMapFragment == false){
                     mMapFragment = new MapFragment(getSupportFragmentManager(), mGoogleApi);
-                    mMapFragment.addMap(mContainer);
+                    mMapFragment.addMap(R.id.map_container, mContainer);
                     mHasMapFragment = true;
                 }
 

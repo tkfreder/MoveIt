@@ -18,8 +18,10 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 
+import com.tinakit.moveit.api.GoogleApi;
 import com.tinakit.moveit.fragment.ActivityChooser;
 import com.tinakit.moveit.fragment.ActivityHistory;
+import com.tinakit.moveit.fragment.MapFragment;
 import com.tinakit.moveit.fragment.UserProfile;
 import com.tinakit.moveit.fragment.UserStats;
 import com.tinakit.moveit.model.ActivityDetail;
@@ -53,12 +55,16 @@ public class MainActivity extends AppCompatActivity {
     // Navigation Drawer
     private DrawerLayout mDrawerLayout;
 
+    // APIs
+    GoogleApi mGoogleApi;
+
+    // Database helper
     private FitnessDBHelper mDatabaseHelper;
 
     //cache
     ArrayList<ActivityDetail> mActivityDetailList;
     ArrayList<User> mUserList;
-    Bundle mSavedInstanceState;
+    //Bundle mSavedInstanceState;
 
     //**********************************************************************************************
     //  onCreate()
@@ -71,7 +77,16 @@ public class MainActivity extends AppCompatActivity {
         setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // save state
-        mSavedInstanceState = savedInstanceState;
+        //mSavedInstanceState = savedInstanceState;
+
+        //end the activity if Google Play Services is not present
+        //redirect user to Google Play Services
+        mGoogleApi = new GoogleApi(this);
+
+        if (!mGoogleApi.servicesAvailable())
+            finish();
+        else
+            mGoogleApi.buildGoogleApiClient();
 
         // instantiate databaseHelper
         mDatabaseHelper = FitnessDBHelper.getInstance(this);
@@ -115,12 +130,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Navigation Drawer
         initializeNavigationDrawer();
-
-        //put a Fragment in the FragmentManager, so just need to call replace when click on nav items
-        // display ActivityChooser screen first
-        ActivityChooser activityChooser = new ActivityChooser();
-        getSupportFragmentManager().beginTransaction().add(R.id.fragmentContainer, activityChooser).commit();
-
 
     }
 
@@ -210,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
                 ActivityChooser activityChooser = (ActivityChooser)getSupportFragmentManager().findFragmentByTag(ActivityChooser.ACTIVITY_CHOOSER_TAG);
                 if (activityChooser == null){
 
-                    activityChooser= new ActivityChooser ();
+                    activityChooser= ActivityChooser.newInstance(mGoogleApi);//new ActivityChooser ();
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, activityChooser).commit();
                 }
 
@@ -238,6 +247,7 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(ActivityTracker.ACTIVITY_TRACKER_INTENT));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(GoogleApi.GOOGLE_API_INTENT));
 
     }
 
@@ -249,6 +259,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         if (DEBUG) Log.d(LOG, "onPause");
 
+        //TODO:  should all Listeners be unregistered here?
         super.onPause();
     }
 
@@ -260,6 +271,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         if (DEBUG) Log.d(LOG, "onResume");
 
+        //TODO:  should all Listeners be registered here?
         super.onResume();
 
     }
@@ -306,10 +318,26 @@ public class MainActivity extends AppCompatActivity {
             String message = intent.getStringExtra(MAIN_ACTIVITY_BROADCAST_RECEIVER);
             if (DEBUG) Log.d(LOG, "BroadcastReceiver - onReceive(): message: " + message);
 
-            if(message.equals(ActivityTracker.ACTIVITY_TRACKER_INTENT)){
+            if(message != null && message.equals(ActivityTracker.ACTIVITY_TRACKER_INTENT)){
 
                 // when Tracker has started, close this Activity
                 finish();
+            }
+
+            //TODO: change key to more generic name
+            // message to indicate Google API Client connection
+            message = intent.getStringExtra(ActivityTracker.ACTIVITY_TRACKER_BROADCAST_RECEIVER);
+
+            if(message != null && message.equals(GoogleApi.GOOGLE_API_INTENT)){
+
+                //put a Fragment in the FragmentManager, so just need to call replace when click on nav items
+                // display ActivityChooser screen first
+                ActivityChooser activityChooser = ActivityChooser.newInstance(mGoogleApi);
+                getSupportFragmentManager().beginTransaction().add(R.id.fragmentContainer, activityChooser).commit();
+
+                //TODO:  should the Message listener for GoogleApi be unregistered at this point
+                LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mMessageReceiver);
+
             }
 
         }

@@ -44,11 +44,11 @@ public class MapFragment implements OnMapReadyCallback {
         mGoogleApi = googleApi;
     }
 
-    public void addMap(ViewGroup container){
+    public void addMap(int containerId, ViewGroup container){
 
         mMapFragment = SupportMapFragment.newInstance();
         FragmentTransaction transaction = mFragmentManager.beginTransaction();
-        transaction.add(R.id.map_container, mMapFragment).commit();
+        transaction.add(containerId, mMapFragment).commit();
         mMapFragment.getMapAsync(this);
     }
 
