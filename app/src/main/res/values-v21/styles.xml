@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <style name="AppTheme" parent="AppTheme.Base">
 
@@ -6,10 +6,16 @@
         <item name="colorPrimaryDark">@color/primary_color_dark</item>
         <item name="colorAccent">@color/accent_color</item>
     </style>
+
     <style name="CustomToolbarTheme" parent="ThemeOverlay.AppCompat.Light">
         <item name="android:background">?android:attr/colorPrimaryDark</item>
         <item name="android:textColorPrimary">@color/white</item>
         <item name="android:textColorSecondary">@color/white</item>
+    </style>
+
+    <style name="nav_list_item">
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
 </resources>

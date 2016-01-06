@@ -39,5 +39,5 @@ limitations under the License.
         android:orderInCategory="200"
         android:icon="@drawable/ic_menu"
         app:showAsAction="always"
-        />  
+        />
 </menu>

@@ -6,24 +6,20 @@
         >
         <item
             android:id="@+id/nav_start"
-            app:itemIconTint="@android:color/black"
             android:icon="@drawable/start_24"
             android:title="@string/start" />
         <item
             android:id="@+id/nav_user_profiles"
-            app:itemIconTint="@android:color/black"
             android:icon="@drawable/user_profile_24"
             android:title="Users" />
         <item
             android:id="@+id/nav_rewards"
-            app:itemIconTint="@android:color/black"
             android:icon="@drawable/reward_24"
             android:title="Rewards" />
         <item
             android:id="@+id/nav_settings"
-            app:itemIconTint="@android:color/black"
             android:icon="@drawable/settings_24"
-            android:title="Settings" />
+            android:title="Admin" />
     </group>
 
 </menu>
