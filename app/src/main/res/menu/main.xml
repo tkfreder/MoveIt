@@ -32,4 +32,12 @@ limitations under the License.
         android:title="@string/settings"
         android:orderInCategory="102"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/navigate"
+        android:title="next"
+        android:orderInCategory="200"
+        android:icon="@drawable/ic_menu"
+        app:showAsAction="always"
+        />  
 </menu>
