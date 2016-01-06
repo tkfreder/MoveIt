@@ -53,10 +53,6 @@ public class MainActivity extends AppCompatActivity {
     // Navigation Drawer
     private DrawerLayout mDrawerLayout;
 
-    private ViewPager mViewPager;
-    protected ViewPagerAdapter mViewPagerAdapter;
-    SlidingTabLayout mSlidingTabLayout;
-
     private FitnessDBHelper mDatabaseHelper;
 
     //cache
@@ -117,27 +113,8 @@ public class MainActivity extends AppCompatActivity {
         actionBar.setHomeAsUpIndicator(R.drawable.hamburger_icon);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        // SlidingTabLayout
-        //mSlidingTabLayout = (SlidingTabLayout)findViewById(R.id.tabLayout);
-
         // Navigation Drawer
         initializeNavigationDrawer();
-
-        //ViewPager
-        //mViewPager = (ViewPager)findViewById(R.id.tab_viewpager);
-        //if (mViewPager != null){
-        //    setupViewPager(mViewPager);
-        //}
-
-        //TabLayout
-        //SlidingTabLayout slidingTabLayout = (SlidingTabLayout)findViewById(R.id.tabLayout);
-        //slidingTabLayout.setViewPager(mViewPager);
-
-        //set tab index if this is redirected
-        //if(getIntent().hasExtra("tab_index")){
-
-        //    mViewPager.setCurrentItem((int)getIntent().getExtras().get("tab_index"));
-        //}
 
         //put a Fragment in the FragmentManager, so just need to call replace when click on nav items
         // display Rewards screen first
@@ -180,9 +157,8 @@ public class MainActivity extends AppCompatActivity {
         switch(id){
 
             case R.id.nav_rewards:
-                //make sure you set title first, as the closeFragments depends on the desired screen
-                getSupportActionBar().setTitle(getResources().getString(R.string.rewards));
 
+                getSupportActionBar().setTitle(getResources().getString(R.string.rewards));
 
                 UserStats userStats = (UserStats)getSupportFragmentManager().findFragmentByTag(UserStats.USER_STATS_TAG);
                 if (userStats == null) {
@@ -197,7 +173,6 @@ public class MainActivity extends AppCompatActivity {
 
             case R.id.nav_history:
 
-                //make sure you set title first, as the closeFragments depends on the desired screen
                 getSupportActionBar().setTitle(getResources().getString(R.string.history));
 
 
@@ -214,13 +189,7 @@ public class MainActivity extends AppCompatActivity {
 
             case R.id.nav_user_profiles:
 
-                //TODO: replace SlidingTabLayout and ViewPager with UserProfile fragment
-                //http://stackoverflow.com/questions/30518710/slidingtablayout-replace-with-fragment
-
-                //make sure you set title first, as the closeFragments depends on the desired screen
                 getSupportActionBar().setTitle(getResources().getString(R.string.user_profiles));
-                closeFragments();
-                //displayTabLayout(View.GONE);
 
                 // check whether UserProfile is already visible
                 UserProfile userProfile = (UserProfile)getSupportFragmentManager().findFragmentByTag(UserProfile.USER_PROFILE_TAG);
@@ -228,95 +197,26 @@ public class MainActivity extends AppCompatActivity {
 
                     userProfile= new UserProfile ();
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, userProfile).commit();
-
-                    /*
-                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                    transaction.add(R.id.fragmentContainer, userProfile, UserProfile.USER_PROFILE_TAG);
-                    transaction.commit();
-*/
-
                 }
 
-                //Intent intent = new Intent(this, UserProfile.class);
-                //startActivity(intent);
                 break;
 
             case R.id.nav_start:
 
-                //make sure you set title first, as the closeFragments depends on the desired screen
                 getSupportActionBar().setTitle(getResources().getString(R.string.start));
-
-                closeFragments();
-
-                //displayTabLayout(View.VISIBLE);
-                //mViewPager.setCurrentItem(0);
+                //TODO: redirect to ActivityTracker, change ActivityTracker to a fragment
 
                 break;
 
             case R.id.nav_settings:
             case R.id.action_settings:
 
-                //make sure you set title first, as the closeFragments depends on the desired screen
                 getSupportActionBar().setTitle(getResources().getString(R.string.settings));
-
-                //displayTabLayout(View.GONE);
-
-                closeFragments();
+                // TODO: redirect to admin screen
 
             break;
 
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-
-        closeFragments();
-    }
-
-    private void closeFragments(){
-
-        // if the desired screen is User Profiles, close other fragments that might be currently displayed
-        if (getSupportActionBar().getTitle().equals(getResources().getString(R.string.user_profiles))){
-
-            /*
-            EditReward editReward = (EditReward)getSupportFragmentManager().findFragmentByTag(EditReward.EDIT_REWARD_TAG);
-            if (editReward!= null && editReward.isVisible()) {
-                getSupportFragmentManager().beginTransaction().remove(editReward).commit();
-            }
-            */
-        }
-
-        else if (getSupportActionBar().getTitle().equals(getResources().getString(R.string.rewards))){
-
-            UserProfile userProfile = (UserProfile)getSupportFragmentManager().findFragmentByTag(UserProfile.USER_PROFILE_TAG);
-            if (userProfile!= null && userProfile.isVisible()) {
-                getSupportFragmentManager().beginTransaction().remove(userProfile).commit();
-            }
-        }
-
-        else if (getSupportActionBar().getTitle().equals(getResources().getString(R.string.start))){
-
-            /*
-            EditReward editReward = (EditReward)getSupportFragmentManager().findFragmentByTag(EditReward.EDIT_REWARD_TAG);
-            if (editReward!= null && editReward.isVisible()) {
-                getSupportFragmentManager().beginTransaction().remove(editReward).commit();
-            }
-*/
-            UserProfile userProfile = (UserProfile)getSupportFragmentManager().findFragmentByTag(UserProfile.USER_PROFILE_TAG);
-            if (userProfile!= null && userProfile.isVisible()) {
-                getSupportFragmentManager().beginTransaction().remove(userProfile).commit();
-            }
-        }
-
-
-    }
-
-    private void displayTabLayout(int visibility){
-
-        mSlidingTabLayout.setVisibility(visibility);
-        mViewPager.setVisibility(visibility);
-
     }
 
     //**********************************************************************************************
@@ -366,38 +266,6 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    //**********************************************************************************************
-    //  ViewPagerAdapter
-    //**********************************************************************************************
-
-    static class ViewPagerAdapter extends FragmentPagerAdapter {
-        private final List<Fragment> mFragmentList = new ArrayList<>();
-        private final List<String> mFragmentTitleList = new ArrayList<>();
-
-        public ViewPagerAdapter(FragmentManager manager){
-            super(manager);
-        }
-
-        @Override
-        public Fragment getItem(int position) { return mFragmentList.get(position);}
-
-        @Override
-        public int getCount() {
-            return mFragmentList.size();
-        }
-
-        public void addFrag(Fragment fragment, String title){
-            mFragmentList.add(fragment);
-            mFragmentTitleList.add(title);
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position){
-            return mFragmentTitleList.get(position);
-        }
-
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -416,33 +284,6 @@ public class MainActivity extends AppCompatActivity {
         callMenuItemAction(item.getItemId());
 
         return super.onOptionsItemSelected(item);
-    }
-
-    //**********************************************************************************************
-    //  setUpViewPager()
-    //**********************************************************************************************
-    private void setupViewPager(ViewPager viewPager){
-
-        // FIRST TAB
-        mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-        mViewPagerAdapter.addFrag(new ActivityChooser(), "START");
-
-        // SECOND TAB
-        Fragment ActivityHistoryFragment = new ActivityHistory();
-        Bundle bundle = new Bundle();
-        bundle.putParcelableArrayList(ActivityHistory.ACTIVITY_HISTORY_KEY, mActivityDetailList);
-        ActivityHistoryFragment.setArguments(bundle);
-        mViewPagerAdapter.addFrag(ActivityHistoryFragment, "HISTORY");
-
-        // THIRD TAB
-        Fragment UserStatsFragment = new UserStats();
-        bundle = new Bundle();
-        bundle.putParcelableArrayList(UserStats.USER_STATS_LIST_KEY, mUserList);
-        UserStatsFragment.setArguments(bundle);
-        mViewPagerAdapter.addFrag(UserStatsFragment, "REWARDS");
-
-        viewPager.setAdapter(mViewPagerAdapter);
-
     }
 
     //**********************************************************************************************
