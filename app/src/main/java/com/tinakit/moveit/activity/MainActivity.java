@@ -6,41 +6,36 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 
 import com.tinakit.moveit.api.GoogleApi;
+import com.tinakit.moveit.component.DaggerStorageComponent;
 import com.tinakit.moveit.fragment.ActivityChooser;
 import com.tinakit.moveit.fragment.ActivityHistory;
-import com.tinakit.moveit.fragment.MapFragment;
 import com.tinakit.moveit.fragment.UserProfile;
 import com.tinakit.moveit.fragment.UserStats;
 import com.tinakit.moveit.model.ActivityDetail;
 
-import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Toast;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.User;
-import com.tinakit.moveit.tab.SlidingTabLayout;
+import com.tinakit.moveit.module.CustomApplication;
+import com.tinakit.moveit.component.StorageComponent;
+import com.tinakit.moveit.module.StorageModule;
 
 import java.util.ArrayList;
-import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * Created by Tina on 10/26/2015.
@@ -58,8 +53,8 @@ public class MainActivity extends AppCompatActivity {
     // APIs
     GoogleApi mGoogleApi;
 
-    // Database helper
-    private FitnessDBHelper mDatabaseHelper;
+    @Inject
+    FitnessDBHelper mDatabaseHelper;
 
     //cache
     ArrayList<ActivityDetail> mActivityDetailList;
@@ -76,6 +71,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+        // Dagger 2:  get StorageComponent
+        ((CustomApplication)getApplication()).getStorageComponent().inject(this);
+
         // save state
         //mSavedInstanceState = savedInstanceState;
 
@@ -89,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
             mGoogleApi.buildGoogleApiClient();
 
         // instantiate databaseHelper
-        mDatabaseHelper = FitnessDBHelper.getInstance(this);
+        //mDatabaseHelper = FitnessDBHelper.getInstance(this);
 
         // get data before initializing UI, need data to pass to ViewPager
         fetchData();

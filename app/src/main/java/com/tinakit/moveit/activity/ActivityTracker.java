@@ -199,7 +199,7 @@ public class ActivityTracker extends AppCompatActivity {
                 intent.putExtra(MainActivity.MAIN_ACTIVITY_BROADCAST_RECEIVER, ACTIVITY_TRACKER_INTENT);
                 LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 
-                startRun();
+                //startRun();
 
                 //set flag to save location data
                 mSaveLocationData = true;
@@ -208,7 +208,7 @@ public class ActivityTracker extends AppCompatActivity {
                 mActivityDetail.setStartDate(new Date());
 
                 //set visibility
-                mMapFragment.setVisibility(View.GONE);
+                //mMapFragment.setVisibility(View.GONE);
 
                 //Restart
                 mCancelButton.setVisibility(View.GONE);
@@ -353,6 +353,29 @@ public class ActivityTracker extends AppCompatActivity {
 
         mRequestedService = true;
 
+        Intent intent = new Intent(ACTIVITY_TRACKER_INTENT);
+        intent.putExtra(MainActivity.MAIN_ACTIVITY_BROADCAST_RECEIVER, ACTIVITY_TRACKER_INTENT);
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+
+        //set flag to save location data
+        mSaveLocationData = true;
+
+        //get timestamp of start
+        mActivityDetail.setStartDate(new Date());
+
+        //set visibility
+        //mMapFragment.setVisibility(View.GONE);
+
+        //Restart
+        mCancelButton.setVisibility(View.GONE);
+
+        //clear out error message
+        mMessage.setText("");
+
+        mStartButton.setVisibility(View.GONE);
+        mStopButton.setVisibility(View.VISIBLE);
+        mPauseButton.setVisibility(View.VISIBLE);
+
         //startServices(mGoogleApi.client());
         mLocationApi.start();
         mAccelerometer.start();
@@ -471,7 +494,7 @@ public class ActivityTracker extends AppCompatActivity {
 
     private void displayResults(){
 
-        mMapFragment.displayMap(mUnitSplitList, getDistance(1));
+        //mMapFragment.displayMap(mUnitSplitList, getDistance(1));
 
         //TODO:  why does sound get truncated?
         playSound();
@@ -514,6 +537,8 @@ public class ActivityTracker extends AppCompatActivity {
             // message to indicate Google API Client connection
             if(message.equals(GoogleApi.GOOGLE_API_INTENT)){
 
+                startRun();
+                /*
                 // only show Start button after connecting to Google Api Client
                 mStartButton.setVisibility(View.VISIBLE);
 
@@ -523,6 +548,7 @@ public class ActivityTracker extends AppCompatActivity {
                     mMapFragment.addMap(R.id.map_container, mContainer);
                     mHasMapFragment = true;
                 }
+                */
 
             }
             else if (message.equals(LocationApi.LOCATION_API_INTENT)){
