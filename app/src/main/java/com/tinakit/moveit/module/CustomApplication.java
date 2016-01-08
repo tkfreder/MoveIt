@@ -1,7 +1,6 @@
 package com.tinakit.moveit.module;
 
 import android.app.Application;
-import android.support.v4.app.FragmentActivity;
 
 
 /**
@@ -9,21 +8,22 @@ import android.support.v4.app.FragmentActivity;
  */
 public class CustomApplication extends Application {
 
-    StorageComponent mStorageComponent;
+    AppComponent mAppComponent;
 
     @Override
     public void onCreate(){
 
         super.onCreate();
 
-        mStorageComponent = DaggerStorageComponent
+        mAppComponent = DaggerAppComponent
                 .builder()
                 .storageModule(new StorageModule(this))
+                .apiModule(new ApiModule())
                 .build();
 
     }
 
-    public StorageComponent getStorageComponent(){ return mStorageComponent;};
+    public AppComponent getStorageComponent(){ return mAppComponent;};
 
 
 

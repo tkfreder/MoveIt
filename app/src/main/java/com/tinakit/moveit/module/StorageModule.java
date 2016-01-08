@@ -32,6 +32,7 @@ import dagger.Provides;
         return FitnessDBHelper.getInstance(mContext);
     }
 
+    /*
     @Provides
     @Singleton
     GoogleApi provideGoogleApi(){
@@ -39,6 +40,5 @@ import dagger.Provides;
         return new GoogleApi();
     }
 
-
-
+*/
 }

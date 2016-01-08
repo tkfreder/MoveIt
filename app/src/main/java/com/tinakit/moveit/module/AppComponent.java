@@ -26,10 +26,13 @@ import dagger.Component;
 
         // define the module that will handle creating the objects to be injected
         modules = {
-                StorageModule.class
+                // these classes correspond to modules referenced in CustomApplicaiton.java
+                StorageModule.class, ApiModule.class
         }
 )
-public interface StorageComponent {
+
+// interface between AppComponent and classes which will be using the injected objects
+public interface AppComponent {
 
     void inject(MainActivity mainActivity);
     void inject(ActivityTracker activityTracker);
