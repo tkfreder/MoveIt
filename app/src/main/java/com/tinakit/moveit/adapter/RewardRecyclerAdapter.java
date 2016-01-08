@@ -76,18 +76,16 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
             @Override
             public void onClick(View v) {
 
-                FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(mContext);
-
                 Button button = (Button)v;
                 if (button.getText().equals("Get It")){
                     Reward reward = (Reward)v.getTag();
                     mUser.setPoints(mUser.getPoints() - reward.getPoints());
 
                     //update user's points
-                    databaseHelper.updateUser(mUser);
+                    mDatabaseHelper.updateUser(mUser);
 
                     //update the reward status
-                    databaseHelper.setRewardStatus(mUser.getUserId(), reward.getRewardId(), RewardStatusType.PENDING);
+                    mDatabaseHelper.setRewardStatus(mUser.getUserId(), reward.getRewardId(), RewardStatusType.PENDING);
 
                 }
                 else if (button.getText().equals("Cancel")){
@@ -96,10 +94,10 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
                     mUser.setPoints(mUser.getPoints() + reward.getPoints());
 
                     //update user's points
-                    databaseHelper.updateUser(mUser);
+                    mDatabaseHelper.updateUser(mUser);
 
                     //update the reward status
-                    databaseHelper.setRewardStatus(mUser.getUserId(), reward.getRewardId(), RewardStatusType.AVAILABLE);
+                    mDatabaseHelper.setRewardStatus(mUser.getUserId(), reward.getRewardId(), RewardStatusType.AVAILABLE);
 
                 }
 
