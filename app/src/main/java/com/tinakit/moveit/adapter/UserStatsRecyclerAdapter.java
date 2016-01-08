@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.RewardView;
+import com.tinakit.moveit.fragment.UserProfile;
 import com.tinakit.moveit.model.User;
 
 import java.util.List;
@@ -63,11 +64,28 @@ public class UserStatsRecyclerAdapter extends RecyclerView.Adapter<UserStatsRecy
 
                 User user = (User) customViewHolder.itemView.getTag();
 
+                //close the current activity
+                //mActivity.finish(); --  not needed if this is a fragment, replacing the current fragment
+
+                //replace current fragment
+                RewardView rewardView = (RewardView)mActivity.getSupportFragmentManager().findFragmentByTag(RewardView.REWARD_VIEW_TAG);
+                if (rewardView == null){
+
+                    rewardView= new RewardView();
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable(RewardView.REWARD_VIEW_USER, user);
+                    rewardView.setArguments(bundle);
+                    mActivity.getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, rewardView).commit();
+                }
+
+                /*
+                // redirect to view User's reward screen
                 Intent intent = new Intent(mContext, RewardView.class);
                 Bundle bundle = new Bundle();
                 bundle.putParcelable("user", user);
                 intent.putExtras(bundle);
                 mContext.startActivity(intent);
+                */
             }
         });
 
