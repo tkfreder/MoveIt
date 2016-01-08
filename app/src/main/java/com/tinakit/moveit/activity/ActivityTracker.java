@@ -139,12 +139,12 @@ public class ActivityTracker extends AppCompatActivity {
 
         //end the activity if Google Play Services is not present
         //redirect user to Google Play Services
-        mGoogleApi = new GoogleApi(this);
+        mGoogleApi = new GoogleApi();
 
-        if (!mGoogleApi.servicesAvailable())
+        if (!mGoogleApi.servicesAvailable(this))
             finish();
         else
-            mGoogleApi.buildGoogleApiClient();
+            mGoogleApi.buildGoogleApiClient(this);
 
         // location listener
         mLocationApi = new LocationApi(this, mGoogleApi.client());
@@ -615,7 +615,7 @@ public class ActivityTracker extends AppCompatActivity {
         //such as through the back button, the check is still performed.
         //end the activity if Google Play Services is not present
         //redirect user to Google Play Services
-        if (!mGoogleApi.servicesAvailable()) {
+        if (!mGoogleApi.servicesAvailable(this)) {
             finish();
         }
 

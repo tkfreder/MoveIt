@@ -19,10 +19,13 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.model.UnitSplit;
 import com.tinakit.moveit.api.GoogleApi;
+import com.tinakit.moveit.module.CustomApplication;
 import com.tinakit.moveit.utility.Map;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * Created by Tina on 12/12/2015.
@@ -36,12 +39,15 @@ public class MapFragment implements OnMapReadyCallback {
     private FragmentManager mFragmentManager;
     private GoogleMap mGoogleMap;
     private SupportMapFragment mMapFragment;
-    private GoogleApi mGoogleApi;
+
+    @Inject
+    GoogleApi mGoogleApi;
 
     public MapFragment(FragmentManager fragmentManager, GoogleApi googleApi){
 
         mFragmentManager = fragmentManager;
         mGoogleApi = googleApi;
+
     }
 
     public void addMap(int containerId, ViewGroup container){

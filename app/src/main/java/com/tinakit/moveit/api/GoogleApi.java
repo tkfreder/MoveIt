@@ -1,6 +1,8 @@
 package com.tinakit.moveit.api;
 
+import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -16,6 +18,8 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.tinakit.moveit.activity.ActivityTracker;
+
+import javax.inject.Inject;
 
 /**
  * Created by Tina on 12/12/2015.
@@ -34,6 +38,7 @@ public class GoogleApi implements GoogleApiClient.ConnectionCallbacks,
 
     // instance fields
     private static FragmentActivity mFragmentActivity;
+    //private Context mContext;
 
     //GOOGLE PLAY SERVICES
     // Request code to use when launching the resolution activity
@@ -44,10 +49,11 @@ public class GoogleApi implements GoogleApiClient.ConnectionCallbacks,
     private static boolean mResolvingError = false;
     private static final String STATE_RESOLVING_ERROR = "resolving_error";
 
-    public GoogleApi(FragmentActivity fragmentActivity){
+    //@Inject
+    //public GoogleApi(Context context){
 
-        mFragmentActivity = fragmentActivity;
-    }
+    //    mFragmentActivity = (FragmentActivity)context;
+    //}
 
     public GoogleApiClient client(){
 
@@ -80,9 +86,11 @@ public class GoogleApi implements GoogleApiClient.ConnectionCallbacks,
 
     }
 
-    public synchronized void buildGoogleApiClient() {
+    public synchronized void buildGoogleApiClient(FragmentActivity fragmentActivity) {
 
-        mGoogleApiClient = new GoogleApiClient.Builder(mFragmentActivity)
+        mFragmentActivity = fragmentActivity;
+
+        mGoogleApiClient = new GoogleApiClient.Builder(fragmentActivity)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
@@ -105,7 +113,7 @@ public class GoogleApi implements GoogleApiClient.ConnectionCallbacks,
         } else if (result.hasResolution()) {
             try {
                 mResolvingError = true;
-                result.startResolutionForResult(mFragmentActivity/*mFragmentActivity*/, REQUEST_RESOLVE_ERROR);
+                result.startResolutionForResult(mFragmentActivity, REQUEST_RESOLVE_ERROR);
             } catch (IntentSender.SendIntentException e) {
                 // There was an error with the resolution intent. Try again.
                 mGoogleApiClient.connect();
@@ -120,16 +128,16 @@ public class GoogleApi implements GoogleApiClient.ConnectionCallbacks,
     /**
      * Method to verify google play services on the device, will direct user to Google Play Store if not installed
      * */
-    public static boolean servicesAvailable() {
+    public static boolean servicesAvailable(FragmentActivity fragmentActivity) {
         int resultCode = GooglePlayServicesUtil
-                .isGooglePlayServicesAvailable(mFragmentActivity);
+                .isGooglePlayServicesAvailable(fragmentActivity);
         if (resultCode != ConnectionResult.SUCCESS) {
             if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-                GooglePlayServicesUtil.getErrorDialog(resultCode, mFragmentActivity,
+                GooglePlayServicesUtil.getErrorDialog(resultCode, fragmentActivity,
                         PLAY_SERVICES_RESOLUTION_REQUEST).show();
             } else {
                 if (DEBUG) Log.d(LOG, "This device does not support Google Play Services.");
-                mFragmentActivity.finish();
+                fragmentActivity.finish();
             }
             return false;
         }

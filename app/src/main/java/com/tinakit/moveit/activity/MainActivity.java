@@ -14,7 +14,6 @@ import android.util.Log;
 import android.view.Menu;
 
 import com.tinakit.moveit.api.GoogleApi;
-import com.tinakit.moveit.component.DaggerStorageComponent;
 import com.tinakit.moveit.fragment.ActivityChooser;
 import com.tinakit.moveit.fragment.ActivityHistory;
 import com.tinakit.moveit.fragment.UserProfile;
@@ -30,8 +29,6 @@ import com.tinakit.moveit.R;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.module.CustomApplication;
-import com.tinakit.moveit.component.StorageComponent;
-import com.tinakit.moveit.module.StorageModule;
 
 import java.util.ArrayList;
 
@@ -50,7 +47,8 @@ public class MainActivity extends AppCompatActivity {
     // Navigation Drawer
     private DrawerLayout mDrawerLayout;
 
-    // APIs
+
+    @Inject
     GoogleApi mGoogleApi;
 
     @Inject
@@ -71,20 +69,21 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        // inject FitnessDBHelper
+        // DI
         ((CustomApplication)getApplication()).getStorageComponent().inject(this);
+        //((CustomApplication)getApplication()).getAppComponent().inject(this);
 
         // save state
         //mSavedInstanceState = savedInstanceState;
 
         //end the activity if Google Play Services is not present
         //redirect user to Google Play Services
-        mGoogleApi = new GoogleApi(this);
+        //mGoogleApi = new GoogleApi();
 
-        if (!mGoogleApi.servicesAvailable())
+        if (!mGoogleApi.servicesAvailable(this))
             finish();
         else
-            mGoogleApi.buildGoogleApiClient();
+            mGoogleApi.buildGoogleApiClient(this);
 
         // instantiate databaseHelper
         //mDatabaseHelper = FitnessDBHelper.getInstance(this);
@@ -217,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
                 ActivityChooser activityChooser = (ActivityChooser)getSupportFragmentManager().findFragmentByTag(ActivityChooser.ACTIVITY_CHOOSER_TAG);
                 if (activityChooser == null){
 
-                    activityChooser= ActivityChooser.newInstance(mGoogleApi);//new ActivityChooser ();
+                    activityChooser= new ActivityChooser ();
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, activityChooser).commit();
                 }
 
@@ -330,7 +329,7 @@ public class MainActivity extends AppCompatActivity {
 
                 //put a Fragment in the FragmentManager, so just need to call replace when click on nav items
                 // display ActivityChooser screen first
-                ActivityChooser activityChooser = ActivityChooser.newInstance(mGoogleApi);
+                ActivityChooser activityChooser = new ActivityChooser();
                 getSupportFragmentManager().beginTransaction().add(R.id.fragmentContainer, activityChooser).commit();
 
                 //TODO:  should the Message listener for GoogleApi be unregistered at this point

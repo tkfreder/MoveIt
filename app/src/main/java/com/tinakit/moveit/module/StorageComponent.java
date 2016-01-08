@@ -1,4 +1,4 @@
-package com.tinakit.moveit.component;
+package com.tinakit.moveit.module;
 
 import com.tinakit.moveit.activity.ActivityTracker;
 import com.tinakit.moveit.activity.MainActivity;
@@ -8,6 +8,7 @@ import com.tinakit.moveit.adapter.EditRewardRecyclerAdapter;
 import com.tinakit.moveit.adapter.EditUserRecyclerAdapter;
 import com.tinakit.moveit.adapter.RewardRecyclerAdapter;
 import com.tinakit.moveit.fragment.ActivityChooser;
+import com.tinakit.moveit.fragment.MapFragment;
 import com.tinakit.moveit.fragment.UserProfile;
 import com.tinakit.moveit.fragment.UserStats;
 import com.tinakit.moveit.module.StorageModule;
@@ -40,4 +41,5 @@ public interface StorageComponent {
     void inject(ActivityChooser activityChooser);
     void inject(UserProfile userProfile);
     void inject(UserStats userStats);
+    void inject(MapFragment mapFragment);
 }

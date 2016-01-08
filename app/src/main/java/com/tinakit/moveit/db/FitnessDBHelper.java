@@ -27,6 +27,9 @@ import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import dagger.Provides;
 
 /**
  * Created by Tina on 9/28/2015.

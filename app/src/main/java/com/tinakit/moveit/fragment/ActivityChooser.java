@@ -58,7 +58,9 @@ public class ActivityChooser  extends Fragment {
 
     // API
     private MapFragment mMapFragment;
-    private GoogleApi mGoogleApi;
+
+    @Inject
+    GoogleApi mGoogleApi;
 
     // UI COMPONENTS
     protected RecyclerView mRecyclerView;

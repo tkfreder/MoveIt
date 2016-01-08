@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 
+import com.tinakit.moveit.api.GoogleApi;
 import com.tinakit.moveit.db.FitnessDBHelper;
 
 import javax.inject.Singleton;
@@ -29,6 +30,13 @@ import dagger.Provides;
     @Provides @Singleton FitnessDBHelper provideDBHelper(){
 
         return FitnessDBHelper.getInstance(mContext);
+    }
+
+    @Provides
+    @Singleton
+    GoogleApi provideGoogleApi(){
+
+        return new GoogleApi();
     }
 
 
