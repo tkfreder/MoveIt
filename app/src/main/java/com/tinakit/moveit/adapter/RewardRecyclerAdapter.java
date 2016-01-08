@@ -113,6 +113,7 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
                     rewardView.setArguments(bundle);
                     mFragmentActivity.getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, rewardView).commit();
                 }
+
             }
         });
 

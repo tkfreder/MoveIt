@@ -30,6 +30,9 @@ import javax.inject.Inject;
  */
 public class EditUserRecyclerAdapter extends RecyclerView.Adapter<EditUserRecyclerAdapter.CustomViewHolder>  {
 
+    // CONSTANTS
+    public static final int AVATAR_FILENAME = 1;
+
     @Inject
     FitnessDBHelper mDatabaseHelper;
     //private FitnessDBHelper mDatabaseHelper;
@@ -37,7 +40,6 @@ public class EditUserRecyclerAdapter extends RecyclerView.Adapter<EditUserRecycl
     private Context mContext;
     private FragmentActivity mActivity;
     private List<User> mUserList;
-    public static final int AVATAR_FILENAME = 1;
 
 
     public EditUserRecyclerAdapter(Context context, FragmentActivity activity, List<User> userList) {
@@ -56,6 +58,11 @@ public class EditUserRecyclerAdapter extends RecyclerView.Adapter<EditUserRecycl
     public void setList(List<User> userList){
 
         mUserList = userList;
+    }
+
+    public List<User> getList(){
+
+       return mUserList;
     }
 
 

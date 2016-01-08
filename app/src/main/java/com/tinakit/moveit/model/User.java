@@ -82,6 +82,19 @@ public class User  implements Parcelable, ParentListItem {
         mIsParticipant = isParticipant;
     }
 
+    public boolean hasSameProfile(User user){
+
+        if(this.getAvatarFileName().equals(user.getAvatarFileName())
+                && this.getUserName().equals(user.getUserName())
+                && this.isAdmin() == user.isAdmin()
+                && this.getWeight() == user.getWeight()){
+
+            return true;
+        }
+        else
+            return false;
+    }
+
     @Override
     public List<Reward> getChildItemList() {
         return mRewardList;
@@ -115,6 +128,7 @@ public class User  implements Parcelable, ParentListItem {
     public int hashCode() {
         return mUserName != null ? mUserName.hashCode() : 0;
     }
+
         protected User(Parcel in) {
             mUserId = in.readInt();
             mUserName = in.readString();
