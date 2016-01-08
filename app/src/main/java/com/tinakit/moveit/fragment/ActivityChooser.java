@@ -1,9 +1,7 @@
 package com.tinakit.moveit.fragment;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,7 +9,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,19 +21,19 @@ import android.widget.ArrayAdapter;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.ActivityTracker;
-import com.tinakit.moveit.api.Accelerometer;
 import com.tinakit.moveit.api.GoogleApi;
-import com.tinakit.moveit.api.LocationApi;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.ActivityType;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.model.UserActivity;
-import com.tinakit.moveit.utility.DialogUtility;
+import com.tinakit.moveit.module.CustomApplication;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import fr.ganfra.materialspinner.MaterialSpinner;
 
@@ -69,35 +66,20 @@ public class ActivityChooser  extends Fragment {
     protected Button mNextButton;
     private ViewGroup mContainer;
 
-    //database
+    @Inject
     FitnessDBHelper mDatabaseHelper;
-
-    public static final ActivityChooser newInstance(GoogleApi googleApi){
-
-        if (mActivityChooser == null){
-
-            mActivityChooser = new ActivityChooser();
-            mActivityChooser.setGoogleApi(googleApi);
-        }
-
-        return mActivityChooser;
-    }
-
-    private void setGoogleApi(GoogleApi googleApi){
-
-        mGoogleApi = googleApi;
-    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mFragmentActivity  = (FragmentActivity)super.getActivity();
         rootView = inflater.inflate(R.layout.activity_chooser, container, false);
-
         mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+        // inject FitnessDBHelper
+        ((CustomApplication)getActivity().getApplication()).getStorageComponent().inject(this);
         //get databaseHelper instance
-        mDatabaseHelper = FitnessDBHelper.getInstance(mFragmentActivity);
+        //mDatabaseHelper = FitnessDBHelper.getInstance(mFragmentActivity);
 
         initializeUI();
 

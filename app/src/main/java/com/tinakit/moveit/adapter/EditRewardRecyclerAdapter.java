@@ -16,25 +16,32 @@ import android.widget.ImageView;
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.Reward;
+import com.tinakit.moveit.module.CustomApplication;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 /**
- * Created by Tina on 10/4/2015.
+ * Created by Tina on 1/7/2016.
  */
 public class EditRewardRecyclerAdapter extends RecyclerView.Adapter<EditRewardRecyclerAdapter.CustomViewHolder>  {
 
+    @Inject
+    FitnessDBHelper mDatabaseHelper;
     private Context mContext;
     private List<Reward> mRewardList;
-    FitnessDBHelper mDatabaseHelper;
     Reward mReward;
 
 
-    public EditRewardRecyclerAdapter(Context context) {
+    public EditRewardRecyclerAdapter(Context context, Activity activity) {
         mContext = context;
 
+        // inject FitnessDBHelper
+        ((CustomApplication)activity.getApplication()).getStorageComponent().inject(this);
+
         // Get singleton instance of database
-        mDatabaseHelper = FitnessDBHelper.getInstance(context);
+        //mDatabaseHelper = FitnessDBHelper.getInstance(context);
 
         // Get Activity Types
         mRewardList = mDatabaseHelper.getAllRewards();

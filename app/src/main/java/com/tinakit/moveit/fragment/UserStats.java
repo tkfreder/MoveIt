@@ -14,8 +14,11 @@ import com.tinakit.moveit.R;
 import com.tinakit.moveit.adapter.UserStatsRecyclerAdapter;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.User;
+import com.tinakit.moveit.module.CustomApplication;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * Created by Tina on 12/19/2015.
@@ -35,7 +38,7 @@ public class UserStats extends Fragment{
     protected RecyclerView mRecyclerView;
     protected UserStatsRecyclerAdapter mUserStatsRecyclerAdapter;
 
-    //database
+    @Inject
     FitnessDBHelper mDatabaseHelper;
 
     @Nullable
@@ -46,8 +49,11 @@ public class UserStats extends Fragment{
 
         mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+        // inject FitnessDBHelper
+        ((CustomApplication)getActivity().getApplication()).getStorageComponent().inject(this);
+
         //get databaseHelper instance
-        mDatabaseHelper = FitnessDBHelper.getInstance(mFragmentActivity);
+        //mDatabaseHelper = FitnessDBHelper.getInstance(mFragmentActivity);
 
         initializeUI();
 

@@ -13,9 +13,12 @@ import com.tinakit.moveit.adapter.PickAvatarRecyclerAdapter;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.Reward;
 import com.tinakit.moveit.model.User;
+import com.tinakit.moveit.module.CustomApplication;
 
 import java.util.Arrays;
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * Created by Tina on 1/1/2016.
@@ -36,7 +39,7 @@ public class PickAvatar extends AppCompatActivity {
     protected RecyclerView mRecyclerView;
     protected PickAvatarRecyclerAdapter mPickAvatarRecyclerAdapter;
 
-    //database
+    @Inject
     FitnessDBHelper mDatabaseHelper;
 
 
@@ -46,8 +49,11 @@ public class PickAvatar extends AppCompatActivity {
         setContentView(R.layout.recycler_view);
         setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+        // inject FitnessDBHelper
+        ((CustomApplication)getApplication()).getStorageComponent().inject(this);
+
         //get databaseHelper instance
-        mDatabaseHelper = FitnessDBHelper.getInstance(mFragmentActivity);
+        //mDatabaseHelper = FitnessDBHelper.getInstance(mFragmentActivity);
 
         // fetch data before initializing UI
         fetchData();

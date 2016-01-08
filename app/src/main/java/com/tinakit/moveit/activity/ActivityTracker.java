@@ -42,10 +42,13 @@ import com.tinakit.moveit.model.UserActivity;
 import com.tinakit.moveit.api.Accelerometer;
 import com.tinakit.moveit.api.GoogleApi;
 import com.tinakit.moveit.api.LocationApi;
+import com.tinakit.moveit.module.CustomApplication;
 import com.tinakit.moveit.utility.CalorieCalculator;
 import com.tinakit.moveit.utility.ChronometerUtility;
 import com.tinakit.moveit.utility.DialogUtility;
 import com.tinakit.moveit.utility.UnitConverter;
+
+import javax.inject.Inject;
 
 public class ActivityTracker extends AppCompatActivity {
 
@@ -105,7 +108,7 @@ public class ActivityTracker extends AppCompatActivity {
     private boolean mSaveLocationData = false;
     private boolean mHasMapFragment = false;
 
-    //database
+    @Inject
     FitnessDBHelper mDatabaseHelper;
 
     @Override
@@ -115,6 +118,9 @@ public class ActivityTracker extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tracker);
         setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        // inject FitnessDBHelper
+        ((CustomApplication)getApplication()).getStorageComponent().inject(this);
 
         // check whether previous screen was ActivityChooser
         mIntent = getIntent();
@@ -155,7 +161,7 @@ public class ActivityTracker extends AppCompatActivity {
     protected void initializeData(){
 
         //get databaseHelper instance
-        mDatabaseHelper = FitnessDBHelper.getInstance(this);
+        //mDatabaseHelper = FitnessDBHelper.getInstance(this);
 
         // get user list from intent
         mActivityDetail = new ActivityDetail();

@@ -19,18 +19,23 @@ import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.activity.PickAvatar;
 import com.tinakit.moveit.fragment.UserProfile;
 import com.tinakit.moveit.model.User;
+import com.tinakit.moveit.module.CustomApplication;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * Created by Tina on 12/31/2015.
  */
 public class EditUserRecyclerAdapter extends RecyclerView.Adapter<EditUserRecyclerAdapter.CustomViewHolder>  {
 
+    @Inject
+    FitnessDBHelper mDatabaseHelper;
     private Context mContext;
     private FragmentActivity mActivity;
     private List<User> mUserList;
-    private FitnessDBHelper mDatabaseHelper;
+    //private FitnessDBHelper mDatabaseHelper;
     public static final int AVATAR_FILENAME = 1;
 
 
@@ -40,7 +45,10 @@ public class EditUserRecyclerAdapter extends RecyclerView.Adapter<EditUserRecycl
         mActivity = activity;
         mUserList = userList;
 
-        mDatabaseHelper = FitnessDBHelper.getInstance(mContext);
+        //mDatabaseHelper = FitnessDBHelper.getInstance(mContext);
+
+        // inject FitnessDBHelper
+        ((CustomApplication)activity.getApplication()).getStorageComponent().inject(this);
 
     }
 

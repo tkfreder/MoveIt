@@ -16,8 +16,11 @@ import com.tinakit.moveit.activity.PickAvatar;
 import com.tinakit.moveit.adapter.EditUserRecyclerAdapter;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.User;
+import com.tinakit.moveit.module.CustomApplication;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * Created by Tina on 12/29/2015.
@@ -34,7 +37,7 @@ public class UserProfile extends Fragment {
     private List<User> mUserList;
     private User mUser;
 
-    //database
+    @Inject
     FitnessDBHelper mDatabaseHelper;
 
     @Nullable
@@ -46,8 +49,11 @@ public class UserProfile extends Fragment {
 
         mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+        // inject FitnessDBHelper
+        ((CustomApplication)getActivity().getApplication()).getStorageComponent().inject(this);
+
         //get databaseHelper instance
-        mDatabaseHelper = FitnessDBHelper.getInstance(mFragmentActivity);
+        //mDatabaseHelper = FitnessDBHelper.getInstance(mFragmentActivity);
 
         // fetch directly from the database
         mUserList = mDatabaseHelper.getUsers();

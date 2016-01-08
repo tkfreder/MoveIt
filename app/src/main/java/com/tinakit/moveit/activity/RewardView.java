@@ -1,5 +1,6 @@
 package com.tinakit.moveit.activity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -21,13 +22,19 @@ import com.tinakit.moveit.fragment.UserStats;
 import com.tinakit.moveit.model.Reward;
 import com.tinakit.moveit.model.RewardStatusType;
 import com.tinakit.moveit.model.User;
+import com.tinakit.moveit.module.CustomApplication;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * Created by Tina on 9/23/2015.
  */
 public class RewardView  extends AppCompatActivity {
+
+    @Inject
+    FitnessDBHelper mDatabaseHelper;
 
     // CACHE
     private User mUser;
@@ -90,7 +97,7 @@ public class RewardView  extends AppCompatActivity {
         //TODO: check points are rounding in a consistent way throughout code, including updating DB
         mTotalCoins_textview.setText(String.format("%d", mUser.getPoints()));
 
-        List<Reward> rewardList = FitnessDBHelper.getInstance(this).getAllRewards();
+        List<Reward> rewardList = mDatabaseHelper.getAllRewards();
 
         if (rewardList.size() != 0){
 
@@ -106,7 +113,7 @@ public class RewardView  extends AppCompatActivity {
         // Initialize recycler view
         //mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-        mRewardRecyclerAdapter = new RewardRecyclerAdapter(this, mUser);
+        mRewardRecyclerAdapter = new RewardRecyclerAdapter(getApplicationContext(), mUser, this);
         mRecyclerView.setAdapter(mRewardRecyclerAdapter);
 
     }
@@ -119,15 +126,18 @@ public class RewardView  extends AppCompatActivity {
 
         private User mUser;
 
-        public RewardRecyclerAdapter(Context context, User user) {
+        public RewardRecyclerAdapter(Context context, User user, Activity activity) {
             mContext = context;
             mUser = user;
 
+            // inject FitnessDBHelper
+            ((CustomApplication)getApplication()).getStorageComponent().inject((RewardView)activity);
+
             // Get singleton instance of database
-            FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(context);
+            //FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(context);
 
             // Get Reward list
-            mRewardList = databaseHelper.getUserRewards(mUser.getUserId());
+            mRewardList = mDatabaseHelper.getUserRewards(mUser.getUserId());
         }
 
         @Override
@@ -156,7 +166,7 @@ public class RewardView  extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
 
-                    FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(mContext);
+                    //FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(mContext);
 
                     Button button = (Button)v;
                     if (button.getText().equals("Get It")){
@@ -164,10 +174,10 @@ public class RewardView  extends AppCompatActivity {
                         mUser.setPoints(mUser.getPoints() - reward.getPoints());
 
                         //update user's points
-                        databaseHelper.updateUser(mUser);
+                        mDatabaseHelper.updateUser(mUser);
 
                         //update the reward status
-                        databaseHelper.setRewardStatus(mUser.getUserId(), reward.getRewardId(), RewardStatusType.PENDING);
+                        mDatabaseHelper.setRewardStatus(mUser.getUserId(), reward.getRewardId(), RewardStatusType.PENDING);
 
                     }
                     else if (button.getText().equals("Cancel")){
@@ -176,10 +186,10 @@ public class RewardView  extends AppCompatActivity {
                         mUser.setPoints(mUser.getPoints() + reward.getPoints());
 
                         //update user's points
-                        databaseHelper.updateUser(mUser);
+                        mDatabaseHelper.updateUser(mUser);
 
                         //update the reward status
-                        databaseHelper.setRewardStatus(mUser.getUserId(), reward.getRewardId(), RewardStatusType.AVAILABLE);
+                        mDatabaseHelper.setRewardStatus(mUser.getUserId(), reward.getRewardId(), RewardStatusType.AVAILABLE);
 
                     }
 

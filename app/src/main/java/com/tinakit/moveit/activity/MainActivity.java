@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        // Dagger 2:  get StorageComponent
+        // inject FitnessDBHelper
         ((CustomApplication)getApplication()).getStorageComponent().inject(this);
 
         // save state
