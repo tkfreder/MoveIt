@@ -41,10 +41,12 @@ public class UserStatsRecyclerAdapter extends RecyclerView.Adapter<UserStatsRecy
     public UserStatsRecyclerAdapter.CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
 
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.stat_list_item_parent, viewGroup, false);
-
         CustomViewHolder viewHolder = new CustomViewHolder(view);
+
         return viewHolder;
+
         }
+
     @Override
     public void onBindViewHolder(final UserStatsRecyclerAdapter.CustomViewHolder customViewHolder, int i) {
 

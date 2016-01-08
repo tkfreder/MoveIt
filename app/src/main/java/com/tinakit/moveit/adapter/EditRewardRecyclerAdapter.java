@@ -29,22 +29,24 @@ public class EditRewardRecyclerAdapter extends RecyclerView.Adapter<EditRewardRe
 
     @Inject
     FitnessDBHelper mDatabaseHelper;
+
     private Context mContext;
     private List<Reward> mRewardList;
     Reward mReward;
 
 
-    public EditRewardRecyclerAdapter(Context context, Activity activity) {
+    public EditRewardRecyclerAdapter(Context context, Activity activity, List<Reward> rewardList) {
         mContext = context;
+        mRewardList = rewardList;
 
         // inject FitnessDBHelper
-        ((CustomApplication)activity.getApplication()).getStorageComponent().inject(this);
+        ((CustomApplication)activity.getApplication()).getAppComponent().inject(this);
 
         // Get singleton instance of database
         //mDatabaseHelper = FitnessDBHelper.getInstance(context);
 
         // Get Activity Types
-        mRewardList = mDatabaseHelper.getAllRewards();
+        //mRewardList = mDatabaseHelper.getAllRewards();
     }
 
     @Override

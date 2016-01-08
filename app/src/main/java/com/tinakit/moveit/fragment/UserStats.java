@@ -29,6 +29,9 @@ public class UserStats extends Fragment{
     public static final String USER_STATS_TAG = "USER_STATS_TAG";
     public static final String USER_STATS_LIST_KEY = "USER_STATS_LIST";
 
+    @Inject
+    FitnessDBHelper mDatabaseHelper;
+
     // local cache
     protected static List<User> mUserList;
     protected FragmentActivity mFragmentActivity;
@@ -38,9 +41,6 @@ public class UserStats extends Fragment{
     protected RecyclerView mRecyclerView;
     protected UserStatsRecyclerAdapter mUserStatsRecyclerAdapter;
 
-    @Inject
-    FitnessDBHelper mDatabaseHelper;
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -49,8 +49,8 @@ public class UserStats extends Fragment{
 
         mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        // inject FitnessDBHelper
-        ((CustomApplication)getActivity().getApplication()).getStorageComponent().inject(this);
+        // Dagger 2 injection
+        ((CustomApplication)getActivity().getApplication()).getAppComponent().inject(this);
 
         //get databaseHelper instance
         //mDatabaseHelper = FitnessDBHelper.getInstance(mFragmentActivity);

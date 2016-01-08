@@ -1,6 +1,7 @@
 package com.tinakit.moveit.module;
 
 import com.tinakit.moveit.api.GoogleApi;
+import com.tinakit.moveit.api.LocationApi;
 
 import javax.inject.Singleton;
 
@@ -19,5 +20,4 @@ public class ApiModule {
 
         return new GoogleApi();
     }
-
 }

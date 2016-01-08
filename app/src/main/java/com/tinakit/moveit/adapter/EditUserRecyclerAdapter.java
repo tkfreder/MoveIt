@@ -32,10 +32,11 @@ public class EditUserRecyclerAdapter extends RecyclerView.Adapter<EditUserRecycl
 
     @Inject
     FitnessDBHelper mDatabaseHelper;
+    //private FitnessDBHelper mDatabaseHelper;
+
     private Context mContext;
     private FragmentActivity mActivity;
     private List<User> mUserList;
-    //private FitnessDBHelper mDatabaseHelper;
     public static final int AVATAR_FILENAME = 1;
 
 
@@ -47,8 +48,8 @@ public class EditUserRecyclerAdapter extends RecyclerView.Adapter<EditUserRecycl
 
         //mDatabaseHelper = FitnessDBHelper.getInstance(mContext);
 
-        // inject FitnessDBHelper
-        ((CustomApplication)activity.getApplication()).getStorageComponent().inject(this);
+        // Dagger 2 injection
+        ((CustomApplication)activity.getApplication()).getAppComponent().inject(this);
 
     }
 
@@ -81,13 +82,13 @@ public class EditUserRecyclerAdapter extends RecyclerView.Adapter<EditUserRecycl
             @Override
             public void onClick(View v) {
 
-                //save the user in bundle
-                Bundle args = new Bundle();
-                args.putParcelable(PickAvatar.PICK_AVATAR_KEY_USER, (User)v.getTag());
+            //save the user in bundle
+            Bundle args = new Bundle();
+            args.putParcelable(PickAvatar.PICK_AVATAR_KEY_USER, (User)v.getTag());
 
-                Intent intent = new Intent(mContext, PickAvatar.class);
-                intent.putExtras(args);
-                mActivity.startActivityForResult(intent,AVATAR_FILENAME);
+            Intent intent = new Intent(mContext, PickAvatar.class);
+            intent.putExtras(args);
+            mActivity.startActivityForResult(intent,AVATAR_FILENAME);
             }
         });
 
@@ -97,29 +98,29 @@ public class EditUserRecyclerAdapter extends RecyclerView.Adapter<EditUserRecycl
             @Override
             public void onClick(View view) {
 
-                User user = (User) view.getTag();
+            User user = (User) view.getTag();
 
-                //get remaining values for User from form in case it was changed
-                user.setUserName(customViewHolder.userName.getText().toString());
-                user.setIsAdmin(customViewHolder.isAdmin.isChecked());
-                user.setWeight(Float.parseFloat(customViewHolder.weight.getText().toString()));
-                // avatar filename is saved in onclicklistener of avatar listview
+            //get remaining values for User from form in case it was changed
+            user.setUserName(customViewHolder.userName.getText().toString());
+            user.setIsAdmin(customViewHolder.isAdmin.isChecked());
+            user.setWeight(Float.parseFloat(customViewHolder.weight.getText().toString()));
+            // avatar filename is saved in onclicklistener of avatar listview
 
-                mDatabaseHelper.updateUser(user);
+            mDatabaseHelper.updateUser(user);
 
-                // redirect back to User Profile
+            // redirect back to User Profile
 
-                // check whether UserProfile is already visible
-                UserProfile userProfile = (UserProfile)mActivity.getSupportFragmentManager().findFragmentByTag(UserProfile.USER_PROFILE_TAG);
-                if (userProfile == null){
+            // check whether UserProfile is already visible
+            UserProfile userProfile = (UserProfile)mActivity.getSupportFragmentManager().findFragmentByTag(UserProfile.USER_PROFILE_TAG);
+            if (userProfile == null){
 
-                    userProfile= new UserProfile ();
-                    FragmentTransaction transaction = mActivity.getSupportFragmentManager().beginTransaction();
-                    transaction.add(R.id.fragmentContainer, userProfile, UserProfile.USER_PROFILE_TAG);
-                    transaction.commit();
+                userProfile= new UserProfile ();
+                FragmentTransaction transaction = mActivity.getSupportFragmentManager().beginTransaction();
+                transaction.add(R.id.fragmentContainer, userProfile, UserProfile.USER_PROFILE_TAG);
+                transaction.commit();
 
-                    //mActivity.getActionBar().setTitle(mContext.getResources().getString(R.string.user_profiles));
-                }
+                //mActivity.getActionBar().setTitle(mContext.getResources().getString(R.string.user_profiles));
+            }
             }
         });
 

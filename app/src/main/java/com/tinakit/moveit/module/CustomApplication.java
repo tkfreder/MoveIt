@@ -23,7 +23,7 @@ public class CustomApplication extends Application {
 
     }
 
-    public AppComponent getStorageComponent(){ return mAppComponent;};
+    public AppComponent getAppComponent(){ return mAppComponent;};
 
 
 

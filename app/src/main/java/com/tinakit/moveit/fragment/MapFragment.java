@@ -1,5 +1,6 @@
 package com.tinakit.moveit.fragment;
 
+import android.app.Activity;
 import android.graphics.Color;
 import android.location.Location;
 import android.support.v4.app.FragmentManager;
@@ -35,18 +36,22 @@ public class MapFragment implements OnMapReadyCallback {
     // CONSTANTS
     private static final float ZOOM_STREET_ROUTE = 15.0f;
 
+    @Inject
+    GoogleApi mGoogleApi;
+
     // INSTANCE FIELDS
     private FragmentManager mFragmentManager;
     private GoogleMap mGoogleMap;
     private SupportMapFragment mMapFragment;
+    private Activity mActivity;
 
-    @Inject
-    GoogleApi mGoogleApi;
-
-    public MapFragment(FragmentManager fragmentManager, GoogleApi googleApi){
+    public MapFragment(FragmentManager fragmentManager, Activity activity) {
 
         mFragmentManager = fragmentManager;
-        mGoogleApi = googleApi;
+        mActivity = activity;
+
+        // Dagger 2 injection
+        ((CustomApplication)mActivity.getApplication()).getAppComponent().inject(this);
 
     }
 

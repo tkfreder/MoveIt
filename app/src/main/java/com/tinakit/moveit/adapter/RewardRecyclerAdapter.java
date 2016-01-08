@@ -17,8 +17,11 @@ import com.tinakit.moveit.activity.RewardView;
 import com.tinakit.moveit.model.Reward;
 import com.tinakit.moveit.model.RewardStatusType;
 import com.tinakit.moveit.model.User;
+import com.tinakit.moveit.module.CustomApplication;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * Created by Tina on 9/25/2015.
@@ -26,20 +29,25 @@ import java.util.List;
 public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAdapter.CustomViewHolder> {
 
     private Context mContext;
-    //TODO: make private after building DB
-    public static List<Reward> mRewardList;
+    private List<Reward> mRewardList;
+
+    @Inject
+    FitnessDBHelper mDatabaseHelper;
 
     private User mUser;
 
-    public RewardRecyclerAdapter(Context context, User user) {
+    public RewardRecyclerAdapter(Context context, User user, Activity activity) {
         mContext = context;
         mUser = user;
 
+        // Dagger 2 injection
+        ((CustomApplication)activity.getApplication()).getAppComponent().inject(this);
+
         // Get singleton instance of database
-        FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(context);
+        //FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(context);
 
         // Get Reward list
-        mRewardList = databaseHelper.getUserRewards(mUser.getUserId());
+        mRewardList = mDatabaseHelper.getUserRewards(mUser.getUserId());
     }
 
     @Override

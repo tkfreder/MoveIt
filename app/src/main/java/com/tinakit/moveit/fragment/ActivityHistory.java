@@ -22,11 +22,14 @@ import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.model.UserActivity;
+import com.tinakit.moveit.module.CustomApplication;
 import com.tinakit.moveit.utility.DateUtility;
 import com.tinakit.moveit.utility.Map;
 import com.tinakit.moveit.utility.UnitConverter;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 import fr.ganfra.materialspinner.MaterialSpinner;
 
@@ -40,9 +43,12 @@ public class ActivityHistory extends Fragment {
     public static final String ACTIVITY_HISTORY_KEY = "ACTIVIY_HISTORY_KEY";
     private static final int APPROX_SIZE_AVATAR_IMAGES = 250;
 
+    @Inject
+    FitnessDBHelper mDatabaseHelper;
+
     //INSTANCE FIELDS
     private FragmentActivity mFragmentActivity;
-    private FitnessDBHelper mDatabaseHelper;
+
     private ActivityHistoryRecyclerAdapter mActivityHistoryRecyclerAdapter;
     private List<ActivityDetail> mActivityDetailList;
     private List<User> mUserList;
@@ -61,8 +67,11 @@ public class ActivityHistory extends Fragment {
 
         mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+        // Dagger 2 injection
+        ((CustomApplication)getActivity().getApplication()).getAppComponent().inject(this);
+
         //get databaseHelper instance
-        mDatabaseHelper = FitnessDBHelper.getInstance(mFragmentActivity);
+        //mDatabaseHelper = FitnessDBHelper.getInstance(mFragmentActivity);
 
         initializeUI();
 
@@ -158,8 +167,8 @@ public class ActivityHistory extends Fragment {
         public ActivityHistoryRecyclerAdapter.CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
 
             View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.activity_history_list_item, viewGroup, false);
-
             CustomViewHolder viewHolder = new CustomViewHolder(view);
+
             return viewHolder;
         }
 

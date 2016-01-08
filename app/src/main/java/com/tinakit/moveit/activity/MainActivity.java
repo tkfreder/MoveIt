@@ -70,8 +70,7 @@ public class MainActivity extends AppCompatActivity {
         setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // DI
-        ((CustomApplication)getApplication()).getStorageComponent().inject(this);
-        //((CustomApplication)getApplication()).getAppComponent().inject(this);
+        ((CustomApplication)getApplication()).getAppComponent().inject(this);
 
         // save state
         //mSavedInstanceState = savedInstanceState;

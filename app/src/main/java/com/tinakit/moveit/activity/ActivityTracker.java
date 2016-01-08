@@ -62,6 +62,12 @@ public class ActivityTracker extends AppCompatActivity {
     public static final String ACTIVITY_TRACKER_INTENT = "ACTIVITY_TRACKER_INTENT";
     private static final String COIN_AUDIO_FILENAME = "cha_ching";
 
+    @Inject
+    GoogleApi mGoogleApi;
+
+    @Inject
+    FitnessDBHelper mDatabaseHelper;
+
     private static final float FEET_COIN_CONVERSION = 1.0f;//0.05f;  //20 feet = 1 coin
     private static long STOP_SERVICE_TIME_LIMIT = 30 * 60 * 1000 * 60; // 30 minutes in seconds
 
@@ -78,8 +84,6 @@ public class ActivityTracker extends AppCompatActivity {
     private Accelerometer mAccelerometer;
     private MapFragment mMapFragment;
 
-    //GOOGLE PLAY SERVICES
-    private GoogleApi mGoogleApi;
     // Request code to use when launching the resolution activity
     private static final int REQUEST_RESOLVE_ERROR = 1001;
     private boolean mResolvingError = false;
@@ -108,9 +112,6 @@ public class ActivityTracker extends AppCompatActivity {
     private boolean mSaveLocationData = false;
     private boolean mHasMapFragment = false;
 
-    @Inject
-    FitnessDBHelper mDatabaseHelper;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         if (DEBUG) Log.d(LOG, "onCreateView()");
@@ -119,8 +120,8 @@ public class ActivityTracker extends AppCompatActivity {
         setContentView(R.layout.activity_tracker);
         setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        // inject FitnessDBHelper
-        ((CustomApplication)getApplication()).getStorageComponent().inject(this);
+        // Dagger 2 injection
+        ((CustomApplication)getApplication()).getAppComponent().inject(this);
 
         // check whether previous screen was ActivityChooser
         mIntent = getIntent();
@@ -139,7 +140,7 @@ public class ActivityTracker extends AppCompatActivity {
 
         //end the activity if Google Play Services is not present
         //redirect user to Google Play Services
-        mGoogleApi = new GoogleApi();
+        //mGoogleApi = new GoogleApi();
 
         if (!mGoogleApi.servicesAvailable(this))
             finish();
@@ -148,7 +149,7 @@ public class ActivityTracker extends AppCompatActivity {
 
         // location listener
         mLocationApi = new LocationApi(this, mGoogleApi.client());
-        mLocationApi.initialize();
+        //mLocationApi.initialize();
 
         // accelerometer
         mAccelerometer = new Accelerometer(this);

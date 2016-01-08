@@ -8,6 +8,8 @@ import com.tinakit.moveit.adapter.EditRewardRecyclerAdapter;
 import com.tinakit.moveit.adapter.EditUserRecyclerAdapter;
 import com.tinakit.moveit.adapter.RewardRecyclerAdapter;
 import com.tinakit.moveit.fragment.ActivityChooser;
+import com.tinakit.moveit.fragment.ActivityHistory;
+import com.tinakit.moveit.fragment.EditRewardFragment;
 import com.tinakit.moveit.fragment.MapFragment;
 import com.tinakit.moveit.fragment.UserProfile;
 import com.tinakit.moveit.fragment.UserStats;
@@ -42,7 +44,9 @@ public interface AppComponent {
     void inject(EditRewardRecyclerAdapter editRewardRecyclerAdapter);
     void inject(EditUserRecyclerAdapter editUserRecyclerAdapter);
     void inject(ActivityChooser activityChooser);
+    void inject(ActivityHistory activityHistory);
     void inject(UserProfile userProfile);
     void inject(UserStats userStats);
     void inject(MapFragment mapFragment);
+    void inject(EditRewardFragment editRewardFragment);
 }

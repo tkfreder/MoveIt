@@ -52,6 +52,9 @@ public class RewardView  extends AppCompatActivity {
         setContentView(R.layout.reward_view);
         setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+        // Dagger 2 injection
+        ((CustomApplication)getApplication()).getAppComponent().inject(this);
+
         initializeUI();
 
         fetchData();
@@ -129,9 +132,6 @@ public class RewardView  extends AppCompatActivity {
         public RewardRecyclerAdapter(Context context, User user, Activity activity) {
             mContext = context;
             mUser = user;
-
-            // inject FitnessDBHelper
-            ((CustomApplication)getApplication()).getStorageComponent().inject((RewardView)activity);
 
             // Get singleton instance of database
             //FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(context);

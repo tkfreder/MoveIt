@@ -47,6 +47,12 @@ public class ActivityChooser  extends Fragment {
     public static final String ACTIVITY_CHOOSER_TAG= "ACTIVITY_CHOOSER_TAG";
     public static final String USER_ACTIVITY_LIST_KEY = "USER_ACTIVITY_LIST_KEY";
 
+    @Inject
+    GoogleApi mGoogleApi;
+
+    @Inject
+    FitnessDBHelper mDatabaseHelper;
+
     // local cache
     protected static List<ActivityType> mActivityTypeList;
     public static ActivityDetail mActivityDetail = new ActivityDetail();
@@ -59,17 +65,12 @@ public class ActivityChooser  extends Fragment {
     // API
     private MapFragment mMapFragment;
 
-    @Inject
-    GoogleApi mGoogleApi;
-
     // UI COMPONENTS
     protected RecyclerView mRecyclerView;
     public static MultiChooserRecyclerAdapter mRecyclerViewAdapter;
     protected Button mNextButton;
     private ViewGroup mContainer;
 
-    @Inject
-    FitnessDBHelper mDatabaseHelper;
 
     @Nullable
     @Override
@@ -79,7 +80,7 @@ public class ActivityChooser  extends Fragment {
         mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // inject FitnessDBHelper
-        ((CustomApplication)getActivity().getApplication()).getStorageComponent().inject(this);
+        ((CustomApplication)getActivity().getApplication()).getAppComponent().inject(this);
         //get databaseHelper instance
         //mDatabaseHelper = FitnessDBHelper.getInstance(mFragmentActivity);
 
@@ -123,7 +124,7 @@ public class ActivityChooser  extends Fragment {
         mRecyclerViewAdapter = new MultiChooserRecyclerAdapter(mFragmentActivity, userList, mUserActivityList_previous);
         mRecyclerView.setAdapter(mRecyclerViewAdapter);
 
-        mMapFragment = new MapFragment(getActivity().getSupportFragmentManager(), mGoogleApi);
+        mMapFragment = new MapFragment(getActivity().getSupportFragmentManager(), getActivity());
         mMapFragment.addMap(R.id.map_container, mContainer);
 
         //display map of starting point

@@ -30,15 +30,15 @@ public class UserProfile extends Fragment {
     // constants
     public static final String USER_PROFILE_TAG = "USER_PROFILE_TAG";
 
+    @Inject
+    FitnessDBHelper mDatabaseHelper;
+
     // cache
     protected FragmentActivity mFragmentActivity;
     private View rootView;
     protected EditUserRecyclerAdapter mEditUserRecyclerAdapter;
     private List<User> mUserList;
     private User mUser;
-
-    @Inject
-    FitnessDBHelper mDatabaseHelper;
 
     @Nullable
     @Override
@@ -49,8 +49,8 @@ public class UserProfile extends Fragment {
 
         mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        // inject FitnessDBHelper
-        ((CustomApplication)getActivity().getApplication()).getStorageComponent().inject(this);
+        // Dagger 2 injection
+        ((CustomApplication)getActivity().getApplication()).getAppComponent().inject(this);
 
         //get databaseHelper instance
         //mDatabaseHelper = FitnessDBHelper.getInstance(mFragmentActivity);

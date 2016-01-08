@@ -33,6 +33,9 @@ import javax.inject.Inject;
  */
 public class EditRewardFragment extends Fragment {
 
+    @Inject
+    FitnessDBHelper mDatabaseHelper;
+
     private FragmentActivity mFragmentActivity;
     //RecyclerView
     private RecyclerView mRecyclerView;
@@ -45,14 +48,18 @@ public class EditRewardFragment extends Fragment {
 
         mFragmentActivity  = (FragmentActivity)super.getActivity();
         mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
         View rootView = inflater.inflate(R.layout.edit_reward, container, false);
+
+        // Dagger 2 injection
+        ((CustomApplication)getActivity().getApplication()).getAppComponent().inject(this);
 
         //RecyclerView
         // Initialize recycler view
         mRecyclerView = (RecyclerView)rootView.findViewById(R.id.reward_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mFragmentActivity));
-        mEditRewardRecyclerAdapter = new EditRewardRecyclerAdapter(getContext(), mFragmentActivity);
+
+        List<Reward> rewardList = mDatabaseHelper.getAllRewards();
+        mEditRewardRecyclerAdapter = new EditRewardRecyclerAdapter(getContext(), mFragmentActivity, rewardList);
         mRecyclerView.setAdapter(mEditRewardRecyclerAdapter);
 
         return rootView;

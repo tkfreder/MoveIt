@@ -50,7 +50,7 @@ public class PickAvatar extends AppCompatActivity {
         setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // inject FitnessDBHelper
-        ((CustomApplication)getApplication()).getStorageComponent().inject(this);
+        ((CustomApplication)getApplication()).getAppComponent().inject(this);
 
         //get databaseHelper instance
         //mDatabaseHelper = FitnessDBHelper.getInstance(mFragmentActivity);
