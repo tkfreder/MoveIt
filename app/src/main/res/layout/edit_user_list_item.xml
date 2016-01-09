@@ -1,14 +1,8 @@
-<android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/tools"
-    android:id="@+id/card_view"
+<android.support.percent.PercentRelativeLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    card_view:cardCornerRadius="4dp"
-    android:layout_margin="5dp">
-    <android.support.percent.PercentRelativeLayout 
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
         <ImageView
             android:id="@+id/avatar"
@@ -91,4 +85,4 @@
 
 
     </android.support.percent.PercentRelativeLayout>
-</android.support.v7.widget.CardView>
+
