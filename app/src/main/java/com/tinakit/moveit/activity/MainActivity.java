@@ -31,6 +31,7 @@ import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.module.CustomApplication;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -44,8 +45,9 @@ public class MainActivity extends AppCompatActivity {
     private static final boolean DEBUG = true;
     public static final String MAIN_ACTIVITY_BROADCAST_RECEIVER = "MAIN_ACTIVITY_BROADCAST_RECEIVER";
 
-    // Navigation Drawer
+    // UI widgets
     private DrawerLayout mDrawerLayout;
+    private Menu mMenu;
 
 
     @Inject
@@ -161,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
 
         switch(id){
 
-            case R.id.nav_rewards:
+             case R.id.nav_rewards:
 
                 getSupportActionBar().setTitle(getResources().getString(R.string.rewards));
 
@@ -180,7 +182,6 @@ public class MainActivity extends AppCompatActivity {
 
                 getSupportActionBar().setTitle(getResources().getString(R.string.history));
 
-
                 ActivityHistory activityHistory = (ActivityHistory)getSupportFragmentManager().findFragmentByTag(ActivityHistory.ACTIVITY_HISTORY_TAG);
                 if (activityHistory == null) {
 
@@ -196,12 +197,13 @@ public class MainActivity extends AppCompatActivity {
 
                 getSupportActionBar().setTitle(getResources().getString(R.string.user_profiles));
 
-                // check whether UserProfile is already visible
+                // check whether UserProfile does not exist
                 UserProfile userProfile = (UserProfile)getSupportFragmentManager().findFragmentByTag(UserProfile.USER_PROFILE_TAG);
                 if (userProfile == null){
 
                     userProfile= new UserProfile ();
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, userProfile).commit();
+
                 }
 
                 break;
@@ -286,6 +288,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        // save menu
+        mMenu = menu;
+
         return true;
     }
 

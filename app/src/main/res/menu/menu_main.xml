@@ -23,6 +23,7 @@ limitations under the License.
         android:title="@string/save"
         android:orderInCategory="200"
         app:showAsAction="always"
+        android:visible="false"
         />
     -->
 <!--

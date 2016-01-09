@@ -2,6 +2,7 @@ package com.tinakit.moveit.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
@@ -13,10 +14,12 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.activity.PickAvatar;
+import com.tinakit.moveit.fragment.EditUser;
 import com.tinakit.moveit.fragment.UserProfile;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.module.CustomApplication;
@@ -80,7 +83,7 @@ public class EditUserRecyclerAdapter extends RecyclerView.Adapter<EditUserRecycl
         User user = mUserList.get(i);
 
         customViewHolder.userName.setText(user.getUserName());
-        customViewHolder.isAdmin.setChecked(user.isAdmin());
+        customViewHolder.isAdmin.setVisibility(user.isAdmin() ? View.VISIBLE : View.GONE);
         customViewHolder.weight.setText(String.valueOf(Math.round(user.getWeight())));
         customViewHolder.avatar.setImageResource(mContext.getResources().getIdentifier(user.getAvatarFileName(), "drawable", mActivity.getPackageName()));
 
@@ -99,8 +102,44 @@ public class EditUserRecyclerAdapter extends RecyclerView.Adapter<EditUserRecycl
             }
         });
 
-        //save current User data in updateButton
-        customViewHolder.updateButton.setTag(user);
+        //save current User data in deleteButton
+        customViewHolder.deleteButton.setTag(user);
+        customViewHolder.deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                User user = (User)v.getTag();
+
+                //TODO: display dialog, asking if you're sure you want to delete this user
+                String message = mActivity.getResources().getString(R.string.confirm_delete_message)  + user.getUserName();
+
+
+            }
+        });
+
+        //save current User data in editButton
+        customViewHolder.editButton.setTag(user);
+        customViewHolder.editButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // check whether UserProfile is already visible
+                EditUser editUser = (EditUser)mActivity.getSupportFragmentManager().findFragmentByTag(EditUser.EDIT_USER_TAG);
+                if (editUser == null){
+
+                    editUser= new EditUser();
+                    FragmentTransaction transaction = mActivity.getSupportFragmentManager().beginTransaction();
+                    transaction.add(R.id.fragmentContainer, editUser, EditUser.EDIT_USER_TAG);
+                    transaction.commit();
+
+                    //mActivity.getActionBar().setTitle(mContext.getResources().getString(R.string.user_profiles));
+                }
+
+            }
+        });
+
+
+        /*
         customViewHolder.updateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -109,7 +148,7 @@ public class EditUserRecyclerAdapter extends RecyclerView.Adapter<EditUserRecycl
 
             //get remaining values for User from form in case it was changed
             user.setUserName(customViewHolder.userName.getText().toString());
-            user.setIsAdmin(customViewHolder.isAdmin.isChecked());
+            user.setIsAdmin(customViewHolder.isAdmin.getVisibility() == View.VISIBLE ? true : false );
             user.setWeight(Float.parseFloat(customViewHolder.weight.getText().toString()));
             // avatar filename is saved in onclicklistener of avatar listview
 
@@ -130,6 +169,7 @@ public class EditUserRecyclerAdapter extends RecyclerView.Adapter<EditUserRecycl
             }
             }
         });
+        */
 
     }
 
@@ -140,20 +180,23 @@ public class EditUserRecyclerAdapter extends RecyclerView.Adapter<EditUserRecycl
 
     public class CustomViewHolder extends RecyclerView.ViewHolder {
 
-        protected EditText userName;
-        protected CheckBox isAdmin;
-        protected EditText weight;
+        protected TextView userName;
+        protected TextView isAdmin;
+        protected TextView weight;
         protected ImageView avatar;
-        protected Button updateButton;
+        protected ImageView deleteButton;
+        protected ImageView editButton;
 
         public CustomViewHolder(View view) {
             super(view);
 
-            this.userName = (EditText)view.findViewById(R.id.userName);
-            this.isAdmin = (CheckBox)view.findViewById(R.id.isAdmin);
-            this.weight = (EditText)view.findViewById(R.id.weight);
+            this.userName = (TextView)view.findViewById(R.id.userName);
+            this.isAdmin = (TextView)view.findViewById(R.id.isAdmin);
+            this.weight = (TextView)view.findViewById(R.id.weight);
             this.avatar = (ImageView) view.findViewById(R.id.avatar);
-            this.updateButton = (Button) view.findViewById(R.id.updateButton);
+            this.deleteButton = (ImageView) view.findViewById(R.id.deleteButton);
+            this.editButton = (ImageView) view.findViewById(R.id.editButton);
+
         }
     }
 

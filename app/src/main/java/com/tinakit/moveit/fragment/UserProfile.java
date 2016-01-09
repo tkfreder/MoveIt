@@ -33,11 +33,13 @@ public class UserProfile extends Fragment {
     @Inject
     FitnessDBHelper mDatabaseHelper;
 
-    // cache
+    // UI
     protected FragmentActivity mFragmentActivity;
     private View rootView;
-    protected EditUserRecyclerAdapter mEditUserRecyclerAdapter;
-    private List<User> mUserList;
+
+    //make these public to enable saving changes from Toolbar
+    public EditUserRecyclerAdapter mEditUserRecyclerAdapter;
+    public List<User> mUserList;
     private User mUser;
 
     @Nullable

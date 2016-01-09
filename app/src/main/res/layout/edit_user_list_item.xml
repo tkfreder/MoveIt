@@ -6,105 +6,89 @@
     android:layout_height="wrap_content"
     card_view:cardCornerRadius="4dp"
     android:layout_margin="5dp">
-    <RelativeLayout
+    <android.support.percent.PercentRelativeLayout 
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-            <RelativeLayout
-                android:id="@+id/avatarLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-                <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/avatarCardView"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    card_view:cardCornerRadius="15dp"
-                    android:layout_margin="5dp">
-                <ImageView
-                    android:id="@+id/avatar"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp" />
-                </android.support.v7.widget.CardView>
-            </RelativeLayout>
-            <RelativeLayout
-                android:id="@+id/userDetailLayout"
+
+        <ImageView
+            android:id="@+id/avatar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_widthPercent="15%"
+            />
+
+        <TextView
+            android:id="@+id/userName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_widthPercent="40%"
+            style="@style/LabelListItemPurple"
+            android:layout_toRightOf="@+id/avatar"
+            android:layout_toEndOf="@+id/avatar"
+            android:layout_alignParentBottom="true"/>
+
+        <RelativeLayout
+            android:id="@+id/weightLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/userName"
+            android:layout_toEndOf="@+id/userName"
+            app:layout_widthPercent="30%">
+
+            <TextView
+                android:id="@+id/weight"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:layout_toRightOf="@+id/avatarLayout"
-                android:layout_toEndOf="@+id/avatarLayout">
-
-                <RelativeLayout
-                    android:id="@+id/userNameLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    >
-                    <TextView
-                        android:id="@+id/userNameText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        style="@style/LabelListItemPurple"
-                        android:text="@string/username"
-                        android:layout_alignParentBottom="true"
-                        android:paddingRight="10dp"/>
-                    <EditText
-                        android:id="@+id/userName"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        style="@style/LabelListItemPurple"
-                        android:layout_toRightOf="@+id/userNameText"
-                        android:layout_alignParentBottom="true"/>
-                </RelativeLayout>
-                <RelativeLayout
-                    android:id="@+id/weightLayout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/userNameLayout">
-                    <TextView
-                        android:id="@+id/weightText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        style="@style/LabelListItemPurple"
-                        android:text="@string/weight"
-                        android:paddingRight="10dp"
-                        android:layout_alignParentBottom="true"/>
-                    <EditText
-                        android:id="@+id/weight"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        style="@style/LabelListItemPurple"
-                        android:layout_toRightOf="@+id/weightText"
-                        android:layout_toEndOf="@+id/weightText"
-                        android:inputType="number"
-                        android:layout_alignParentBottom="true"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        style="@style/LabelListItemPurple"
-                        android:layout_toRightOf="@+id/weight"
-                        android:layout_toEndOf="@+id/weight"
-                        android:paddingLeft="4dp"
-                        android:text="@string/pounds"
-                        android:layout_alignParentBottom="true"/>
-                </RelativeLayout>
-                <CheckBox
-                    android:id="@+id/isAdmin"
-                    android:text="@string/is_admin"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    style="@style/LabelListItemPurple"
-                    android:layout_below="@+id/weightLayout"
-                    android:enabled="false"/>
-
-            </RelativeLayout>
-
-
-            <Button
-                android:id="@+id/updateButton"
-                android:layout_width="300dp"
+                style="@style/LabelListItemPurple"
+                android:inputType="number"
+                android:layout_alignParentBottom="true"/>
+            <TextView
+                android:id="@+id/lbsTextView"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/avatarLayout"
-                android:text="@string/update">
-            </Button>
+                style="@style/LabelListItemPurple"
+                android:layout_toRightOf="@+id/weight"
+                android:layout_toEndOf="@+id/weight"
+                android:paddingLeft="4dp"
+                android:text="@string/pounds"
+                android:layout_alignParentBottom="true"/>
 
-    </RelativeLayout>
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/isAdmin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_widthPercent="5%"
+            android:text="@string/admin"
+            android:textColor="@color/red"
+            android:layout_toRightOf="@+id/weightLayout"
+            android:layout_toEndOf="@+id/weightLayout"
+            android:layout_alignParentBottom="true"/>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_widthPercent="10%"
+            android:layout_toRightOf="@+id/isAdmin"
+            android:layout_toEndOf="@+id/isAdmin"
+            android:layout_alignParentRight="true">
+
+            <ImageView
+                android:id="@+id/deleteButton"
+                android:layout_width="@dimen/icon_size"
+                android:layout_height="@dimen/icon_size"
+                android:src="@drawable/ic_action_discard"
+                />
+            <ImageView
+                android:id="@+id/editButton"
+                android:layout_width="@dimen/icon_size"
+                android:layout_height="@dimen/icon_size"
+                android:src="@drawable/ic_action_edit"
+                android:layout_toRightOf="@+id/deleteButton"
+                android:layout_toEndOf="@+id/deleteButton"/>
+        </RelativeLayout>
+
+
+    </android.support.percent.PercentRelativeLayout>
 </android.support.v7.widget.CardView>
