@@ -54,11 +54,11 @@ public class ActivityChooser  extends Fragment {
     FitnessDBHelper mDatabaseHelper;
 
     // local cache
-    protected static List<ActivityType> mActivityTypeList;
-    public static ActivityDetail mActivityDetail = new ActivityDetail();
     protected FragmentActivity mFragmentActivity;
     private View rootView;
-    ArrayList<UserActivity> mUserActivityList = new ArrayList<>();
+    protected static List<ActivityType> mActivityTypeList;
+    public static ActivityDetail mActivityDetail = new ActivityDetail();
+       ArrayList<UserActivity> mUserActivityList = new ArrayList<>();
     List<UserActivity> mUserActivityList_previous;
     private static ActivityChooser mActivityChooser;
 

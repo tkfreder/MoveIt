@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.PickAvatar;
-import com.tinakit.moveit.adapter.EditUserRecyclerAdapter;
+import com.tinakit.moveit.adapter.UserProfileRecyclerAdapter;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.module.CustomApplication;
@@ -38,7 +38,7 @@ public class UserProfile extends Fragment {
     private View rootView;
 
     //make these public to enable saving changes from Toolbar
-    public EditUserRecyclerAdapter mEditUserRecyclerAdapter;
+    public UserProfileRecyclerAdapter mUserProfileRecyclerAdapter;
     public List<User> mUserList;
     private User mUser;
 
@@ -67,8 +67,8 @@ public class UserProfile extends Fragment {
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(linearLayoutManager);
 
-        mEditUserRecyclerAdapter = new EditUserRecyclerAdapter(getActivity(), mFragmentActivity, mUserList);
-        mRecyclerView.setAdapter(mEditUserRecyclerAdapter);
+        mUserProfileRecyclerAdapter = new UserProfileRecyclerAdapter(getActivity(), mFragmentActivity, mUserList);
+        mRecyclerView.setAdapter(mUserProfileRecyclerAdapter);
 
 
         return rootView;
@@ -84,8 +84,8 @@ public class UserProfile extends Fragment {
                 mUserList.set(mUserList.indexOf(mUser), mUser);
 
                 // refresh recyclerview with new user list data
-                mEditUserRecyclerAdapter.setList(mUserList);
-                mEditUserRecyclerAdapter.notifyDataSetChanged();
+                mUserProfileRecyclerAdapter.setList(mUserList);
+                mUserProfileRecyclerAdapter.notifyDataSetChanged();
             }
         }
     }

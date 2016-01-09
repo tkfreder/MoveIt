@@ -2,7 +2,6 @@ package com.tinakit.moveit.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.opengl.Visibility;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
@@ -10,17 +9,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.tinakit.moveit.R;
+import com.tinakit.moveit.activity.RewardView;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.activity.PickAvatar;
 import com.tinakit.moveit.fragment.EditUser;
-import com.tinakit.moveit.fragment.UserProfile;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.module.CustomApplication;
 
@@ -31,7 +27,7 @@ import javax.inject.Inject;
 /**
  * Created by Tina on 12/31/2015.
  */
-public class EditUserRecyclerAdapter extends RecyclerView.Adapter<EditUserRecyclerAdapter.CustomViewHolder>  {
+public class UserProfileRecyclerAdapter extends RecyclerView.Adapter<UserProfileRecyclerAdapter.CustomViewHolder>  {
 
     // CONSTANTS
     public static final int AVATAR_FILENAME = 1;
@@ -45,7 +41,7 @@ public class EditUserRecyclerAdapter extends RecyclerView.Adapter<EditUserRecycl
     private List<User> mUserList;
 
 
-    public EditUserRecyclerAdapter(Context context, FragmentActivity activity, List<User> userList) {
+    public UserProfileRecyclerAdapter(Context context, FragmentActivity activity, List<User> userList) {
 
         mContext = context;
         mActivity = activity;
@@ -70,7 +66,7 @@ public class EditUserRecyclerAdapter extends RecyclerView.Adapter<EditUserRecycl
 
 
     @Override
-    public EditUserRecyclerAdapter.CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+    public UserProfileRecyclerAdapter.CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
 
             View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.edit_user_list_item, viewGroup, false);
 
@@ -78,7 +74,7 @@ public class EditUserRecyclerAdapter extends RecyclerView.Adapter<EditUserRecycl
             return viewHolder;
     }
     @Override
-    public void onBindViewHolder(final EditUserRecyclerAdapter.CustomViewHolder customViewHolder, int i) {
+    public void onBindViewHolder(final UserProfileRecyclerAdapter.CustomViewHolder customViewHolder, int i) {
 
         User user = mUserList.get(i);
 
@@ -128,6 +124,12 @@ public class EditUserRecyclerAdapter extends RecyclerView.Adapter<EditUserRecycl
                 if (editUser == null){
 
                     editUser= new EditUser();
+
+                    //save User changes
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable(EditUser.EDIT_USER_USER, (User)v.getTag());
+                    editUser.setArguments(bundle);
+
                     FragmentTransaction transaction = mActivity.getSupportFragmentManager().beginTransaction();
                     transaction.add(R.id.fragmentContainer, editUser, EditUser.EDIT_USER_TAG);
                     transaction.commit();

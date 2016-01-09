@@ -1,33 +1,50 @@
 <android.support.percent.PercentRelativeLayout
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="100dp"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-        <ImageView
-            android:id="@+id/avatar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_widthPercent="15%"
-            />
+    <ImageView
+        android:id="@+id/avatar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_widthPercent="20%"
+        />
+
+    <RelativeLayout
+        android:id="@+id/userLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_widthPercent="40%"
+        android:layout_toRightOf="@+id/avatar"
+        android:layout_toEndOf="@+id/avatar"
+        >
 
         <TextView
             android:id="@+id/userName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_widthPercent="40%"
             style="@style/LabelListItemPurple"
-            android:layout_toRightOf="@+id/avatar"
-            android:layout_toEndOf="@+id/avatar"
-            android:layout_alignParentBottom="true"/>
+            android:layout_alignParentLeft="true"/>
+        <TextView
+            android:id="@+id/isAdmin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/astericks"
+            android:textColor="@color/red"
+            android:paddingLeft="4dp"
+            android:layout_toRightOf="@+id/userName"
+            android:layout_toEndOf="@+id/userName"/>
 
-        <RelativeLayout
+    </RelativeLayout>
+
+    <RelativeLayout
             android:id="@+id/weightLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/userName"
-            android:layout_toEndOf="@+id/userName"
-            app:layout_widthPercent="30%">
+            android:layout_toRightOf="@+id/userLayout"
+            android:layout_toEndOf="@+id/userLayout"
+            app:layout_widthPercent="20%">
 
             <TextView
                 android:id="@+id/weight"
@@ -35,7 +52,7 @@
                 android:layout_height="wrap_content"
                 style="@style/LabelListItemPurple"
                 android:inputType="number"
-                android:layout_alignParentBottom="true"/>
+                android:layout_alignParentLeft="true"/>
             <TextView
                 android:id="@+id/lbsTextView"
                 android:layout_width="wrap_content"
@@ -44,44 +61,35 @@
                 android:layout_toRightOf="@+id/weight"
                 android:layout_toEndOf="@+id/weight"
                 android:paddingLeft="4dp"
-                android:text="@string/pounds"
-                android:layout_alignParentBottom="true"/>
+                android:text="@string/pounds"/>
 
         </RelativeLayout>
 
-        <TextView
-            android:id="@+id/isAdmin"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_widthPercent="5%"
-            android:text="@string/admin"
-            android:textColor="@color/red"
-            android:layout_toRightOf="@+id/weightLayout"
-            android:layout_toEndOf="@+id/weightLayout"
-            android:layout_alignParentBottom="true"/>
 
-        <RelativeLayout
+        <android.support.percent.PercentRelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_widthPercent="10%"
+            app:layout_widthPercent="20%"
             android:layout_toRightOf="@+id/isAdmin"
             android:layout_toEndOf="@+id/isAdmin"
             android:layout_alignParentRight="true">
 
             <ImageView
                 android:id="@+id/deleteButton"
-                android:layout_width="@dimen/icon_size"
-                android:layout_height="@dimen/icon_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_widthPercent="50%"
                 android:src="@drawable/ic_action_discard"
                 />
             <ImageView
                 android:id="@+id/editButton"
-                android:layout_width="@dimen/icon_size"
-                android:layout_height="@dimen/icon_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_widthPercent="50%"
                 android:src="@drawable/ic_action_edit"
                 android:layout_toRightOf="@+id/deleteButton"
                 android:layout_toEndOf="@+id/deleteButton"/>
-        </RelativeLayout>
+        </android.support.percent.PercentRelativeLayout>
 
 
     </android.support.percent.PercentRelativeLayout>

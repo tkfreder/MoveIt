@@ -146,6 +146,7 @@
     <string name="username">username:</string>
     <string name="is_admin">is admin</string>
     <string name="admin">Admin</string>
+    <string name="astericks">*</string>
     <string name="history">History</string>
 
 <!-- TODO: Remove or change this placeholder text -->
