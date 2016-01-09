@@ -21,6 +21,12 @@
         <item name="android:background">?attr/colorPrimaryDark</item>
         <item name="android:textColorPrimary">@color/white</item>
         <item name="android:textColorSecondary">@color/white</item>
+        <item name="actionMenuTextColor">@color/white</item>
+        <item name="android:actionButtonStyle">@style/MyActionButtonStyle</item>
+    </style>
+
+    <style name="MyActionButtonStyle" parent="AppTheme.Base">
+        <item name="android:paddingRight">@dimen/activity_vertical_margin</item>
     </style>
 
     <style name="nav_list_item">

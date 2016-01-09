@@ -17,6 +17,14 @@ limitations under the License.
       xmlns:app="http://schemas.android.com/apk/res-auto"
       xmlns:tools="http://schemas.android.com/tools"
       tools:context=".MainActivity" >
+
+    <item
+        android:id="@+id/save"
+        android:title="@string/save"
+        android:orderInCategory="200"
+        app:showAsAction="always"
+        />
+    -->
 <!--
     <item
         android:id="@+id/navigate"

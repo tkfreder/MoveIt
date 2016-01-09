@@ -11,11 +11,17 @@
         <item name="android:background">?android:attr/colorPrimaryDark</item>
         <item name="android:textColorPrimary">@color/white</item>
         <item name="android:textColorSecondary">@color/white</item>
+        <item name="actionMenuTextColor">@color/white</item>
+        <item name="android:actionButtonStyle">@style/MyActionButtonStyle</item>
     </style>
 
     <style name="nav_list_item">
         <item name="android:textSize">14sp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="MyActionButtonStyle" parent="AppTheme.Base">
+        <item name="android:paddingRight">@dimen/activity_vertical_margin</item>
     </style>
 
 </resources>
