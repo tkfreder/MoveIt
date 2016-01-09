@@ -42,8 +42,6 @@ public class EditUser extends Fragment {
     CheckBox mAdmin;
     Button mSaveButton;
 
-
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

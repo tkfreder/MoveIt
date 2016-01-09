@@ -131,7 +131,7 @@ public class UserProfileRecyclerAdapter extends RecyclerView.Adapter<UserProfile
                     editUser.setArguments(bundle);
 
                     FragmentTransaction transaction = mActivity.getSupportFragmentManager().beginTransaction();
-                    transaction.add(R.id.fragmentContainer, editUser, EditUser.EDIT_USER_TAG);
+                    transaction.replace(R.id.fragmentContainer, editUser, EditUser.EDIT_USER_TAG);
                     transaction.commit();
 
                     //mActivity.getActionBar().setTitle(mContext.getResources().getString(R.string.user_profiles));
