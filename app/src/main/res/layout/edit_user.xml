@@ -8,7 +8,8 @@
     <RelativeLayout
         android:id="@+id/avatarLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="@dimen/activity_horizontal_margin">
         <RelativeLayout
             android:layout_width="@dimen/edit_image_size"
             android:layout_height="@dimen/edit_image_size"
@@ -32,52 +33,78 @@
 
     </RelativeLayout>
 
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/userNameLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/avatarLayout"
-            android:gravity="center">
-
-            <EditText
-                android:id="@+id/userName"
-                android:layout_width="wrap_content"
-                android:minWidth="@dimen/min_width_long_edit_text"
-                android:layout_height="wrap_content"
-                android:hint="@string/username"/>
-        </android.support.design.widget.TextInputLayout>
-
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/weightLayout"
+    <RelativeLayout
+        android:id="@+id/formLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/userNameLayout"
-        android:gravity="center">
+        android:padding="@dimen/activity_horizontal_margin"
+        android:layout_below="@+id/avatarLayout">
 
-        <EditText
-            android:id="@+id/weight"
+        <RelativeLayout
             android:layout_width="wrap_content"
-            android:minWidth="@dimen/min_width_short_edit_text"
             android:layout_height="wrap_content"
-            android:inputType="number"
-            android:hint="@string/weight_hint"
-            />
-    </android.support.design.widget.TextInputLayout>
+            android:layout_centerInParent="true"
+            >
 
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/userNameLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:padding="@dimen/activity_horizontal_margin">
 
-    <CheckBox
-        android:id="@+id/isAdmin"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/is_admin"
-        android:layout_below="@id/weightLayout"
-        android:layout_centerInParent="true"/>
+                <EditText
+                    android:id="@+id/userName"
+                    android:layout_width="wrap_content"
+                    android:minWidth="@dimen/min_width_long_edit_text"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/username"/>
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/weightLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/userNameLayout"
+                android:padding="@dimen/activity_horizontal_margin"
+                android:gravity="left">
+
+                <EditText
+                    android:id="@+id/weight"
+                    android:layout_width="wrap_content"
+                    android:minWidth="@dimen/min_width_short_edit_text"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:hint="@string/weight_hint"
+                    />
+            </android.support.design.widget.TextInputLayout>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/weightLayout"
+                android:padding="@dimen/activity_horizontal_margin"
+                android:gravity="left">
+                <CheckBox
+                    android:id="@+id/isAdmin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/admin"
+                    />
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
     <Button
         android:id="@+id/saveButton"
-        android:layout_width="@dimen/button_long"
+        android:layout_width="@dimen/button_short"
         android:layout_height="wrap_content"
         android:text="@string/save"
-        android:layout_below="@id/isAdmin"
-        android:layout_centerInParent="true"/>
+        android:layout_below="@id/formLayout"
+        android:layout_centerInParent="true"
+        android:padding="@dimen/activity_horizontal_margin"
+        android:background="@color/green"
+        android:textColor="@color/white"/>
 
 </RelativeLayout>
