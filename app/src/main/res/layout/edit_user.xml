@@ -5,27 +5,33 @@
     android:layout_height="match_parent"
     android:padding="@dimen/activity_vertical_margin"
     >
-
     <RelativeLayout
         android:id="@+id/avatarLayout"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/edit_image_size"
-        android:layout_gravity="center">
-        <ImageView
-            android:id="@+id/avatar"
+        android:layout_height="wrap_content">
+        <RelativeLayout
             android:layout_width="@dimen/edit_image_size"
             android:layout_height="@dimen/edit_image_size"
-            android:background="@drawable/white_image_border"
-            />
-        <ImageView
-            android:layout_width="@dimen/icon_size"
-            android:layout_height="@dimen/icon_size"
-            android:src="@drawable/ic_action_edit"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:background="@drawable/white_image_border"
-            />
+            android:layout_centerInParent="true">
+            <ImageView
+                android:id="@+id/avatar"
+                android:layout_width="@dimen/edit_image_size"
+                android:layout_height="@dimen/edit_image_size"
+                android:background="@drawable/white_image_border"
+                />
+            <ImageView
+                android:layout_width="@dimen/icon_size"
+                android:layout_height="@dimen/icon_size"
+                android:src="@drawable/ic_action_edit"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/white_image_border"
+                />
+        </RelativeLayout>
+
     </RelativeLayout>
+
+
 
         <android.support.percent.PercentRelativeLayout
             android:id="@+id/userNameLayout"
