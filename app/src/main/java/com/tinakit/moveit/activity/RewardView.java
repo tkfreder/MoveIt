@@ -49,7 +49,6 @@ public class RewardView extends Fragment {
     //UI Widgets
     private RecyclerView mRecyclerView;
     private ImageView mAvatar;
-    private TextView mMessage;
     private TextView mTotalCoins_textview;
     private RewardRecyclerAdapter mRewardRecyclerAdapter;
     protected FragmentActivity mFragmentActivity;
@@ -78,7 +77,6 @@ public class RewardView extends Fragment {
         //wire up UI components
         mAvatar = (ImageView)rootView.findViewById(R.id.avatar);
         mTotalCoins_textview = (TextView)rootView.findViewById(R.id.coinTotal);
-        mMessage = (TextView)rootView.findViewById(R.id.message);
         mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recycler_view);
     }
 
@@ -149,16 +147,6 @@ public class RewardView extends Fragment {
         mTotalCoins_textview.setText(String.format("%d", mUser.getPoints()));
 
         List<Reward> rewardList = mDatabaseHelper.getAllRewards();
-
-        if (rewardList.size() != 0){
-
-            //display message if not enough coins to redeem reward
-            if (rewardList.get(0).getPoints() > mUser.getPoints()){
-
-                mMessage.setVisibility(View.VISIBLE);
-                mMessage.setText("You need " + String.valueOf(rewardList.get(0).getPoints() - mUser.getPoints()) + " more coins to get a reward.");
-            }
-        }
 
         //RecyclerView
         // Initialize recycler view
