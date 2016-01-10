@@ -7,4 +7,7 @@
     <dimen name="avatar_size">48dp</dimen>
     <dimen name="button_long">300dp</dimen>
     <dimen name="edit_image_size">100dp</dimen>
+    <dimen name="min_width_long_edit_text">150dp</dimen>
+    <dimen name="min_width_short_edit_text">100dp</dimen>
+
 </resources>
