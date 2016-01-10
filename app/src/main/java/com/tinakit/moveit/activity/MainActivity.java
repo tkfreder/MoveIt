@@ -141,8 +141,6 @@ public class MainActivity extends AppCompatActivity {
 
             setupDrawerContent(navigationView);
         }
-
-
     }
 
     private void setupDrawerContent(final NavigationView navigationView){

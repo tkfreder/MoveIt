@@ -12,8 +12,12 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -172,6 +176,11 @@ public class ActivityTracker extends AppCompatActivity {
     }
 
     protected void initializeUI(){
+
+
+        // set Toolbar, display title on app bar
+        setSupportActionBar((Toolbar) findViewById(R.id.toolBar));
+        getSupportActionBar().setTitle(getResources().getString(R.string.app_name));
 
         mCounterLayout = (LinearLayout)findViewById(R.id.counterLayout);
         mStartButton = (Button) findViewById(R.id.startButton);
