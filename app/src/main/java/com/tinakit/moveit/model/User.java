@@ -16,7 +16,7 @@ public class User  implements Parcelable, ParentListItem {
     private int mUserId;
     private String mUserName;
     private int mIsAdmin;
-    private float mWeight;
+    private int mWeight;
     private String mAvatarFileName;
     private int mPoints;
     private boolean mIsParticipant;
@@ -50,11 +50,11 @@ public class User  implements Parcelable, ParentListItem {
         mIsAdmin = isAdmin ? 1 : 0;
     }
 
-    public float getWeight() {
+    public int getWeight() {
         return mWeight;
     }
 
-    public void setWeight(float weight) {
+    public void setWeight(int weight) {
         mWeight = weight;
     }
 
@@ -133,7 +133,7 @@ public class User  implements Parcelable, ParentListItem {
             mUserId = in.readInt();
             mUserName = in.readString();
             mIsAdmin = in.readInt();
-            mWeight = in.readFloat();
+            mWeight = in.readInt();
             mAvatarFileName = in.readString();
             mPoints = in.readInt();
             mIsParticipant = in.readByte() != 0x00;
@@ -156,7 +156,7 @@ public class User  implements Parcelable, ParentListItem {
             dest.writeInt(mUserId);
             dest.writeString(mUserName);
             dest.writeInt(mIsAdmin);
-            dest.writeFloat(mWeight);
+            dest.writeInt(mWeight);
             dest.writeString(mAvatarFileName);
             dest.writeInt(mPoints);
             dest.writeByte((byte) (mIsParticipant ? 0x01 : 0x00));

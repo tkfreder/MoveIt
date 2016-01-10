@@ -1,5 +1,6 @@
 package com.tinakit.moveit.activity;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -16,6 +17,7 @@ import android.view.Menu;
 import com.tinakit.moveit.api.GoogleApi;
 import com.tinakit.moveit.fragment.ActivityChooser;
 import com.tinakit.moveit.fragment.ActivityHistory;
+import com.tinakit.moveit.fragment.EditUser;
 import com.tinakit.moveit.fragment.UserProfile;
 import com.tinakit.moveit.fragment.UserStats;
 import com.tinakit.moveit.model.ActivityDetail;
@@ -347,8 +349,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         // get current fragment in container
-        UserProfile userProfile = (UserProfile)getSupportFragmentManager().findFragmentByTag(UserProfile.USER_PROFILE_TAG);
-        userProfile.onActivityResult(requestCode, resultCode, data);
+        //UserProfile userProfile = (UserProfile)getSupportFragmentManager().findFragmentByTag(UserProfile.USER_PROFILE_TAG);
+        //userProfile.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == EditUser.PICK_AVATAR_REQUEST){
+
+            if (resultCode == Activity.RESULT_OK){
+
+                EditUser editUser = (EditUser)getSupportFragmentManager().findFragmentByTag(EditUser.EDIT_USER_TAG);
+                editUser.onActivityResult(requestCode, resultCode, data);
+            }
+        }
+
     }
 
 }

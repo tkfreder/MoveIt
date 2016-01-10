@@ -24,15 +24,15 @@ import java.util.List;
 public class PickAvatarRecyclerAdapter extends RecyclerView.Adapter<PickAvatarRecyclerAdapter.CustomViewHolder>  {
 
     private Context mContext;
-    private Activity mActivity;
+    private FragmentActivity mFragmentActivity;
     private List<String> mAvatarFileList;
     private User mUser;
 
 
-    public PickAvatarRecyclerAdapter(Context context, Activity activity, List<String> avatarFileList, User user) {
+    public PickAvatarRecyclerAdapter(Context context, FragmentActivity fragmentActivity, List<String> avatarFileList, User user) {
 
         mContext = context;
-        mActivity = activity;
+        mFragmentActivity = fragmentActivity;
         mAvatarFileList = avatarFileList;
         mUser = user;
 
@@ -52,7 +52,7 @@ public class PickAvatarRecyclerAdapter extends RecyclerView.Adapter<PickAvatarRe
 
         String avatarFileName = mAvatarFileList.get(i);
 
-        customViewHolder.avatar.setImageResource(mContext.getResources().getIdentifier(avatarFileName, "drawable", mActivity.getPackageName()));
+        customViewHolder.avatar.setImageResource(mContext.getResources().getIdentifier(avatarFileName, "drawable", mFragmentActivity.getPackageName()));
         //customViewHolder.avatar.setImageResource(getResources().getIdentifier(user.getAvatarFileName(), "drawable", mFragmentActivity.getPackageName()));
 
         customViewHolder.avatar.setTag(avatarFileName);
@@ -68,8 +68,10 @@ public class PickAvatarRecyclerAdapter extends RecyclerView.Adapter<PickAvatarRe
                 Bundle bundle = new Bundle();
                 bundle.putParcelable(PickAvatar.PICK_AVATAR_KEY_USER, mUser);
                 intent.putExtras(bundle);
-                mActivity.setResult(mActivity.RESULT_OK, intent);
-                mActivity.finish();
+
+                mFragmentActivity.setResult(mFragmentActivity.RESULT_OK, intent);
+                mFragmentActivity.finish();
+                //mActivity.finish();
             }
         });
 

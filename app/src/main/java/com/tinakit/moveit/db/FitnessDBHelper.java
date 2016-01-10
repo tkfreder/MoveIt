@@ -169,7 +169,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 KEY_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // Define a primary key
                 KEY_USER_NAME + " TEXT, " +
                 KEY_USER_IS_ADMIN  + " INTEGER, " +
-                KEY_USER_WEIGHT  + " REAL, " +
+                KEY_USER_WEIGHT  + " INTEGER, " +
                 KEY_USER_AVATAR_FILENAME + " TEXT, " +
                 KEY_USER_POINTS + " INTEGER" +
                 ")";
@@ -414,7 +414,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                         user.setUserId(cursor.getInt(cursor.getColumnIndex(KEY_USER_ID)));
                         user.setUserName(cursor.getString(cursor.getColumnIndex(KEY_USER_NAME)));
                         user.setIsAdmin(cursor.getInt(cursor.getColumnIndex(KEY_USER_IS_ADMIN)) == 1 ? true : false);
-                        user.setWeight(cursor.getFloat(cursor.getColumnIndex(KEY_USER_WEIGHT)));
+                        user.setWeight(cursor.getInt(cursor.getColumnIndex(KEY_USER_WEIGHT)));
                         user.setAvatarFileName(cursor.getString(cursor.getColumnIndex(KEY_USER_AVATAR_FILENAME)));
                         user.setPoints(cursor.getInt(cursor.getColumnIndex(KEY_USER_POINTS)));
                         userList.add(user);
@@ -456,7 +456,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                     user.setUserId(cursor.getInt(cursor.getColumnIndex(KEY_USER_ID)));
                     user.setUserName(cursor.getString(cursor.getColumnIndex(KEY_USER_NAME)));
                     user.setIsAdmin(cursor.getInt(cursor.getColumnIndex(KEY_USER_IS_ADMIN)) > 0 ? true : false);
-                    user.setWeight(cursor.getFloat(cursor.getColumnIndex(KEY_USER_WEIGHT)));
+                    user.setWeight(cursor.getInt(cursor.getColumnIndex(KEY_USER_WEIGHT)));
                     user.setAvatarFileName(cursor.getString(cursor.getColumnIndex(KEY_USER_AVATAR_FILENAME)));
                     user.setPoints(cursor.getInt(cursor.getColumnIndex(KEY_USER_POINTS)));
                 }

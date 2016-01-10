@@ -1,5 +1,7 @@
 package com.tinakit.moveit.fragment;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -13,6 +15,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.tinakit.moveit.R;
+import com.tinakit.moveit.activity.PickAvatar;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.module.CustomApplication;
@@ -26,6 +29,7 @@ public class EditUser extends Fragment {
 
     public static final String EDIT_USER_TAG = "EDIT_USER_TAG";
     public static final String EDIT_USER_USER = "EDIT_USER_USER";
+    public static final int PICK_AVATAR_REQUEST = 1;
 
     @Inject
     FitnessDBHelper mDatabaseHelper;
@@ -37,6 +41,7 @@ public class EditUser extends Fragment {
 
     // UI Widgets
     ImageView mAvatar;
+    ImageView mEditAvatar;
     EditText mUserName;
     EditText mWeight;
     CheckBox mAdmin;
@@ -64,6 +69,7 @@ public class EditUser extends Fragment {
     private void initializeUI(){
 
         mAvatar = (ImageView)rootView.findViewById(R.id.avatar);
+        mEditAvatar = (ImageView)rootView.findViewById(R.id.editAvatar);
         mUserName = (EditText)rootView.findViewById(R.id.userName);
         mWeight = (EditText)rootView.findViewById(R.id.weight);
         mAdmin = (CheckBox)rootView.findViewById(R.id.isAdmin);
@@ -94,21 +100,40 @@ public class EditUser extends Fragment {
                 }
             } else {
 
-                populateForm();
+                populateForm(mUser);
             }
         }
     }
 
-    private void populateForm(){
+    private void populateForm(User user){
 
-        mUserName.setText(mUser.getUserName());
-        mAvatar.setImageResource(getResources().getIdentifier(mUser.getAvatarFileName(), "drawable", getActivity().getPackageName()));
-        mWeight.setText(String.valueOf(mUser.getWeight()));
-        mAdmin.setChecked(mUser.isAdmin());
+        mUserName.setText(user.getUserName());
+        mAvatar.setImageResource(getResources().getIdentifier(user.getAvatarFileName(), "drawable", getActivity().getPackageName()));
+        mWeight.setText(String.valueOf(user.getWeight()));
+        mAdmin.setChecked(user.isAdmin());
     }
 
     private void setActionListeners(){
 
+
+        mEditAvatar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // save any changes into User object
+                mUser.setUserName(mUserName.getText().toString());
+                mUser.setWeight(Integer.parseInt(mWeight.getText().toString()));
+                mUser.setIsAdmin(mAdmin.isChecked());
+
+                //save the user in bundle
+                Bundle args = new Bundle();
+                args.putParcelable(PickAvatar.PICK_AVATAR_KEY_USER, mUser);
+
+                Intent intent = new Intent(getActivity(), PickAvatar.class);
+                intent.putExtras(args);
+                mFragmentActivity.startActivityForResult(intent, PICK_AVATAR_REQUEST);
+            }
+        });
 
         //TODO:  set onClickListener on Avatar to browse images and/or go to camera
         //set tag on mAvatar to save filepath to avatar image
@@ -125,4 +150,19 @@ public class EditUser extends Fragment {
             }
         });
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == EditUser.PICK_AVATAR_REQUEST){
+
+            if (resultCode == Activity.RESULT_OK) {
+                mUser = data.getParcelableExtra(PickAvatar.PICK_AVATAR_KEY_USER);
+                populateForm(mUser);
+            }
+        }
+
+    }
+
 }
