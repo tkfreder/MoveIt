@@ -27,9 +27,6 @@ import javax.inject.Inject;
  */
 public class UserProfile extends Fragment {
 
-    // constants
-    public static final String USER_PROFILE_TAG = "USER_PROFILE_TAG";
-
     @Inject
     FitnessDBHelper mDatabaseHelper;
 
@@ -72,21 +69,5 @@ public class UserProfile extends Fragment {
 
 
         return rootView;
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == PickAvatar.PICK_AVATAR_REQUEST_CODE){
-            if (resultCode == mFragmentActivity.RESULT_OK) {
-                mUser = data.getParcelableExtra(PickAvatar.PICK_AVATAR_KEY_USER);
-                mUserList.set(mUserList.indexOf(mUser), mUser);
-
-                // refresh recyclerview with new user list data
-                mUserProfileRecyclerAdapter.setList(mUserList);
-                mUserProfileRecyclerAdapter.notifyDataSetChanged();
-            }
-        }
     }
 }
