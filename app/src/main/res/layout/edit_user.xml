@@ -20,6 +20,7 @@
                 android:background="@drawable/white_image_border"
                 />
             <ImageView
+                android:id="@+id/editAvatar"
                 android:layout_width="@dimen/icon_size"
                 android:layout_height="@dimen/icon_size"
                 android:src="@drawable/ic_action_edit"
@@ -30,32 +31,21 @@
         </RelativeLayout>
 
     </RelativeLayout>
-        <android.support.percent.PercentRelativeLayout
+
+        <android.support.design.widget.TextInputLayout
             android:id="@+id/userNameLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/avatarLayout"
-            >
-                <TextView
-                    android:id="@+id/userNameTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/username"
-                    app:layout_widthPercent="50%"
-                    android:gravity="end"
-                    android:layout_centerVertical="true"
-                    />
+            android:gravity="center">
 
-                <EditText
-                    android:id="@+id/userName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:layout_widthPercent="50%"
-                    android:layout_toRightOf="@+id/userNameTextView"
-                    android:layout_toEndOf="@+id/userNameTextView"
-                    android:layout_centerVertical="true"/>
-
-        </android.support.percent.PercentRelativeLayout>
+            <EditText
+                android:id="@+id/userName"
+                android:layout_width="wrap_content"
+                android:minWidth="@dimen/min_width_edit_text"
+                android:layout_height="wrap_content"
+                android:hint="@string/username"/>
+            </android.support.design.widget.TextInputLayout>
 
     <android.support.percent.PercentRelativeLayout
         android:id="@+id/weightLayout"
