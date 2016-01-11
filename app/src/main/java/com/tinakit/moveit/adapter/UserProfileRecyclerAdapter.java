@@ -34,7 +34,6 @@ public class UserProfileRecyclerAdapter extends RecyclerView.Adapter<UserProfile
 
     @Inject
     FitnessDBHelper mDatabaseHelper;
-    //private FitnessDBHelper mDatabaseHelper;
 
     private Context mContext;
     private FragmentActivity mActivity;
@@ -46,8 +45,6 @@ public class UserProfileRecyclerAdapter extends RecyclerView.Adapter<UserProfile
         mContext = context;
         mActivity = activity;
         mUserList = userList;
-
-        //mDatabaseHelper = FitnessDBHelper.getInstance(mContext);
 
         // Dagger 2 injection
         ((CustomApplication)activity.getApplication()).getAppComponent().inject(this);
@@ -84,19 +81,6 @@ public class UserProfileRecyclerAdapter extends RecyclerView.Adapter<UserProfile
         customViewHolder.avatar.setImageResource(mContext.getResources().getIdentifier(user.getAvatarFileName(), "drawable", mActivity.getPackageName()));
 
         customViewHolder.avatar.setTag(user);
-        customViewHolder.avatar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            //save the user in bundle
-            Bundle args = new Bundle();
-            args.putParcelable(PickAvatar.PICK_AVATAR_KEY_USER, (User)v.getTag());
-
-            Intent intent = new Intent(mContext, PickAvatar.class);
-            intent.putExtras(args);
-            mActivity.startActivityForResult(intent,AVATAR_FILENAME);
-            }
-        });
 
         //save current User data in deleteButton
         customViewHolder.deleteButton.setTag(user);
@@ -133,8 +117,6 @@ public class UserProfileRecyclerAdapter extends RecyclerView.Adapter<UserProfile
                     FragmentTransaction transaction = mActivity.getSupportFragmentManager().beginTransaction();
                     transaction.replace(R.id.fragmentContainer, editUser, EditUser.EDIT_USER_TAG);
                     transaction.commit();
-
-                    //mActivity.getActionBar().setTitle(mContext.getResources().getString(R.string.user_profiles));
                 }
 
             }
