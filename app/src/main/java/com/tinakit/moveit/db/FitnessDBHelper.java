@@ -64,6 +64,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     private static final String KEY_USER_WEIGHT = "weight";
     private static final String KEY_USER_AVATAR_FILENAME = "avatarFileName";
     private static final String KEY_USER_POINTS = "points";
+    private static final String KEY_USER_IS_ENABLED = "isEnabled";
 
     //ACTIVITIES TABLE
     private static final String TABLE_ACTIVITIES = "Activities";
@@ -171,7 +172,8 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 KEY_USER_IS_ADMIN  + " INTEGER, " +
                 KEY_USER_WEIGHT  + " INTEGER, " +
                 KEY_USER_AVATAR_FILENAME + " TEXT, " +
-                KEY_USER_POINTS + " INTEGER" +
+                KEY_USER_POINTS + " INTEGER, " +
+                KEY_USER_IS_ENABLED + " INTEGER " +
                 ")";
 
         String CREATE_ACTIVITY_USERS_TABLE = "CREATE TABLE " + TABLE_ACTIVITY_USERS +
@@ -301,10 +303,10 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (5, 'Animal Jam points', 10);");
 
         //TODO: DUMMY DATA
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Laura', 0, 50, 'avatar_cat_purple', 0);");
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Lucy', 0, 40, 'avatar_cat_blue', 0);");
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Alec', 0, 175, 'avatar_cat_green', 0);");
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Tina', 1, 100, 'avatar_cat_red', 0);");
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Laura', 0, 50, 'avatar_cat_purple', 0, 1);");
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Lucy', 0, 40, 'avatar_cat_blue', 0, 1);");
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Alec', 0, 175, 'avatar_cat_green', 0, 1);");
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Tina', 1, 100, 'avatar_cat_red', 0, 1);");
 
         //TODO: DUMMY DATA
         //TODO:  when adding User or Reward, ensure that RewardStatus gets populated with available rewards for that user
@@ -379,6 +381,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             values.put(KEY_USER_WEIGHT, user.getWeight());
             values.put(KEY_USER_AVATAR_FILENAME, user.getAvatarFileName());
             values.put(KEY_USER_POINTS, 0);
+            values.put(KEY_USER_IS_ENABLED, 1);
 
             // Notice how we haven't specified the primary key. SQLite auto increments the primary key column.
             db.insertOrThrow(TABLE_USERS, null, values);
@@ -403,7 +406,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
             Cursor cursor = db.query(TABLE_USERS,
                     new String[]{KEY_USER_ID, KEY_USER_NAME, KEY_USER_IS_ADMIN, KEY_USER_WEIGHT, KEY_USER_AVATAR_FILENAME, KEY_USER_POINTS},
-                    null, null, null, null, KEY_USER_ID);
+                    KEY_USER_IS_ENABLED + "= ?", new String[]{"1"}, null, null, KEY_USER_ID);
 
             try{
 
@@ -530,7 +533,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
             db.setTransactionSuccessful();
         } catch (Exception e) {
-            Log.d(LOGTAG, "Error during setUserPoints()");
+            Log.d(LOGTAG, "Error during updateUser()");
         } finally {
             db.endTransaction();
         }
@@ -538,28 +541,32 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         return rowsAffected;
     }
 
-    public boolean deleteUser(User user){
+    public long disableUser(User user){
 
         // Create and/or open the database for writing
         //SQLiteDatabase db = getWritableDatabase();
 
-        // It's a good idea to wrap the delete in a transaction. This helps with performance and ensures
+        long rowsAffected = 0;
+
+        // It's a good idea to wrap the update in a transaction. This helps with performance and ensures
         // consistency of the database.
         db.beginTransaction();
         try {
 
-            return db.delete(TABLE_USERS, KEY_USER_ID + "= ? ", new String[]{String.valueOf(user.getUserId())}) > 0;
+            ContentValues values = new ContentValues();
+            values.put(KEY_USER_IS_ENABLED, 0);
 
+            rowsAffected = db.update(TABLE_USERS, values, KEY_USER_ID + "= ?", new String[]{String.valueOf(user.getUserId())});
+
+            db.setTransactionSuccessful();
         } catch (Exception e) {
-            Log.d(LOGTAG, "Error during deleteUser()");
+            Log.d(LOGTAG, "Error during disableUser()");
         } finally {
             db.endTransaction();
         }
 
-
-        return false;
+        return rowsAffected;
     }
-
 
     /***********************************************************************************************
      ACTIVITY_USERS Operations

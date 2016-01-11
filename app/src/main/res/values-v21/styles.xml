@@ -24,7 +24,7 @@
         <item name="android:paddingRight">@dimen/activity_vertical_margin</item>
     </style>
 
-    <style name="AlertDialogCustom.Destructive">
+    <style name="AlertDialogCustom.Destructive" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="android:buttonBarPositiveButtonStyle">@style/DestructiveButton</item>
     </style>
 

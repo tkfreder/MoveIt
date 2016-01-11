@@ -19,6 +19,7 @@ import com.tinakit.moveit.activity.RewardView;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.activity.PickAvatar;
 import com.tinakit.moveit.fragment.EditUser;
+import com.tinakit.moveit.fragment.UserProfile;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.module.CustomApplication;
 
@@ -102,7 +103,13 @@ public class UserProfileRecyclerAdapter extends RecyclerView.Adapter<UserProfile
                             public void onClick(DialogInterface dialogInterface, int i) {
 
                                 // delete user
-                                mDatabaseHelper.deleteUser(mUser);
+                                long rowsAffected = mDatabaseHelper.disableUser(mUser);
+                                if (rowsAffected == 1){
+
+                                    //refresh by redirecting to UserProfile
+                                    UserProfile userProfile = new UserProfile();
+                                    mActivity.getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, userProfile).commit();
+                                }
                             }
                         })
                         .setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
@@ -114,7 +121,8 @@ public class UserProfileRecyclerAdapter extends RecyclerView.Adapter<UserProfile
                             }
                         })
                         .setTitle(R.string.title_delete_user)
-                        .create();
+                        .setMessage(R.string.message_delete_user)
+                        .show();
 
 
             }
