@@ -407,7 +407,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             Cursor cursor = db.query(TABLE_USERS,
                     new String[]{KEY_USER_ID, KEY_USER_NAME, KEY_USER_IS_ADMIN, KEY_USER_WEIGHT, KEY_USER_AVATAR_FILENAME, KEY_USER_POINTS},
                     KEY_USER_IS_ENABLED + "= ?", new String[]{"1"}, null, null, KEY_USER_ID);
-
             try{
 
                 if (cursor.moveToFirst())

@@ -43,6 +43,7 @@ public class EditUser extends Fragment {
     protected FragmentActivity mFragmentActivity;
     private View rootView;
     private User mUser;
+    private boolean mHasChanges = false;
 
     // UI Widgets
     ImageView mAvatar;
@@ -101,7 +102,6 @@ public class EditUser extends Fragment {
                     userProfile = new UserProfile();
                     //replace current fragment
                     getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, userProfile).commit();
-
                 }
             } else {
 
@@ -133,7 +133,8 @@ public class EditUser extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                mSaveButton.setEnabled(true);
+
+                validateForm();
             }
         });
 
@@ -167,7 +168,6 @@ public class EditUser extends Fragment {
             public void afterTextChanged(Editable s) {
 
                 validateForm();
-                mSaveButton.setEnabled(true);
             }
         });
 
@@ -226,19 +226,19 @@ public class EditUser extends Fragment {
 
     private void validateForm(){
 
-        if(mUserName.getText().toString().trim().equals("")) {
-            mUserName.setError(getResources().getString(R.string.message_username_empty));
+        if(mUserName.getText().toString().trim().equals("") || mWeight.getText().toString().trim().equals("")) {
+
             mSaveButton.setEnabled(false);
+
+            if (mUserName.getText().toString().trim().equals(""))
+                mUserName.setError(getResources().getString(R.string.message_username_empty));
+
+            if (mWeight.getText().toString().trim().equals(""))
+                mWeight.setError(getResources().getString(R.string.message_weight_empty));
         }
         else
             mSaveButton.setEnabled(true);
 
-        if(mWeight.getText().toString().trim().equals("")) {
-            mWeight.setError(getResources().getString(R.string.message_weight_empty));
-            mSaveButton.setEnabled(false);
-        }
-        else
-            mSaveButton.setEnabled(true);
     }
 
 }
