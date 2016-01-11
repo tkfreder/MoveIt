@@ -146,17 +146,17 @@ public class UserProfileRecyclerAdapter extends RecyclerView.Adapter<UserProfile
                     bundle.putParcelable(EditUser.EDIT_USER_USER, (User)v.getTag());
                     editUser.setArguments(bundle);
 
-                    //mActivity.getSupportFragmentManager().beginTransaction()
-                    //.replace(R.id.fragmentContainer, editUser, EditUser.EDIT_USER_TAG)
-                    //.commit();
+                    mActivity.getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragmentContainer, editUser, EditUser.EDIT_USER_TAG)
+                    .commit();
 
 
                     //REFERENCE: http://developer.android.com/training/implementing-navigation/temporal.html
-                    mActivity.getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragmentContainer, editUser, EditUser.EDIT_USER_TAG)
+                    //mActivity.getSupportFragmentManager().beginTransaction()
+                    //.add(R.id.fragmentContainer, editUser, EditUser.EDIT_USER_TAG)
                     // Add this transaction to the back stack
-                            .addToBackStack(null)
-                            .commit();
+                    //        .addToBackStack(null)
+                    //        .commit();
 
 
 

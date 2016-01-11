@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
@@ -41,7 +42,7 @@ public class EditUser extends Fragment {
 
     // local cache
     protected FragmentActivity mFragmentActivity;
-    private View rootView;
+    private View mRootView;
     private User mUser;
     private boolean mHasChanges = false;
 
@@ -57,7 +58,7 @@ public class EditUser extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mFragmentActivity  = (FragmentActivity)super.getActivity();
-        rootView = inflater.inflate(R.layout.edit_user, container, false);
+        mRootView = inflater.inflate(R.layout.edit_user, container, false);
         mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // inject FitnessDBHelper
@@ -69,17 +70,17 @@ public class EditUser extends Fragment {
 
         setActionListeners();
 
-        return rootView;
+        return mRootView;
     }
 
     private void initializeUI(){
 
-        mAvatar = (ImageView)rootView.findViewById(R.id.avatar);
-        mEditAvatar = (ImageView)rootView.findViewById(R.id.editAvatar);
-        mUserName = (EditText)rootView.findViewById(R.id.userName);
-        mWeight = (EditText)rootView.findViewById(R.id.weight);
-        mAdmin = (CheckBox)rootView.findViewById(R.id.isAdmin);
-        mSaveButton = (Button)rootView.findViewById(R.id.saveButton);
+        mAvatar = (ImageView)mRootView.findViewById(R.id.avatar);
+        mEditAvatar = (ImageView)mRootView.findViewById(R.id.editAvatar);
+        mUserName = (EditText)mRootView.findViewById(R.id.userName);
+        mWeight = (EditText)mRootView.findViewById(R.id.weight);
+        mAdmin = (CheckBox)mRootView.findViewById(R.id.isAdmin);
+        mSaveButton = (Button)mRootView.findViewById(R.id.saveButton);
     }
 
     private void fetchData(){
@@ -190,7 +191,9 @@ public class EditUser extends Fragment {
 
                 if (rowsAffected > 0){
 
-                    Toast.makeText(getActivity(), "Your changes have been saved", Toast.LENGTH_LONG);
+                    //Toast.makeText(getActivity(), "Your changes have been saved", Toast.LENGTH_LONG);
+                    Snackbar.make(mRootView.findViewById(R.id.main_layout), getResources().getString(R.string.message_saved_changes), Snackbar.LENGTH_LONG)
+                            .show();
                 }
             }
         });
