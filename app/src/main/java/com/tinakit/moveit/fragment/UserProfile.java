@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -39,6 +40,7 @@ public class UserProfile extends Fragment {
 
     //make these public to enable saving changes from Toolbar
     public UserProfileRecyclerAdapter mUserProfileRecyclerAdapter;
+    private RecyclerView mRecyclerView;
     public List<User> mUserList;
     private User mUser;
 
@@ -60,7 +62,7 @@ public class UserProfile extends Fragment {
         // fetch directly from the database
         mUserList = mDatabaseHelper.getUsers();
 
-        RecyclerView mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true); //child items have fixed dimensions, allows the RecyclerView to optimize better by figuring out the exact height and width of the entire list based on the adapter.
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mFragmentActivity);
@@ -70,7 +72,18 @@ public class UserProfile extends Fragment {
         mUserProfileRecyclerAdapter = new UserProfileRecyclerAdapter(getActivity(), mFragmentActivity, mUserList);
         mRecyclerView.setAdapter(mUserProfileRecyclerAdapter);
 
+        getActivity().getSupportFragmentManager().addOnBackStackChangedListener(
+                new FragmentManager.OnBackStackChangedListener() {
+                    public void onBackStackChanged() {
+                        // Update your UI here.
+                        mUserList = mDatabaseHelper.getUsers();
+                        mUserProfileRecyclerAdapter = new UserProfileRecyclerAdapter(getActivity(), mFragmentActivity, mUserList);
+                        mRecyclerView.setAdapter(mUserProfileRecyclerAdapter);
+                    }
+                });
 
         return rootView;
     }
+
+
 }

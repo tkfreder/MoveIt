@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -145,9 +146,23 @@ public class UserProfileRecyclerAdapter extends RecyclerView.Adapter<UserProfile
                     bundle.putParcelable(EditUser.EDIT_USER_USER, (User)v.getTag());
                     editUser.setArguments(bundle);
 
-                    FragmentTransaction transaction = mActivity.getSupportFragmentManager().beginTransaction();
-                    transaction.replace(R.id.fragmentContainer, editUser, EditUser.EDIT_USER_TAG);
-                    transaction.commit();
+                    //mActivity.getSupportFragmentManager().beginTransaction()
+                    //.replace(R.id.fragmentContainer, editUser, EditUser.EDIT_USER_TAG)
+                    //.commit();
+
+
+                    //REFERENCE: http://developer.android.com/training/implementing-navigation/temporal.html
+                    mActivity.getSupportFragmentManager().beginTransaction()
+                    .add(R.id.fragmentContainer, editUser, EditUser.EDIT_USER_TAG)
+                    // Add this transaction to the back stack
+                            .addToBackStack(null)
+                            .commit();
+
+
+
+                    //transaction.replace(R.id.fragmentContainer, editUser, EditUser.EDIT_USER_TAG);
+                    //transaction.commit();
+
                 }
 
             }
