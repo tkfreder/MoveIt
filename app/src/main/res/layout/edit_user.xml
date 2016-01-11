@@ -58,6 +58,7 @@
                     android:layout_width="wrap_content"
                     android:minWidth="@dimen/min_width_long_edit_text"
                     android:layout_height="wrap_content"
+                    android:singleLine="true"
                     android:hint="@string/username"/>
             </android.support.design.widget.TextInputLayout>
 
@@ -67,7 +68,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/userNameLayout"
                 android:padding="@dimen/activity_horizontal_margin"
-                android:gravity="left">
+                android:gravity="left"
+                >
 
                 <EditText
                     android:id="@+id/weight"
@@ -75,6 +77,7 @@
                     android:minWidth="@dimen/min_width_short_edit_text"
                     android:layout_height="wrap_content"
                     android:inputType="number"
+
                     android:hint="@string/weight_hint"
                     />
             </android.support.design.widget.TextInputLayout>
@@ -105,6 +108,7 @@
         android:layout_centerInParent="true"
         android:padding="@dimen/activity_horizontal_margin"
         android:background="@color/green"
-        android:textColor="@color/white"/>
+        android:textColor="@color/white"
+        android:enabled="false"/>
 
 </RelativeLayout>

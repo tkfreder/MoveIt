@@ -6,13 +6,18 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.PickAvatar;
@@ -89,7 +94,7 @@ public class EditUser extends Fragment {
                 // redirect to UserStats screen
                 //Intent intent = new Intent(this, UserStats.class);
 
-                // check if UserStats is already displayed
+                // check if UserProfile is already displayed
                 UserProfile userProfile = (UserProfile) getActivity().getSupportFragmentManager().findFragmentByTag(UserProfile.USER_PROFILE_TAG);
                 if (userProfile == null) {
 
@@ -115,15 +120,28 @@ public class EditUser extends Fragment {
 
     private void setActionListeners(){
 
+        mUserName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                mSaveButton.setEnabled(true);
+            }
+        });
 
         mEditAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                // save any changes into User object
-                mUser.setUserName(mUserName.getText().toString());
-                mUser.setWeight(Integer.parseInt(mWeight.getText().toString()));
-                mUser.setIsAdmin(mAdmin.isChecked());
+                saveUser();
 
                 //save the user in bundle
                 Bundle args = new Bundle();
@@ -135,18 +153,45 @@ public class EditUser extends Fragment {
             }
         });
 
+        mWeight.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                validateForm();
+                mSaveButton.setEnabled(true);
+            }
+        });
+
+        mAdmin.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mSaveButton.setEnabled(true);
+            }
+        });
+
         //TODO:  set onClickListener on Avatar to browse images and/or go to camera
         //set tag on mAvatar to save filepath to avatar image
         mSaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                User user = new User();
-                user.setUserName(mUserName.getText().toString());
-                user.setAvatarFileName((String)mAvatar.getTag());
-                user.setWeight(Integer.parseInt(mWeight.getText().toString()));
+                saveUser();
 
-                mDatabaseHelper.updateUser(user);
+                long rowsAffected = mDatabaseHelper.updateUser(mUser);
+
+                if (rowsAffected > 0){
+
+                    Toast.makeText(getActivity(), "Your changes have been saved", Toast.LENGTH_LONG);
+                }
             }
         });
     }
@@ -160,9 +205,40 @@ public class EditUser extends Fragment {
             if (resultCode == Activity.RESULT_OK) {
                 mUser = data.getParcelableExtra(PickAvatar.PICK_AVATAR_KEY_USER);
                 populateForm(mUser);
+
+                //Avatar has been updated, enable Save button
+                mSaveButton.setEnabled(true);
             }
         }
 
+    }
+
+    private void saveUser(){
+
+        // save any changes into User object
+        mUser.setUserName(mUserName.getText().toString());
+        mUser.setWeight(Integer.parseInt(mWeight.getText().toString()));
+        mUser.setIsAdmin(mAdmin.isChecked());
+
+        //any change to avatar should already be saved in OnActivityResult
+
+    }
+
+    private void validateForm(){
+
+        if(mUserName.getText().toString().trim().equals("")) {
+            mUserName.setError(getResources().getString(R.string.message_username_empty));
+            mSaveButton.setEnabled(false);
+        }
+        else
+            mSaveButton.setEnabled(true);
+
+        if(mWeight.getText().toString().trim().equals("")) {
+            mWeight.setError(getResources().getString(R.string.message_weight_empty));
+            mSaveButton.setEnabled(false);
+        }
+        else
+            mSaveButton.setEnabled(true);
     }
 
 }

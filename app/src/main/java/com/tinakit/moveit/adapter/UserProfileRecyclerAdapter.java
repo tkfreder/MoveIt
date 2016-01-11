@@ -1,10 +1,12 @@
 package com.tinakit.moveit.adapter;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,6 +40,7 @@ public class UserProfileRecyclerAdapter extends RecyclerView.Adapter<UserProfile
     private Context mContext;
     private FragmentActivity mActivity;
     private List<User> mUserList;
+    private User mUser;
 
 
     public UserProfileRecyclerAdapter(Context context, FragmentActivity activity, List<User> userList) {
@@ -88,10 +91,30 @@ public class UserProfileRecyclerAdapter extends RecyclerView.Adapter<UserProfile
             @Override
             public void onClick(View v) {
 
-                User user = (User)v.getTag();
+                mUser = (User)v.getTag();
 
-                //TODO: display dialog, asking if you're sure you want to delete this user
-                String message = mActivity.getResources().getString(R.string.confirm_delete_message)  + user.getUserName();
+                AlertDialog alertDialog = new AlertDialog.Builder(
+                        mActivity,
+                        R.style.AlertDialogCustom_Destructive)
+                        .setPositiveButton(R.string.button_delete, new DialogInterface.OnClickListener()
+                {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                                // delete user
+                                mDatabaseHelper.deleteUser(mUser);
+                            }
+                        })
+                        .setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                // Cancel Action
+                                //don't do anything
+
+                            }
+                        })
+                        .setTitle(R.string.title_delete_user)
+                        .create();
 
 
             }

@@ -538,6 +538,28 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         return rowsAffected;
     }
 
+    public boolean deleteUser(User user){
+
+        // Create and/or open the database for writing
+        //SQLiteDatabase db = getWritableDatabase();
+
+        // It's a good idea to wrap the delete in a transaction. This helps with performance and ensures
+        // consistency of the database.
+        db.beginTransaction();
+        try {
+
+            return db.delete(TABLE_USERS, KEY_USER_ID + "= ? ", new String[]{String.valueOf(user.getUserId())}) > 0;
+
+        } catch (Exception e) {
+            Log.d(LOGTAG, "Error during deleteUser()");
+        } finally {
+            db.endTransaction();
+        }
+
+
+        return false;
+    }
+
 
     /***********************************************************************************************
      ACTIVITY_USERS Operations

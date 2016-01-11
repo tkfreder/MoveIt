@@ -27,6 +27,9 @@ import javax.inject.Inject;
  */
 public class UserProfile extends Fragment {
 
+    // CONSTANTS
+    public static final String USER_PROFILE_TAG = "USER_PROFILE_TAG";
+
     @Inject
     FitnessDBHelper mDatabaseHelper;
 

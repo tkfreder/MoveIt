@@ -154,5 +154,9 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="save">save</string>
     <string name="confirm_delete_message">Are you sure you want to delete </string>
-
+    <string name="message_username_empty">Please enter a username.</string>
+    <string name="message_weight_empty">Please enter a weight.</string>
+    <string name="button_delete">DELETE</string>
+    <string name="button_cancel">CANCEL</string>
+    <string name="title_delete_user">DELETE USER?</string>
 </resources>
