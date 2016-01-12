@@ -67,6 +67,14 @@
     <string name="admin_tab_history">History</string>
     <string name="admin_tab_settings">Settings</string>
 
+    <!-- button names -->
+    <string name="button_save">Save</string>
+
+    <!-- hint messages -->
+    <string name="hint_delete_user">delete user</string>
+    <string name="hint_edit_user">edit user</string>
+    <string name="hint_save_user">save user</string>
+
     <string name="title_activity_sensor_api">SensorAPI</string>
 
     <string name="title_activity_fused_location_api">FusedLocationApi</string>

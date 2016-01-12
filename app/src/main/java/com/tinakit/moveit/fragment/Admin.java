@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.adapter.UserProfileRecyclerAdapter;
+import com.tinakit.moveit.adapter.ViewPagerAdapter;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.module.CustomApplication;
 import com.tinakit.moveit.tab.SlidingTabLayout;
@@ -78,43 +79,6 @@ public class Admin extends Fragment {
     }
 
     private void setActionListeners(){
-
-    }
-
-    //**********************************************************************************************
-    //  ViewPagerAdapter
-    //**********************************************************************************************
-
-    static class ViewPagerAdapter extends FragmentPagerAdapter {
-        private final List<Fragment> mFragmentList = new ArrayList<>();
-        private final List<String> mFragmentTitleList = new ArrayList<>();
-
-        public ViewPagerAdapter(FragmentManager manager){
-            super(manager);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-
-            Fragment fragment = mFragmentList.get(position);
-
-            return fragment;
-        }
-
-        @Override
-        public int getCount() {
-            return mFragmentList.size();
-        }
-
-        public void addFrag(Fragment fragment, String title){
-            mFragmentList.add(fragment);
-            mFragmentTitleList.add(title);
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position){
-            return mFragmentTitleList.get(position);
-        }
 
     }
 

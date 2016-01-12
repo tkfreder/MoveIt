@@ -13,6 +13,7 @@
     <color name="activated_color">#fff2e5</color>
     <color name="pressed_color">#ffd9b3</color>
     <color name="black_87">#212121</color>
+    <color name="edit_text_highlight">#ffff94</color>
 
 
 </resources>

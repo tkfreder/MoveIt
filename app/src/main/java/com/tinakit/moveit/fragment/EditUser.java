@@ -160,7 +160,8 @@ public class EditUser extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
 
-                    validateForm();
+                if(existsUserName())
+                    mUserName.setError(getString(R.string.message_username_exists));
             }
         });
 
@@ -180,6 +181,7 @@ public class EditUser extends Fragment {
             }
         });
 
+
         mWeight.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -193,10 +195,9 @@ public class EditUser extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
 
-                if(!existsUserName())
-                    validateForm();
-                else
-                    mUserName.setError(getString(R.string.message_username_exists));
+                if (!isValidWeight()){
+                    mWeight.setError(getString(R.string.message_weight_empty));
+                }
             }
         });
 
@@ -213,36 +214,38 @@ public class EditUser extends Fragment {
             @Override
             public void onClick(View v) {
 
-                saveUser();
+                if (validateForm()) {
 
-                if (mIsNewUser){
+                    saveUser();
 
-                    long rowId = mDatabaseHelper.addUser(mUser);
+                    if (mIsNewUser) {
 
-                    if (rowId != -1){
+                        long rowId = mDatabaseHelper.addUser(mUser);
 
-                        mIsNewUser = false;
+                        if (rowId != -1) {
 
-                        UserProfile userProfile = new UserProfile();
-                        //replace current fragment
-                        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, userProfile).commit();
+                            mIsNewUser = false;
 
-                    }else{
+                            UserProfile userProfile = new UserProfile();
+                            //replace current fragment
+                            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, userProfile).commit();
 
-                        Snackbar.make(mRootView.findViewById(R.id.main_layout), getString(R.string.error_message_add_user), Snackbar.LENGTH_LONG)
-                                .show();
-                    }
+                        } else {
+
+                            Snackbar.make(mRootView.findViewById(R.id.main_layout), getString(R.string.error_message_add_user), Snackbar.LENGTH_LONG)
+                                    .show();
+                        }
 
 
-                }
-                else{
+                    } else {
 
-                    long rowsAffected = mDatabaseHelper.updateUser(mUser);
+                        long rowsAffected = mDatabaseHelper.updateUser(mUser);
 
-                    if (rowsAffected == 1){
+                        if (rowsAffected == 1) {
 
-                        Snackbar.make(mRootView.findViewById(R.id.main_layout), getString(R.string.message_saved_changes), Snackbar.LENGTH_LONG)
-                                .show();
+                            Snackbar.make(mRootView.findViewById(R.id.main_layout), getString(R.string.message_saved_changes), Snackbar.LENGTH_LONG)
+                                    .show();
+                        }
                     }
                 }
 
@@ -278,22 +281,25 @@ public class EditUser extends Fragment {
 
     }
 
-    private void validateForm(){
+    private boolean validateForm(){
 
-        if(mUserName.getText().toString().trim().equals("") || mWeight.getText().toString().trim().equals("")) {
+        if(!existsUserName() && isValidWeight()) {
 
-            mSaveButton.setEnabled(false);
-
-            if (mUserName.getText().toString().trim().equals(""))
-                mUserName.setError(getString(R.string.message_username_empty));
-
-            if (mWeight.getText().toString().trim().equals("0"))
-                mWeight.setError(getString(R.string.message_weight_empty));
-
+           return true;
         }
         else
-            mSaveButton.setEnabled(true);
+            return false;
 
+    }
+
+    private boolean isValidWeight(){
+
+        if(Integer.parseInt(mWeight.getText().toString()) == 0){
+
+            return false;
+        }
+
+        return true;
     }
 
     private boolean existsUserName(){
