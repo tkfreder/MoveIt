@@ -180,7 +180,7 @@ public class ActivityTracker extends AppCompatActivity {
 
         // set Toolbar, display title on app bar
         setSupportActionBar((Toolbar) findViewById(R.id.toolBar));
-        getSupportActionBar().setTitle(getResources().getString(R.string.app_name));
+        getSupportActionBar().setTitle(getString(R.string.app_name));
 
         mCounterLayout = (LinearLayout)findViewById(R.id.counterLayout);
         mStartButton = (Button) findViewById(R.id.startButton);
@@ -266,12 +266,12 @@ public class ActivityTracker extends AppCompatActivity {
 
                     //not enough data
                     mStartButton.setVisibility(View.VISIBLE);
-                    mStartButton.setText(getResources().getString(R.string.restart));
+                    mStartButton.setText(getString(R.string.restart));
 
                     mCancelButton.setVisibility(View.VISIBLE);
 
                     //message:  no data to display
-                    mMessage.setText("No location data was collected. " + getResources().getString(R.string.restart) + "?");
+                    mMessage.setText("No location data was collected. " + getString(R.string.restart) + "?");
                     playSound();
 
                 }
@@ -594,7 +594,7 @@ public class ActivityTracker extends AppCompatActivity {
                 mAccelerometer.stop();
 
                 //display warning message that no movement has been detected
-                DialogUtility.displayAlertDialog(context, getResources().getString(R.string.warning), getResources().getString(R.string.no_movement), getResources().getString(R.string.ok));
+                DialogUtility.displayAlertDialog(context, getString(R.string.warning), getString(R.string.no_movement), getString(R.string.ok));
             }
         }
     };

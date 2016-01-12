@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
 
              case R.id.nav_rewards:
 
-                getSupportActionBar().setTitle(getResources().getString(R.string.rewards));
+                getSupportActionBar().setTitle(getString(R.string.rewards));
 
                 UserStats userStats = (UserStats)getSupportFragmentManager().findFragmentByTag(UserStats.USER_STATS_TAG);
                 if (userStats == null) {
@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
 
             case R.id.nav_history:
 
-                getSupportActionBar().setTitle(getResources().getString(R.string.history));
+                getSupportActionBar().setTitle(getString(R.string.history));
 
                 ActivityHistory activityHistory = (ActivityHistory)getSupportFragmentManager().findFragmentByTag(ActivityHistory.ACTIVITY_HISTORY_TAG);
                 if (activityHistory == null) {
@@ -195,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
 
             case R.id.nav_user_profiles:
 
-                getSupportActionBar().setTitle(getResources().getString(R.string.user_profiles));
+                getSupportActionBar().setTitle(getString(R.string.user_profiles));
 
                 // check whether UserProfile does not exist
                 UserProfile userProfile = (UserProfile)getSupportFragmentManager().findFragmentByTag(UserProfile.USER_PROFILE_TAG);
@@ -210,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
 
             case R.id.nav_start:
 
-                getSupportActionBar().setTitle(getResources().getString(R.string.start));
+                getSupportActionBar().setTitle(getString(R.string.start));
                 //TODO: redirect to ActivityTracker, change ActivityTracker to a fragment
 
                 // check whether UserProfile is already visible
@@ -227,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.nav_settings:
             case R.id.action_settings:
 
-                getSupportActionBar().setTitle(getResources().getString(R.string.settings));
+                getSupportActionBar().setTitle(getString(R.string.settings));
                 // TODO: redirect to admin screen
 
             break;

@@ -133,7 +133,7 @@ public class EditUser extends Fragment {
         mWeight.setText("0");
 
         // set button text
-        mSaveButton.setText(getResources().getString(R.string.button_add));
+        mSaveButton.setText(getString(R.string.button_add));
 
     }
 
@@ -230,7 +230,7 @@ public class EditUser extends Fragment {
 
                     }else{
 
-                        Snackbar.make(mRootView.findViewById(R.id.main_layout), getResources().getString(R.string.error_message_add_user), Snackbar.LENGTH_LONG)
+                        Snackbar.make(mRootView.findViewById(R.id.main_layout), getString(R.string.error_message_add_user), Snackbar.LENGTH_LONG)
                                 .show();
                     }
 
@@ -242,7 +242,7 @@ public class EditUser extends Fragment {
 
                     if (rowsAffected == 1){
 
-                        Snackbar.make(mRootView.findViewById(R.id.main_layout), getResources().getString(R.string.message_saved_changes), Snackbar.LENGTH_LONG)
+                        Snackbar.make(mRootView.findViewById(R.id.main_layout), getString(R.string.message_saved_changes), Snackbar.LENGTH_LONG)
                                 .show();
                     }
                 }
@@ -286,10 +286,10 @@ public class EditUser extends Fragment {
             mSaveButton.setEnabled(false);
 
             if (mUserName.getText().toString().trim().equals(""))
-                mUserName.setError(getResources().getString(R.string.message_username_empty));
+                mUserName.setError(getString(R.string.message_username_empty));
 
             if (mWeight.getText().toString().trim().equals("0"))
-                mWeight.setError(getResources().getString(R.string.message_weight_empty));
+                mWeight.setError(getString(R.string.message_weight_empty));
 
         }
         else
