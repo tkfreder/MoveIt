@@ -366,9 +366,9 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
      */
 
     // Insert a User into the database
-    public void addUser(User user) {
-        // Create and/or open the database for writing
-        //SQLiteDatabase db = getWritableDatabase();
+    public long addUser(User user) {
+
+        long rowId = -1;
 
         // It's a good idea to wrap our insert in a transaction. This helps with performance and ensures
         // consistency of the database.
@@ -384,7 +384,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             values.put(KEY_USER_IS_ENABLED, 1);
 
             // Notice how we haven't specified the primary key. SQLite auto increments the primary key column.
-            db.insertOrThrow(TABLE_USERS, null, values);
+            rowId = db.insertOrThrow(TABLE_USERS, null, values);
             db.setTransactionSuccessful();
         } catch (Exception e) {
             Log.d(LOGTAG, "Error during addUser()");
@@ -392,7 +392,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             db.endTransaction();
         }
 
-        db.close();
+        return rowId;
     }
 
     public ArrayList<User> getUsers()

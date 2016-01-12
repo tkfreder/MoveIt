@@ -26,6 +26,9 @@ import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.module.CustomApplication;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.inject.Inject;
 
 /**
@@ -44,7 +47,7 @@ public class EditUser extends Fragment {
     protected FragmentActivity mFragmentActivity;
     private View mRootView;
     private User mUser;
-    private boolean mHasChanges = false;
+    private boolean mIsNewUser = false;
 
     // UI Widgets
     ImageView mAvatar;
@@ -109,6 +112,18 @@ public class EditUser extends Fragment {
                 populateForm(mUser);
             }
         }
+        else{
+
+            mIsNewUser = true;
+            mUser = new User();
+
+            // get array list of avatar filenames from string array resource
+            List<String> avatarFileList = Arrays.asList(getResources().getStringArray(R.array.avatar_images));
+            String avatarFileName = avatarFileList.get(0);
+            mUser.setAvatarFileName(avatarFileName);
+            // set default avatar
+            mAvatar.setImageResource(getResources().getIdentifier(avatarFileName, "drawable", getActivity().getPackageName()));
+        }
     }
 
     private void populateForm(User user){
@@ -135,7 +150,7 @@ public class EditUser extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
 
-                validateForm();
+                    validateForm();
             }
         });
 
@@ -187,14 +202,30 @@ public class EditUser extends Fragment {
 
                 saveUser();
 
-                long rowsAffected = mDatabaseHelper.updateUser(mUser);
+                if (mIsNewUser){
 
-                if (rowsAffected > 0){
+                    long rowId = mDatabaseHelper.addUser(mUser);
 
-                    //Toast.makeText(getActivity(), "Your changes have been saved", Toast.LENGTH_LONG);
-                    Snackbar.make(mRootView.findViewById(R.id.main_layout), getResources().getString(R.string.message_saved_changes), Snackbar.LENGTH_LONG)
-                            .show();
+                    if (rowId != -1){
+
+                        Snackbar.make(mRootView.findViewById(R.id.main_layout), getResources().getString(R.string.message_added_user), Snackbar.LENGTH_LONG)
+                                .show();
+
+                        mIsNewUser = false;
+                    }
+
                 }
+                else{
+
+                    long rowsAffected = mDatabaseHelper.updateUser(mUser);
+
+                    if (rowsAffected == 1){
+
+                        Snackbar.make(mRootView.findViewById(R.id.main_layout), getResources().getString(R.string.message_saved_changes), Snackbar.LENGTH_LONG)
+                                .show();
+                    }
+                }
+
             }
         });
     }
@@ -238,6 +269,7 @@ public class EditUser extends Fragment {
 
             if (mWeight.getText().toString().trim().equals(""))
                 mWeight.setError(getResources().getString(R.string.message_weight_empty));
+
         }
         else
             mSaveButton.setEnabled(true);

@@ -10,5 +10,7 @@
     <dimen name="edit_image_size">100dp</dimen>
     <dimen name="min_width_long_edit_text">150dp</dimen>
     <dimen name="min_width_short_edit_text">100dp</dimen>
+    <dimen name="round_button_diameter">48dp</dimen>
+    <dimen name="add_button_margin">4dp</dimen>
 
 </resources>

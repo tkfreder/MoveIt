@@ -3,6 +3,7 @@ package com.tinakit.moveit.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -37,6 +38,7 @@ public class UserProfile extends Fragment {
     // UI
     protected FragmentActivity mFragmentActivity;
     private View rootView;
+    protected FloatingActionButton mAddUserButton;
 
     //make these public to enable saving changes from Toolbar
     public UserProfileRecyclerAdapter mUserProfileRecyclerAdapter;
@@ -49,7 +51,7 @@ public class UserProfile extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         mFragmentActivity  = (FragmentActivity)super.getActivity();
-        rootView = inflater.inflate(R.layout.recycler_view, container, false);
+        rootView = inflater.inflate(R.layout.user_profile, container, false);
 
         mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
@@ -62,16 +64,11 @@ public class UserProfile extends Fragment {
         // fetch directly from the database
         mUserList = mDatabaseHelper.getUsers();
 
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
-        mRecyclerView.setHasFixedSize(true); //child items have fixed dimensions, allows the RecyclerView to optimize better by figuring out the exact height and width of the entire list based on the adapter.
+        initializeUI();
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mFragmentActivity);
-        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        mRecyclerView.setLayoutManager(linearLayoutManager);
+        setActionListeners();
 
-        mUserProfileRecyclerAdapter = new UserProfileRecyclerAdapter(getActivity(), mFragmentActivity, mUserList);
-        mRecyclerView.setAdapter(mUserProfileRecyclerAdapter);
-
+        //TODO: not sure if we still need this if not calling onBackStack
         getActivity().getSupportFragmentManager().addOnBackStackChangedListener(
                 new FragmentManager.OnBackStackChangedListener() {
                     public void onBackStackChanged() {
@@ -85,5 +82,41 @@ public class UserProfile extends Fragment {
         return rootView;
     }
 
+    private void initializeUI(){
+
+        mAddUserButton = (FloatingActionButton)rootView.findViewById(R.id.addUserButton);
+
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
+        mRecyclerView.setHasFixedSize(true); //child items have fixed dimensions, allows the RecyclerView to optimize better by figuring out the exact height and width of the entire list based on the adapter.
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mFragmentActivity);
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        mRecyclerView.setLayoutManager(linearLayoutManager);
+
+        mUserProfileRecyclerAdapter = new UserProfileRecyclerAdapter(getActivity(), mFragmentActivity, mUserList);
+        mRecyclerView.setAdapter(mUserProfileRecyclerAdapter);
+
+    }
+
+    private void setActionListeners(){
+
+        mAddUserButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+
+                // check whether UserProfile is already visible
+                EditUser editUser = (EditUser)mFragmentActivity.getSupportFragmentManager().findFragmentByTag(EditUser.EDIT_USER_TAG);
+                if (editUser == null) {
+
+                    editUser = new EditUser();
+                    mFragmentActivity.getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragmentContainer, editUser, EditUser.EDIT_USER_TAG)
+                            .commit();
+                }
+            }
+        });
+    }
 
 }
