@@ -48,6 +48,7 @@ public class EditUser extends Fragment {
     private View mRootView;
     private User mUser;
     private boolean mIsNewUser = false;
+    private List<User> mUserList;
 
     // UI Widgets
     ImageView mAvatar;
@@ -88,6 +89,10 @@ public class EditUser extends Fragment {
 
     private void fetchData(){
 
+        // get UserName list, for validating new UserName
+        mUserList = mDatabaseHelper.getUsers();
+
+        // get User out of Bundle, if exists
         Bundle bundle = this.getArguments();
         if (bundle != null && bundle.containsKey(EDIT_USER_USER)) {
 
@@ -189,7 +194,10 @@ public class EditUser extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
 
-                validateForm();
+                if(!existsUserName())
+                    validateForm();
+                else
+                    mUserName.setError(getString(R.string.message_username_exists));
             }
         });
 
@@ -287,6 +295,17 @@ public class EditUser extends Fragment {
         else
             mSaveButton.setEnabled(true);
 
+    }
+
+    private boolean existsUserName(){
+
+        for (User user : mUserList){
+            if(user.getUserName().equals(mUserName.getText().toString().trim())){
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }

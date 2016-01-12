@@ -165,4 +165,5 @@
     <string name="error_message_add_user">An error occurred in adding User.  Try again.</string>
     <string name="message_added_user">User has been added.</string>
     <string name="button_add">Add</string>
+    <string name="message_username_exists">That username is taken.  Try another.</string>
 </resources>
