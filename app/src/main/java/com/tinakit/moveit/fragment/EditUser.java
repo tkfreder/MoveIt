@@ -96,34 +96,40 @@ public class EditUser extends Fragment {
             // if this is the first time, there will be no data in the bundle
             if (mUser == null) {
 
-                // redirect to UserStats screen
-                //Intent intent = new Intent(this, UserStats.class);
-
-                // check if UserProfile is already displayed
-                UserProfile userProfile = (UserProfile) getActivity().getSupportFragmentManager().findFragmentByTag(UserProfile.USER_PROFILE_TAG);
-                if (userProfile == null) {
-
-                    userProfile = new UserProfile();
-                    //replace current fragment
-                    getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, userProfile).commit();
-                }
+                // redirect to UserProfile
+                UserProfile userProfile = new UserProfile();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, userProfile).commit();
             } else {
 
                 populateForm(mUser);
             }
         }
+
+        // New User mode
         else{
 
             mIsNewUser = true;
-            mUser = new User();
+            setDefaults();
 
-            // get array list of avatar filenames from string array resource
-            List<String> avatarFileList = Arrays.asList(getResources().getStringArray(R.array.avatar_images));
-            String avatarFileName = avatarFileList.get(0);
-            mUser.setAvatarFileName(avatarFileName);
-            // set default avatar
-            mAvatar.setImageResource(getResources().getIdentifier(avatarFileName, "drawable", getActivity().getPackageName()));
         }
+    }
+
+    private void setDefaults(){
+
+        mUser = new User();
+
+        // set default avatar
+        List<String> avatarFileList = Arrays.asList(getResources().getStringArray(R.array.avatar_images));
+        String avatarFileName = avatarFileList.get(0);
+        mUser.setAvatarFileName(avatarFileName);
+        mAvatar.setImageResource(getResources().getIdentifier(avatarFileName, "drawable", getActivity().getPackageName()));
+
+        // set weight
+        mWeight.setText("0");
+
+        // set button text
+        mSaveButton.setText(getResources().getString(R.string.button_add));
+
     }
 
     private void populateForm(User user){
@@ -208,11 +214,18 @@ public class EditUser extends Fragment {
 
                     if (rowId != -1){
 
-                        Snackbar.make(mRootView.findViewById(R.id.main_layout), getResources().getString(R.string.message_added_user), Snackbar.LENGTH_LONG)
-                                .show();
-
                         mIsNewUser = false;
+
+                        UserProfile userProfile = new UserProfile();
+                        //replace current fragment
+                        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, userProfile).commit();
+
+                    }else{
+
+                        Snackbar.make(mRootView.findViewById(R.id.main_layout), getResources().getString(R.string.error_message_add_user), Snackbar.LENGTH_LONG)
+                                .show();
                     }
+
 
                 }
                 else{
@@ -267,7 +280,7 @@ public class EditUser extends Fragment {
             if (mUserName.getText().toString().trim().equals(""))
                 mUserName.setError(getResources().getString(R.string.message_username_empty));
 
-            if (mWeight.getText().toString().trim().equals(""))
+            if (mWeight.getText().toString().trim().equals("0"))
                 mWeight.setError(getResources().getString(R.string.message_weight_empty));
 
         }

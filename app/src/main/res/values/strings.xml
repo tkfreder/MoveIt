@@ -162,5 +162,7 @@
     <string name="message_delete_user">All data associated with this user will be lost.  Alternatively, you can Cancel and rename the User so as not to lose the associated data.  Then create a new User.</string>
     <string name="hint_admin">Gives this User access to Admin features, ie. editing users and rewards.</string>
     <string name="message_saved_changes">Your changes have been saved.</string>
+    <string name="error_message_add_user">An error occurred in adding User.  Try again.</string>
     <string name="message_added_user">User has been added.</string>
+    <string name="button_add">Add</string>
 </resources>
