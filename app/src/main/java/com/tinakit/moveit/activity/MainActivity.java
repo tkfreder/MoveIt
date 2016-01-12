@@ -163,7 +163,23 @@ public class MainActivity extends AppCompatActivity {
 
         switch(id){
 
-             case R.id.nav_rewards:
+            case R.id.nav_start:
+
+                getSupportActionBar().setTitle(getString(R.string.start));
+                //TODO: redirect to ActivityTracker, change ActivityTracker to a fragment
+
+                // check whether UserProfile is already visible
+                ActivityChooser activityChooser = (ActivityChooser)getSupportFragmentManager().findFragmentByTag(ActivityChooser.ACTIVITY_CHOOSER_TAG);
+                if (activityChooser == null){
+
+                    activityChooser= new ActivityChooser ();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, activityChooser).commit();
+                }
+
+
+                break;
+
+             case R.id.nav_progress:
 
                 getSupportActionBar().setTitle(getString(R.string.rewards));
 
@@ -178,6 +194,15 @@ public class MainActivity extends AppCompatActivity {
 
                 break;
 
+            case R.id.nav_admin:
+            case R.id.action_settings:
+
+                getSupportActionBar().setTitle(getString(R.string.settings));
+                // TODO: redirect to admin screen
+
+                break;
+
+            /*
             case R.id.nav_history:
 
                 getSupportActionBar().setTitle(getString(R.string.history));
@@ -208,29 +233,7 @@ public class MainActivity extends AppCompatActivity {
 
                 break;
 
-            case R.id.nav_start:
-
-                getSupportActionBar().setTitle(getString(R.string.start));
-                //TODO: redirect to ActivityTracker, change ActivityTracker to a fragment
-
-                // check whether UserProfile is already visible
-                ActivityChooser activityChooser = (ActivityChooser)getSupportFragmentManager().findFragmentByTag(ActivityChooser.ACTIVITY_CHOOSER_TAG);
-                if (activityChooser == null){
-
-                    activityChooser= new ActivityChooser ();
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, activityChooser).commit();
-                }
-
-
-                break;
-
-            case R.id.nav_settings:
-            case R.id.action_settings:
-
-                getSupportActionBar().setTitle(getString(R.string.settings));
-                // TODO: redirect to admin screen
-
-            break;
+*/
 
         }
     }

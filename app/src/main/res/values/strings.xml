@@ -44,60 +44,6 @@
         <item>swim</item>
     </string-array>
 
-    <!-- usernames //TODO: to implement a secure login method-->
-    <string-array
-        name="string_array_username">
-        <item>parent</item>
-        <item>child1</item>
-        <item>child2</item>
-        <item>child3</item>
-    </string-array>
-
-    <!-- passwords //TODO: to implement a secure login method-->
-    <string-array
-        name="string_array_password">
-        <item>parent</item>
-        <item>child1</item>
-        <item>child2</item>
-        <item>child3</item>
-    </string-array>
-
-    <!-- flag weight //TODO: to implement a secure login method -->
-    <string-array
-        name="string_array_weight">
-        <item>Choose:</item>
-        <item>40</item>
-        <item>50</item>
-        <item>60</item>
-        <item>70</item>
-        <item>80</item>
-        <item>90</item>
-        <item>100</item>
-        <item>110</item>
-        <item>120</item>
-        <item>130</item>
-    </string-array>
-
-    <!-- default rewards -->
-    <string-array
-        name="string_array_reward">
-        <item>Screen Time (15 min.)</item>
-        <item>Picking Dinner Menu</item>
-        <item>Dessert Outing</item>
-        <item>Beach Outing</item>
-        <item>Sleepover w/ Friend</item>
-    </string-array>
-
-    <!-- coin denominations -->
-    <string-array
-        name="string_array_coin_denomination">
-        <item>25</item>
-        <item>50</item>
-        <item>100</item>
-        <item>125</item>
-        <item>150</item>
-    </string-array>
-
     <!-- avatar filenames -->
     <string-array name="avatar_images">
         <item>avatar_cat_blue</item>
@@ -109,6 +55,12 @@
         <item>avatar_cat_yellow</item>
         <item>avatar_angel</item>
     </string-array>
+
+    <!-- navigation drawer menu names -->
+    <string name="nav_menu_start">Start</string>
+    <string name="nav_menu_progress">Progress</string>
+    <string name="nav_menu_admin">Admin</string>
+
 
     <string name="title_activity_sensor_api">SensorAPI</string>
 
