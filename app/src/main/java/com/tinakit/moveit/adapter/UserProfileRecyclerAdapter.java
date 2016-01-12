@@ -150,57 +150,10 @@ public class UserProfileRecyclerAdapter extends RecyclerView.Adapter<UserProfile
                     .replace(R.id.fragmentContainer, editUser, EditUser.EDIT_USER_TAG)
                     .commit();
 
-
-                    //REFERENCE: http://developer.android.com/training/implementing-navigation/temporal.html
-                    //mActivity.getSupportFragmentManager().beginTransaction()
-                    //.add(R.id.fragmentContainer, editUser, EditUser.EDIT_USER_TAG)
-                    // Add this transaction to the back stack
-                    //        .addToBackStack(null)
-                    //        .commit();
-
-
-
-                    //transaction.replace(R.id.fragmentContainer, editUser, EditUser.EDIT_USER_TAG);
-                    //transaction.commit();
-
                 }
 
             }
         });
-
-
-        /*
-        customViewHolder.updateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            User user = (User) view.getTag();
-
-            //get remaining values for User from form in case it was changed
-            user.setUserName(customViewHolder.userName.getText().toString());
-            user.setIsAdmin(customViewHolder.isAdmin.getVisibility() == View.VISIBLE ? true : false );
-            user.setWeight(Float.parseFloat(customViewHolder.weight.getText().toString()));
-            // avatar filename is saved in onclicklistener of avatar listview
-
-            mDatabaseHelper.updateUser(user);
-
-            // redirect back to User Profile
-
-            // check whether UserProfile is already visible
-            UserProfile userProfile = (UserProfile)mActivity.getSupportFragmentManager().findFragmentByTag(UserProfile.USER_PROFILE_TAG);
-            if (userProfile == null){
-
-                userProfile= new UserProfile ();
-                FragmentTransaction transaction = mActivity.getSupportFragmentManager().beginTransaction();
-                transaction.add(R.id.fragmentContainer, userProfile, UserProfile.USER_PROFILE_TAG);
-                transaction.commit();
-
-                //mActivity.getActionBar().setTitle(mContext.getResources().getString(R.string.user_profiles));
-            }
-            }
-        });
-        */
-
     }
 
     @Override
