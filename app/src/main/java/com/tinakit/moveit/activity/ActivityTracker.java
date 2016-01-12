@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -26,7 +27,6 @@ import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.tinakit.moveit.db.FitnessDBHelper;
@@ -356,7 +356,8 @@ public class ActivityTracker extends AppCompatActivity {
 
     private void finishTracking(String message){
 
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        Snackbar.make(findViewById(R.id.main_layout), message, Snackbar.LENGTH_LONG)
+                .show();
         finish();
         startActivity(new Intent(this, MainActivity.class));
     }
