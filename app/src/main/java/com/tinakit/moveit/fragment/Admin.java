@@ -43,7 +43,6 @@ public class Admin extends Fragment {
     private ViewPager mViewPager;
     protected ViewPagerAdapter mViewPagerAdapter;
     private SlidingTabLayout mSlidingTabLayout;
-    private TabLayout mTabLayout;
 
     @Nullable
     @Override
@@ -72,38 +71,13 @@ public class Admin extends Fragment {
             setupViewPager(mViewPager);
         }
 
-        mTabLayout = (TabLayout)rootView.findViewById(R.id.tabLayout);
-        mTabLayout.setupWithViewPager(mViewPager);
-
         //TabLayout
-        //mSlidingTabLayout = (SlidingTabLayout)rootView.findViewById(R.id.tabLayout);
-        //mSlidingTabLayout.setViewPager(mViewPager);
+        mSlidingTabLayout = (SlidingTabLayout)rootView.findViewById(R.id.tabLayout);
+        mSlidingTabLayout.setViewPager(mViewPager);
 
-        //set tab index if this is redirected
-        //if(getIntent().hasExtra("tab_index")){
-
-        //    mViewPager.setCurrentItem((int)getIntent().getExtras().get("tab_index"));
-        //}
     }
 
     private void setActionListeners(){
-
-        mTabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-
-                mViewPager.setCurrentItem(tab.getPosition());
-
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-            }
-        });
 
     }
 
