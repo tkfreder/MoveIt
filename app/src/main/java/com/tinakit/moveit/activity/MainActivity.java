@@ -17,6 +17,7 @@ import android.view.Menu;
 import com.tinakit.moveit.api.GoogleApi;
 import com.tinakit.moveit.fragment.ActivityChooser;
 import com.tinakit.moveit.fragment.ActivityHistory;
+import com.tinakit.moveit.fragment.Admin;
 import com.tinakit.moveit.fragment.EditUser;
 import com.tinakit.moveit.fragment.UserProfile;
 import com.tinakit.moveit.fragment.UserStats;
@@ -165,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
 
             case R.id.nav_start:
 
-                getSupportActionBar().setTitle(getString(R.string.start));
+                getSupportActionBar().setTitle(getString(R.string.nav_menu_start));
                 //TODO: redirect to ActivityTracker, change ActivityTracker to a fragment
 
                 // check whether UserProfile is already visible
@@ -181,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
 
              case R.id.nav_progress:
 
-                getSupportActionBar().setTitle(getString(R.string.rewards));
+                getSupportActionBar().setTitle(getString(R.string.nav_menu_progress));
 
                 UserStats userStats = (UserStats)getSupportFragmentManager().findFragmentByTag(UserStats.USER_STATS_TAG);
                 if (userStats == null) {
@@ -197,8 +198,16 @@ public class MainActivity extends AppCompatActivity {
             case R.id.nav_admin:
             case R.id.action_settings:
 
-                getSupportActionBar().setTitle(getString(R.string.settings));
-                // TODO: redirect to admin screen
+                getSupportActionBar().setTitle(getString(R.string.nav_menu_admin));
+
+                Admin admin = (Admin)getSupportFragmentManager().findFragmentByTag(Admin.ADMIN_TAG);
+                if (admin == null) {
+
+                    admin = new Admin();
+                    //replace current fragment with Rewards fragment
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, admin).commit();
+
+                }
 
                 break;
 

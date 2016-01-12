@@ -61,6 +61,11 @@
     <string name="nav_menu_progress">Progress</string>
     <string name="nav_menu_admin">Admin</string>
 
+    <!-- navigation drawer: Admin : tab menu names -->
+    <string name="admin_tab_inbox">Inbox</string>
+    <string name="admin_tab_users">Users</string>
+    <string name="admin_tab_history">History</string>
+    <string name="admin_tab_settings">Settings</string>
 
     <string name="title_activity_sensor_api">SensorAPI</string>
 

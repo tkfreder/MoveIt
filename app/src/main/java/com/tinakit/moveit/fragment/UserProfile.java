@@ -58,9 +58,6 @@ public class UserProfile extends Fragment {
         // Dagger 2 injection
         ((CustomApplication)getActivity().getApplication()).getAppComponent().inject(this);
 
-        //get databaseHelper instance
-        //mDatabaseHelper = FitnessDBHelper.getInstance(mFragmentActivity);
-
         // fetch directly from the database
         mUserList = mDatabaseHelper.getUsers();
 
