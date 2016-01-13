@@ -13,10 +13,6 @@
         android:icon="@drawable/ic_coin_bank"
         android:title="@string/nav_menu_coins" />
         <item
-            android:id="@+id/nav_reward"
-            android:icon="@drawable/ic_reward"
-            android:title="@string/nav_menu_reward" />
-        <item
             android:id="@+id/nav_charts"
             android:icon="@drawable/ic_charts"
             android:title="@string/nav_menu_charts" />

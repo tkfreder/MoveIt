@@ -247,7 +247,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 " , r." + KEY_REWARD_NAME + " AS " + KEY_REWARD_NAME +
                 " FROM " + TABLE_REWARDUSER + " ru" +
                 " LEFT JOIN " + TABLE_REWARDS + " r on ru." + KEY_REWARDUSER_REWARD_ID_FK + " = r._id";
-                //" LEFT JOIN " + TABLE_USERS + " u on u._id = ru.userId" +
+                //" LEFT JOIN " + TABLE_USERS + " u on u._id = ru.userId";
 
         String CREATE_VIEW_FIRST_LOCATION_POINTS = "CREATE VIEW " + VIEW_FIRST_LOCATION_POINTS + " AS" +
                 " SELECT " + KEY_ACTIVITY_START_DATE +
@@ -296,11 +296,10 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
         //TODO: DUMMY DATA
         //populate Rewards table
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (1, 'popsicle dessert', 1);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (2, 'trip to Michaels', 3);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (3, 'pancakes for dinner', 5);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (4, 'pick of Sat. outing', 7);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (5, 'Animal Jam points', 10);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (1, 'Animal Jam 5 Diamonds', 300);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (2, 'Chocolate Chip Pancake Dinner', 200);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (3, 'Arclight Movie', 200);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (4, 'Dinner Out of Choice', 200);");
 
         //TODO: DUMMY DATA
         db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Laura', 0, 50, 'avatar_cat_purple', 0, 1);");
@@ -313,28 +312,9 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         //populate RewardStatus table
 
         db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 1, 1, 0);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 2, 1, 0);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 3, 1, 0);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 4, 1, 0);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 5, 1, 0);");
-
-        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 1, 2, 0);");
         db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 2, 2, 0);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 3, 2, 0);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 4, 2, 0);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 5, 2, 0);");
-
-        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 1, 3, 0);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 2, 3, 0);");
         db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 3, 3, 0);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 4, 3, 0);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 5, 3, 0);");
-
-        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 1, 4, 0);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 2, 4, 0);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 3, 4, 0);");
         db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 4, 4, 0);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 5, 4, 0);");
 
     }
 
@@ -1086,10 +1066,9 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
         try {
 
-            Cursor cursor = db.query(TABLE_REWARDS,
-                    new String[]{KEY_REWARD_ID,KEY_REWARD_NAME,KEY_REWARD_POINTS},
-                    null,
-                    new String[]{String.valueOf(1)}, null, null, null);
+            Cursor cursor = db.query(VIEW_REWARDSTATUS_USER,
+                    new String[]{KEY_REWARDUSER_REWARD_ID_FK,KEY_REWARD_NAME,KEY_REWARD_POINTS,KEY_REWARDUSER_USER_ID_FK},
+                    null,null, null, null, null);
 
             try{
 
@@ -1097,9 +1076,10 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
                     do{
                         Reward reward = new Reward();
-                        reward.setRewardId(cursor.getInt(cursor.getColumnIndex(KEY_REWARD_ID)));
+                        reward.setRewardId(cursor.getInt(cursor.getColumnIndex(KEY_REWARDUSER_REWARD_ID_FK)));
                         reward.setName(cursor.getString(cursor.getColumnIndex(KEY_REWARD_NAME)));
                         reward.setPoints(cursor.getInt(cursor.getColumnIndex(KEY_REWARD_POINTS)));
+                        reward.setUserId(cursor.getInt(cursor.getColumnIndex(KEY_REWARDUSER_USER_ID_FK)));
                         rewardList.add(reward);
                     }while (cursor.moveToNext());
 
@@ -1180,7 +1160,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
      ***********************************************************************************************
      */
 
-    public List<Reward> getUserRewards(int userId){
+    public List<Reward> getUserRewards(User user){
 
         // Create and/or open the database for writing
         //SQLiteDatabase db = getReadableDatabase();
@@ -1193,7 +1173,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             Cursor cursor = db.query(VIEW_REWARDSTATUS_USER,
                     new String[]{KEY_REWARDUSER_REWARD_ID_FK, KEY_REWARD_POINTS, KEY_REWARDUSER_REWARD_STATUS_ID,KEY_REWARD_NAME},
                     KEY_REWARDUSER_USER_ID_FK + " = ? ",
-                    new String[]{String.valueOf(userId)}, null, null, KEY_REWARD_POINTS);
+                    new String[]{String.valueOf(user.getUserId())}, null, null, KEY_REWARDUSER_REWARD_ID_FK + " DESC"/*KEY_REWARD_POINTS*/);
 
             try{
 
@@ -1227,6 +1207,8 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
         return rewardList;
     }
+
+
 
     public long setRewardStatus(int userId, int rewardId, RewardStatusType rewardStatusType){
 

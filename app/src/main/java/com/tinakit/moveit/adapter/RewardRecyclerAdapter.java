@@ -50,7 +50,7 @@ public class RewardRecyclerAdapter extends RecyclerView.Adapter<RewardRecyclerAd
         //FitnessDBHelper databaseHelper = FitnessDBHelper.getInstance(context);
 
         // Get Reward list
-        mRewardList = mDatabaseHelper.getUserRewards(mUser.getUserId());
+        mRewardList = mDatabaseHelper.getUserRewards(mUser);
     }
 
     @Override

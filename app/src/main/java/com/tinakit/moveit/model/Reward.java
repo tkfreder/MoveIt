@@ -14,6 +14,7 @@ public class Reward implements Parcelable {
     private String mDescription;
     private boolean mEnabled;
     private RewardStatusType mRewardStatusType;
+    private int mUserId;
 
     public Reward (){}
 
@@ -65,6 +66,14 @@ public class Reward implements Parcelable {
         mRewardStatusType = rewardStatusType;
     }
 
+    public int getUserId() {
+        return mUserId;
+    }
+
+    public void setUserId(int userId) {
+        mUserId = userId;
+    }
+
     protected Reward(Parcel in) {
         mRewardId = in.readInt();
         mName = in.readString();
@@ -72,6 +81,7 @@ public class Reward implements Parcelable {
         mDescription = in.readString();
         mEnabled = in.readByte() != 0x00;
         mRewardStatusType = (RewardStatusType) in.readValue(RewardStatusType.class.getClassLoader());
+        mUserId = in.readInt();
     }
 
     @Override
@@ -87,6 +97,7 @@ public class Reward implements Parcelable {
         dest.writeString(mDescription);
         dest.writeByte((byte) (mEnabled ? 0x01 : 0x00));
         dest.writeValue(mRewardStatusType);
+        dest.writeInt(mUserId);
     }
 
     @SuppressWarnings("unused")

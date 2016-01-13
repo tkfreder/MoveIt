@@ -80,7 +80,7 @@ public class UserStats extends Fragment{
         for (User user : mUserList){
 
             //set the reward list for each user
-            user.setChildItemList(mDatabaseHelper.getUserRewards(user.getUserId()));
+            user.setChildItemList(mDatabaseHelper.getUserRewards(user));
         }
 
         mUserStatsRecyclerAdapter = new UserStatsRecyclerAdapter(layoutInflater.getContext(), mFragmentActivity, mUserList);

@@ -19,6 +19,7 @@
         app:layout_widthPercent="35%"
         android:layout_toRightOf="@+id/avatar"
         android:layout_toEndOf="@+id/avatar"
+        android:gravity="bottom"
         >
         <TextView
             android:id="@+id/userName"

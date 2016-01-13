@@ -29,6 +29,7 @@ import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.RewardView;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.activity.PickAvatar;
+import com.tinakit.moveit.fragment.EditReward;
 import com.tinakit.moveit.fragment.EditUser;
 import com.tinakit.moveit.fragment.UserProfile;
 import com.tinakit.moveit.model.User;
@@ -167,15 +168,15 @@ public class UserProfileRecyclerAdapter extends RecyclerView.Adapter<UserProfile
             @Override
             public void onClick(View v) {
 
-                RewardView rewardView = new RewardView();
+                EditReward editReward = new EditReward();
 
                 //save User changes
                 Bundle bundle = new Bundle();
-                bundle.putParcelable(RewardView.REWARD_VIEW_USER, (User)v.getTag());
-                rewardView.setArguments(bundle);
+                bundle.putParcelable(EditReward.EDIT_REWARD_USER, (User)v.getTag());
+                editReward.setArguments(bundle);
 
                 mActivity.getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragmentContainer, rewardView, RewardView.REWARD_VIEW_USER)
+                        .replace(R.id.fragmentContainer, editReward, EditReward.EDIT_REWARD_TAG)
                         .commit();
             }
         });
