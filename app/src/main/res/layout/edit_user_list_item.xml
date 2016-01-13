@@ -20,7 +20,7 @@
         android:layout_toRightOf="@+id/avatar"
         android:layout_toEndOf="@+id/avatar"
         >
-        <EditText
+        <TextView
             android:id="@+id/userName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -46,7 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/userLayout"
             android:layout_toEndOf="@+id/userLayout"
-            app:layout_widthPercent="15%">
+            app:layout_widthPercent="20%">
 
             <TextView
                 android:id="@+id/weight"
@@ -54,7 +54,8 @@
                 android:layout_height="wrap_content"
                 style="@style/LabelListItemPurple"
                 android:inputType="number"
-                android:layout_alignParentLeft="true"/>
+                android:layout_alignParentLeft="true"
+                android:enabled="false"/>
             <TextView
                 android:id="@+id/lbsTextView"
                 android:layout_width="wrap_content"
@@ -71,7 +72,7 @@
         <android.support.percent.PercentRelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_widthPercent="25%"
+            app:layout_widthPercent="20%"
             android:layout_toRightOf="@+id/isAdmin"
             android:layout_toEndOf="@+id/isAdmin"
             android:layout_alignParentRight="true">
@@ -93,18 +94,6 @@
                 android:hint="@string/hint_edit_user"
                 android:layout_toRightOf="@+id/deleteButton"
                 android:layout_toEndOf="@+id/deleteButton"/>
-            <ImageView
-                android:id="@+id/saveButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_widthPercent="50%"
-                android:hint="@string/hint_save_user"
-                android:src="@drawable/ic_action_accept"
-                android:visibility="gone"
-                android:layout_toRightOf="@+id/editButton"
-                android:layout_toEndOf="@+id/editButton"/>
         </android.support.percent.PercentRelativeLayout>
-
-
     </android.support.percent.PercentRelativeLayout>
 

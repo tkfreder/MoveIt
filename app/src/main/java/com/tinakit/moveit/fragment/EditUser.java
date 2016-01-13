@@ -160,26 +160,13 @@ public class EditUser extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
 
-                if(existsUserName())
+                if (existsUserName())
                     mUserName.setError(getString(R.string.message_username_exists));
             }
         });
 
-        mEditAvatar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                saveUser();
-
-                //save the user in bundle
-                Bundle args = new Bundle();
-                args.putParcelable(PickAvatar.PICK_AVATAR_KEY_USER, mUser);
-
-                Intent intent = new Intent(getActivity(), PickAvatar.class);
-                intent.putExtras(args);
-                mFragmentActivity.startActivityForResult(intent, PICK_AVATAR_REQUEST);
-            }
-        });
+        mAvatar.setOnClickListener(avatarClickListener);
+        mEditAvatar.setOnClickListener(avatarClickListener);
 
 
         mWeight.addTextChangedListener(new TextWatcher() {
@@ -195,7 +182,7 @@ public class EditUser extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
 
-                if (!isValidWeight()){
+                if (!isValidWeight(Integer.parseInt(mWeight.getText().toString()))){
                     mWeight.setError(getString(R.string.message_weight_empty));
                 }
             }
@@ -253,6 +240,8 @@ public class EditUser extends Fragment {
         });
     }
 
+
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -281,9 +270,25 @@ public class EditUser extends Fragment {
 
     }
 
+    View.OnClickListener avatarClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+            saveUser();
+
+            //save the user in bundle
+            Bundle args = new Bundle();
+            args.putParcelable(PickAvatar.PICK_AVATAR_KEY_USER, mUser);
+
+            Intent intent = new Intent(getActivity(), PickAvatar.class);
+            intent.putExtras(args);
+            mFragmentActivity.startActivityForResult(intent, PICK_AVATAR_REQUEST);
+        }
+    };
+
     private boolean validateForm(){
 
-        if(!existsUserName() && isValidWeight()) {
+        if(!existsUserName() && isValidWeight(Integer.parseInt(mWeight.getText().toString()))) {
 
            return true;
         }
@@ -292,9 +297,9 @@ public class EditUser extends Fragment {
 
     }
 
-    private boolean isValidWeight(){
+    public boolean isValidWeight(int weight){
 
-        if(Integer.parseInt(mWeight.getText().toString()) == 0){
+        if( weight == 0){
 
             return false;
         }

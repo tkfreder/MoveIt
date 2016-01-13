@@ -19,6 +19,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -89,40 +91,13 @@ public class UserProfileRecyclerAdapter extends RecyclerView.Adapter<UserProfile
 
         User user = mUserList.get(i);
 
-        // save User data, in order to compare against original username
-        customViewHolder.userName.setTag(user);
         customViewHolder.userName.setText(user.getUserName());
-        customViewHolder.userName.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-                User user = (User)customViewHolder.userName.getTag();
-
-                //save new username
-                user.setUserName(customViewHolder.userName.getText().toString().trim());
-                if(existsUserName(user)){
-
-                    customViewHolder.userName.setError(mContext.getString(R.string.message_username_exists));
-                }
-
-            }
-        });
 
         customViewHolder.isAdmin.setVisibility(user.isAdmin() ? View.VISIBLE : View.GONE);
-        customViewHolder.weight.setText(String.valueOf(Math.round(user.getWeight())));
-        customViewHolder.avatar.setImageResource(mContext.getResources().getIdentifier(user.getAvatarFileName(), "drawable", mActivity.getPackageName()));
 
-        customViewHolder.avatar.setTag(user);
+        customViewHolder.weight.setText(String.valueOf(Math.round(user.getWeight())));
+
+        customViewHolder.avatar.setImageResource(mContext.getResources().getIdentifier(user.getAvatarFileName(), "drawable", mActivity.getPackageName()));
 
         //save current User data in deleteButton
         customViewHolder.deleteButton.setTag(user);
@@ -172,95 +147,21 @@ public class UserProfileRecyclerAdapter extends RecyclerView.Adapter<UserProfile
             @Override
             public void onClick(View v) {
 
-                // set focus on username field
-                customViewHolder.userName.setEnabled(true);
-                customViewHolder.userName.setSelection(customViewHolder.userName.getText().length());
-                customViewHolder.userName.requestFocus();
 
-                // set
+                EditUser editUser= new EditUser();
 
-                // hide edit button
-                customViewHolder.editButton.setVisibility(View.GONE);
+                //save User changes
+                Bundle bundle = new Bundle();
+                bundle.putParcelable(EditUser.EDIT_USER_USER, (User)v.getTag());
+                editUser.setArguments(bundle);
 
-                // display save button
-                customViewHolder.saveButton.setVisibility(View.VISIBLE);
-
-
-
-                //customViewHolder.userName.setBackgroundColor(ContextCompat.getColor(mContext, R.color.pressed_color));
-                /*
-                // check whether UserProfile is already visible
-                EditUser editUser = (EditUser)mActivity.getSupportFragmentManager().findFragmentByTag(EditUser.EDIT_USER_TAG);
-                if (editUser == null){
-
-                    editUser= new EditUser();
-
-                    //save User changes
-                    Bundle bundle = new Bundle();
-                    bundle.putParcelable(EditUser.EDIT_USER_USER, (User)v.getTag());
-                    editUser.setArguments(bundle);
-
-                    mActivity.getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragmentContainer, editUser, EditUser.EDIT_USER_TAG)
-                    .commit();
-
-                }
-                */
+                mActivity.getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragmentContainer, editUser, EditUser.EDIT_USER_TAG)
+                .commit();
 
             }
         });
 
-        customViewHolder.saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                User user = (User)v.getTag();
-                if (isValidUser(customViewHolder, user)){
-
-
-                }
-
-            }
-        });
-    }
-
-    private boolean isValidUser(CustomViewHolder holder, User user){
-
-        if(user.getUserName().equals("") || user.getWeight() <= 0) {
-
-            //holder.saveButton.setEnabled(false);
-
-            if (user.getUserName().equals(""))
-            holder.userName.setError(mContext.getString(R.string.message_username_empty));
-
-            if (user.getWeight() <= 0)
-                holder.weight.setError(mContext.getString(R.string.message_weight_empty));
-
-            return false;
-        }
-        else
-            return true;
-            //holder.saveButton.setEnabled(true);
-
-    }
-
-    /*
-    *
-    * Checks whether other Users have this name already
-    *
-     */
-    private boolean existsUserName(User thisUser){
-
-        for (User user : mUserList){
-            //do not compare against original username of this user
-            if (user.getUserId() != thisUser.getUserId()){
-                if(user.getUserName().equals(thisUser.getUserName())){
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     @Override
@@ -270,24 +171,22 @@ public class UserProfileRecyclerAdapter extends RecyclerView.Adapter<UserProfile
 
     public class CustomViewHolder extends RecyclerView.ViewHolder {
 
-        protected EditText userName;
+        protected TextView userName;
         protected TextView isAdmin;
         protected TextView weight;
         protected ImageView avatar;
         protected ImageView deleteButton;
         protected ImageView editButton;
-        protected ImageView saveButton;
 
         public CustomViewHolder(View view) {
             super(view);
 
-            this.userName = (EditText)view.findViewById(R.id.userName);
+            this.userName = (TextView)view.findViewById(R.id.userName);
             this.isAdmin = (TextView)view.findViewById(R.id.isAdmin);
             this.weight = (TextView)view.findViewById(R.id.weight);
             this.avatar = (ImageView) view.findViewById(R.id.avatar);
             this.deleteButton = (ImageView) view.findViewById(R.id.deleteButton);
             this.editButton = (ImageView) view.findViewById(R.id.editButton);
-            this.saveButton = (ImageView) view.findViewById(R.id.saveButton);
 
 
         }
