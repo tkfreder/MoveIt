@@ -58,7 +58,9 @@
 
     <!-- navigation drawer menu names -->
     <string name="nav_menu_start">Start</string>
-    <string name="nav_menu_progress">Progress</string>
+    <string name="nav_menu_coins">Coins</string>
+    <string name="nav_menu_reward">Reward Wishlist</string>
+    <string name="nav_menu_charts">Charts</string>
     <string name="nav_menu_admin">Admin</string>
 
     <!-- navigation drawer: Admin : tab menu names -->
@@ -74,6 +76,7 @@
     <string name="hint_delete_user">delete user</string>
     <string name="hint_edit_user">edit user</string>
     <string name="hint_save_user">save user</string>
+    <string name="hint_user_reward">description of reward for this user</string>
 
     <string name="title_activity_sensor_api">SensorAPI</string>
 

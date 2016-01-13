@@ -180,9 +180,9 @@ public class MainActivity extends AppCompatActivity {
 
                 break;
 
-             case R.id.nav_progress:
+             case R.id.nav_coins:
 
-                getSupportActionBar().setTitle(getString(R.string.nav_menu_progress));
+                getSupportActionBar().setTitle(getString(R.string.nav_menu_coins));
 
                 UserStats userStats = (UserStats)getSupportFragmentManager().findFragmentByTag(UserStats.USER_STATS_TAG);
                 if (userStats == null) {
@@ -192,6 +192,27 @@ public class MainActivity extends AppCompatActivity {
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, userStats).commit();
 
                 }
+
+                break;
+
+            case R.id.nav_reward:
+
+                getSupportActionBar().setTitle(getString(R.string.nav_menu_reward));
+
+                RewardView rewardView = (RewardView)getSupportFragmentManager().findFragmentByTag(RewardView.REWARD_VIEW_TAG);
+                if (rewardView == null) {
+
+                    rewardView = new RewardView();
+                    //replace current fragment with Rewards fragment
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, rewardView).commit();
+
+                }
+
+                break;
+
+            case R.id.nav_charts:
+
+                getSupportActionBar().setTitle(getString(R.string.nav_menu_charts));
 
                 break;
 

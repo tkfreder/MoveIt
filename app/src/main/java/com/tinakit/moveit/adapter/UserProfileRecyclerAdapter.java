@@ -162,6 +162,24 @@ public class UserProfileRecyclerAdapter extends RecyclerView.Adapter<UserProfile
             }
         });
 
+        customViewHolder.rewardButton.setTag(user);
+        customViewHolder.rewardButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                RewardView rewardView = new RewardView();
+
+                //save User changes
+                Bundle bundle = new Bundle();
+                bundle.putParcelable(RewardView.REWARD_VIEW_USER, (User)v.getTag());
+                rewardView.setArguments(bundle);
+
+                mActivity.getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragmentContainer, rewardView, RewardView.REWARD_VIEW_USER)
+                        .commit();
+            }
+        });
+
     }
 
     @Override
@@ -177,6 +195,7 @@ public class UserProfileRecyclerAdapter extends RecyclerView.Adapter<UserProfile
         protected ImageView avatar;
         protected ImageView deleteButton;
         protected ImageView editButton;
+        protected ImageView rewardButton;
 
         public CustomViewHolder(View view) {
             super(view);
@@ -187,6 +206,8 @@ public class UserProfileRecyclerAdapter extends RecyclerView.Adapter<UserProfile
             this.avatar = (ImageView) view.findViewById(R.id.avatar);
             this.deleteButton = (ImageView) view.findViewById(R.id.deleteButton);
             this.editButton = (ImageView) view.findViewById(R.id.editButton);
+            this.rewardButton = (ImageView) view.findViewById(R.id.rewardButton);
+
 
 
         }

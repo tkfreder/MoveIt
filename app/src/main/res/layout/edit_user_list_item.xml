@@ -9,7 +9,7 @@
         android:id="@+id/avatar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_widthPercent="20%"
+        app:layout_widthPercent="15%"
         />
 
     <RelativeLayout
@@ -46,7 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/userLayout"
             android:layout_toEndOf="@+id/userLayout"
-            app:layout_widthPercent="20%">
+            app:layout_widthPercent="15%">
 
             <TextView
                 android:id="@+id/weight"
@@ -72,7 +72,7 @@
         <android.support.percent.PercentRelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_widthPercent="20%"
+            app:layout_widthPercent="30%"
             android:layout_toRightOf="@+id/isAdmin"
             android:layout_toEndOf="@+id/isAdmin"
             android:layout_alignParentRight="true">
@@ -81,7 +81,7 @@
                 android:id="@+id/deleteButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_widthPercent="50%"
+                app:layout_widthPercent="33%"
                 android:src="@drawable/ic_action_discard"
                 android:hint="@string/hint_delete_user"
                 />
@@ -89,11 +89,20 @@
                 android:id="@+id/editButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_widthPercent="50%"
+                app:layout_widthPercent="33%"
                 android:src="@drawable/ic_action_edit"
                 android:hint="@string/hint_edit_user"
                 android:layout_toRightOf="@+id/deleteButton"
                 android:layout_toEndOf="@+id/deleteButton"/>
+            <ImageView
+                android:id="@+id/rewardButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_widthPercent="34%"
+                android:src="@drawable/ic_reward"
+                android:hint="@string/hint_user_reward"
+                android:layout_toRightOf="@+id/editButton"
+                android:layout_toEndOf="@+id/editButton"/>
         </android.support.percent.PercentRelativeLayout>
     </android.support.percent.PercentRelativeLayout>
 
