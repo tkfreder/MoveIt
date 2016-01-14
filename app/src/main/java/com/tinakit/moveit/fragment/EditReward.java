@@ -2,6 +2,7 @@ package com.tinakit.moveit.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -78,7 +79,18 @@ public class EditReward extends Fragment {
             public void onClick(View v) {
 
                 List<Reward> rewardList = mEditRewardRecyclerAdapter.getRewardList();
-                //mDatabaseHelper.updateRewards(rewardList);
+                int rowsAffected = mDatabaseHelper.updateAllRewards(rewardList);
+
+                if(rowsAffected > 0){
+
+                    Snackbar.make(mRootView.findViewById(R.id.main_layout), getString(R.string.message_update_reward), Snackbar.LENGTH_LONG)
+                            .show();
+                }
+                else{
+
+                    Snackbar.make(mRootView.findViewById(R.id.main_layout), getString(R.string.error_message_update_reward), Snackbar.LENGTH_LONG)
+                            .show();
+                }
             }
         });
 

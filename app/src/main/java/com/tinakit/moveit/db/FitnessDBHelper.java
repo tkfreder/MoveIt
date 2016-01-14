@@ -114,6 +114,12 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     private static final String KEY_REWARDUSER_USER_ID_FK = "userId";
     private static final String KEY_REWARDUSER_REWARD_STATUS_ID = "rewardStatusId";
 
+    //REWARDS_EARNED TABLE
+    private static final String TABLE_REWARDS_EARNED = "RewardsEarned";
+    private static final String KEY_REWARDSEARNED__ID = "_id";
+    private static final String KEY_REWARDSEARNED_REWARD_NAME = "rewardName";
+    private static final String KEY_REWARDSEARNED_REWARD_POINTS = "points";
+    private static final String KEY_REWARDSEARNED_USER_ID_FK = "userId";
 
     //VIEWS
     private static final String VIEW_REWARDSTATUS_USER = "RewardStatusUser";
@@ -239,6 +245,14 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 KEY_REWARDUSER_REWARD_STATUS_ID + " INTEGER " +
                 ")";
 
+        String CREATE_REWARDSEARNED_TABLE = "CREATE TABLE " + TABLE_REWARDS_EARNED +
+                "(" +
+                KEY_REWARDSEARNED__ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // Define a primary key
+                KEY_REWARD_NAME + " TEXT, " +
+                KEY_REWARD_POINTS + " INTEGER, " +
+                KEY_REWARDSEARNED_USER_ID_FK + " INTEGER REFERENCES " + TABLE_USERS + // Define a foreign key
+                ")";
+
         String CREATE_VIEW_REWARDSTATUSUSER = "CREATE VIEW " + VIEW_REWARDSTATUS_USER + " AS" +
                 " SELECT r._id AS " + KEY_REWARDUSER_REWARD_ID_FK +
                 " , r." + KEY_REWARD_POINTS + " AS " + KEY_REWARD_POINTS +
@@ -282,6 +296,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_ACTIVITY_LOCATION_DATA_TABLE);
         db.execSQL(CREATE_REWARDS_TABLE);
         db.execSQL(CREATE_REWARDUSER_TABLE);
+        db.execSQL(CREATE_REWARDSEARNED_TABLE);
         db.execSQL(CREATE_VIEW_REWARDSTATUSUSER);
         db.execSQL(CREATE_VIEW_FIRST_LOCATION_POINTS);
         db.execSQL(CREATE_VIEW_ACTIVITY_USERS_DETAIL);
@@ -332,6 +347,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACTIVITY_LOCATION_DATA);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_REWARDS);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_REWARDUSER);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_REWARDS_EARNED);
             db.execSQL("DROP VIEW IF EXISTS " + VIEW_REWARDSTATUS_USER);
             db.execSQL("DROP VIEF IF EXISTS " + VIEW_FIRST_LOCATION_POINTS);
             db.execSQL("DROP VIEF IF EXISTS " + VIEW_ACTIVITY_USERS_DETAIL);
@@ -1127,6 +1143,35 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             Log.d(LOGTAG, "Error during updateReward()");
         } finally {
             db.endTransaction();
+        }
+
+        return rowsAffected;
+    }
+
+    public int updateAllRewards(List<Reward> rewardList){
+
+        int rowsAffected = 0;
+
+        for (Reward reward : rewardList){
+
+            db.beginTransaction();
+            try {
+
+                ContentValues values = new ContentValues();
+                values.put(KEY_REWARD_NAME, reward.getName());
+                values.put(KEY_REWARD_POINTS, reward.getPoints());
+
+                rowsAffected = db.update(TABLE_REWARDS, values, KEY_REWARD_ID + "= ? ", new String[]{String.valueOf(reward.getRewardId())});
+
+                db.setTransactionSuccessful();
+
+                rowsAffected++;
+
+            } catch (Exception e) {
+                Log.d(LOGTAG, "Error during updateAllRewards()");
+            } finally {
+                db.endTransaction();
+            }
         }
 
         return rowsAffected;

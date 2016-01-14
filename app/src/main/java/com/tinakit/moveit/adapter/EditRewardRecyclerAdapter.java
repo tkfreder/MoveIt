@@ -23,6 +23,7 @@ import com.tinakit.moveit.model.Reward;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.module.CustomApplication;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,8 +75,10 @@ public class EditRewardRecyclerAdapter extends RecyclerView.Adapter<EditRewardRe
 
     public List<Reward> getRewardList(){
 
-        for (int i = 0; i < mRewardMap.size(); i++)
-            mRewardList.set(i, mRewardMap.get(i));
+        //for (int i = 0; i < mRewardMap.size(); i++)
+        //    mRewardList.set(i, mRewardMap.get(i));
+
+        mRewardList = new ArrayList<Reward>(mRewardMap.values());
 
         return mRewardList;
     }
