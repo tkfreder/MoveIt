@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,8 +23,10 @@ import com.tinakit.moveit.model.Reward;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.module.CustomApplication;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.inject.Inject;
 
@@ -38,8 +42,8 @@ public class EditRewardRecyclerAdapter extends RecyclerView.Adapter<EditRewardRe
     private FragmentActivity mFragmentActivity;
     private List<Reward> mRewardList;
     private List<User> mUserList;
-    Reward mReward;
 
+    Map<Integer,Reward> mRewardMap;
 
     public EditRewardRecyclerAdapter(Context context, FragmentActivity fragmentActivity, List<Reward> rewardList) {
         mContext = context;
@@ -56,8 +60,24 @@ public class EditRewardRecyclerAdapter extends RecyclerView.Adapter<EditRewardRe
         // Get Activity Types
         //mRewardList = mDatabaseHelper.getAllRewards();
 
+        mRewardMap = new TreeMap<Integer,Reward>();
+
+        for (Reward r : mRewardList){
+
+            mRewardMap.put(r.getRewardId(), r);
+
+        }
+
         // get list of Users
         mUserList = mDatabaseHelper.getUsers();
+    }
+
+    public List<Reward> getRewardList(){
+
+        for (int i = 0; i < mRewardMap.size(); i++)
+            mRewardList.set(i, mRewardMap.get(i));
+
+        return mRewardList;
     }
 
     @Override
@@ -86,12 +106,56 @@ public class EditRewardRecyclerAdapter extends RecyclerView.Adapter<EditRewardRe
         // Populate data from Reward data object
         int numPoints = reward.getPoints();
 
-        customViewHolder.avatar.setImageResource(mContext.getResources().getIdentifier(theUser.getAvatarFileName(), "drawable", mFragmentActivity.getPackageName()));
+        //customViewHolder.avatar.setImageResource(mContext.getResources().getIdentifier(theUser.getAvatarFileName(), "drawable", mFragmentActivity.getPackageName()));
         customViewHolder.userName.setText(theUser.getUserName());
-        customViewHolder.points.setText(String.valueOf(numPoints));
-        customViewHolder.name.setText(reward.getName());
-        customViewHolder.itemView.setTag(reward);
 
+        customViewHolder.points.setTag(reward);
+        customViewHolder.points.setText(String.valueOf(numPoints));
+        customViewHolder.points.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                Reward reward = (Reward)customViewHolder.points.getTag();
+                reward.setPoints(!s.toString().equals("") ? Integer.parseInt(s.toString()) : 0 );
+                mRewardMap.put(reward.getRewardId(),reward);
+
+            }
+        });
+
+        customViewHolder.name.setTag(reward);
+        customViewHolder.name.setText(reward.getName());
+        customViewHolder.name.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                Reward reward = (Reward)customViewHolder.points.getTag();
+                reward.setName(s.toString());
+                mRewardMap.put(reward.getRewardId(),reward);
+
+            }
+        });
+
+/*
         customViewHolder.saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -105,6 +169,7 @@ public class EditRewardRecyclerAdapter extends RecyclerView.Adapter<EditRewardRe
                 mFragmentActivity.getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, editReward).commit();
             }
         });
+        */
 
         /*
         customViewHolder.deleteButton.setOnClickListener(new View.OnClickListener() {
@@ -153,21 +218,21 @@ public class EditRewardRecyclerAdapter extends RecyclerView.Adapter<EditRewardRe
 
     public class CustomViewHolder extends RecyclerView.ViewHolder {
 
-        protected ImageView avatar;
+        //protected ImageView avatar;
         protected TextView userName;
         protected EditText points;
         protected EditText name;
-        protected ImageView saveButton;
+        //protected ImageView saveButton;
         //ImageView deleteButton;
 
         public CustomViewHolder(View view) {
             super(view);
 
-            this.avatar = (ImageView)view.findViewById(R.id.avatar);
+            //this.avatar = (ImageView)view.findViewById(R.id.avatar);
             this.userName = (TextView)view.findViewById(R.id.userName);
             this.points = (EditText) view.findViewById(R.id.points);
             this.name = (EditText) view.findViewById(R.id.name);
-            this.saveButton = (ImageView) view.findViewById(R.id.saveButton);
+            //this.saveButton = (ImageView) view.findViewById(R.id.saveButton);
             //this.deleteButton = (ImageView) view.findViewById(R.id.delete);
         }
     }

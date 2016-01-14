@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 
 import com.tinakit.moveit.R;
@@ -40,12 +41,11 @@ public class EditReward extends Fragment {
     private List<Reward> mRewardList;
 
     // UI widgets
-    View mRootView;
-    EditText mPoints;
-    EditText mName;
+    private View mRootView;
+    private EditRewardRecyclerAdapter mEditRewardRecyclerAdapter;
+    private RecyclerView mRecyclerView;
+    private Button mSaveButton;
 
-    EditRewardRecyclerAdapter mEditRewardRecyclerAdapter;
-    RecyclerView mRecyclerView;
 
 
     @Nullable
@@ -54,7 +54,7 @@ public class EditReward extends Fragment {
 
         mFragmentActivity  = (FragmentActivity)super.getActivity();
         mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        mRootView = inflater.inflate(R.layout.recycler_view, container, false);
+        mRootView = inflater.inflate(R.layout.edit_reward, container, false);
 
         // Dagger 2 injection
         ((CustomApplication)getActivity().getApplication()).getAppComponent().inject(this);
@@ -71,6 +71,16 @@ public class EditReward extends Fragment {
         mRewardList = mDatabaseHelper.getAllRewards();
         mEditRewardRecyclerAdapter = new EditRewardRecyclerAdapter(inflater.getContext(), mFragmentActivity, mRewardList);
         mRecyclerView.setAdapter(mEditRewardRecyclerAdapter);
+
+        mSaveButton = (Button)mRootView.findViewById(R.id.saveButton);
+        mSaveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                List<Reward> rewardList = mEditRewardRecyclerAdapter.getRewardList();
+                //mDatabaseHelper.updateRewards(rewardList);
+            }
+        });
 
         return mRootView;
     }
