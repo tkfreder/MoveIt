@@ -95,15 +95,6 @@
                 android:hint="@string/hint_edit_user"
                 android:layout_toRightOf="@+id/deleteButton"
                 android:layout_toEndOf="@+id/deleteButton"/>
-            <ImageView
-                android:id="@+id/rewardButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_widthPercent="34%"
-                android:src="@drawable/ic_reward"
-                android:hint="@string/hint_user_reward"
-                android:layout_toRightOf="@+id/editButton"
-                android:layout_toEndOf="@+id/editButton"/>
         </android.support.percent.PercentRelativeLayout>
     </android.support.percent.PercentRelativeLayout>
 

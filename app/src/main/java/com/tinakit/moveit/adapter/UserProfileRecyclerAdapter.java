@@ -26,10 +26,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.tinakit.moveit.R;
-import com.tinakit.moveit.activity.RewardView;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.activity.PickAvatar;
-import com.tinakit.moveit.fragment.EditReward;
 import com.tinakit.moveit.fragment.EditUser;
 import com.tinakit.moveit.fragment.UserProfile;
 import com.tinakit.moveit.model.User;
@@ -163,24 +161,6 @@ public class UserProfileRecyclerAdapter extends RecyclerView.Adapter<UserProfile
             }
         });
 
-        customViewHolder.rewardButton.setTag(user);
-        customViewHolder.rewardButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                EditReward editReward = new EditReward();
-
-                //save User changes
-                Bundle bundle = new Bundle();
-                bundle.putParcelable(EditReward.EDIT_REWARD_USER, (User)v.getTag());
-                editReward.setArguments(bundle);
-
-                mActivity.getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragmentContainer, editReward, EditReward.EDIT_REWARD_TAG)
-                        .commit();
-            }
-        });
-
     }
 
     @Override
@@ -196,7 +176,6 @@ public class UserProfileRecyclerAdapter extends RecyclerView.Adapter<UserProfile
         protected ImageView avatar;
         protected ImageView deleteButton;
         protected ImageView editButton;
-        protected ImageView rewardButton;
 
         public CustomViewHolder(View view) {
             super(view);
@@ -207,9 +186,6 @@ public class UserProfileRecyclerAdapter extends RecyclerView.Adapter<UserProfile
             this.avatar = (ImageView) view.findViewById(R.id.avatar);
             this.deleteButton = (ImageView) view.findViewById(R.id.deleteButton);
             this.editButton = (ImageView) view.findViewById(R.id.editButton);
-            this.rewardButton = (ImageView) view.findViewById(R.id.rewardButton);
-
-
 
         }
     }
