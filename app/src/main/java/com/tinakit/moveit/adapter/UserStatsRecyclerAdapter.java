@@ -57,27 +57,6 @@ public class UserStatsRecyclerAdapter extends RecyclerView.Adapter<UserStatsRecy
         customViewHolder.points.setText(String.valueOf(user.getPoints()));
         customViewHolder.itemView.setTag(user);
 
-        customViewHolder.rewardButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-
-            User user = (User) customViewHolder.itemView.getTag();
-
-            //replace current fragment
-            RewardView rewardView = (RewardView)mActivity.getSupportFragmentManager().findFragmentByTag(RewardView.REWARD_VIEW_TAG);
-            if (rewardView == null){
-
-                rewardView= new RewardView();
-                Bundle bundle = new Bundle();
-                bundle.putParcelable(RewardView.REWARD_VIEW_USER, user);
-                rewardView.setArguments(bundle);
-                mActivity.getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, rewardView).commit();
-            }
-            }
-        });
-
-
     }
 
     @Override
@@ -89,14 +68,12 @@ public class UserStatsRecyclerAdapter extends RecyclerView.Adapter<UserStatsRecy
 
         protected ImageView avatar;
         protected TextView points;
-        protected Button rewardButton;
 
         public CustomViewHolder(View view) {
             super(view);
 
             this.avatar = (ImageView) view.findViewById(R.id.avatar);
             this.points = (TextView) view.findViewById(R.id.points);
-            this.rewardButton = (Button) view.findViewById(R.id.rewardButton);
         }
     }
 
