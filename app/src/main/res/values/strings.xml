@@ -64,6 +64,7 @@
 
     <!-- navigation drawer: Admin : tab menu names -->
     <string name="admin_tab_inbox">Inbox</string>
+    <string name="admin_tab_rewards">Rewards</string>
     <string name="admin_tab_users">Users</string>
     <string name="admin_tab_history">History</string>
     <string name="admin_tab_settings">Settings</string>

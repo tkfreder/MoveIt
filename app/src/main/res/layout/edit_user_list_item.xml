@@ -16,7 +16,7 @@
         android:id="@+id/userLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_widthPercent="35%"
+        app:layout_widthPercent="45%"
         android:layout_toRightOf="@+id/avatar"
         android:layout_toEndOf="@+id/avatar"
         android:gravity="bottom"
@@ -47,7 +47,7 @@
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/userLayout"
             android:layout_toEndOf="@+id/userLayout"
-            app:layout_widthPercent="15%">
+            app:layout_widthPercent="20%">
 
             <TextView
                 android:id="@+id/weight"
@@ -73,7 +73,7 @@
         <android.support.percent.PercentRelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_widthPercent="30%"
+            app:layout_widthPercent="20%"
             android:layout_toRightOf="@+id/isAdmin"
             android:layout_toEndOf="@+id/isAdmin"
             android:layout_alignParentRight="true">
@@ -82,7 +82,7 @@
                 android:id="@+id/deleteButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_widthPercent="33%"
+                app:layout_widthPercent="50%"
                 android:src="@drawable/ic_action_discard"
                 android:hint="@string/hint_delete_user"
                 />
@@ -90,7 +90,7 @@
                 android:id="@+id/editButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_widthPercent="33%"
+                app:layout_widthPercent="50%"
                 android:src="@drawable/ic_action_edit"
                 android:hint="@string/hint_edit_user"
                 android:layout_toRightOf="@+id/deleteButton"
