@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -166,17 +167,7 @@ public class MainActivity extends AppCompatActivity {
 
             case R.id.nav_start:
 
-                getSupportActionBar().setTitle(getString(R.string.nav_menu_start));
-                //TODO: redirect to ActivityTracker, change ActivityTracker to a fragment
-
-                // check whether UserProfile is already visible
-                ActivityChooser activityChooser = (ActivityChooser)getSupportFragmentManager().findFragmentByTag(ActivityChooser.ACTIVITY_CHOOSER_TAG);
-                if (activityChooser == null){
-
-                    activityChooser= new ActivityChooser ();
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, activityChooser).commit();
-                }
-
+                displayStartScreen();
 
                 break;
 
@@ -250,6 +241,38 @@ public class MainActivity extends AppCompatActivity {
 
 */
 
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        //displayStartScreen();
+
+        int count = getSupportFragmentManager().getBackStackEntryCount();
+
+        if (count == 0) {
+
+            displayStartScreen();
+
+        } else {
+
+            getSupportActionBar().setTitle(getString(R.string.app_bar_header_admin));
+            getSupportFragmentManager().popBackStack();
+        }
+
+    }
+
+    private void displayStartScreen(){
+
+        getSupportActionBar().setTitle(getString(R.string.nav_menu_start));
+
+        // check whether UserProfile is already visible
+        ActivityChooser activityChooser = (ActivityChooser)getSupportFragmentManager().findFragmentByTag(ActivityChooser.ACTIVITY_CHOOSER_TAG);
+        if (activityChooser == null){
+
+            activityChooser= new ActivityChooser ();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, activityChooser).commit();
         }
     }
 

@@ -8,6 +8,9 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +31,7 @@ import javax.inject.Inject;
 /**
  * Created by Tina on 1/12/2016.
  */
-public class Admin extends Fragment {
+public class Admin extends Fragment{
 
     // CONSTANTS
     public static final String ADMIN_TAG = "ADMIN_TAG";
@@ -51,7 +54,6 @@ public class Admin extends Fragment {
 
         mFragmentActivity  = (FragmentActivity)super.getActivity();
         rootView = inflater.inflate(R.layout.admin_layout, container, false);
-
         mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // Dagger 2 injection
@@ -76,10 +78,29 @@ public class Admin extends Fragment {
         mSlidingTabLayout = (SlidingTabLayout)rootView.findViewById(R.id.tabLayout);
         mSlidingTabLayout.setViewPager(mViewPager);
 
+
     }
 
     private void setActionListeners(){
 
+        mSlidingTabLayout.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+                ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(getString(R.string.app_bar_header_admin) + " : " + mViewPagerAdapter.getPageTitle(position));
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
     //**********************************************************************************************
@@ -96,6 +117,7 @@ public class Admin extends Fragment {
         mViewPagerAdapter.addFrag(new ActivityHistory(), getString(R.string.admin_tab_history));
         mViewPagerAdapter.addFrag(new AdminSettings(), getString(R.string.admin_tab_settings));
         viewPager.setAdapter(mViewPagerAdapter);
+
     }
 
 

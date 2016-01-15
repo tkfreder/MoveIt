@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.MenuView;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -146,6 +147,8 @@ public class UserProfileRecyclerAdapter extends RecyclerView.Adapter<UserProfile
             @Override
             public void onClick(View v) {
 
+                // update app bar title
+                ((AppCompatActivity)mActivity).getSupportActionBar().setTitle(mActivity.getString(R.string.app_bar_header_admin) + " : " + mActivity.getString(R.string.app_bar_header_edit_user));
 
                 EditUser editUser= new EditUser();
 
@@ -154,9 +157,12 @@ public class UserProfileRecyclerAdapter extends RecyclerView.Adapter<UserProfile
                 bundle.putParcelable(EditUser.EDIT_USER_USER, (User)v.getTag());
                 editUser.setArguments(bundle);
 
-                mActivity.getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragmentContainer, editUser, EditUser.EDIT_USER_TAG)
-                .commit();
+                mActivity.getSupportFragmentManager()
+                        .beginTransaction()
+                        //add() instead of replace() so BackButton can track via fragment back stack
+                        .add(R.id.fragmentContainer, editUser, EditUser.EDIT_USER_TAG)
+                        .addToBackStack(null)
+                        .commit();
 
             }
         });

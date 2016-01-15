@@ -80,6 +80,11 @@
     <string name="hint_points"># coins</string>
     <string name="hint_reward_title">reward title</string>
 
+    <!-- hint messages -->
+    <string name="app_bar_header_admin">Admin</string>
+    <string name="app_bar_header_new_user">New User</string>
+    <string name="app_bar_header_edit_user">Edit User</string>
+
     <!-- dialog messages -->
     <string name="message_update_reward">Save successful.</string>
     <string name="error_message_update_reward">An error occurred. Try again.</string>

@@ -7,6 +7,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -101,15 +102,18 @@ public class UserProfile extends Fragment {
             @Override
             public void onClick(View v) {
 
-
+                ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(getActivity().getString(R.string.app_bar_header_admin) + " : " + getActivity().getString(R.string.app_bar_header_new_user));
 
                 // check whether UserProfile is already visible
                 EditUser editUser = (EditUser)mFragmentActivity.getSupportFragmentManager().findFragmentByTag(EditUser.EDIT_USER_TAG);
                 if (editUser == null) {
 
                     editUser = new EditUser();
-                    mFragmentActivity.getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.fragmentContainer, editUser, EditUser.EDIT_USER_TAG)
+                    mFragmentActivity.getSupportFragmentManager()
+                            .beginTransaction()
+                            //add() instead of replace() so BackButton can track via fragment back stack
+                            .add(R.id.fragmentContainer, editUser, EditUser.EDIT_USER_TAG)
+                            .addToBackStack(getString(R.string.app_bar_header_edit_user))
                             .commit();
                 }
             }

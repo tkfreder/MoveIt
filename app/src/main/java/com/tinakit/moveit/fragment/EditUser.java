@@ -102,7 +102,10 @@ public class EditUser extends Fragment {
 
                 // redirect to UserProfile
                 UserProfile userProfile = new UserProfile();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, userProfile).commit();
+                getActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragmentContainer, userProfile)
+                        .commit();
             } else {
 
                 populateForm(mUser);
@@ -316,6 +319,14 @@ public class EditUser extends Fragment {
         }
 
         return false;
+    }
+
+    public String getTitle(){
+
+        if (mUser == null)
+            return getString(R.string.app_bar_header_new_user);
+        else
+            return getString(R.string.app_bar_header_edit_user);
     }
 
 }
