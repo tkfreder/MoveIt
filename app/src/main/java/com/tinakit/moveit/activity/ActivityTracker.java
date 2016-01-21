@@ -547,6 +547,7 @@ public class ActivityTracker extends AppCompatActivity {
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+
             String message = intent.getStringExtra(ACTIVITY_TRACKER_BROADCAST_RECEIVER);
 
             if (DEBUG) Log.d(LOG, "BroadcastReceiver - onReceive(): message: " + message);
@@ -607,10 +608,10 @@ public class ActivityTracker extends AppCompatActivity {
     @Override
     public void onPause() {
         if (DEBUG) Log.d(LOG, "onPause");
-
-        //maintain Location tracking, we want to continue to collect location data until user clicks Stop button
-        //other apps may run concurrently, such as music player
         super.onPause();
+
+        // unregister intents with BroadcastReceiver
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
     }
 
     //**********************************************************************************************
@@ -622,13 +623,9 @@ public class ActivityTracker extends AppCompatActivity {
         if (DEBUG) Log.d(LOG, "onResume");
         super.onResume();
 
-        //ensures that if the user returns to the running app through some other means,
-        //such as through the back button, the check is still performed.
-        //end the activity if Google Play Services is not present
-        //redirect user to Google Play Services
-        if (!mGoogleApi.servicesAvailable(this)) {
-            finish();
-        }
+        // register intents with BroadcastReceiver
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(LocationApi.LOCATION_API_INTENT));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(Accelerometer.ACCELEROMETER_INTENT));
 
     }
 

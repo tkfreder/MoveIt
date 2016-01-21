@@ -53,9 +53,11 @@ public class UserStatsRecyclerAdapter extends RecyclerView.Adapter<UserStatsRecy
 
         User user = mUserList.get(i);
 
-        customViewHolder.avatar.setImageResource(mContext.getResources().getIdentifier(user.getAvatarFileName(), "drawable", mActivity.getPackageName()));
+        //customViewHolder.avatar.setImageResource(mContext.getResources().getIdentifier(user.getAvatarFileName(), "drawable", mActivity.getPackageName()));
+        customViewHolder.userName.setText(user.getUserName());
         customViewHolder.points.setText(String.valueOf(user.getPoints()));
         customViewHolder.itemView.setTag(user);
+        customViewHolder.arcChart.setImageResource(mContext.getResources().getIdentifier("arc_chart_" + String.valueOf(i+1), "drawable", mActivity.getPackageName()));
 
     }
 
@@ -66,14 +68,18 @@ public class UserStatsRecyclerAdapter extends RecyclerView.Adapter<UserStatsRecy
 
     public class CustomViewHolder extends RecyclerView.ViewHolder {
 
-        protected ImageView avatar;
+        //protected ImageView avatar;
+        protected TextView userName;
         protected TextView points;
+        protected ImageView arcChart;
 
         public CustomViewHolder(View view) {
             super(view);
 
-            this.avatar = (ImageView) view.findViewById(R.id.avatar);
+            //this.avatar = (ImageView) view.findViewById(R.id.avatar);
+            this.userName= (TextView) view.findViewById(R.id.userName);
             this.points = (TextView) view.findViewById(R.id.points);
+            this.arcChart = (ImageView)view.findViewById(R.id.arcChart);
         }
     }
 

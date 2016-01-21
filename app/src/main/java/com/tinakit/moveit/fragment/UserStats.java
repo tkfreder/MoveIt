@@ -95,8 +95,10 @@ public class UserStats extends Fragment{
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true); //child items have fixed dimensions, allows the RecyclerView to optimize better by figuring out the exact height and width of the entire list based on the adapter.
 
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(mFragmentActivity, 2);
-        mRecyclerView.setLayoutManager(gridLayoutManager);
+        //GridLayoutManager gridLayoutManager = new GridLayoutManager(mFragmentActivity, 2);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mFragmentActivity);
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        mRecyclerView.setLayoutManager(linearLayoutManager);
     }
 
 }
