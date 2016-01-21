@@ -22,7 +22,7 @@ public class Accelerometer implements SensorEventListener{
 
     // CONSTANTS
     public static final String ACCELEROMETER_INTENT = "ACCELEROMETER_INTENT";
-    private static final int ACCELEROMETER_DELAY = 60 * 30; //in seconds
+    private static final int ACCELEROMETER_DELAY = 3; //in seconds
     private static final float SHAKE_THRESHOLD = 0.5f;
 
     // INSTANCE FIELDS
@@ -36,7 +36,7 @@ public class Accelerometer implements SensorEventListener{
     public Accelerometer(FragmentActivity fragmentActivity){
 
         mFragmentActivity = fragmentActivity;
-        executor = Executors.newSingleThreadScheduledExecutor();
+
     }
 
     @Override
@@ -65,6 +65,7 @@ public class Accelerometer implements SensorEventListener{
                     Intent intent = new Intent(ACCELEROMETER_INTENT);
                     intent.putExtra(ActivityTracker.ACTIVITY_TRACKER_BROADCAST_RECEIVER, ACCELEROMETER_INTENT);
                     LocalBroadcastManager.getInstance(mFragmentActivity).sendBroadcast(intent);
+
                 }
 
                 last_x = x;
@@ -87,6 +88,8 @@ public class Accelerometer implements SensorEventListener{
     }
 
     public void start(){
+
+        executor = Executors.newSingleThreadScheduledExecutor();
 
         if (hasAccelerometer()) {
             // success! we have an accelerometer

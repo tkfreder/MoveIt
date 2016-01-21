@@ -33,6 +33,7 @@ import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.fragment.ActivityChooser;
 import com.tinakit.moveit.fragment.ActivityHistory;
 import com.tinakit.moveit.fragment.MapFragment;
+import com.tinakit.moveit.fragment.UserStats;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.UnitSplit;
 import com.tinakit.moveit.model.User;
@@ -64,7 +65,8 @@ public class ActivityTracker extends AppCompatActivity {
     public static final String ACTIVITY_TRACKER_BROADCAST_RECEIVER = "TRACKER_RECEIVER";
     public static final String ACTIVITY_TRACKER_STARTED = "ACTIVITY_TRACKER_STARTED";
     public static final String ACTIVITY_TRACKER_INTENT = "ACTIVITY_TRACKER_INTENT";
-    private static final String COIN_AUDIO_FILENAME = "cha_ching";
+    private static final String AUDIO_ADD_POINTS = "cha_ching";
+    private static final String AUDIO_NO_MOVEMENT = "bike_horn";
 
     @Inject
     GoogleApi mGoogleApi;
@@ -272,7 +274,7 @@ public class ActivityTracker extends AppCompatActivity {
 
                     //message:  no data to display
                     mMessage.setText("No location data was collected. " + getString(R.string.restart) + "?");
-                    playSound();
+                    playSound(AUDIO_ADD_POINTS);
 
                 }
             }
@@ -283,12 +285,6 @@ public class ActivityTracker extends AppCompatActivity {
             public void onClick(View v) {
 
                 pauseTracking();
-
-                //set button visibility
-                mPauseButton.setVisibility(View.GONE);
-                mResumeButton.setVisibility(View.VISIBLE);
-                mStopButton.setVisibility(View.VISIBLE);
-                mCancelButton.setVisibility(View.GONE);
 
             }
         });
@@ -313,11 +309,6 @@ public class ActivityTracker extends AppCompatActivity {
 
                 resumeTracking();
 
-                //set button visibility
-                mResumeButton.setVisibility(View.GONE);
-                mStopButton.setVisibility(View.VISIBLE);
-                mPauseButton.setVisibility(View.VISIBLE);
-
             }
         });
 
@@ -340,6 +331,15 @@ public class ActivityTracker extends AppCompatActivity {
 
         //save current time
         mTimeWhenStopped = mChronometerUtility.getTime() - SystemClock.elapsedRealtime();
+
+        //disable accelerometer listener
+        mAccelerometer.stop();
+
+        //set button visibility
+        mPauseButton.setVisibility(View.GONE);
+        mResumeButton.setVisibility(View.VISIBLE);
+        mStopButton.setVisibility(View.VISIBLE);
+        mCancelButton.setVisibility(View.GONE);
     }
 
     private void resumeTracking(){
@@ -352,6 +352,11 @@ public class ActivityTracker extends AppCompatActivity {
 
         //chronometer settings, set base time to time when paused ChronometerUtility.elapsedTime()
         mChronometerUtility.resume(mTimeWhenStopped);
+
+        //set button visibility
+        mResumeButton.setVisibility(View.GONE);
+        mStopButton.setVisibility(View.VISIBLE);
+        mPauseButton.setVisibility(View.VISIBLE);
     }
 
     private void finishTracking(String message){
@@ -359,7 +364,9 @@ public class ActivityTracker extends AppCompatActivity {
         Snackbar.make(findViewById(R.id.main_layout), message, Snackbar.LENGTH_LONG)
                 .show();
         finish();
+
         startActivity(new Intent(this, MainActivity.class));
+
     }
 
     //**********************************************************************************************
@@ -408,8 +415,6 @@ public class ActivityTracker extends AppCompatActivity {
         //display counters
         mCounterLayout.setVisibility(View.VISIBLE);
 
-        //TODO:  START STEP COUNTING UNTIL FIRST LOCATION API CONNECTION IS MADE AND PERIODS OF LOST CONNECTION
-
         //display map of starting point
         //mMapFragment.displayStartMap();
 
@@ -433,10 +438,10 @@ public class ActivityTracker extends AppCompatActivity {
 
     }
 
-    private void playSound(){
+    private void playSound(String audioFileName){
 
         MediaPlayer mp;
-        mp = MediaPlayer.create(this, getResources().getIdentifier(COIN_AUDIO_FILENAME, "raw", getPackageName()));//R.raw.cat_meow);
+        mp = MediaPlayer.create(this, getResources().getIdentifier(audioFileName, "raw", getPackageName()));//R.raw.cat_meow);
         mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
             @Override
@@ -513,8 +518,7 @@ public class ActivityTracker extends AppCompatActivity {
 
         //mMapFragment.displayMap(mUnitSplitList, getDistance(1));
 
-        //TODO:  why does sound get truncated?
-        playSound();
+        playSound(AUDIO_ADD_POINTS);
 
     }
 
@@ -579,24 +583,23 @@ public class ActivityTracker extends AppCompatActivity {
                     refreshData();
                 }
 
-                //TODO: do we still want a time limit?
+                /*
+                // auto-shutoff after reched time limit
                 if(mChronometerUtility.getTimeByUnits(mChronometer.getText().toString(), 0) > STOP_SERVICE_TIME_LIMIT && !mIsTimeLimit){
                     mIsTimeLimit = true;
                     reachedTimeLimit();
                     stopRun();
                 }
+                */
             }
-            else if (message.equals(Accelerometer.ACCELEROMETER_INTENT)){
+            else if (message.equals(Accelerometer.ACCELEROMETER_INTENT) && DialogUtility.mIsVisible == false){
 
-                playSound();
+                playSound(AUDIO_NO_MOVEMENT);
 
                 pauseTracking();
 
-                //disable accelerometer listener
-                mAccelerometer.stop();
-
                 //display warning message that no movement has been detected
-                DialogUtility.displayAlertDialog(context, getString(R.string.warning), getString(R.string.no_movement), getString(R.string.ok));
+                DialogUtility.displayAlertDialog(ActivityTracker.this, getString(R.string.warning), getString(R.string.msg_activity_tracker_no_movement), getString(R.string.ok));
             }
         }
     };
@@ -726,7 +729,7 @@ public class ActivityTracker extends AppCompatActivity {
             float delta = totalPoints - mTotalPoints;
 
             if(delta > 0 ){
-                playSound();
+                playSound(AUDIO_ADD_POINTS);
             }
 
             //update coins

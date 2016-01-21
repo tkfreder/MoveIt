@@ -13,14 +13,25 @@ import com.tinakit.moveit.R;
  */
 public class DialogUtility {
 
+    public static boolean mIsVisible = false;
+
     public static void displayAlertDialog(Context context, String title, String message, String positiveButtonLabel){
+
+        mIsVisible = true;
 
         AlertDialog.Builder alert = new AlertDialog.Builder(context);
 
         alert.setTitle(title);
         alert.setMessage(message);
-        alert.setPositiveButton(positiveButtonLabel, null);
+        alert.setPositiveButton(positiveButtonLabel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                mIsVisible = false;
+            }
+        });
         alert.show();
+
     }
 
     public static Dialog displayConfirmDialog(Context context, String confirmMessage, DialogInterface.OnClickListener listenerPositive, DialogInterface.OnClickListener listenerNegative){
