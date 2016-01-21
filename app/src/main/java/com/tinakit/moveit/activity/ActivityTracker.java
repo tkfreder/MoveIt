@@ -84,6 +84,7 @@ public class ActivityTracker extends AppCompatActivity {
     private long mTimeElapsed = 0; //in seconds
     private boolean mIsTimeLimit = false;
     private Intent mIntent;
+    private static boolean mWarningIsVisible = false;
 
     // APIs
     private LocationApi mLocationApi;
@@ -592,17 +593,39 @@ public class ActivityTracker extends AppCompatActivity {
                 }
                 */
             }
-            else if (message.equals(Accelerometer.ACCELEROMETER_INTENT) && DialogUtility.mIsVisible == false){
+            else if (message.equals(Accelerometer.ACCELEROMETER_INTENT) && mWarningIsVisible == false){
 
                 playSound(AUDIO_NO_MOVEMENT);
 
                 pauseTracking();
 
                 //display warning message that no movement has been detected
-                DialogUtility.displayAlertDialog(ActivityTracker.this, getString(R.string.warning), getString(R.string.msg_activity_tracker_no_movement), getString(R.string.ok));
+                //DialogUtility.displayAlertDialog(ActivityTracker.this, getString(R.string.warning), getString(R.string.msg_activity_tracker_no_movement), getString(R.string.ok));
+
+                displayNoMovementWarning();
+
             }
         }
     };
+
+    private void displayNoMovementWarning(){
+
+        mWarningIsVisible = true;
+
+        AlertDialog.Builder alert = new AlertDialog.Builder(ActivityTracker.this);
+
+        alert.setTitle(getString(R.string.warning));
+        alert.setMessage(getString(R.string.msg_activity_tracker_no_movement));
+        alert.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                mWarningIsVisible = false;
+                resumeTracking();
+            }
+        });
+        alert.show();
+    }
 
     //**********************************************************************************************
     //  onPause() - Activity is partially obscured by another app but still partially visible and not the activity in focus

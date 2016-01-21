@@ -24,7 +24,7 @@
     <string name="done">Done</string>
 
     <!-- Dialog messages -->
-    <string name="msg_activity_tracker_no_movement">No movement detected. Click Resume to continue tracking.</string>
+    <string name="msg_activity_tracker_no_movement">No movement detected. Click OK to continue tracking.</string>
 
     <!-- list of activities - referenced by DB Table: ActivityType.activityTypeId -->
     <string-array
