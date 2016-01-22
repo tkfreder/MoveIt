@@ -14,12 +14,15 @@ import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,7 +58,7 @@ import com.tinakit.moveit.utility.UnitConverter;
 
 import javax.inject.Inject;
 
-public class ActivityTracker extends AppCompatActivity {
+public class ActivityTracker extends Fragment {
 
     //DEBUG
     private static final String LOG = "ACTIVITY_TRACKER";
@@ -76,6 +79,10 @@ public class ActivityTracker extends AppCompatActivity {
 
     private static final float FEET_COIN_CONVERSION = 1.0f;//0.05f;  //20 feet = 1 coin
     private static long STOP_SERVICE_TIME_LIMIT = 30 * 60 * 1000 * 60; // 30 minutes in seconds
+
+    // cache
+    protected FragmentActivity mFragmentActivity;
+    private View rootView;
 
     //save all location points during location updates
     private List<UnitSplit> mUnitSplitList = new ArrayList<>();
@@ -119,20 +126,23 @@ public class ActivityTracker extends AppCompatActivity {
     private boolean mSaveLocationData = false;
     private boolean mHasMapFragment = false;
 
+    @Nullable
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        if (DEBUG) Log.d(LOG, "onCreateView()");
-
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tracker);
-        setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mFragmentActivity  = (FragmentActivity)super.getActivity();
+        rootView = inflater.inflate(R.layout.activity_tracker, container, false);
+        mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // Dagger 2 injection
-        ((CustomApplication)getApplication()).getAppComponent().inject(this);
+        ((CustomApplication)mFragmentActivity.getApplication()).getAppComponent().inject(this);
 
-        // check whether previous screen was ActivityChooser
-        mIntent = getIntent();
-        if (mIntent.hasExtra(ActivityChooser.USER_ACTIVITY_LIST_KEY)) {
+        Bundle bundle = this.getArguments();
+        if (bundle != null && bundle.containsKey(ActivityChooser.USER_ACTIVITY_LIST_KEY)){
+
+            // get user list from intent
+            mActivityDetail = new ActivityDetail();
+            ArrayList<UserActivity> userActivityList = bundle.getParcelableArrayList(ActivityChooser.USER_ACTIVITY_LIST_KEY);
+            mActivityDetail.setUserActivityList(userActivityList);
 
             initializeUI();
 
@@ -141,6 +151,19 @@ public class ActivityTracker extends AppCompatActivity {
             bindApi(savedInstanceState);
         }
 
+        /*
+        // check whether previous screen was ActivityChooser
+        mIntent = mFragmentActivity.getIntent();
+        if (mIntent.hasExtra(ActivityChooser.USER_ACTIVITY_LIST_KEY)) {
+
+            initializeUI();
+
+            initializeData();
+
+            bindApi(savedInstanceState);
+        }
+*/
+        return rootView;
     }
 
     protected void bindApi(@Nullable Bundle savedInstanceState ){
@@ -149,17 +172,17 @@ public class ActivityTracker extends AppCompatActivity {
         //redirect user to Google Play Services
         //mGoogleApi = new GoogleApi();
 
-        if (!mGoogleApi.servicesAvailable(this))
-            finish();
+        if (!mGoogleApi.servicesAvailable(mFragmentActivity))
+            mFragmentActivity.finish();
         else
-            mGoogleApi.buildGoogleApiClient(this);
+            mGoogleApi.buildGoogleApiClient(mFragmentActivity);
 
         // location listener
-        mLocationApi = new LocationApi(this, mGoogleApi.client());
+        mLocationApi = new LocationApi(mFragmentActivity, mGoogleApi.client());
         //mLocationApi.initialize();
 
         // accelerometer
-        mAccelerometer = new Accelerometer(this);
+        mAccelerometer = new Accelerometer(mFragmentActivity);
 
         //check savedInstanceState not null
         mResolvingError = savedInstanceState != null
@@ -171,33 +194,28 @@ public class ActivityTracker extends AppCompatActivity {
         //get databaseHelper instance
         //mDatabaseHelper = FitnessDBHelper.getInstance(this);
 
-        // get user list from intent
-        mActivityDetail = new ActivityDetail();
-        ArrayList<UserActivity> userActivityList = getIntent().getParcelableArrayListExtra(ActivityChooser.USER_ACTIVITY_LIST_KEY);
-        mActivityDetail.setUserActivityList(userActivityList);
+
+
+        //lock Navigation Drawer
+        MainActivity.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
     }
 
     protected void initializeUI(){
 
-
-        // set Toolbar, display title on app bar
-        setSupportActionBar((Toolbar) findViewById(R.id.toolBar));
-        getSupportActionBar().setTitle(getString(R.string.app_name));
-
-        mCounterLayout = (LinearLayout)findViewById(R.id.counterLayout);
-        mStartButton = (Button) findViewById(R.id.startButton);
-        mStopButton = (Button) findViewById(R.id.stopButton);
-        mPauseButton = (Button) findViewById(R.id.pauseButton);
-        mSaveButton = (Button) findViewById(R.id.saveButton);
-        mResumeButton = (Button) findViewById(R.id.resumeButton);
-        mCancelButton = (Button)findViewById(R.id.cancelButton);
-        mButtonLinearLayout = (LinearLayout)findViewById(R.id.buttonLayout);
-        mChronometer = (Chronometer) findViewById(R.id.chronometer);
-        mDistance = (TextView) findViewById(R.id.distance);
-        mCoins = (TextView) findViewById(R.id.coins);
-        mFeetPerMinute = (TextView) findViewById(R.id.feetPerMinute);
-        mMessage = (TextView) findViewById(R.id.message);
+        mCounterLayout = (LinearLayout)rootView.findViewById(R.id.counterLayout);
+        mStartButton = (Button) rootView.findViewById(R.id.startButton);
+        mStopButton = (Button) rootView.findViewById(R.id.stopButton);
+        mPauseButton = (Button) rootView.findViewById(R.id.pauseButton);
+        mSaveButton = (Button) rootView.findViewById(R.id.saveButton);
+        mResumeButton = (Button) rootView.findViewById(R.id.resumeButton);
+        mCancelButton = (Button)rootView.findViewById(R.id.cancelButton);
+        mButtonLinearLayout = (LinearLayout)rootView.findViewById(R.id.buttonLayout);
+        mChronometer = (Chronometer) rootView.findViewById(R.id.chronometer);
+        mDistance = (TextView) rootView.findViewById(R.id.distance);
+        mCoins = (TextView) rootView.findViewById(R.id.coins);
+        mFeetPerMinute = (TextView) rootView.findViewById(R.id.feetPerMinute);
+        mMessage = (TextView) rootView.findViewById(R.id.message);
 
         setButtonOnClickListeners();
     }
@@ -216,7 +234,7 @@ public class ActivityTracker extends AppCompatActivity {
                 // send message to indicate there is new location data
                 Intent intent = new Intent(ACTIVITY_TRACKER_INTENT);
                 intent.putExtra(MainActivity.MAIN_ACTIVITY_BROADCAST_RECEIVER, ACTIVITY_TRACKER_INTENT);
-                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                LocalBroadcastManager.getInstance(mFragmentActivity.getApplicationContext()).sendBroadcast(intent);
 
                 //startRun();
 
@@ -362,11 +380,11 @@ public class ActivityTracker extends AppCompatActivity {
 
     private void finishTracking(String message){
 
-        Snackbar.make(findViewById(R.id.main_layout), message, Snackbar.LENGTH_LONG)
+        Snackbar.make(rootView.findViewById(R.id.main_layout), message, Snackbar.LENGTH_LONG)
                 .show();
-        finish();
+        mFragmentActivity.finish();
 
-        startActivity(new Intent(this, MainActivity.class));
+        startActivity(new Intent(mFragmentActivity, MainActivity.class));
 
     }
 
@@ -380,7 +398,7 @@ public class ActivityTracker extends AppCompatActivity {
 
         Intent intent = new Intent(ACTIVITY_TRACKER_INTENT);
         intent.putExtra(MainActivity.MAIN_ACTIVITY_BROADCAST_RECEIVER, ACTIVITY_TRACKER_INTENT);
-        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+        LocalBroadcastManager.getInstance(mFragmentActivity.getApplicationContext()).sendBroadcast(intent);
 
         //set flag to save location data
         mSaveLocationData = true;
@@ -406,8 +424,8 @@ public class ActivityTracker extends AppCompatActivity {
         mAccelerometer.start();
 
         //register api intents with BroadcastReceiver
-        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(LocationApi.LOCATION_API_INTENT));
-        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(Accelerometer.ACCELEROMETER_INTENT));
+        LocalBroadcastManager.getInstance(mFragmentActivity).registerReceiver(mMessageReceiver, new IntentFilter(LocationApi.LOCATION_API_INTENT));
+        LocalBroadcastManager.getInstance(mFragmentActivity).registerReceiver(mMessageReceiver, new IntentFilter(Accelerometer.ACCELEROMETER_INTENT));
 
         //initialize ChronometerUtility, start timer
         mChronometerUtility = new ChronometerUtility (mChronometer);
@@ -429,7 +447,7 @@ public class ActivityTracker extends AppCompatActivity {
         mAccelerometer.stop();
 
         // unregister intents with BroadcastReceiver
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+        LocalBroadcastManager.getInstance(mFragmentActivity).unregisterReceiver(mMessageReceiver);
 
         //stop chronometer
         mChronometerUtility.stop();
@@ -442,7 +460,7 @@ public class ActivityTracker extends AppCompatActivity {
     private void playSound(String audioFileName){
 
         MediaPlayer mp;
-        mp = MediaPlayer.create(this, getResources().getIdentifier(audioFileName, "raw", getPackageName()));//R.raw.cat_meow);
+        mp = MediaPlayer.create(mFragmentActivity, getResources().getIdentifier(audioFileName, "raw", mFragmentActivity.getPackageName()));//R.raw.cat_meow);
         mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
             @Override
@@ -532,7 +550,7 @@ public class ActivityTracker extends AppCompatActivity {
         if (DEBUG) Log.d(LOG, "onStart");
         super.onStart();
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(GoogleApi.GOOGLE_API_INTENT));
+        LocalBroadcastManager.getInstance(mFragmentActivity).registerReceiver(mMessageReceiver, new IntentFilter(GoogleApi.GOOGLE_API_INTENT));
     }
 
     //**********************************************************************************************
@@ -612,7 +630,7 @@ public class ActivityTracker extends AppCompatActivity {
 
         mWarningIsVisible = true;
 
-        AlertDialog.Builder alert = new AlertDialog.Builder(ActivityTracker.this);
+        AlertDialog.Builder alert = new AlertDialog.Builder(mFragmentActivity);
 
         alert.setTitle(getString(R.string.warning));
         alert.setMessage(getString(R.string.msg_activity_tracker_no_movement));
@@ -637,7 +655,7 @@ public class ActivityTracker extends AppCompatActivity {
         super.onPause();
 
         // unregister intents with BroadcastReceiver
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+        LocalBroadcastManager.getInstance(mFragmentActivity).unregisterReceiver(mMessageReceiver);
     }
 
     //**********************************************************************************************
@@ -650,8 +668,8 @@ public class ActivityTracker extends AppCompatActivity {
         super.onResume();
 
         // register intents with BroadcastReceiver
-        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(LocationApi.LOCATION_API_INTENT));
-        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(Accelerometer.ACCELEROMETER_INTENT));
+        LocalBroadcastManager.getInstance(mFragmentActivity).registerReceiver(mMessageReceiver, new IntentFilter(LocationApi.LOCATION_API_INTENT));
+        LocalBroadcastManager.getInstance(mFragmentActivity).registerReceiver(mMessageReceiver, new IntentFilter(Accelerometer.ACCELEROMETER_INTENT));
 
     }
 
@@ -690,7 +708,7 @@ public class ActivityTracker extends AppCompatActivity {
     }
 
     private void displayAlertDialog(String title, String message){
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mFragmentActivity);
 
         // set title
         alertDialogBuilder.setTitle(title);
@@ -868,7 +886,7 @@ public class ActivityTracker extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_RESOLVE_ERROR) {
             mResolvingError = false;
-            if (resultCode == this.RESULT_OK) {
+            if (resultCode == mFragmentActivity.RESULT_OK) {
                 // Make sure the app is not already connected or attempting to connect
                 if (!mGoogleApi.client().isConnecting() &&
                         !mGoogleApi.client().isConnected()) {

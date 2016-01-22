@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -98,11 +99,23 @@ public class ActivityChooser  extends Fragment {
             @Override
             public void onClick(View v) {
 
+                /*
                 //sort the UserActivityList before saving it
                 Intent intent = new Intent(mFragmentActivity, ActivityTracker.class);
                 Collections.sort(mUserActivityList);
                 intent.putParcelableArrayListExtra(USER_ACTIVITY_LIST_KEY, mUserActivityList);
                 startActivity(intent);
+*/
+
+
+                // sort activity list first
+                Collections.sort(mUserActivityList);
+
+                Bundle bundle = new Bundle();
+                bundle.putParcelableArrayList(USER_ACTIVITY_LIST_KEY, mUserActivityList);
+                ActivityTracker activityTracker = new ActivityTracker();
+                activityTracker.setArguments(bundle);
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, activityTracker).commit();
             }
         });
     }

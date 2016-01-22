@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String MAIN_ACTIVITY_BROADCAST_RECEIVER = "MAIN_ACTIVITY_BROADCAST_RECEIVER";
 
     // UI widgets
-    private DrawerLayout mDrawerLayout;
+    public static DrawerLayout mDrawerLayout;
     private Menu mMenu;
 
 
@@ -138,6 +138,8 @@ public class MainActivity extends AppCompatActivity {
     private void initializeNavigationDrawer(){
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+
         NavigationView navigationView = (NavigationView)findViewById(R.id.navigation_view);
         navigationView.setItemIconTintList(null);
 

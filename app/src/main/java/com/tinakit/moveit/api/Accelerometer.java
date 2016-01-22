@@ -23,7 +23,7 @@ public class Accelerometer implements SensorEventListener{
     // CONSTANTS
     public static final String ACCELEROMETER_INTENT = "ACCELEROMETER_INTENT";
     private static final int ACCELEROMETER_DELAY = 3; //in seconds
-    private static final float SHAKE_THRESHOLD = 0.5f;
+    private static final float SHAKE_THRESHOLD = 0.3f;
 
     // INSTANCE FIELDS
     private FragmentActivity mFragmentActivity;
