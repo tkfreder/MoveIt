@@ -49,12 +49,12 @@
 
     <!-- avatar filenames -->
     <string-array name="avatar_images">
-        <item>avatar_cat_blue</item>
-        <item>avatar_cat_green</item>
+        <item>avatar_1</item>
+        <item>avatar_2</item>
         <item>avatar_cat_orange</item>
         <item>avatar_cat_pink</item>
-        <item>avatar_cat_purple</item>
-        <item>avatar_cat_red</item>
+        <item>avatar_3</item>
+        <item>avatar_4</item>
         <item>avatar_cat_yellow</item>
         <item>avatar_angel</item>
     </string-array>

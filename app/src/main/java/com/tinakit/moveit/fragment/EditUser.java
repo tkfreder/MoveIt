@@ -46,6 +46,7 @@ public class EditUser extends Fragment {
     protected FragmentActivity mFragmentActivity;
     private View mRootView;
     private User mUser;
+    private User mUser_previous;
     private boolean mIsNewUser = false;
     private List<User> mUserList;
 
@@ -96,6 +97,9 @@ public class EditUser extends Fragment {
         if (bundle != null && bundle.containsKey(EDIT_USER_USER)) {
 
             mUser = bundle.getParcelable(EDIT_USER_USER);
+
+            // save current User
+            mUser_previous = mUser;
 
             // if this is the first time, there will be no data in the bundle
             if (mUser == null) {
@@ -163,7 +167,9 @@ public class EditUser extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
 
-                if (existsUserName())
+                //only check if name exists if new username is same as the previous one
+                boolean isSameUserName = s.toString().equals(mUser_previous.getUserName());
+                if (!isSameUserName && existsUserName())
                     mUserName.setError(getString(R.string.message_username_exists));
             }
         });
@@ -291,7 +297,7 @@ public class EditUser extends Fragment {
 
     private boolean validateForm(){
 
-        if(!existsUserName() && isValidWeight(Integer.parseInt(mWeight.getText().toString()))) {
+        if(isValidWeight(Integer.parseInt(mWeight.getText().toString()))) {
 
            return true;
         }

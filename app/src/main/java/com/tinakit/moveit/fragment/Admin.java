@@ -108,7 +108,7 @@ public class Admin extends Fragment{
     //**********************************************************************************************
     private void setupViewPager(ViewPager viewPager){
 
-        mViewPagerAdapter = new ViewPagerAdapter(getActivity().getSupportFragmentManager());
+        mViewPagerAdapter = new ViewPagerAdapter(getChildFragmentManager());
 
         // create Tabs
         //mViewPagerAdapter.addFrag(new AdminInBox(), getString(R.string.admin_tab_inbox));

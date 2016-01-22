@@ -55,11 +55,16 @@ public class Accelerometer implements SensorEventListener{
                 long diffTime = (curTime - lastUpdate);
                 lastUpdate = curTime;
 
-                float speed = Math.abs(x + y + z - last_x - last_y - last_z)/ diffTime * 10000;
+                //float speed = Math.abs(x + y + z - last_x - last_y - last_z)/ diffTime * 10000;
+                float speedX = Math.abs(x - last_x)/diffTime * 10000;
+                float speedY = Math.abs(y - last_y)/diffTime * 10000;
+                float speedZ = Math.abs(z - last_z)/diffTime * 10000;
+
 
 
                 //check for inactivity, below shake threshold
-                if (speed < SHAKE_THRESHOLD) {
+                //if (speed < SHAKE_THRESHOLD){
+                if (!(speedX > SHAKE_THRESHOLD || speedY > SHAKE_THRESHOLD || speedZ > SHAKE_THRESHOLD)) {
 
                     // send message to indicate there is new location data
                     Intent intent = new Intent(ACCELEROMETER_INTENT);
