@@ -120,6 +120,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     private static final String KEY_REWARDSEARNED_REWARD_NAME = "rewardName";
     private static final String KEY_REWARDSEARNED_REWARD_POINTS = "points";
     private static final String KEY_REWARDSEARNED_USER_ID_FK = "userId";
+    private static final String KEY_REWARDSEARNED_TIMESTAMP = "timeStamp";
 
     //VIEWS
     private static final String VIEW_REWARDSTATUS_USER = "RewardStatusUser";
@@ -250,6 +251,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 KEY_REWARDSEARNED__ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // Define a primary key
                 KEY_REWARD_NAME + " TEXT, " +
                 KEY_REWARD_POINTS + " INTEGER, " +
+                KEY_REWARDSEARNED_TIMESTAMP + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, " +
                 KEY_REWARDSEARNED_USER_ID_FK + " INTEGER REFERENCES " + TABLE_USERS + // Define a foreign key
                 ")";
 
