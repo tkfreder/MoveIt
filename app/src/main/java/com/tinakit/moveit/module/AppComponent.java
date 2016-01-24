@@ -14,6 +14,7 @@ import com.tinakit.moveit.fragment.EditUser;
 import com.tinakit.moveit.fragment.MapFragment;
 import com.tinakit.moveit.fragment.UserProfile;
 import com.tinakit.moveit.fragment.UserStats;
+import com.tinakit.moveit.fragment.UserStatsMain;
 
 import javax.inject.Singleton;
 
@@ -46,8 +47,9 @@ public interface AppComponent {
     void inject(ActivityChooser activityChooser);
     void inject(ActivityHistory activityHistory);
     void inject(UserProfile userProfile);
-    void inject(UserStats userStats);
+    void inject(UserStatsMain userStatsMain);
     void inject(MapFragment mapFragment);
     void inject(EditReward editReward);
     void inject(EditUser editUser);
+    void inject(UserStats userStats);
 }

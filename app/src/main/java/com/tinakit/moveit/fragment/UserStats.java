@@ -7,24 +7,21 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.hookedonplay.decoviewlib.DecoView;
 import com.hookedonplay.decoviewlib.charts.SeriesItem;
-import com.hookedonplay.decoviewlib.charts.SeriesLabel;
 import com.hookedonplay.decoviewlib.events.DecoEvent;
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.adapter.UserStatsRecyclerAdapter;
+import com.tinakit.moveit.adapter.ViewPagerAdapter;
 import com.tinakit.moveit.db.FitnessDBHelper;
-import com.tinakit.moveit.model.Reward;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.module.CustomApplication;
 
@@ -34,13 +31,14 @@ import java.util.List;
 import javax.inject.Inject;
 
 /**
- * Created by Tina on 12/19/2015.
+ * Created by Tina on 1/24/2016.
  */
-public class UserStats extends Fragment{
+public class UserStats extends Fragment {
 
     // CONSTANTS
     public static final String USER_STATS_TAG = "USER_STATS_TAG";
     public static final String USER_STATS_LIST_KEY = "USER_STATS_LIST";
+    public static final String USER_STATS_ARG_USER = "USER_STATS_ARG_USER";
 
     @Inject
     FitnessDBHelper mDatabaseHelper;
@@ -50,6 +48,7 @@ public class UserStats extends Fragment{
     private View rootView;
     List<Integer> mColorList;
     List<User> mUserList;
+    User mUser;
 
     // UI COMPONENTS
     protected RecyclerView mRecyclerView;
@@ -57,10 +56,13 @@ public class UserStats extends Fragment{
     protected SeriesItem seriesItem2;
     protected TextView textPercentage;
     List<SeriesItem> mSeriesItemList;
+    protected ViewPager mViewPager;
+    protected ViewPagerAdapter mViewPagerAdapter;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
         mFragmentActivity  = (FragmentActivity)super.getActivity();
         //rootView = inflater.inflate(R.layout.recycler_view, container, false);
         rootView = inflater.inflate(R.layout.user_stats, container, false);
@@ -77,9 +79,15 @@ public class UserStats extends Fragment{
 
     private void initializeUI(){
 
+        Bundle args = getArguments();
+        if(args != null && args.containsKey(USER_STATS_ARG_USER)){
+
+            mUser = (User)args.getParcelable(USER_STATS_ARG_USER);
+        }
+
         mColorList = new ArrayList<>();
 
-        mColorList.add(Color.argb(255,76,175,80)); // green
+        mColorList.add(Color.argb(255, 76, 175, 80)); // green
         mColorList.add(Color.argb(255,194,24,91)); // violet
         mColorList.add(Color.argb(255,25,118,210)); //blue
         mColorList.add(Color.argb(255,255,87,34)); // red
@@ -165,10 +173,9 @@ public class UserStats extends Fragment{
 
             decoView.addEvent(new DecoEvent.Builder(percentageList.get(i))
                     .setIndex(series1Index)
-                    .setDelay(3000 * i)
+                    .setDelay(2000 * i)
                     .build());
 
         }
     }
-
 }

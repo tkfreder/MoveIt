@@ -1,29 +1,22 @@
 package com.tinakit.moveit.activity;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.adapter.RewardRecyclerAdapter;
 import com.tinakit.moveit.db.FitnessDBHelper;
-import com.tinakit.moveit.fragment.UserStats;
+import com.tinakit.moveit.fragment.UserStatsMain;
 import com.tinakit.moveit.model.Reward;
-import com.tinakit.moveit.model.RewardStatusType;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.module.CustomApplication;
 
@@ -97,12 +90,12 @@ public class RewardView extends Fragment {
                 //Intent intent = new Intent(this, UserStats.class);
 
                 // check if UserStats is already displayed
-                UserStats userStats = (UserStats) getActivity().getSupportFragmentManager().findFragmentByTag(UserStats.USER_STATS_TAG);
-                if (userStats == null) {
+                UserStatsMain userStatsMain = (UserStatsMain) getActivity().getSupportFragmentManager().findFragmentByTag(UserStatsMain.USER_STATS_TAG);
+                if (userStatsMain == null) {
 
-                    userStats = new UserStats();
+                    userStatsMain = new UserStatsMain();
                     //replace current fragment with Rewards fragment
-                    getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, userStats).commit();
+                    getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, userStatsMain).commit();
 
                 }
             } else {

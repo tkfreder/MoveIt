@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -17,11 +16,9 @@ import android.view.Menu;
 
 import com.tinakit.moveit.api.GoogleApi;
 import com.tinakit.moveit.fragment.ActivityChooser;
-import com.tinakit.moveit.fragment.ActivityHistory;
 import com.tinakit.moveit.fragment.Admin;
 import com.tinakit.moveit.fragment.EditUser;
-import com.tinakit.moveit.fragment.UserProfile;
-import com.tinakit.moveit.fragment.UserStats;
+import com.tinakit.moveit.fragment.UserStatsMain;
 import com.tinakit.moveit.model.ActivityDetail;
 
 import android.support.v4.view.GravityCompat;
@@ -35,7 +32,6 @@ import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.module.CustomApplication;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -177,12 +173,12 @@ public class MainActivity extends AppCompatActivity {
 
                 getSupportActionBar().setTitle(getString(R.string.nav_menu_coins));
 
-                UserStats userStats = (UserStats)getSupportFragmentManager().findFragmentByTag(UserStats.USER_STATS_TAG);
-                if (userStats == null) {
+                UserStatsMain userStatsMain = (UserStatsMain)getSupportFragmentManager().findFragmentByTag(UserStatsMain.USER_STATS_TAG);
+                if (userStatsMain == null) {
 
-                    userStats = new UserStats();
+                    userStatsMain = new UserStatsMain();
                     //replace current fragment with Rewards fragment
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, userStats).commit();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, userStatsMain).commit();
 
                 }
 
