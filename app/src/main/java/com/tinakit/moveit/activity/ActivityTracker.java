@@ -510,8 +510,21 @@ public class ActivityTracker extends Fragment {
         for (UserActivity userActivity : activityDetail.getUserActivityList()){
 
             User user = userActivity.getUser();
+
+
             user.setPoints(totalPoints + user.getPoints());
+
+            // if user earned enough points to earn a reward or multiple rewards
+            while (user.getPoints() >= user.getChildItemList().get(0).getPoints()) {
+
+                user.setPoints(user.getPoints() - user.getChildItemList().get(0).getPoints());
+
+                // insert Reward Earned
+                databaseHelper.insertRewardEarned(user.getChildItemList().get(0).getName(), user.getChildItemList().get(0).getPoints(), user.getUserId());
+            }
+
             databaseHelper.updateUser(user);
+
         }
 
     }

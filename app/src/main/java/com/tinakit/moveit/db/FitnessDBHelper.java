@@ -329,10 +329,10 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
         //TODO: DUMMY DATA
         //populate Rewards table
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (1, 'Animal Jam 5 Diamonds', 300);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (2, 'Chocolate Chip Pancake Dinner', 200);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (3, 'Arclight Movie', 200);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (4, 'Dinner Out of Choice', 200);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (1, 'Animal Jam 5 Diamonds', 5);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (2, 'Chocolate Chip Pancake Dinner', 6);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (3, 'Arclight Movie', 7);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (4, 'Dinner Out of Choice', 8);");
 
         //TODO: DUMMY DATA
         db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Laura', 0, 50, 'avatar_3', 0, 1);");
@@ -1051,6 +1051,32 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             db.setTransactionSuccessful();
         } catch (Exception e) {
             Log.d(LOGTAG, "Error during insertReward()");
+        } finally {
+            db.endTransaction();
+        }
+
+    }
+
+    public void insertRewardEarned(String rewardName, int rewardPoints, int userId){
+
+        // Create and/or open the database for writing
+        //SQLiteDatabase db = getWritableDatabase();
+
+        // It's a good idea to wrap our insert in a transaction. This helps with performance and ensures
+        // consistency of the database.
+        db.beginTransaction();
+        try {
+
+            ContentValues values = new ContentValues();
+            values.put(KEY_REWARD_NAME, rewardName);
+            values.put(KEY_REWARD_POINTS, rewardPoints);
+            values.put(KEY_REWARDSEARNED_USER_ID_FK, userId);
+
+            // Notice how we haven't specified the primary key. SQLite auto increments the primary key column.
+            db.insertOrThrow(TABLE_REWARDS_EARNED, null, values);
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            Log.d(LOGTAG, "Error during insertRewardEarned()");
         } finally {
             db.endTransaction();
         }

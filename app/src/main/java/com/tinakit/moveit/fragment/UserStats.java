@@ -165,7 +165,7 @@ public class UserStats extends Fragment{
 
             decoView.addEvent(new DecoEvent.Builder(percentageList.get(i))
                     .setIndex(series1Index)
-                    .setDelay(5000 * i)
+                    .setDelay(3000 * i)
                     .build());
 
         }
