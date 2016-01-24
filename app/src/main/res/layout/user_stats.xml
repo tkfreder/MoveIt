@@ -27,12 +27,65 @@
             style="@style/HeaderFont"/>
     </RelativeLayout>
 
-    <LinearLayout
-        android:id="@+id/userLayout"
+
+    <RelativeLayout
+        android:id="@+id/coinLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_below="@+id/arcChartLayout"/>
+        android:gravity="center"
+        android:layout_below="@+id/arcChartLayout"
+        >
+
+        <TextView
+            android:id="@+id/points"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/LabelListItemPurple"
+            />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="2dp"
+            android:src="@drawable/gold_coin_24"
+            android:layout_toRightOf="@+id/points"
+            android:layout_toEndOf="@+id/points"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rewardLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_below="@+id/coinLayout"
+        >
+
+        <TextView
+            android:id="@+id/rewardPoints"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/LabelListItemPurple"
+            />
+
+        <ImageView
+            android:id="@+id/goldCoin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="2dp"
+            android:src="@drawable/gold_coin_24"
+            android:layout_toRightOf="@+id/rewardPoints"
+            android:layout_toEndOf="@+id/rewardPoints"/>
+        <TextView
+            android:id="@+id/rewardName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/goldCoin"
+            android:layout_toEndOf="@+id/goldCoin"/>
+
+
+    </RelativeLayout>
+
+
 
 
 </RelativeLayout>

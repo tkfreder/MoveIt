@@ -47,7 +47,6 @@ public class UserStats extends Fragment {
     protected FragmentActivity mFragmentActivity;
     private View rootView;
     List<Integer> mColorList;
-    List<User> mUserList;
     User mUser;
 
     // UI COMPONENTS
@@ -64,7 +63,6 @@ public class UserStats extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         mFragmentActivity  = (FragmentActivity)super.getActivity();
-        //rootView = inflater.inflate(R.layout.recycler_view, container, false);
         rootView = inflater.inflate(R.layout.user_stats, container, false);
 
         mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -95,6 +93,7 @@ public class UserStats extends Fragment {
         mColorList.add(Color.argb(255,93,64,55));
         mColorList.add(Color.argb(255,211,47,47));
 
+        /*
         // add textview for each user
         LinearLayout userLayout = (LinearLayout)rootView.findViewById(R.id.userLayout);
 
@@ -111,23 +110,24 @@ public class UserStats extends Fragment {
             userLayout.addView(textView);
 
         }
+        */
 
         textPercentage = (TextView) rootView.findViewById(R.id.textPercentage);
 
-        List<Integer> percentageList = new ArrayList<>();
+        //List<Integer> percentageList = new ArrayList<>();
 
-        for (int i = 0; i < mUserList.size(); i++){
+        //for (int i = 0; i < mUserList.size(); i++){
 
-            int percentage = Math.round(100 * mUserList.get(i).getPoints() / mUserList.get(i).getChildItemList().get(0).getPoints());
-            percentageList.add(percentage);
-        }
+            int percentage = Math.round(100 * mUser.getPoints() / mUser.getChildItemList().get(0).getPoints());
+            //percentageList.add(percentage);
+        //}
 
         DecoView decoView = (DecoView) rootView.findViewById(R.id.dynamicArcView);
 
         // background arc
         SeriesItem backgroundSeries = new SeriesItem.Builder(Color.argb(255,211,211,211))
                 .setRange(0, 100, 0)
-                .setLineWidth((float) mUserList.size() * 32)
+                .setLineWidth(32f)
                 .build();
 
         int backIndex = decoView.addSeries(backgroundSeries);
@@ -137,13 +137,13 @@ public class UserStats extends Fragment {
                 .build());
 
         // add item series for each user
-        for (int i=0; i < mUserList.size(); i++){
+        //for (int i=0; i < mUserList.size(); i++){
 
             // first arc
-            SeriesItem seriesItem2 = new SeriesItem.Builder(mColorList.get(i % mColorList.size()))
+            SeriesItem seriesItem2 = new SeriesItem.Builder(mColorList.get(mUser.getUserId() % mColorList.size()))
                     .setRange(0, 100, 0)
                     .setLineWidth(32f)
-                    .setInset(new PointF((float) ((i - 1) * 32) - 16, (float) ((i - 1) * 32) - 16))
+                    //.setInset(new PointF((float) ((i - 1) * 32) - 16, (float) ((i - 1) * 32) - 16))
                     /*.setSeriesLabel(new SeriesLabel.Builder(mUserList.get(i).getUserName() + " %.0f%%")
                             .setVisible(true)
                             .setColorBack(Color.argb(150, 0, 0, 0))
@@ -171,11 +171,11 @@ public class UserStats extends Fragment {
             });
 
 
-            decoView.addEvent(new DecoEvent.Builder(percentageList.get(i))
+            decoView.addEvent(new DecoEvent.Builder(percentage)
                     .setIndex(series1Index)
-                    .setDelay(2000 * i)
+                    .setDelay(2000)
                     .build());
 
-        }
+        //}
     }
 }

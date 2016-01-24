@@ -67,7 +67,8 @@ public class UserStatsMain extends Fragment{
 
     private void initializeUI(){
 
-        //ViewPager
+        mUserList = mDatabaseHelper.getUsers();
+
         mViewPager = (ViewPager)rootView.findViewById(R.id.viewpager_user_stats);
         if (mViewPager != null){
             setupViewPager(mViewPager);
@@ -79,8 +80,6 @@ public class UserStatsMain extends Fragment{
     //  setUpViewPager()
     //**********************************************************************************************
     private void setupViewPager(ViewPager viewPager){
-
-        mUserList = mDatabaseHelper.getUsers();
 
         mUserStatsPagerAdapter = new UserStatsPagerAdapter(getChildFragmentManager());
         viewPager.setAdapter(mUserStatsPagerAdapter);
