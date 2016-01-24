@@ -4,67 +4,55 @@
                 android:layout_height="match_parent"
                 xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/viewpager_user_stats"
+    <TextView
+        android:id="@+id/userName"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-    <RelativeLayout
-        android:id="@+id/arcChartLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <com.hookedonplay.decoviewlib.DecoView
-            xmlns:custom="http://schemas.android.com/apk/res-auto"
-            custom:dv_lineWidth="26dp"
-            android:id="@+id/dynamicArcView"
-            android:layout_width="280dp"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"/>
-        <TextView
-            android:id="@+id/textPercentage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            style="@style/HeaderFont"/>
-    </RelativeLayout>
+        android:layout_height="wrap_content"
+        style="@style/LabelListItemPurple"
+        android:gravity="center_horizontal">
+    </TextView>
 
+    <TextView
+        android:id="@+id/rewardName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/LabelListItemPurple"
+        android:gravity="center_horizontal"
+        android:layout_below="@+id/userName"/>
 
     <RelativeLayout
         android:id="@+id/coinLayout"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_below="@+id/arcChartLayout"
-        >
+        android:layout_below="@+id/rewardName"
+        android:layout_centerInParent="true"
+          >
 
         <TextView
             android:id="@+id/points"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@style/LabelListItemPurple"
+            android:text="100"
             />
 
-        <ImageView
+        <TextView
+            android:id="@+id/outOf"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingLeft="2dp"
-            android:src="@drawable/gold_coin_24"
+            android:text=" out of "
+            style="@style/LabelListItemPurple"
             android:layout_toRightOf="@+id/points"
             android:layout_toEndOf="@+id/points"/>
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/rewardLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_below="@+id/coinLayout"
-        >
 
         <TextView
             android:id="@+id/rewardPoints"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@style/LabelListItemPurple"
+            android:layout_toRightOf="@+id/outOf"
+            android:layout_toEndOf="@+id/outOf"
             />
 
         <ImageView
@@ -75,17 +63,34 @@
             android:src="@drawable/gold_coin_24"
             android:layout_toRightOf="@+id/rewardPoints"
             android:layout_toEndOf="@+id/rewardPoints"/>
-        <TextView
-            android:id="@+id/rewardName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/goldCoin"
-            android:layout_toEndOf="@+id/goldCoin"/>
 
 
     </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/coinLayout">
+        <RelativeLayout
+            android:id="@+id/arcChartLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <com.hookedonplay.decoviewlib.DecoView
+                xmlns:custom="http://schemas.android.com/apk/res-auto"
+                custom:dv_lineWidth="26dp"
+                android:id="@+id/dynamicArcView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                custom:dv_arc_gravity_horizontal="Fill"
+                android:layout_centerInParent="true"/>
+            <TextView
+                android:id="@+id/textPercentage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/HeaderFont"
+                android:layout_centerInParent="true"/>
 
+    </RelativeLayout>
 
-
+    </RelativeLayout>
 
 </RelativeLayout>

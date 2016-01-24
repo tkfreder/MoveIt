@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.hookedonplay.decoviewlib.DecoView;
 import com.hookedonplay.decoviewlib.charts.SeriesItem;
+import com.hookedonplay.decoviewlib.charts.SeriesLabel;
 import com.hookedonplay.decoviewlib.events.DecoEvent;
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.adapter.UserStatsRecyclerAdapter;
@@ -39,6 +40,7 @@ public class UserStats extends Fragment {
     public static final String USER_STATS_TAG = "USER_STATS_TAG";
     public static final String USER_STATS_LIST_KEY = "USER_STATS_LIST";
     public static final String USER_STATS_ARG_USER = "USER_STATS_ARG_USER";
+    private static final float ARC_LINE_WIDTH = 64f;
 
     @Inject
     FitnessDBHelper mDatabaseHelper;
@@ -93,41 +95,27 @@ public class UserStats extends Fragment {
         mColorList.add(Color.argb(255,93,64,55));
         mColorList.add(Color.argb(255,211,47,47));
 
-        /*
-        // add textview for each user
-        LinearLayout userLayout = (LinearLayout)rootView.findViewById(R.id.userLayout);
-
-        mUserList = mDatabaseHelper.getUsers();
-
-        for (int i = 0; i < mUserList.size(); i++){
-
-            TextView textView = new TextView(mFragmentActivity);
-            textView.setId(mUserList.get(i).getUserId());
-            textView.setTextColor(mColorList.get(i % mColorList.size()));
-            textView.setTextSize(16);
-            textView.setTypeface(null, Typeface.BOLD);
-            textView.setText(mUserList.get(i).getUserName() + " " + String.valueOf(mUserList.get(i).getPoints()) + "(" + 100 * mUserList.get(i).getPoints()/mUserList.get(i).getChildItemList().get(0).getPoints() + "%)" + " " + mUserList.get(i).getChildItemList().get(0).getName());
-            userLayout.addView(textView);
-
-        }
-        */
-
         textPercentage = (TextView) rootView.findViewById(R.id.textPercentage);
+        int percentage = Math.round(100 * mUser.getPoints() / mUser.getChildItemList().get(0).getPoints());
 
-        //List<Integer> percentageList = new ArrayList<>();
+        TextView userName = (TextView)rootView.findViewById(R.id.userName);
+        userName.setText(mUser.getUserName());
 
-        //for (int i = 0; i < mUserList.size(); i++){
+        TextView points = (TextView)rootView.findViewById(R.id.points);
+        points.setText(String.valueOf(mUser.getPoints()));
 
-            int percentage = Math.round(100 * mUser.getPoints() / mUser.getChildItemList().get(0).getPoints());
-            //percentageList.add(percentage);
-        //}
+        TextView pointsReward = (TextView)rootView.findViewById(R.id.rewardPoints);
+        pointsReward.setText(String.valueOf(mUser.getChildItemList().get(0).getPoints()));
+
+        TextView rewardName = (TextView)rootView.findViewById(R.id.rewardName);
+        rewardName.setText(mUser.getChildItemList().get(0).getName());
 
         DecoView decoView = (DecoView) rootView.findViewById(R.id.dynamicArcView);
 
         // background arc
         SeriesItem backgroundSeries = new SeriesItem.Builder(Color.argb(255,211,211,211))
                 .setRange(0, 100, 0)
-                .setLineWidth(32f)
+                .setLineWidth(ARC_LINE_WIDTH)
                 .build();
 
         int backIndex = decoView.addSeries(backgroundSeries);
@@ -136,46 +124,40 @@ public class UserStats extends Fragment {
                 .setIndex(backIndex)
                 .build());
 
-        // add item series for each user
-        //for (int i=0; i < mUserList.size(); i++){
+        SeriesItem seriesItem2 = new SeriesItem.Builder(mColorList.get(mUser.getUserId() % mColorList.size()))
+                .setRange(0, 100, 0)
+                .setLineWidth(ARC_LINE_WIDTH)
+                .setSeriesLabel(new SeriesLabel.Builder(mUser.getUserName() + " %.0f%%")
+                        .setVisible(true)
+                        .setColorBack(Color.argb(150, 0, 0, 0))
+                        .setColorText(Color.argb(255, 255, 255, 255))
+                        //.setTypeface(customTypeface) //Load the font from your Android assets folder
+                        .build())
 
-            // first arc
-            SeriesItem seriesItem2 = new SeriesItem.Builder(mColorList.get(mUser.getUserId() % mColorList.size()))
-                    .setRange(0, 100, 0)
-                    .setLineWidth(32f)
-                    //.setInset(new PointF((float) ((i - 1) * 32) - 16, (float) ((i - 1) * 32) - 16))
-                    /*.setSeriesLabel(new SeriesLabel.Builder(mUserList.get(i).getUserName() + " %.0f%%")
-                            .setVisible(true)
-                            .setColorBack(Color.argb(150, 0, 0, 0))
-                            .setColorText(Color.argb(255, 255, 255, 255))
-                                    //.setTypeface(customTypeface) //Load the font from your Android assets folder
-                            .build())
-                            */
-                    .build();
+                .build();
 
-            int series1Index = decoView.addSeries(seriesItem2);
+        int series1Index = decoView.addSeries(seriesItem2);
 
-            seriesItem2.addArcSeriesItemListener(new SeriesItem.SeriesItemListener() {
-                @Override
-                public void onSeriesItemAnimationProgress(float percentComplete, float currentPosition) {
+        seriesItem2.addArcSeriesItemListener(new SeriesItem.SeriesItemListener() {
+            @Override
+            public void onSeriesItemAnimationProgress(float percentComplete, float currentPosition) {
 
-                    float percentFilled = ((currentPosition) / 100);
-                    textPercentage.setText(String.format("%.0f%%", percentFilled * 100f));
-                }
+                float percentFilled = ((currentPosition) / 100);
+                textPercentage.setText(String.format("%.0f%%", percentFilled * 100f));
+            }
 
-                @Override
-                public void onSeriesItemDisplayProgress(float percentComplete) {
+            @Override
+            public void onSeriesItemDisplayProgress(float percentComplete) {
 
-                    textPercentage.setText("");
-                }
-            });
+                textPercentage.setText("");
+            }
+        });
 
 
-            decoView.addEvent(new DecoEvent.Builder(percentage)
-                    .setIndex(series1Index)
-                    .setDelay(2000)
-                    .build());
+        decoView.addEvent(new DecoEvent.Builder(percentage)
+                .setIndex(series1Index)
+                .setDelay(2000)
+                .build());
 
-        //}
     }
 }
