@@ -504,8 +504,7 @@ public class ActivityTracker extends Fragment {
 
             user.setPoints(totalPoints + user.getPoints());
 
-            // if user earned enough points to earn a reward or multiple rewards
-            while (user.getPoints() >= user.getChildItemList().get(0).getPoints()) {
+            if (user.getPoints() >= user.getChildItemList().get(0).getPoints()) {
 
                 user.setPoints(user.getPoints() - user.getChildItemList().get(0).getPoints());
 
