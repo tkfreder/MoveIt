@@ -2,6 +2,7 @@ package com.tinakit.moveit.fragment;
 
 import android.graphics.Color;
 import android.graphics.PointF;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -12,6 +13,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.hookedonplay.decoviewlib.DecoView;
@@ -43,9 +46,10 @@ public class UserStats extends Fragment{
     FitnessDBHelper mDatabaseHelper;
 
     // local cache
-    protected static List<User> mUserList;
     protected FragmentActivity mFragmentActivity;
     private View rootView;
+    List<Integer> mColorList;
+    List<User> mUserList;
 
     // UI COMPONENTS
     protected RecyclerView mRecyclerView;
@@ -66,107 +70,47 @@ public class UserStats extends Fragment{
         // Dagger 2 injection
         ((CustomApplication)getActivity().getApplication()).getAppComponent().inject(this);
 
-        //get databaseHelper instance
-        //mDatabaseHelper = FitnessDBHelper.getInstance(mFragmentActivity);
-
         initializeUI();
-
-        //fetchData(inflater);
 
         return rootView;
     }
 
-    private void fetchData(LayoutInflater layoutInflater){
-
-        // get UserActivityList from intent
-
-        Bundle bundle = this.getArguments();
-        if (bundle != null && bundle.containsKey(USER_STATS_LIST_KEY)){
-
-            mUserList = bundle.getParcelableArrayList(USER_STATS_LIST_KEY);
-        }
-        else{
-            // fetch directly from the database
-            mUserList = mDatabaseHelper.getUsers();
-        }
-
-        //set RewardList for each user
-        for (User user : mUserList){
-
-            //set the reward list for each user
-            user.setChildItemList(mDatabaseHelper.getUserRewards(user));
-        }
-
-        //mUserStatsRecyclerAdapter = new UserStatsRecyclerAdapter(layoutInflater.getContext(), mFragmentActivity, mUserList);
-        //mRecyclerView.setAdapter(mUserStatsRecyclerAdapter);
-    }
-
     private void initializeUI(){
+
+        mColorList = new ArrayList<>();
+
+        mColorList.add(Color.argb(255,76,175,80)); // green
+        mColorList.add(Color.argb(255,194,24,91)); // violet
+        mColorList.add(Color.argb(255,25,118,210)); //blue
+        mColorList.add(Color.argb(255,255,87,34)); // red
+        mColorList.add(Color.argb(255,255,133,17)); // orange
+        mColorList.add(Color.argb(255,93,64,55));
+        mColorList.add(Color.argb(255,211,47,47));
+
+        // add textview for each user
+        LinearLayout userLayout = (LinearLayout)rootView.findViewById(R.id.userLayout);
+
+        mUserList = mDatabaseHelper.getUsers();
+
+        for (int i = 0; i < mUserList.size(); i++){
+
+            TextView textView = new TextView(mFragmentActivity);
+            textView.setId(mUserList.get(i).getUserId());
+            textView.setTextColor(mColorList.get(i % mColorList.size()));
+            textView.setTextSize(16);
+            textView.setTypeface(null, Typeface.BOLD);
+            textView.setText(mUserList.get(i).getUserName() + " " + String.valueOf(mUserList.get(i).getPoints()) + "(" + 100 * mUserList.get(i).getPoints()/mUserList.get(i).getChildItemList().get(0).getPoints() + "%)" + " " + mUserList.get(i).getChildItemList().get(0).getName());
+            userLayout.addView(textView);
+
+        }
 
         textPercentage = (TextView) rootView.findViewById(R.id.textPercentage);
 
-        List<User> userList = new ArrayList<User>();
-        User user = new User();
-
-        user.setPoints(250);
-        user.setUserName("Laura");
-        userList.add(user);
-
-        user = new User();
-        user.setPoints(280);
-        user.setUserName("Lucy");
-        userList.add(user);
-
-        user = new User();
-        user.setPoints(20);
-        user.setUserName("Alec");
-        userList.add(user);
-
-        user = new User();
-        user.setPoints(50);
-        user.setUserName("Tina");
-        userList.add(user);
-
-        List<Reward> rewardList = new ArrayList<>();
-        Reward reward = new Reward();
-        reward.setName("Animal Jam 5 Diamonds");
-        reward.setPoints(350);
-        reward.setUserId(1);
-        rewardList.add(reward);
-        userList.get(0).setChildItemList(rewardList);
-
-
-        reward = new Reward();
-        reward.setName("Chocolate Chip Pancake Dinner");
-        reward.setPoints(300);
-        reward.setUserId(2);
-        rewardList = new ArrayList<>();
-        rewardList.add(reward);
-        userList.get(1).setChildItemList(rewardList);
-
-        reward = new Reward();
-        reward.setName("Arclight Movie Night");
-        reward.setPoints(200);
-        reward.setUserId(3);
-        rewardList = new ArrayList<>();
-        rewardList.add(reward);
-        userList.get(2).setChildItemList(rewardList);
-
-        reward = new Reward();
-        reward.setName("Dinner Out");
-        reward.setPoints(200);
-        reward.setUserId(4);
-        rewardList = new ArrayList<>();
-        rewardList.add(reward);
-        userList.get(3).setChildItemList(rewardList);
-
-
-        // sample data
         List<Integer> percentageList = new ArrayList<>();
 
-        for (int i = 0; i < userList.size(); i++){
+        for (int i = 0; i < mUserList.size(); i++){
 
-            int percentage = Math.round(100 * userList.get(i).getPoints() / userList.get(i).getChildItemList().get(0).getPoints());
+            int percentage = Math.round(100 * mUserList.get(i).getPoints() / mUserList.get(i).getChildItemList().get(0).getPoints());
             percentageList.add(percentage);
         }
 
@@ -175,6 +119,7 @@ public class UserStats extends Fragment{
         // background arc
         SeriesItem backgroundSeries = new SeriesItem.Builder(Color.argb(255,211,211,211))
                 .setRange(0, 100, 0)
+                .setLineWidth((float) mUserList.size() * 32)
                 .build();
 
         int backIndex = decoView.addSeries(backgroundSeries);
@@ -183,32 +128,21 @@ public class UserStats extends Fragment{
                 .setIndex(backIndex)
                 .build());
 
-        // populate color array
-        List<Integer> mColorList = new ArrayList<>();
-
-        mColorList.add(Color.argb(255,255,133,17));
-        mColorList.add(Color.argb(255,194,24,91));
-        mColorList.add(Color.argb(255,255,87,34));
-        mColorList.add(Color.argb(255,25,118,210));
-        mColorList.add(Color.argb(255,76,175,80));
-        mColorList.add(Color.argb(255,93,64,55));
-        mColorList.add(Color.argb(255,211,47,47));
-
-
         // add item series for each user
-        for (int i=0; i < userList.size(); i++){
+        for (int i=0; i < mUserList.size(); i++){
 
             // first arc
-            SeriesItem seriesItem2 = new SeriesItem.Builder(mColorList.get(i%7))
+            SeriesItem seriesItem2 = new SeriesItem.Builder(mColorList.get(i % mColorList.size()))
                     .setRange(0, 100, 0)
                     .setLineWidth(32f)
-                    .setInset(new PointF((float)(i-1)*32, (float)(i-1)*32))
-                    .setSeriesLabel(new SeriesLabel.Builder(userList.get(i).getUserName() + " %.0f%%")
+                    .setInset(new PointF((float) ((i - 1) * 32) - 16, (float) ((i - 1) * 32) - 16))
+                    /*.setSeriesLabel(new SeriesLabel.Builder(mUserList.get(i).getUserName() + " %.0f%%")
                             .setVisible(true)
                             .setColorBack(Color.argb(150, 0, 0, 0))
                             .setColorText(Color.argb(255, 255, 255, 255))
                                     //.setTypeface(customTypeface) //Load the font from your Android assets folder
                             .build())
+                            */
                     .build();
 
             int series1Index = decoView.addSeries(seriesItem2);
@@ -224,6 +158,7 @@ public class UserStats extends Fragment{
                 @Override
                 public void onSeriesItemDisplayProgress(float percentComplete) {
 
+                    textPercentage.setText("");
                 }
             });
 
@@ -234,20 +169,6 @@ public class UserStats extends Fragment{
                     .build());
 
         }
-
-
-
-        /*
-        //RecyclerView
-        // Initialize recycler view
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
-        mRecyclerView.setHasFixedSize(true); //child items have fixed dimensions, allows the RecyclerView to optimize better by figuring out the exact height and width of the entire list based on the adapter.
-
-        //GridLayoutManager gridLayoutManager = new GridLayoutManager(mFragmentActivity, 2);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mFragmentActivity);
-        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        mRecyclerView.setLayoutManager(linearLayoutManager);
-        */
     }
 
 }

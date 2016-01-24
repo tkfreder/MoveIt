@@ -105,7 +105,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     private static final String TABLE_REWARDS = "Rewards";
     private static final String KEY_REWARD_ID = "_id";
     private static final String KEY_REWARD_NAME = "rewardName";
-    private static final String KEY_REWARD_POINTS = "points";
+    private static final String KEY_REWARD_POINTS = "rewardPoints";
 
     //REWARDUSER TABLE
     private static final String TABLE_REWARDUSER = "RewardUser";
