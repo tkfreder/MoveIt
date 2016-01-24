@@ -112,7 +112,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     private static final String KEY_REWARDUSER_ID = "_id";
     private static final String KEY_REWARDUSER_REWARD_ID_FK = "rewardId";
     private static final String KEY_REWARDUSER_USER_ID_FK = "userId";
-    private static final String KEY_REWARDUSER_REWARD_STATUS_ID = "rewardStatusId";
+    //private static final String KEY_REWARDUSER_REWARD_STATUS_ID = "rewardStatusId";
 
     //REWARDS_EARNED TABLE
     private static final String TABLE_REWARDS_EARNED = "RewardsEarned";
@@ -121,6 +121,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     private static final String KEY_REWARDSEARNED_REWARD_POINTS = "points";
     private static final String KEY_REWARDSEARNED_USER_ID_FK = "userId";
     private static final String KEY_REWARDSEARNED_TIMESTAMP = "timeStamp";
+    private static final String KEY_REWARDSEARNED_DATE_FULFILLED = "fulfillDate";
 
     //VIEWS
     private static final String VIEW_REWARDSTATUS_USER = "RewardStatusUser";
@@ -243,8 +244,8 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 "(" +
                 KEY_REWARDUSER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // Define a primary key
                 KEY_REWARDUSER_REWARD_ID_FK + " INTEGER REFERENCES " + TABLE_REWARDS + "," + // Define a foreign key
-                KEY_REWARDUSER_USER_ID_FK + " INTEGER REFERENCES " + TABLE_USERS + "," + // Define a foreign key
-                KEY_REWARDUSER_REWARD_STATUS_ID + " INTEGER " +
+                KEY_REWARDUSER_USER_ID_FK + " INTEGER REFERENCES " + TABLE_USERS + // Define a foreign key
+                //KEY_REWARDUSER_REWARD_STATUS_ID + " INTEGER " +
                 ")";
 
         String CREATE_REWARDSEARNED_TABLE = "CREATE TABLE " + TABLE_REWARDS_EARNED +
@@ -253,13 +254,14 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 KEY_REWARD_NAME + " TEXT, " +
                 KEY_REWARD_POINTS + " INTEGER, " +
                 KEY_REWARDSEARNED_TIMESTAMP + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, " +
+                KEY_REWARDSEARNED_DATE_FULFILLED + " TIMESTAME, " +
                 KEY_REWARDSEARNED_USER_ID_FK + " INTEGER REFERENCES " + TABLE_USERS + // Define a foreign key
                 ")";
 
         String CREATE_VIEW_REWARDSTATUSUSER = "CREATE VIEW " + VIEW_REWARDSTATUS_USER + " AS" +
                 " SELECT r._id AS " + KEY_REWARDUSER_REWARD_ID_FK +
                 " , r." + KEY_REWARD_POINTS + " AS " + KEY_REWARD_POINTS +
-                " , ru." + KEY_REWARDUSER_REWARD_STATUS_ID + " AS " + KEY_REWARDUSER_REWARD_STATUS_ID +
+                //" , ru." + KEY_REWARDUSER_REWARD_STATUS_ID + " AS " + KEY_REWARDUSER_REWARD_STATUS_ID +
                 " , ru." + KEY_REWARDUSER_USER_ID_FK + " AS " + KEY_REWARDUSER_USER_ID_FK +
                 " , r." + KEY_REWARD_NAME + " AS " + KEY_REWARD_NAME +
                 " FROM " + TABLE_REWARDUSER + " ru" +
@@ -341,13 +343,11 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Tina', 1, 100, 'avatar_4', 0, 1);");
 
         //TODO: DUMMY DATA
-        //TODO:  when adding User or Reward, ensure that RewardStatus gets populated with available rewards for that user
-        //populate RewardStatus table
 
-        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 1, 1, 0);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 2, 2, 0);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 3, 3, 0);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 4, 4, 0);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 1, 1);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 2, 2);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 3, 3);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 4, 4);");
 
     }
 
@@ -1269,7 +1269,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         try {
 
             Cursor cursor = db.query(VIEW_REWARDSTATUS_USER,
-                    new String[]{KEY_REWARDUSER_REWARD_ID_FK, KEY_REWARD_POINTS, KEY_REWARDUSER_REWARD_STATUS_ID,KEY_REWARD_NAME},
+                    new String[]{KEY_REWARDUSER_REWARD_ID_FK, KEY_REWARD_POINTS/*, KEY_REWARDUSER_REWARD_STATUS_ID*/,KEY_REWARD_NAME},
                     KEY_REWARDUSER_USER_ID_FK + " = ? ",
                     new String[]{String.valueOf(user.getUserId())}, null, null, KEY_REWARDUSER_REWARD_ID_FK + " DESC"/*KEY_REWARD_POINTS*/);
 
@@ -1280,7 +1280,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                     do{
                         Reward reward = new Reward();
                         reward.setPoints(cursor.getInt(cursor.getColumnIndex(KEY_REWARD_POINTS)));
-                        reward.setRewardStatusType(RewardStatusType.values()[cursor.getInt(cursor.getColumnIndex(KEY_REWARDUSER_REWARD_STATUS_ID))]);
+                        //reward.setRewardStatusType(RewardStatusType.values()[cursor.getInt(cursor.getColumnIndex(KEY_REWARDUSER_REWARD_STATUS_ID))]);
                         reward.setRewardId(cursor.getInt(cursor.getColumnIndex(KEY_REWARDUSER_REWARD_ID_FK)));
                         reward.setName(cursor.getString(cursor.getColumnIndex(KEY_REWARD_NAME)));
                         rewardList.add(reward);
@@ -1307,7 +1307,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     }
 
 
-
+/*
     public long setRewardStatus(int userId, int rewardId, RewardStatusType rewardStatusType){
 
         // Create and/or open the database for writing
@@ -1334,7 +1334,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
         return rowsAffected;
     }
-
+*/
     public long setUserPoints(User user, int points){
 
         // Create and/or open the database for writing

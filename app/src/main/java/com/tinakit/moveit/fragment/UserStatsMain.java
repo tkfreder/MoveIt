@@ -67,6 +67,7 @@ public class UserStatsMain extends Fragment{
 
     private void initializeUI(){
 
+        // get user data
         mUserList = mDatabaseHelper.getUsers();
 
         mViewPager = (ViewPager)rootView.findViewById(R.id.viewpager_user_stats);
