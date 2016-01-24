@@ -126,6 +126,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     private static final String VIEW_REWARDSTATUS_USER = "RewardStatusUser";
     private static final String VIEW_FIRST_LOCATION_POINTS = "FirstLocationPoints";
     private static final String VIEW_ACTIVITY_USERS_DETAIL = "ActivityUsersDetail";
+    private static final String VIEW_USERS_REWARDS_DETAIL = "UsersRewardsDetail";
 
     private static Context mContext;
     private SQLiteDatabase db;
@@ -291,6 +292,20 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 " INNER JOIN " + TABLE_USERS + " u on u." + KEY_ACTIVITY_USERS_ID + " = a." + KEY_ACTIVITY_USERS_USER_ID +
                 " INNER JOIN " + TABLE_ACTIVITY_TYPE + " t on t." + KEY_ACTIVITY_TYPE_ID + " = a." + KEY_ACTIVITY_USERS_ACTIVITY_TYPE_ID_FK;
 
+        String CREATE_VIEW_USERS_REWARDS_DETAIL = "CREATE VIEW " + VIEW_USERS_REWARDS_DETAIL + " AS" +
+                " SELECT u._id AS " + KEY_REWARDUSER_USER_ID_FK +
+                " , u." + KEY_USER_NAME + " AS " + KEY_USER_NAME +
+                " , u." + KEY_USER_IS_ADMIN + " AS " + KEY_USER_IS_ADMIN +
+                " , u." + KEY_USER_IS_ENABLED + " AS " + KEY_USER_IS_ENABLED +
+                " , u." + KEY_USER_WEIGHT + " AS " + KEY_USER_WEIGHT +
+                " , u." + KEY_USER_AVATAR_FILENAME + " AS " + KEY_USER_AVATAR_FILENAME +
+                " , u." + KEY_USER_POINTS + " AS " + KEY_USER_POINTS +
+                " , r." + KEY_REWARD_POINTS + " AS " + KEY_REWARD_POINTS +
+                " , r." + KEY_REWARD_NAME + " AS " + KEY_REWARD_NAME +
+                " FROM " + TABLE_USERS + " u" +
+                " LEFT JOIN " + TABLE_REWARDUSER + " ru on u." + KEY_USER_ID + " = ru." + KEY_REWARDUSER_USER_ID_FK +
+                " LEFT JOIN " + TABLE_REWARDS + " r on ru." + KEY_REWARDUSER_REWARD_ID_FK + "= r." + KEY_REWARD_ID;
+
         db.execSQL(CREATE_USERS_TABLE);
         db.execSQL(CREATE_ACTIVITY_USERS_TABLE);
         db.execSQL(CREATE_ACTIVITY_TYPE_TABLE);
@@ -302,6 +317,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_VIEW_REWARDSTATUSUSER);
         db.execSQL(CREATE_VIEW_FIRST_LOCATION_POINTS);
         db.execSQL(CREATE_VIEW_ACTIVITY_USERS_DETAIL);
+        db.execSQL(CREATE_VIEW_USERS_REWARDS_DETAIL);
 
         //populate ActivityType table
         db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 'walk', 4.6, '1995 world record, walking speed meters/second', 1,'walk_48',1);");
@@ -353,6 +369,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             db.execSQL("DROP VIEW IF EXISTS " + VIEW_REWARDSTATUS_USER);
             db.execSQL("DROP VIEF IF EXISTS " + VIEW_FIRST_LOCATION_POINTS);
             db.execSQL("DROP VIEF IF EXISTS " + VIEW_ACTIVITY_USERS_DETAIL);
+            db.execSQL("DROP VIEF IF EXISTS " + VIEW_USERS_REWARDS_DETAIL);
             onCreate(db);
 
         }
@@ -402,21 +419,29 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
         try {
 
-            Cursor cursor = db.query(TABLE_USERS,
-                    new String[]{KEY_USER_ID, KEY_USER_NAME, KEY_USER_IS_ADMIN, KEY_USER_WEIGHT, KEY_USER_AVATAR_FILENAME, KEY_USER_POINTS},
-                    KEY_USER_IS_ENABLED + "= ?", new String[]{"1"}, null, null, KEY_USER_ID);
+            Cursor cursor = db.query(VIEW_USERS_REWARDS_DETAIL,
+                    new String[]{KEY_REWARDUSER_USER_ID_FK, KEY_USER_NAME, KEY_USER_IS_ADMIN, KEY_USER_WEIGHT, KEY_USER_AVATAR_FILENAME, KEY_USER_POINTS, KEY_REWARD_NAME, KEY_REWARD_POINTS},
+                    KEY_USER_IS_ENABLED + "= ?", new String[]{"1"}, null, null, KEY_REWARDUSER_USER_ID_FK);
             try{
 
                 if (cursor.moveToFirst())
                 {
                     do{
                         User user = new User();
-                        user.setUserId(cursor.getInt(cursor.getColumnIndex(KEY_USER_ID)));
+                        user.setUserId(cursor.getInt(cursor.getColumnIndex(KEY_REWARDUSER_USER_ID_FK)));
                         user.setUserName(cursor.getString(cursor.getColumnIndex(KEY_USER_NAME)));
                         user.setIsAdmin(cursor.getInt(cursor.getColumnIndex(KEY_USER_IS_ADMIN)) == 1 ? true : false);
                         user.setWeight(cursor.getInt(cursor.getColumnIndex(KEY_USER_WEIGHT)));
                         user.setAvatarFileName(cursor.getString(cursor.getColumnIndex(KEY_USER_AVATAR_FILENAME)));
                         user.setPoints(cursor.getInt(cursor.getColumnIndex(KEY_USER_POINTS)));
+
+                        // create Reward
+                        Reward reward = new Reward();
+                        reward.setName(cursor.getString(cursor.getColumnIndex(KEY_REWARD_NAME)));
+                        reward.setPoints(cursor.getInt(cursor.getColumnIndex(KEY_REWARD_POINTS)));
+                        List<Reward> rewardList = new ArrayList<Reward>();
+                        rewardList.add(reward);
+                        user.setChildItemList(rewardList);
                         userList.add(user);
                     }while (cursor.moveToNext());
                 }

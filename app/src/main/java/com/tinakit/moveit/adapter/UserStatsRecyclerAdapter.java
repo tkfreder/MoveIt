@@ -2,6 +2,7 @@ package com.tinakit.moveit.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +13,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.hookedonplay.decoviewlib.DecoView;
+import com.hookedonplay.decoviewlib.charts.SeriesItem;
+import com.hookedonplay.decoviewlib.events.DecoEvent;
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.RewardView;
 import com.tinakit.moveit.fragment.UserProfile;
@@ -57,8 +61,26 @@ public class UserStatsRecyclerAdapter extends RecyclerView.Adapter<UserStatsRecy
         customViewHolder.userName.setText(user.getUserName());
         customViewHolder.points.setText(String.valueOf(user.getPoints()));
         customViewHolder.itemView.setTag(user);
-        customViewHolder.arcChart.setImageResource(mContext.getResources().getIdentifier("arc_chart_" + String.valueOf(i+1), "drawable", mActivity.getPackageName()));
 
+        //customViewHolder.arcChart.configureAngles(280, 0);
+        customViewHolder.arcChart.addSeries(new SeriesItem.Builder(Color.argb(255, 218, 218, 218))
+                .setRange(0, 100, 100)
+                //.setInitialVisibility(true)
+                //.setLineWidth(32f)
+                .build());
+
+        //Create data series track
+        final SeriesItem seriesItem1 = new SeriesItem.Builder(Color.argb(255, 64, 196, 0))
+                .setRange(0, 100, 0)
+                //.setLineWidth(32f)
+                .build();
+
+        int series1Index = customViewHolder.arcChart.addSeries(seriesItem1);
+
+        /*customViewHolder.arcChart.addEvent(new DecoEvent.Builder(DecoEvent.EventType.EVENT_SHOW, true)
+                .setDelay(1000)
+                .setDuration(2000)
+                .build());*/
     }
 
     @Override
@@ -71,7 +93,7 @@ public class UserStatsRecyclerAdapter extends RecyclerView.Adapter<UserStatsRecy
         //protected ImageView avatar;
         protected TextView userName;
         protected TextView points;
-        protected ImageView arcChart;
+        protected DecoView arcChart;
 
         public CustomViewHolder(View view) {
             super(view);
@@ -79,7 +101,7 @@ public class UserStatsRecyclerAdapter extends RecyclerView.Adapter<UserStatsRecy
             //this.avatar = (ImageView) view.findViewById(R.id.avatar);
             this.userName= (TextView) view.findViewById(R.id.userName);
             this.points = (TextView) view.findViewById(R.id.points);
-            this.arcChart = (ImageView)view.findViewById(R.id.arcChart);
+            this.arcChart = (DecoView)view.findViewById(R.id.arcChart);
         }
     }
 
