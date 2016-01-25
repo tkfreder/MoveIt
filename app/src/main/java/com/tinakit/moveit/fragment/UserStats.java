@@ -168,7 +168,7 @@ public class UserStats extends Fragment {
 
                     float percentFilled = ((currentPosition) / 100);
                     int pointsRemaining = mRewardPoints >= mUser.getPoints() ? Math.round(mRewardPoints * (1 - percentFilled)) : mRewardPoints;
-                    textPercentage.setText(String.format("%d more " + (pointsRemaining == 1 ? "coin" : "coins" + " to go!")));
+                    textPercentage.setText(String.format("%d more " + (pointsRemaining == 1 ? "coin" : "coins") + " to go!", pointsRemaining));
                 }
 
                 @Override
