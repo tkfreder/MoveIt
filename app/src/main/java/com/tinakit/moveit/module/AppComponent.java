@@ -7,6 +7,7 @@ import com.tinakit.moveit.adapter.EditRewardRecyclerAdapter;
 import com.tinakit.moveit.adapter.UserProfileRecyclerAdapter;
 import com.tinakit.moveit.fragment.ActivityChooser;
 import com.tinakit.moveit.fragment.ActivityHistory;
+import com.tinakit.moveit.fragment.AdminInBox;
 import com.tinakit.moveit.fragment.EditReward;
 import com.tinakit.moveit.fragment.EditUser;
 import com.tinakit.moveit.fragment.MapFragment;
@@ -48,4 +49,5 @@ public interface AppComponent {
     void inject(EditReward editReward);
     void inject(EditUser editUser);
     void inject(UserStats userStats);
+    void inject(AdminInBox adminInBox);
 }

@@ -45,7 +45,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     private static final int    DATABASE_VERSION = 1;
 
     //FORMATTING
-    private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss:SSS";
+    public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss:SSS";
 
     //ACTIVITY_USERS TABLE
     private static final String TABLE_ACTIVITY_USERS = "ActivityUsers";
@@ -1078,15 +1078,65 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
     }
 
+    public List<Reward> getUnFulfilledRewards(){
+
+        List<Reward> rewardList = new ArrayList<>();
+
+        try {
+
+            // RewardsEarnedId is not the same as RewardId
+            Cursor cursor = db.query(TABLE_REWARDS_EARNED,
+                    new String[]{KEY_REWARDSEARNED__ID,KEY_REWARDSEARNED_REWARD_NAME,KEY_REWARDSEARNED_REWARD_POINTS,KEY_REWARDSEARNED_TIMESTAMP,KEY_REWARDSEARNED_DATE_FULFILLED, KEY_REWARDSEARNED_USER_ID_FK},
+                    KEY_REWARDSEARNED_DATE_FULFILLED + " is null",
+                    null, null, null, null);
+
+            try{
+
+                if (cursor.moveToFirst()) {
+
+                    do {
+
+                        Reward reward = new Reward();
+                        reward.setRewardId(cursor.getInt(cursor.getColumnIndex(KEY_REWARDSEARNED__ID)));
+                        reward.setName(cursor.getString(cursor.getColumnIndex(KEY_REWARDSEARNED_REWARD_NAME)));
+                        reward.setPoints(cursor.getInt(cursor.getColumnIndex(KEY_REWARDSEARNED_REWARD_POINTS)));
+                        reward.setDateEarned(new SimpleDateFormat(DATE_FORMAT).parse(cursor.getString(cursor.getColumnIndex(KEY_REWARDSEARNED_TIMESTAMP))));
+                        reward.setUserId(cursor.getInt(cursor.getColumnIndex(KEY_REWARDSEARNED_USER_ID_FK)));
+                        rewardList.add(reward);
+
+                    } while (cursor.moveToNext());
+
+                }
+
+            }catch(Exception exception) {
+
+                exception.printStackTrace();
+
+            } finally{
+
+                if (cursor != null && !cursor.isClosed())
+                {
+                    cursor.close();
+                }
+            }
+
+        } catch (Exception e) {
+            Log.d(LOGTAG, "Error during getUnFulfilledRewards()");
+        }
+
+        return rewardList;
+    }
+
+
     public List<Reward> getRewardsEarned(User user){
 
         List<Reward> rewardList = new ArrayList<>();
 
         try {
 
-            // RewardsEarnedId is not the same as RewardId, so don't need RewardsEarnedId
+            // RewardsEarnedId is not the same as RewardId
             Cursor cursor = db.query(TABLE_REWARDS_EARNED,
-                    new String[]{KEY_REWARDSEARNED_REWARD_NAME,KEY_REWARDSEARNED_REWARD_POINTS,KEY_REWARDSEARNED_TIMESTAMP,KEY_REWARDSEARNED_DATE_FULFILLED, KEY_REWARDSEARNED_USER_ID_FK},
+                    new String[]{KEY_REWARDSEARNED__ID,KEY_REWARDSEARNED_REWARD_NAME,KEY_REWARDSEARNED_REWARD_POINTS,KEY_REWARDSEARNED_TIMESTAMP,KEY_REWARDSEARNED_DATE_FULFILLED, KEY_REWARDSEARNED_USER_ID_FK},
                     KEY_REWARDSEARNED_USER_ID_FK + " = ?",
                     new String[]{String.valueOf(user.getUserId())}, null, null, null);
 
@@ -1097,6 +1147,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                     do {
 
                         Reward reward = new Reward();
+                        reward.setRewardId(cursor.getInt(cursor.getColumnIndex(KEY_REWARDSEARNED__ID)));
                         reward.setName(cursor.getString(cursor.getColumnIndex(KEY_REWARDSEARNED_REWARD_NAME)));
                         reward.setPoints(cursor.getInt(cursor.getColumnIndex(KEY_REWARDSEARNED_REWARD_POINTS)));
                         reward.setDateEarned(new SimpleDateFormat(DATE_FORMAT).parse(cursor.getString(cursor.getColumnIndex(KEY_REWARDSEARNED_TIMESTAMP))));
@@ -1127,6 +1178,33 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
         return rewardList;
     }
+
+    public int updateRewardEarned(Reward reward){
+
+        int rowsAffected = 0;
+
+        db.beginTransaction();
+        try {
+
+            ContentValues values = new ContentValues();
+            values.put(KEY_REWARDSEARNED_REWARD_NAME, reward.getName());
+            values.put(KEY_REWARDSEARNED_REWARD_POINTS, reward.getPoints());
+            values.put(KEY_REWARDSEARNED_DATE_FULFILLED, new SimpleDateFormat(DATE_FORMAT).format(reward.getDateFulfilled()));
+            values.put(KEY_REWARDSEARNED_USER_ID_FK, reward.getUserId());
+
+            rowsAffected = db.update(TABLE_REWARDS_EARNED, values, KEY_REWARDSEARNED__ID + "= ? ", new String[]{String.valueOf(reward.getRewardId())});
+
+
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            Log.d(LOGTAG, "Error during updateRewardEarned()");
+        } finally {
+            db.endTransaction();
+        }
+
+        return rowsAffected;
+    }
+
 
     public Reward getReward(int rewardId){
 

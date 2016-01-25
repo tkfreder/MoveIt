@@ -149,5 +149,6 @@
     <string name="hint_admin">Gives this User access to Admin features, ie. editing users and rewards.</string>
 
     <string name="button_add">Add</string>
+    <string name="fulfill">Fulfill</string>
 
 </resources>
