@@ -17,7 +17,6 @@ import com.hookedonplay.decoviewlib.DecoView;
 import com.hookedonplay.decoviewlib.charts.SeriesItem;
 import com.hookedonplay.decoviewlib.events.DecoEvent;
 import com.tinakit.moveit.R;
-import com.tinakit.moveit.activity.RewardView;
 import com.tinakit.moveit.fragment.UserProfile;
 import com.tinakit.moveit.model.User;
 

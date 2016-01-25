@@ -251,10 +251,10 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         String CREATE_REWARDSEARNED_TABLE = "CREATE TABLE " + TABLE_REWARDS_EARNED +
                 "(" +
                 KEY_REWARDSEARNED__ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // Define a primary key
-                KEY_REWARD_NAME + " TEXT, " +
-                KEY_REWARD_POINTS + " INTEGER, " +
+                KEY_REWARDSEARNED_REWARD_NAME + " TEXT, " +
+                KEY_REWARDSEARNED_REWARD_POINTS + " INTEGER, " +
                 KEY_REWARDSEARNED_TIMESTAMP + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, " +
-                KEY_REWARDSEARNED_DATE_FULFILLED + " TIMESTAME, " +
+                KEY_REWARDSEARNED_DATE_FULFILLED + " TIMESTAMP, " +
                 KEY_REWARDSEARNED_USER_ID_FK + " INTEGER REFERENCES " + TABLE_USERS + // Define a foreign key
                 ")";
 
@@ -331,10 +331,10 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
         //TODO: DUMMY DATA
         //populate Rewards table
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (1, 'Animal Jam 5 Diamonds', 5);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (2, 'Chocolate Chip Pancake Dinner', 6);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (3, 'Arclight Movie', 7);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (4, 'Dinner Out of Choice', 8);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (1, 'Animal Jam 5 Diamonds', 1);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (2, 'Chocolate Chip Pancake Dinner', 2);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (3, 'Arclight Movie', 3);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (4, 'Dinner Out of Choice', 4);");
 
         //TODO: DUMMY DATA
         db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Laura', 0, 50, 'avatar_3', 0, 1);");
@@ -1059,20 +1059,15 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
     public void insertRewardEarned(String rewardName, int rewardPoints, int userId){
 
-        // Create and/or open the database for writing
-        //SQLiteDatabase db = getWritableDatabase();
-
-        // It's a good idea to wrap our insert in a transaction. This helps with performance and ensures
-        // consistency of the database.
         db.beginTransaction();
         try {
 
             ContentValues values = new ContentValues();
-            values.put(KEY_REWARD_NAME, rewardName);
-            values.put(KEY_REWARD_POINTS, rewardPoints);
+            values.put(KEY_REWARDSEARNED_REWARD_NAME, rewardName);
+            values.put(KEY_REWARDSEARNED_REWARD_POINTS, rewardPoints);
             values.put(KEY_REWARDSEARNED_USER_ID_FK, userId);
+            values.put(KEY_REWARDSEARNED_TIMESTAMP, new SimpleDateFormat(DATE_FORMAT).format(new Date()));
 
-            // Notice how we haven't specified the primary key. SQLite auto increments the primary key column.
             db.insertOrThrow(TABLE_REWARDS_EARNED, null, values);
             db.setTransactionSuccessful();
         } catch (Exception e) {
@@ -1083,10 +1078,57 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
     }
 
-    public Reward getReward(int rewardId){
+    public List<Reward> getRewardsEarned(User user){
 
-        // Create and/or open the database for writing
-        //SQLiteDatabase db = getReadableDatabase();
+        List<Reward> rewardList = new ArrayList<>();
+
+        try {
+
+            // RewardsEarnedId is not the same as RewardId, so don't need RewardsEarnedId
+            Cursor cursor = db.query(TABLE_REWARDS_EARNED,
+                    new String[]{KEY_REWARDSEARNED_REWARD_NAME,KEY_REWARDSEARNED_REWARD_POINTS,KEY_REWARDSEARNED_TIMESTAMP,KEY_REWARDSEARNED_DATE_FULFILLED, KEY_REWARDSEARNED_USER_ID_FK},
+                    KEY_REWARDSEARNED_USER_ID_FK + " = ?",
+                    new String[]{String.valueOf(user.getUserId())}, null, null, null);
+
+            try{
+
+                if (cursor.moveToFirst()) {
+
+                    do {
+
+                        Reward reward = new Reward();
+                        reward.setName(cursor.getString(cursor.getColumnIndex(KEY_REWARDSEARNED_REWARD_NAME)));
+                        reward.setPoints(cursor.getInt(cursor.getColumnIndex(KEY_REWARDSEARNED_REWARD_POINTS)));
+                        reward.setDateEarned(new SimpleDateFormat(DATE_FORMAT).parse(cursor.getString(cursor.getColumnIndex(KEY_REWARDSEARNED_TIMESTAMP))));
+                        if(cursor.getString(cursor.getColumnIndex(KEY_REWARDSEARNED_DATE_FULFILLED)) != null)
+                            reward.setDateFulfilled(new SimpleDateFormat(DATE_FORMAT).parse(cursor.getString(cursor.getColumnIndex(KEY_REWARDSEARNED_DATE_FULFILLED))));
+                        reward.setUserId(cursor.getInt(cursor.getColumnIndex(KEY_REWARDSEARNED_USER_ID_FK)));
+                        rewardList.add(reward);
+
+                    } while (cursor.moveToNext());
+
+                }
+
+            }catch(Exception exception) {
+
+                exception.printStackTrace();
+
+            } finally{
+
+                if (cursor != null && !cursor.isClosed())
+                {
+                    cursor.close();
+                }
+            }
+
+        } catch (Exception e) {
+            Log.d(LOGTAG, "Error during getReward()");
+        }
+
+        return rewardList;
+    }
+
+    public Reward getReward(int rewardId){
 
         //initialize Reward object
         Reward reward = new Reward();

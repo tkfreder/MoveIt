@@ -2,74 +2,47 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:paddingTop="@dimen/activity_horizontal_margin"
                 xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <TextView
-        android:id="@+id/userName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/LabelListItemPurple"
-        android:gravity="center_horizontal">
-    </TextView>
-
-    <TextView
-        android:id="@+id/rewardName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/LabelListItemPurple"
-        android:gravity="center_horizontal"
-        android:layout_below="@+id/userName"/>
-
     <RelativeLayout
-        android:id="@+id/coinLayout"
+        android:id="@+id/userLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/rewardName"
-        android:layout_centerInParent="true"
-          >
+        android:layout_centerHorizontal="true"
+        >
 
+        <TextView
+            android:id="@+id/userName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/LabelSmallPurple"
+            android:gravity="center_horizontal">
+        </TextView>
         <TextView
             android:id="@+id/points"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/LabelListItemPurple"
-            android:text="100"
+            style="@style/LabelSmallPurple"
+            android:paddingLeft="16dp"
+            android:layout_toRightOf="@+id/userName"
+            android:layout_toEndOf="@+id/userName"
             />
-
-        <TextView
-            android:id="@+id/outOf"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingLeft="2dp"
-            android:text=" out of "
-            style="@style/LabelListItemPurple"
-            android:layout_toRightOf="@+id/points"
-            android:layout_toEndOf="@+id/points"/>
-
-        <TextView
-            android:id="@+id/rewardPoints"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/LabelListItemPurple"
-            android:layout_toRightOf="@+id/outOf"
-            android:layout_toEndOf="@+id/outOf"
-            />
-
         <ImageView
             android:id="@+id/goldCoin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingLeft="2dp"
             android:src="@drawable/gold_coin_24"
-            android:layout_toRightOf="@+id/rewardPoints"
-            android:layout_toEndOf="@+id/rewardPoints"/>
-
-
+            android:layout_toRightOf="@+id/points"
+            android:layout_toEndOf="@+id/points"
+            android:layout_centerVertical="true"/>
     </RelativeLayout>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/coinLayout">
+        android:layout_below="@+id/userLayout">
         <RelativeLayout
             android:id="@+id/arcChartLayout"
             android:layout_width="match_parent"
@@ -82,12 +55,60 @@
                 android:layout_height="match_parent"
                 custom:dv_arc_gravity_horizontal="Fill"
                 android:layout_centerInParent="true"/>
-            <TextView
-                android:id="@+id/textPercentage"
+            <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@style/HeaderFont"
-                android:layout_centerInParent="true"/>
+                android:layout_centerInParent="true">
+
+                <RelativeLayout
+                    android:id="@+id/ribbonLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/ribbon"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:src="@drawable/ribbon"/>
+                    <TextView
+                        android:id="@+id/congratulations"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/LabelMediumGreen"
+                        android:text="Congratulations!"
+                        android:gravity="center_horizontal"
+                        android:layout_below="@+id/ribbon"/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/LabelMediumGreen"
+                        android:gravity="center_horizontal"
+                        android:text="You earned"
+                        android:layout_below="@+id/congratulations"/>
+
+                </RelativeLayout>
+                <TextView
+                    android:id="@+id/rewardName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/LabelMediumGreen"
+                    android:gravity="center_horizontal"
+                    android:paddingTop="24dp"
+                    android:layout_below="@+id/ribbonLayout"
+                    />
+                <TextView
+                    android:id="@+id/textPercentage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/LabelMediumGreen"
+                    android:gravity="center_horizontal"
+                    android:layout_below="@+id/rewardName"/>
+
+
+            </RelativeLayout>
 
     </RelativeLayout>
 

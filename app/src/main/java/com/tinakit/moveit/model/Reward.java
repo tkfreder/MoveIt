@@ -3,6 +3,8 @@ package com.tinakit.moveit.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Date;
+
 /**
  * Created by Tina on 9/23/2015.
  */
@@ -11,10 +13,9 @@ public class Reward implements Parcelable {
     private int mRewardId;
     private String mName;
     private int mPoints;
-    private String mDescription;
-    private boolean mEnabled;
-    private RewardStatusType mRewardStatusType;
     private int mUserId;
+    private Date mDateEarned;
+    private Date mDateFulfilled;
 
     public Reward (){}
 
@@ -42,30 +43,6 @@ public class Reward implements Parcelable {
         mPoints = points;
     }
 
-    public String getDescription() {
-        return mDescription;
-    }
-
-    public void setDescription(String description) {
-        mDescription = description;
-    }
-
-    public boolean isEnabled() {
-        return mEnabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        mEnabled = enabled;
-    }
-
-    public RewardStatusType getRewardStatusType() {
-        return mRewardStatusType;
-    }
-
-    public void setRewardStatusType(RewardStatusType rewardStatusType) {
-        mRewardStatusType = rewardStatusType;
-    }
-
     public int getUserId() {
         return mUserId;
     }
@@ -74,14 +51,31 @@ public class Reward implements Parcelable {
         mUserId = userId;
     }
 
+    public Date getDateEarned() {
+        return mDateEarned;
+    }
+
+    public void setDateEarned(Date dateEarned) {
+        mDateEarned = dateEarned;
+    }
+
+    public Date getDateFulfilled() {
+        return mDateFulfilled;
+    }
+
+    public void setDateFulfilled(Date dateFulfilled) {
+        mDateFulfilled = dateFulfilled;
+    }
+
     protected Reward(Parcel in) {
         mRewardId = in.readInt();
         mName = in.readString();
         mPoints = in.readInt();
-        mDescription = in.readString();
-        mEnabled = in.readByte() != 0x00;
-        mRewardStatusType = (RewardStatusType) in.readValue(RewardStatusType.class.getClassLoader());
         mUserId = in.readInt();
+        long tmpMDateEarned = in.readLong();
+        mDateEarned = tmpMDateEarned != -1 ? new Date(tmpMDateEarned) : null;
+        long tmpMDateFulfilled = in.readLong();
+        mDateFulfilled = tmpMDateFulfilled != -1 ? new Date(tmpMDateFulfilled) : null;
     }
 
     @Override
@@ -94,10 +88,9 @@ public class Reward implements Parcelable {
         dest.writeInt(mRewardId);
         dest.writeString(mName);
         dest.writeInt(mPoints);
-        dest.writeString(mDescription);
-        dest.writeByte((byte) (mEnabled ? 0x01 : 0x00));
-        dest.writeValue(mRewardStatusType);
         dest.writeInt(mUserId);
+        dest.writeLong(mDateEarned != null ? mDateEarned.getTime() : -1L);
+        dest.writeLong(mDateFulfilled != null ? mDateFulfilled.getTime() : -1L);
     }
 
     @SuppressWarnings("unused")
