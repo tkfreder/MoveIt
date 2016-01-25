@@ -3,27 +3,49 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="80dp">
     <TextView
         android:id="@+id/date"
         android:layout_width="wrap_content"
-        app:layout_widthPercent="20%"
-        android:layout_height="wrap_content"/>
+        app:layout_widthPercent="15%"
+        android:layout_height="match_parent"
+        android:layout_centerVertical="true"
+        style="@style/LabelListItemPurple"/>
     <TextView
         android:id="@+id/userName"
         android:layout_width="wrap_content"
-        app:layout_widthPercent="20%"
-        android:layout_height="wrap_content"/>
+        app:layout_widthPercent="25%"
+        android:layout_height="match_parent"
+        android:layout_toEndOf="@+id/date"
+        android:layout_toRightOf="@+id/date"
+        android:layout_centerVertical="true"
+        style="@style/LabelListItemPurple"/>
     <TextView
         android:id="@+id/rewardName"
         android:layout_width="wrap_content"
-        app:layout_widthPercent="40%"
-        android:layout_height="wrap_content"/>
-    <Button
-        android:id="@+id/fulfill"
-        android:layout_width="wrap_content"
-        app:layout_widthPercent="20%"
-        android:layout_height="wrap_content"
-        android:text="@string/fulfill"/>
+        app:layout_widthPercent="35%"
+        android:layout_height="match_parent"
+        android:layout_toEndOf="@+id/userName"
+        android:layout_toRightOf="@+id/userName"
+        android:layout_centerVertical="true"
+        style="@style/LabelListItemPurple"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        app:layout_widthPercent="25%"
+        android:layout_height="match_parent"
+        android:layout_toEndOf="@+id/rewardName"
+        android:layout_toRightOf="@+id/rewardName">
+
+        <Button
+            android:id="@+id/fulfill"
+            android:layout_width="wrap_content"
+            android:minWidth="@dimen/button_width_minimum"
+            android:padding="@dimen/button_external_padding"
+            android:layout_height="wrap_content"
+            android:text="@string/fulfill"
+            android:background="@color/blue"
+            android:textColor="@color/white"/>
+    </LinearLayout>
+
 
 </android.support.percent.PercentRelativeLayout>

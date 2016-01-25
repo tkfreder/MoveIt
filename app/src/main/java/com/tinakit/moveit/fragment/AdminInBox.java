@@ -17,6 +17,7 @@ import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.Reward;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.module.CustomApplication;
+import com.tinakit.moveit.utility.DateUtility;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -113,7 +114,7 @@ public class AdminInBox extends Fragment {
 
             Reward reward = mRewardList.get(position);
 
-            holder.date.setText(reward.getDateEarned().toString());
+            holder.date.setText(DateUtility.getDateFormattedRecent(reward.getDateEarned(), 7));
 
             String userName = "";
             for (User user : mUserList){

@@ -12,5 +12,7 @@
     <dimen name="min_width_short_edit_text">100dp</dimen>
     <dimen name="round_button_diameter">48dp</dimen>
     <dimen name="add_button_margin">4dp</dimen>
+    <dimen name="button_width_minimum">64dp</dimen>
+    <dimen name="button_external_padding">8dp</dimen>
 
 </resources>
