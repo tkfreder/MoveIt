@@ -1179,30 +1179,36 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         return rewardList;
     }
 
-    public int updateRewardEarned(Reward reward){
+    public int updateRewardsEarned(List<Reward> rewardList){
 
-        int rowsAffected = 0;
+        int totalRowsAffected = 0;
 
-        db.beginTransaction();
-        try {
+        for (Reward reward : rewardList){
 
-            ContentValues values = new ContentValues();
-            values.put(KEY_REWARDSEARNED_REWARD_NAME, reward.getName());
-            values.put(KEY_REWARDSEARNED_REWARD_POINTS, reward.getPoints());
-            values.put(KEY_REWARDSEARNED_DATE_FULFILLED, new SimpleDateFormat(DATE_FORMAT).format(reward.getDateFulfilled()));
-            values.put(KEY_REWARDSEARNED_USER_ID_FK, reward.getUserId());
+            db.beginTransaction();
 
-            rowsAffected = db.update(TABLE_REWARDS_EARNED, values, KEY_REWARDSEARNED__ID + "= ? ", new String[]{String.valueOf(reward.getRewardId())});
+            try {
 
+                ContentValues values = new ContentValues();
+                values.put(KEY_REWARDSEARNED_REWARD_NAME, reward.getName());
+                values.put(KEY_REWARDSEARNED_REWARD_POINTS, reward.getPoints());
+                values.put(KEY_REWARDSEARNED_DATE_FULFILLED, new SimpleDateFormat(DATE_FORMAT).format(reward.getDateFulfilled()));
+                values.put(KEY_REWARDSEARNED_USER_ID_FK, reward.getUserId());
 
-            db.setTransactionSuccessful();
-        } catch (Exception e) {
-            Log.d(LOGTAG, "Error during updateRewardEarned()");
-        } finally {
-            db.endTransaction();
+                int rowsAffected = db.update(TABLE_REWARDS_EARNED, values, KEY_REWARDSEARNED__ID + "= ? ", new String[]{String.valueOf(reward.getRewardId())});
+
+                if (rowsAffected > 0)
+                    totalRowsAffected += rowsAffected;
+
+                db.setTransactionSuccessful();
+            } catch (Exception e) {
+                Log.d(LOGTAG, "Error during updateRewardsEarned()");
+            } finally {
+                db.endTransaction();
+            }
         }
 
-        return rowsAffected;
+        return totalRowsAffected;
     }
 
 

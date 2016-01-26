@@ -36,13 +36,13 @@
         android:layout_toEndOf="@+id/rewardName"
         android:layout_toRightOf="@+id/rewardName">
 
-        <Button
-            android:id="@+id/fulfill"
+
+        <CheckBox
+            android:id="@+id/fulfillCheckBox"
             android:layout_width="wrap_content"
             android:minWidth="@dimen/button_width_minimum"
             android:padding="@dimen/button_external_padding"
             android:layout_height="wrap_content"
-            android:text="@string/fulfill"
             android:background="@color/blue"
             android:textColor="@color/white"/>
     </LinearLayout>

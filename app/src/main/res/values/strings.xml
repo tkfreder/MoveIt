@@ -91,6 +91,8 @@
     <!-- dialog messages -->
     <string name="message_update_reward">Save successful.</string>
     <string name="error_message_update_reward">An error occurred. Try again.</string>
+    <string name="message_update_reward_earned">Update successful.</string>
+    <string name="error_message_update_reward_earned">An error occurred. Try again.</string>
     <string name="message_saved_changes">Your changes have been saved.</string>
     <string name="error_message_add_user">An error occurred in adding User.  Try again.</string>
     <string name="message_added_user">User has been added.</string>
