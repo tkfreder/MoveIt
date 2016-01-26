@@ -3,7 +3,6 @@ package com.tinakit.moveit.utility;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
-import android.location.Location;
 
 import com.google.android.gms.maps.model.LatLng;
 

@@ -1,10 +1,7 @@
 package com.tinakit.moveit.module;
 
-import android.app.Activity;
 import android.content.Context;
-import android.support.v4.app.Fragment;
 
-import com.tinakit.moveit.api.GoogleApi;
 import com.tinakit.moveit.db.FitnessDBHelper;
 
 import javax.inject.Singleton;

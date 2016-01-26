@@ -1,6 +1,5 @@
 package com.tinakit.moveit.fragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -15,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.tinakit.moveit.R;
-import com.tinakit.moveit.activity.PickAvatar;
 import com.tinakit.moveit.adapter.UserProfileRecyclerAdapter;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.User;

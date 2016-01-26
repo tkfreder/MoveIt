@@ -2,30 +2,17 @@ package com.tinakit.moveit.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.tinakit.moveit.R;
-import com.tinakit.moveit.adapter.UserProfileRecyclerAdapter;
 import com.tinakit.moveit.adapter.ViewPagerAdapter;
-import com.tinakit.moveit.db.FitnessDBHelper;
-import com.tinakit.moveit.module.CustomApplication;
 import com.tinakit.moveit.tab.SlidingTabLayout;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
 
     // source reference: http://blog.grafixartist.com/material-design-tabs-with-android-design-support-library/
 /**

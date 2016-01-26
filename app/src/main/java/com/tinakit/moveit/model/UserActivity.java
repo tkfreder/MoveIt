@@ -1,7 +1,7 @@
 package com.tinakit.moveit.model;
 
-import android.os.Parcelable;
 import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
  * Created by Tina on 11/7/2015.

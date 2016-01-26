@@ -1,12 +1,10 @@
 package com.tinakit.moveit.fragment;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -19,10 +17,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.tinakit.moveit.R;
-import com.tinakit.moveit.activity.MainActivity;
-import com.tinakit.moveit.model.UnitSplit;
 import com.tinakit.moveit.api.GoogleApi;
+import com.tinakit.moveit.model.UnitSplit;
 import com.tinakit.moveit.module.CustomApplication;
 import com.tinakit.moveit.utility.Map;
 

@@ -1,7 +1,6 @@
 package com.tinakit.moveit.fragment;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,8 +10,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -30,8 +27,6 @@ import com.tinakit.moveit.utility.UnitConverter;
 import java.util.List;
 
 import javax.inject.Inject;
-
-import fr.ganfra.materialspinner.MaterialSpinner;
 
 /**
  * Created by Tina on 12/15/2015.

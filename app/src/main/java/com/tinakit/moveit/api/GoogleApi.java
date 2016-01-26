@@ -1,8 +1,6 @@
 package com.tinakit.moveit.api;
 
-import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -18,8 +16,6 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.tinakit.moveit.activity.ActivityTracker;
-
-import javax.inject.Inject;
 
 /**
  * Created by Tina on 12/12/2015.

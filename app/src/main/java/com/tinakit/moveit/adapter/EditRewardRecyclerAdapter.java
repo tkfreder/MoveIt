@@ -1,8 +1,6 @@
 package com.tinakit.moveit.adapter;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -10,21 +8,16 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.db.FitnessDBHelper;
-import com.tinakit.moveit.fragment.EditReward;
-import com.tinakit.moveit.fragment.UserProfile;
 import com.tinakit.moveit.model.Reward;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.module.CustomApplication;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;

@@ -1,9 +1,6 @@
 package com.tinakit.moveit.module;
 
 import com.tinakit.moveit.api.GoogleApi;
-import com.tinakit.moveit.api.LocationApi;
-
-import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;

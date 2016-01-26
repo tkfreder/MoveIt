@@ -25,26 +25,25 @@ import android.widget.Chronometer;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.tinakit.moveit.R;
+import com.tinakit.moveit.api.Accelerometer;
+import com.tinakit.moveit.api.GoogleApi;
+import com.tinakit.moveit.api.LocationApi;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.fragment.ActivityChooser;
 import com.tinakit.moveit.fragment.MapFragment;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.UnitSplit;
 import com.tinakit.moveit.model.User;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import com.tinakit.moveit.R;
 import com.tinakit.moveit.model.UserActivity;
-import com.tinakit.moveit.api.Accelerometer;
-import com.tinakit.moveit.api.GoogleApi;
-import com.tinakit.moveit.api.LocationApi;
 import com.tinakit.moveit.module.CustomApplication;
 import com.tinakit.moveit.utility.CalorieCalculator;
 import com.tinakit.moveit.utility.ChronometerUtility;
 import com.tinakit.moveit.utility.UnitConverter;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import javax.inject.Inject;
 

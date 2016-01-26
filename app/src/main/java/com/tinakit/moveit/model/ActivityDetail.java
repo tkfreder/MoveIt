@@ -1,13 +1,13 @@
 package com.tinakit.moveit.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import android.os.Parcelable;
-import android.os.Parcel;
 
 /**
  * Created by Tina on 9/22/2015.

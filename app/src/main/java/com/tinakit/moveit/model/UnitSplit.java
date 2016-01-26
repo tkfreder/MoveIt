@@ -2,8 +2,6 @@ package com.tinakit.moveit.model;
 
 import android.location.Location;
 
-import java.util.Date;
-
 /**
  * Created by Tina on 6/18/2015.
  */

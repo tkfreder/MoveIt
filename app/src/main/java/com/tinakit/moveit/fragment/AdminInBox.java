@@ -65,7 +65,7 @@ public class AdminInBox extends Fragment {
         mRecyclerAdapter = new AdminInboxRecyclerAdapter(rewardList, userList);
         recyclerView.setAdapter(mRecyclerAdapter);
 
-        mFulfillButton = (Button)mRootView.findViewById(R.id.fulfill);
+        mFulfillButton = (Button)mRootView.findViewById(R.id.fulfillButton);
         mFulfillButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

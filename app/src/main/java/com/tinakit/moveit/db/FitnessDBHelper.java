@@ -6,17 +6,16 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.MatrixCursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
 import android.util.Log;
-import android.database.SQLException;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.ActivityType;
 import com.tinakit.moveit.model.Reward;
-import com.tinakit.moveit.model.RewardStatusType;
 import com.tinakit.moveit.model.UnitSplit;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.model.UserActivity;
@@ -25,11 +24,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import dagger.Provides;
 
 /**
  * Created by Tina on 9/28/2015.

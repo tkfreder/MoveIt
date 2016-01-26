@@ -1,7 +1,5 @@
 package com.tinakit.moveit;
 
-import com.tinakit.moveit.api.LocationApi;
-
 /**
  * Created by Tina on 12/15/2015.
  */
