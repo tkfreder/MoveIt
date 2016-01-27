@@ -85,47 +85,56 @@ public class UserProfileRecyclerAdapter extends RecyclerView.Adapter<UserProfile
 
         customViewHolder.avatar.setImageResource(mContext.getResources().getIdentifier(user.getAvatarFileName(), "drawable", mActivity.getPackageName()));
 
-        //save current User data in deleteButton
-        customViewHolder.deleteButton.setTag(user);
-        customViewHolder.deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        if (user.isAdmin()){
 
-                mUser = (User)v.getTag();
+            // do not display delete button
+            customViewHolder.deleteButton.setVisibility(View.INVISIBLE);
+        }
+        else{
 
-                AlertDialog alertDialog = new AlertDialog.Builder(
-                        mActivity,
-                        R.style.AlertDialogCustom_Destructive)
-                        .setPositiveButton(R.string.button_delete, new DialogInterface.OnClickListener()
-                {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
+            //save current User data in deleteButton
+            customViewHolder.deleteButton.setTag(user);
+            customViewHolder.deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
-                                // delete user
-                                long rowsAffected = mDatabaseHelper.disableUser(mUser);
-                                if (rowsAffected == 1){
+                    mUser = (User)v.getTag();
 
-                                    //refresh by redirecting to UserProfile
-                                    UserProfile userProfile = new UserProfile();
-                                    mActivity.getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, userProfile).commit();
+                    AlertDialog alertDialog = new AlertDialog.Builder(
+                            mActivity,
+                            R.style.AlertDialogCustom_Destructive)
+                            .setPositiveButton(R.string.button_delete, new DialogInterface.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+
+                                    // delete user
+                                    long rowsAffected = mDatabaseHelper.disableUser(mUser);
+                                    if (rowsAffected == 1){
+
+                                        //refresh by redirecting to UserProfile
+                                        UserProfile userProfile = new UserProfile();
+                                        mActivity.getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, userProfile).commit();
+                                    }
                                 }
-                            }
-                        })
-                        .setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                // Cancel Action
-                                //don't do anything
+                            })
+                            .setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    // Cancel Action
+                                    //don't do anything
 
-                            }
-                        })
-                        .setTitle(R.string.title_delete_user)
-                        .setMessage(R.string.message_delete_user)
-                        .show();
+                                }
+                            })
+                            .setTitle(R.string.title_delete_user)
+                            .setMessage(R.string.message_delete_user)
+                            .show();
 
 
-            }
-        });
+                }
+            });
+
+        }
 
         //save current User data in editButton
         customViewHolder.editButton.setTag(user);

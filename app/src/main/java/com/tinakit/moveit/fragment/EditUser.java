@@ -8,6 +8,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -91,6 +92,9 @@ public class EditUser extends Fragment {
         // get UserName list, for validating new UserName
         mUserList = mDatabaseHelper.getUsers();
 
+        // initialize mUser_previous in case adding new user
+        mUser_previous = new User();
+
         // get User out of Bundle, if exists
         Bundle bundle = this.getArguments();
         if (bundle != null && bundle.containsKey(EDIT_USER_USER)) {
@@ -144,8 +148,10 @@ public class EditUser extends Fragment {
 
     private void populateForm(User user){
 
-        mUserName.setText(user.getUserName());
-        mAvatar.setImageResource(getResources().getIdentifier(user.getAvatarFileName(), "drawable", getActivity().getPackageName()));
+        if (!TextUtils.isEmpty(mUser.getUserName()))
+            mUserName.setText(user.getUserName());
+        if (!TextUtils.isEmpty(mUser.getAvatarFileName()))
+            mAvatar.setImageResource(getResources().getIdentifier(user.getAvatarFileName(), "drawable", getActivity().getPackageName()));
         mWeight.setText(String.valueOf(user.getWeight()));
         mAdmin.setChecked(user.isAdmin());
     }
@@ -167,8 +173,14 @@ public class EditUser extends Fragment {
             public void afterTextChanged(Editable s) {
 
                 //only check if name exists if new username is same as the previous one
-                boolean isSameUserName = s.toString().equals(mUser_previous.getUserName());
-                if (!isSameUserName && existsUserName())
+                if (!TextUtils.isEmpty(mUser_previous.getUserName())){
+
+                    boolean isSameUserName = s.toString().equals(mUser_previous.getUserName());
+                    if (!isSameUserName)
+                        mUserName.setError(getString(R.string.message_username_exists));
+                }
+
+                if (existsUserName())
                     mUserName.setError(getString(R.string.message_username_exists));
             }
         });
@@ -190,8 +202,10 @@ public class EditUser extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
 
-                if (!isValidWeight(Integer.parseInt(mWeight.getText().toString()))){
-                    mWeight.setError(getString(R.string.message_weight_empty));
+                if (!TextUtils.isEmpty(mWeight.getText())){
+                    if (!isValidWeight(Integer.parseInt(mWeight.getText().toString()))){
+                        mWeight.setError(getString(R.string.message_weight_empty));
+                    }
                 }
             }
         });
@@ -220,6 +234,9 @@ public class EditUser extends Fragment {
                         if (rowId != -1) {
 
                             mIsNewUser = false;
+
+                            // add a placeholder for Reward for the new user
+
 
                             UserProfile userProfile = new UserProfile();
                             //replace current fragment
