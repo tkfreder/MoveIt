@@ -80,7 +80,6 @@ public class Admin extends Fragment{
             @Override
             public void onPageSelected(int position) {
 
-                ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(getString(R.string.app_bar_header_admin) + " : " + mViewPagerAdapter.getPageTitle(position));
             }
 
             @Override
