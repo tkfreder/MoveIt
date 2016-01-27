@@ -325,7 +325,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
         //TODO: DUMMY DATA
         //populate Rewards table
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (1, 'Animal Jam 5 Diamonds', 1);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (1, 'Animal Jam Diamonds', 1);");
         db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (2, 'Chocolate Chip Pancake Dinner', 2);");
         db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (3, 'Arclight Movie', 3);");
         db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (4, 'Dinner Out of Choice', 4);");

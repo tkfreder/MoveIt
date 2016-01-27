@@ -1,22 +1,46 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/recycler_view_main_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="@dimen/activity_vertical_margin">
 
+    <android.support.percent.PercentRelativeLayout
+        android:id="@+id/noItemsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/mountain"
+            android:layout_width="600dp"
+            android:layout_height="wrap_content"
+            app:layout_heightPercent="40%"
+            android:src="@drawable/mountain"
+            android:gravity="center"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_heightPercent="60%"
+            android:text="Waiting for users to earn rewards."
+            style="@style/Gray_15"
+            android:gravity="center_horizontal"
+            android:layout_below="@+id/mountain"
+            />
+
+    </android.support.percent.PercentRelativeLayout>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"/>
+        android:layout_height="wrap_content"/>
     <Button
         android:id="@+id/fulfillButton"
-        android:layout_width="wrap_content"
+        android:layout_width="@dimen/button_long"
         android:layout_height="wrap_content"
-        android:minWidth="@dimen/button_width_minimum"
-        android:padding="@dimen/button_external_padding"
+        android:text="@string/fulfill"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="25dp"
         android:background="@color/blue"
-        android:textColor="@color/white"
-        android:text="@string/fulfill"/>
+        android:textColor="@color/white"/>
 
-</RelativeLayout>
+</FrameLayout>

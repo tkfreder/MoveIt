@@ -29,23 +29,14 @@
         android:layout_toRightOf="@+id/userName"
         android:layout_centerVertical="true"
         style="@style/LabelListItemPurple"/>
-    <LinearLayout
-        android:layout_width="match_parent"
-        app:layout_widthPercent="25%"
-        android:layout_height="match_parent"
-        android:layout_toEndOf="@+id/rewardName"
-        android:layout_toRightOf="@+id/rewardName">
-
 
         <CheckBox
+            app:layout_widthPercent="25%"
             android:id="@+id/fulfillCheckBox"
-            android:layout_width="wrap_content"
-            android:minWidth="@dimen/button_width_minimum"
-            android:padding="@dimen/button_external_padding"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/blue"
-            android:textColor="@color/white"/>
-    </LinearLayout>
-
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+/>
 
 </android.support.percent.PercentRelativeLayout>
