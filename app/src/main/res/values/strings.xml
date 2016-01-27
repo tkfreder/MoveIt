@@ -51,12 +51,12 @@
     <string-array name="avatar_images">
         <item>avatar_1</item>
         <item>avatar_2</item>
-        <item>avatar_cat_orange</item>
-        <item>avatar_cat_pink</item>
         <item>avatar_3</item>
         <item>avatar_4</item>
-        <item>avatar_cat_yellow</item>
-        <item>avatar_angel</item>
+        <item>avatar_5</item>
+        <item>avatar_6</item>
+        <item>avatar_7</item>
+        <item>avatar_8</item>
     </string-array>
 
     <!-- navigation drawer menu names -->

@@ -342,9 +342,9 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         //TODO: DUMMY DATA
         //populate Rewards table
         db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (1, 'Animal Jam Diamonds', 1, 1);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (2, 'Chocolate Chip Pancake Dinner', 2, 2);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (2, 'Pancake Dinner', 2, 2);");
         db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (3, 'Arclight Movie', 3, 3);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (4, 'Dinner Out of Choice', 4, 4);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (4, 'Dinner Out', 4, 4);");
 
 
         /*
@@ -1038,22 +1038,20 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
      ***********************************************************************************************
      */
 
-    public void insertReward(String rewardName, int points){
+    public long insertReward(String rewardName, int points, long userId){
 
-        // Create and/or open the database for writing
-        //SQLiteDatabase db = getWritableDatabase();
+        long rowId = -1;
 
-        // It's a good idea to wrap our insert in a transaction. This helps with performance and ensures
-        // consistency of the database.
         db.beginTransaction();
         try {
 
             ContentValues values = new ContentValues();
             values.put(KEY_REWARD_NAME, rewardName);
             values.put(KEY_REWARD_POINTS, points);
+            values.put(KEY_REWARD_USER_ID_FK, userId);
 
             // Notice how we haven't specified the primary key. SQLite auto increments the primary key column.
-            db.insertOrThrow(TABLE_REWARDS, null, values);
+            rowId = db.insertOrThrow(TABLE_REWARDS, null, values);
             db.setTransactionSuccessful();
         } catch (Exception e) {
             Log.d(LOGTAG, "Error during insertReward()");
@@ -1061,6 +1059,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             db.endTransaction();
         }
 
+        return rowId;
     }
 
     String CREATE_REWARDS_TABLE = "CREATE TABLE " + TABLE_REWARDS +

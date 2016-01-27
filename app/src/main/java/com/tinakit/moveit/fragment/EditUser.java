@@ -38,6 +38,8 @@ public class EditUser extends Fragment {
     public static final String EDIT_USER_TAG = "EDIT_USER_TAG";
     public static final String EDIT_USER_USER = "EDIT_USER_USER";
     public static final int PICK_AVATAR_REQUEST = 1;
+    private static final String YOUR_REWARD = "Your Reward TBD";
+    private static final int DEFAULT_REWARD_POINTS = 200;
 
     @Inject
     FitnessDBHelper mDatabaseHelper;
@@ -235,8 +237,8 @@ public class EditUser extends Fragment {
 
                             mIsNewUser = false;
 
-                            // add a placeholder for Reward for the new user
-
+                            // add a Reward placeholderfor the new user
+                            mDatabaseHelper.insertReward(YOUR_REWARD, DEFAULT_REWARD_POINTS, rowId);
 
                             UserProfile userProfile = new UserProfile();
                             //replace current fragment
