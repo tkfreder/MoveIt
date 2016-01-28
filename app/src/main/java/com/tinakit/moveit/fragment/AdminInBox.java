@@ -41,9 +41,11 @@ public class AdminInBox extends Fragment {
     //protected FragmentActivity mFragmentActivity;
     protected View mRootView;
     protected Button mFulfillButton;
+    protected List<Reward> mRewardListUnfulfilled;
     protected List<Reward> mRewardsFulfilledList;
     protected RecyclerView mRecyclerView;
     protected AdminInboxRecyclerAdapter mRecyclerAdapter;
+    protected PercentRelativeLayout mNoItemsLayout;
 
     @Nullable
     @Override
@@ -62,26 +64,42 @@ public class AdminInBox extends Fragment {
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(layoutManager);
 
-        List<Reward> rewardList = mDatabaseHelper.getUnFulfilledRewards();
+        mRewardListUnfulfilled = mDatabaseHelper.getUnFulfilledRewards();
         List<User> userList = mDatabaseHelper.getUsers();
 
         mFulfillButton = (Button)mRootView.findViewById(R.id.fulfillButton);
-        PercentRelativeLayout noItemsLayout = (PercentRelativeLayout)mRootView.findViewById(R.id.noItemsLayout);
+        mNoItemsLayout = (PercentRelativeLayout)mRootView.findViewById(R.id.noItemsLayout);
 
-        if (rewardList.size() > 0){
+        if (mRewardListUnfulfilled.size() > 0){
 
-            noItemsLayout.setVisibility(View.GONE);
+            mNoItemsLayout.setVisibility(View.GONE);
 
-            mRecyclerAdapter = new AdminInboxRecyclerAdapter(rewardList, userList);
+            mRecyclerAdapter = new AdminInboxRecyclerAdapter(mRewardListUnfulfilled, userList);
             mRecyclerView.setAdapter(mRecyclerAdapter);
 
             mFulfillButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
-                    Reward reward = (Reward) v.getTag();
-                    reward.setDateFulfilled(new Date());
+
+
+                    for (int i = 0; i < mRewardsFulfilledList.size(); i++){
+
+
+                        // set dateFulfilled for all rewards on the list
+                        mRewardsFulfilledList.get(i).setDateFulfilled(new Date());
+
+                        // update the unfulfilled list by removing each reward
+                        mRewardListUnfulfilled.remove(mRewardListUnfulfilled.indexOf(mRewardsFulfilledList.get(i)));
+
+
+                    }
+
+                    // mark rewards as fulfilled
                     int rowsEffected = mDatabaseHelper.updateRewardsEarned(mRewardsFulfilledList);
+
+                    // clear out the fulfilled list
+                    mRewardsFulfilledList.clear();
 
                     if (rowsEffected > 0) {
 
@@ -89,7 +107,14 @@ public class AdminInBox extends Fragment {
                                 .show();
 
                         // refresh RecyclerView
+                        mRecyclerAdapter.setRewardList(mRewardListUnfulfilled);
                         mRecyclerAdapter.notifyDataSetChanged();
+
+                        if (mRewardListUnfulfilled.size() == 0){
+
+                            mFulfillButton.setVisibility(View.GONE);
+                            mNoItemsLayout.setVisibility(View.VISIBLE);
+                        }
 
                     } else {
 
@@ -104,7 +129,7 @@ public class AdminInBox extends Fragment {
         } else {
 
             mFulfillButton.setVisibility(View.GONE);
-            noItemsLayout.setVisibility(View.VISIBLE);
+            mNoItemsLayout.setVisibility(View.VISIBLE);
         }
 
 
@@ -141,6 +166,11 @@ public class AdminInBox extends Fragment {
                 fulfillCheckBox = (CheckBox)itemView.findViewById(R.id.fulfillCheckBox);
 
             }
+        }
+
+        public void setRewardList(List<Reward> rewardList){
+
+            mRewardList = rewardList;
         }
 
         @Override
