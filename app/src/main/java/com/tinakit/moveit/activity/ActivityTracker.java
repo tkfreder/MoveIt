@@ -55,7 +55,6 @@ public class ActivityTracker extends Fragment {
 
     //CONSTANTS
     public static final String ACTIVITY_TRACKER_BROADCAST_RECEIVER = "TRACKER_RECEIVER";
-    public static final String ACTIVITY_TRACKER_STARTED = "ACTIVITY_TRACKER_STARTED";
     public static final String ACTIVITY_TRACKER_INTENT = "ACTIVITY_TRACKER_INTENT";
     private static final String AUDIO_ADD_POINTS = "cha_ching";
     private static final String AUDIO_NO_MOVEMENT = "bike_horn";
@@ -66,7 +65,7 @@ public class ActivityTracker extends Fragment {
     @Inject
     FitnessDBHelper mDatabaseHelper;
 
-    private static final float FEET_COIN_CONVERSION = 1.0f;//0.05f;  //20 feet = 1 coin
+    private static final float FEET_COIN_CONVERSION = 0.02f;//  # coins per feet (1 coin/50 ft = 0.02)
     private static long STOP_SERVICE_TIME_LIMIT = 30 * 60 * 1000 * 60; // 30 minutes in seconds
 
     // cache
@@ -139,19 +138,6 @@ public class ActivityTracker extends Fragment {
 
             bindApi(savedInstanceState);
         }
-
-        /*
-        // check whether previous screen was ActivityChooser
-        mIntent = mFragmentActivity.getIntent();
-        if (mIntent.hasExtra(ActivityChooser.USER_ACTIVITY_LIST_KEY)) {
-
-            initializeUI();
-
-            initializeData();
-
-            bindApi(savedInstanceState);
-        }
-*/
         return rootView;
     }
 
@@ -159,7 +145,6 @@ public class ActivityTracker extends Fragment {
 
         //end the activity if Google Play Services is not present
         //redirect user to Google Play Services
-        //mGoogleApi = new GoogleApi();
 
         if (!mGoogleApi.servicesAvailable(mFragmentActivity))
             mFragmentActivity.finish();
@@ -168,7 +153,6 @@ public class ActivityTracker extends Fragment {
 
         // location listener
         mLocationApi = new LocationApi(mFragmentActivity, mGoogleApi.client());
-        //mLocationApi.initialize();
 
         // accelerometer
         mAccelerometer = new Accelerometer(mFragmentActivity);
@@ -179,11 +163,6 @@ public class ActivityTracker extends Fragment {
     }
 
     protected void initializeData(){
-
-        //get databaseHelper instance
-        //mDatabaseHelper = FitnessDBHelper.getInstance(this);
-
-
 
         //lock Navigation Drawer
         MainActivity.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
