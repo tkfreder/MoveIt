@@ -38,11 +38,19 @@
             android:layout_toEndOf="@+id/points"
             android:layout_centerVertical="true"/>
     </RelativeLayout>
+    <LinearLayout
+        android:id="@+id/rewardLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@+id/userLayout">
+
+    </LinearLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/userLayout">
+        android:layout_below="@+id/rewardLayout">
         <RelativeLayout
             android:id="@+id/arcChartLayout"
             android:layout_width="match_parent"

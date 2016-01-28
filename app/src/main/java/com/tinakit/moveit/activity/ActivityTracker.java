@@ -65,7 +65,7 @@ public class ActivityTracker extends Fragment {
     @Inject
     FitnessDBHelper mDatabaseHelper;
 
-    private static final float FEET_COIN_CONVERSION = 0.02f;//  # coins per feet (1 coin/50 ft = 0.02)
+    private static final float FEET_COIN_CONVERSION = 1.0f;//  # coins per feet (1 coin/50 ft = 0.02)
     private static long STOP_SERVICE_TIME_LIMIT = 30 * 60 * 1000 * 60; // 30 minutes in seconds
 
     // cache
@@ -83,7 +83,7 @@ public class ActivityTracker extends Fragment {
 
     // APIs
     private LocationApi mLocationApi;
-    private Accelerometer mAccelerometer;
+    //private Accelerometer mAccelerometer;
     private MapFragment mMapFragment;
 
     // Request code to use when launching the resolution activity
@@ -155,7 +155,7 @@ public class ActivityTracker extends Fragment {
         mLocationApi = new LocationApi(mFragmentActivity, mGoogleApi.client());
 
         // accelerometer
-        mAccelerometer = new Accelerometer(mFragmentActivity);
+        //mAccelerometer = new Accelerometer(mFragmentActivity);
 
         //check savedInstanceState not null
         mResolvingError = savedInstanceState != null
@@ -320,7 +320,7 @@ public class ActivityTracker extends Fragment {
         mTimeWhenStopped = mChronometerUtility.getTime() - SystemClock.elapsedRealtime();
 
         //disable accelerometer listener
-        mAccelerometer.stop();
+        //mAccelerometer.stop();
 
         //set button visibility
         mPauseButton.setVisibility(View.GONE);
@@ -335,7 +335,7 @@ public class ActivityTracker extends Fragment {
         mSaveLocationData = true;
 
         //start accelerometer listener, after a delay of ACCELEROMETER_DELAY
-        mAccelerometer.start();
+        //mAccelerometer.start();
 
         //chronometer settings, set base time to time when paused ChronometerUtility.elapsedTime()
         mChronometerUtility.resume(mTimeWhenStopped);
@@ -389,7 +389,7 @@ public class ActivityTracker extends Fragment {
 
         //startServices(mGoogleApi.client());
         mLocationApi.start();
-        mAccelerometer.start();
+        //mAccelerometer.start();
 
         //register api intents with BroadcastReceiver
         LocalBroadcastManager.getInstance(mFragmentActivity).registerReceiver(mMessageReceiver, new IntentFilter(LocationApi.LOCATION_API_INTENT));
@@ -412,7 +412,7 @@ public class ActivityTracker extends Fragment {
 
         //stopServices(mGoogleApi.client());
         mLocationApi.stop();
-        mAccelerometer.stop();
+        //mAccelerometer.stop();
 
         // unregister intents with BroadcastReceiver
         LocalBroadcastManager.getInstance(mFragmentActivity).unregisterReceiver(mMessageReceiver);
@@ -559,17 +559,6 @@ public class ActivityTracker extends Fragment {
             if(message.equals(GoogleApi.GOOGLE_API_INTENT)){
 
                 startRun();
-                /*
-                // only show Start button after connecting to Google Api Client
-                mStartButton.setVisibility(View.VISIBLE);
-
-                //add map once
-                if (mHasMapFragment == false){
-                    mMapFragment = new MapFragment(getSupportFragmentManager(), mGoogleApi);
-                    mMapFragment.addMap(R.id.map_container, mContainer);
-                    mHasMapFragment = true;
-                }
-                */
 
             }
             else if (message.equals(LocationApi.LOCATION_API_INTENT)){
@@ -596,9 +585,6 @@ public class ActivityTracker extends Fragment {
                 playSound(AUDIO_NO_MOVEMENT);
 
                 pauseTracking();
-
-                //display warning message that no movement has been detected
-                //DialogUtility.displayAlertDialog(ActivityTracker.this, getString(R.string.warning), getString(R.string.msg_activity_tracker_no_movement), getString(R.string.ok));
 
                 displayNoMovementWarning();
 
@@ -671,7 +657,7 @@ public class ActivityTracker extends Fragment {
         if (DEBUG) Log.d(LOG, "onDestroy");
         super.onDestroy();
 
-        mAccelerometer.stop();
+        //mAccelerometer.stop();
     }
 
     //**********************************************************************************************
@@ -745,8 +731,7 @@ public class ActivityTracker extends Fragment {
             int totalPoints =  Math.round(mActivityDetail.getDistanceInFeet() * FEET_COIN_CONVERSION);
 
             //compare previous totalCoins to current one
-            //TODO:  for now, the points earned is based on distance, so each user will earn the same amount of coins
-            //for now, use points earned of first user to represent the points earned for each user
+            // points earned is based on distance, so each user will earn the same amount of coins
             float delta = totalPoints - mTotalPoints;
 
             if(delta > 0 ){
@@ -801,14 +786,10 @@ public class ActivityTracker extends Fragment {
         float[] intervalDistance = new float[3];
         float totalDistance = 0.0f;
 
-        //DEBUG
-        //StringBuilder stringBuilder = new StringBuilder();
-
         for (int i = 0 ; i < mUnitSplitList.size() - 1 ; i++){
+
             Location.distanceBetween(mUnitSplitList.get(i).getLocation().getLatitude(), mUnitSplitList.get(i).getLocation().getLongitude(), mUnitSplitList.get(i+1).getLocation().getLatitude(), mUnitSplitList.get(i + 1).getLocation().getLongitude(), intervalDistance);
             totalDistance += Math.abs(intervalDistance[0]);
-            //DEBUG
-            //stringBuilder.append("\n" + i + ": " + intervalDistance[0] + " meters");
 
         }
 

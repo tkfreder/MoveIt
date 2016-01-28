@@ -1,5 +1,6 @@
 package com.tinakit.moveit.fragment;
 
+import android.app.ActionBar;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,6 +11,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -24,6 +27,8 @@ import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.Reward;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.module.CustomApplication;
+import com.tinakit.moveit.utility.CheatSheet;
+import com.tinakit.moveit.utility.DateUtility;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,22 +55,15 @@ public class UserStats extends Fragment {
     protected List<Integer> mColorList;
     protected User mUser;
     private int mRewardPoints;
-    private boolean mHasReward = false;
 
     // UI COMPONENTS
-    protected RecyclerView mRecyclerView;
-    protected UserStatsRecyclerAdapter mUserStatsRecyclerAdapter;
-    protected SeriesItem seriesItem2;
     protected TextView textPercentage;
-    List<SeriesItem> mSeriesItemList;
-    protected ViewPager mViewPager;
-    protected ViewPagerAdapter mViewPagerAdapter;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        mFragmentActivity  = (FragmentActivity)super.getActivity();
+        mFragmentActivity  = super.getActivity();
         rootView = inflater.inflate(R.layout.user_stats, container, false);
 
         mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -83,7 +81,7 @@ public class UserStats extends Fragment {
         Bundle args = getArguments();
         if(args != null && args.containsKey(USER_STATS_ARG_USER)){
 
-            mUser = (User)args.getParcelable(USER_STATS_ARG_USER);
+            mUser = args.getParcelable(USER_STATS_ARG_USER);
 
             // get rewards earned for this user
             List<Reward> rewardList = mDatabaseHelper.getRewardsEarned(mUser);
@@ -94,6 +92,17 @@ public class UserStats extends Fragment {
                 if(reward.getDateFulfilled() == null){
 
                     rewardListToFulfill.add(reward);
+
+                }
+                else{
+
+                    ImageView certificate = new ImageView(mFragmentActivity);
+                    certificate.setImageResource(getResources().getIdentifier("ribbon", "drawable", mFragmentActivity.getPackageName()));
+                    certificate.setLayoutParams(new ViewGroup.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT));
+                    certificate.setMaxWidth(10);
+                    CheatSheet.setup(certificate,DateUtility.getDateFormattedRecent(reward.getDateEarned(), 7));
+                    LinearLayout layout = (LinearLayout)rootView.findViewById(R.id.rewardLayout);
+                    layout.addView(certificate);
                 }
             }
 
@@ -175,7 +184,7 @@ public class UserStats extends Fragment {
                 }
             });
 
-            int percentage = rewardListToFulfill.size() == 0 ? Math.round(100 * mUser.getPoints() / mRewardPoints) :  100;
+            int percentage = rewardListToFulfill.size() == 0 ? Math.round(100 * (mUser.getPoints() % mRewardPoints) / mRewardPoints) :  100;
 
             decoView.addEvent(new DecoEvent.Builder(percentage)
                     .setIndex(series1Index)
