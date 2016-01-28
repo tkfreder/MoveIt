@@ -21,18 +21,14 @@ import java.util.concurrent.TimeUnit;
 public class Accelerometer implements SensorEventListener{
 
     // CONSTANTS
-    public static final int SENSITIVITY_LIGHT = 11;
-    public static final int SENSITIVITY_MEDIUM = 13;
-    public static final int SENSITIVITY_HARD = 15;
     public static final String ACCELEROMETER_INTENT = "ACCELEROMETER_INTENT";
     private static final int ACCELEROMETER_DELAY = 3; //in seconds
-    //private static final float SHAKE_THRESHOLD = 0.3f;
-    private static final int ACCELERATION_THRESHOLD = SENSITIVITY_LIGHT;
+    private static final float SHAKE_THRESHOLD = 0.3f;
 
     // INSTANCE FIELDS
     private FragmentActivity mFragmentActivity;
     private SensorManager mSensorManager;
-    private Sensor mAccelerometer;
+    private Sensor sensorAccelerometer;
     private ScheduledExecutorService executor;
     private float last_x, last_y, last_z;
     private long lastUpdate = 0;
@@ -60,15 +56,15 @@ public class Accelerometer implements SensorEventListener{
                 lastUpdate = curTime;
 
                 //float speed = Math.abs(x + y + z - last_x - last_y - last_z)/ diffTime * 10000;
-                final double magnitudeSquared = x * x + y * y + z * z;
+                float speedX = Math.abs(x - last_x)/diffTime * 10000;
+                float speedY = Math.abs(y - last_y)/diffTime * 10000;
+                float speedZ = Math.abs(z - last_z)/diffTime * 10000;
 
 
-                // Instead of comparing magnitude to ACCELERATION_THRESHOLD,
-                // compare their squares. This is equivalent and doesn't need the
-                // actual magnitude, which would be computed using (expesive) Math.sqrt().
+
                 //check for inactivity, below shake threshold
-                if(magnitudeSquared < ACCELERATION_THRESHOLD * ACCELERATION_THRESHOLD){
                 //if (speed < SHAKE_THRESHOLD){
+                if (!(speedX > SHAKE_THRESHOLD || speedY > SHAKE_THRESHOLD || speedZ > SHAKE_THRESHOLD)) {
 
                     // send message to indicate there is new location data
                     Intent intent = new Intent(ACCELEROMETER_INTENT);
@@ -96,36 +92,24 @@ public class Accelerometer implements SensorEventListener{
         return mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null;
     }
 
-    public void start(SensorManager sensorManager){
+    public void start(){
 
-        if (mAccelerometer == null) {
-            mSensorManager = sensorManager;
-            mAccelerometer = mSensorManager.getDefaultSensor(
-                    Sensor.TYPE_ACCELEROMETER);
+        executor = Executors.newSingleThreadScheduledExecutor();
 
-            // If this phone has an accelerometer, listen to it.
-            //if (mAccelerometer != null) {
-            //    mSensorManager.registerListener(Accelerometer.this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-            //}
+        if (hasAccelerometer()) {
+            // success! we have an accelerometer
 
-            executor = Executors.newSingleThreadScheduledExecutor();
+            executor.schedule(new Runnable(){
 
-            //if (hasAccelerometer()) {
-            if (mAccelerometer != null){
-                // success! we have an accelerometer
+                @Override
+                public void run(){
 
-                executor.schedule(new Runnable(){
+                    //mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+                    sensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+                    mSensorManager.registerListener(Accelerometer.this, sensorAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+                }
+            }, ACCELEROMETER_DELAY, TimeUnit.SECONDS);
 
-                    @Override
-                    public void run(){
-
-                        //mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-                        //mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-                        mSensorManager.registerListener(Accelerometer.this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-                    }
-                }, ACCELEROMETER_DELAY, TimeUnit.SECONDS);
-
-            }
         }
 
     }
@@ -133,13 +117,12 @@ public class Accelerometer implements SensorEventListener{
     public void stop(){
 
         //unregister accelerometer
-        if(mAccelerometer != null){
+        if(sensorAccelerometer != null){
             mSensorManager.unregisterListener(this);
-            mSensorManager = null;
-            mAccelerometer = null;
 
             if (!executor.isTerminated())
                 executor.shutdownNow();
+
         }
 
     }

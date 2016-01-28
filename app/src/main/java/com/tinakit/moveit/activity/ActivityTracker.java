@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.hardware.SensorManager;
 import android.location.Location;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -45,10 +44,6 @@ import com.tinakit.moveit.utility.UnitConverter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -119,9 +114,6 @@ public class ActivityTracker extends Fragment {
     private long mTimeWhenStopped;
     private boolean mSaveLocationData = false;
     private boolean mHasMapFragment = false;
-    private ScheduledExecutorService worker = Executors.newSingleThreadScheduledExecutor();
-    private SensorManager mSensorManager;
-
 
     @Nullable
     @Override
@@ -177,6 +169,9 @@ public class ActivityTracker extends Fragment {
         // location listener
         mLocationApi = new LocationApi(mFragmentActivity, mGoogleApi.client());
         //mLocationApi.initialize();
+
+        // accelerometer
+        mAccelerometer = new Accelerometer(mFragmentActivity);
 
         //check savedInstanceState not null
         mResolvingError = savedInstanceState != null
@@ -361,7 +356,7 @@ public class ActivityTracker extends Fragment {
         mSaveLocationData = true;
 
         //start accelerometer listener, after a delay of ACCELEROMETER_DELAY
-        mAccelerometer.start(mSensorManager);
+        mAccelerometer.start();
 
         //chronometer settings, set base time to time when paused ChronometerUtility.elapsedTime()
         mChronometerUtility.resume(mTimeWhenStopped);
@@ -415,24 +410,7 @@ public class ActivityTracker extends Fragment {
 
         //startServices(mGoogleApi.client());
         mLocationApi.start();
-
-        // accelerometer
-        if (mAccelerometer == null)
-            mAccelerometer = new Accelerometer(mFragmentActivity);
-
-        mSensorManager = (SensorManager) mFragmentActivity.getSystemService(mFragmentActivity.SENSOR_SERVICE);
-        mAccelerometer.start(mSensorManager);
-
-/*
-        Runnable task = new Runnable() {
-            public void run() {
-               mAccelerometer.start();
-            }
-        };
-
-        worker.schedule(task, 5, TimeUnit.SECONDS);
-*/
-        //mAccelerometer.start();
+        mAccelerometer.start();
 
         //register api intents with BroadcastReceiver
         LocalBroadcastManager.getInstance(mFragmentActivity).registerReceiver(mMessageReceiver, new IntentFilter(LocationApi.LOCATION_API_INTENT));
