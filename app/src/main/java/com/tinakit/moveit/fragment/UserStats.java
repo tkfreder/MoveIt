@@ -100,7 +100,6 @@ public class UserStats extends Fragment {
                     ImageView certificate = new ImageView(mFragmentActivity);
                     certificate.setImageResource(getResources().getIdentifier("ribbon", "drawable", mFragmentActivity.getPackageName()));
                     LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(100,100);
-                    layoutParams.gravity = Gravity.CENTER;
                     certificate.setLayoutParams(layoutParams);
                     CheatSheet.setup(certificate,DateUtility.getDateFormattedRecent(reward.getDateEarned(), 7));
                     LinearLayout layout = (LinearLayout)rootView.findViewById(R.id.rewardLayout);

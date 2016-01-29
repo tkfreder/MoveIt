@@ -49,9 +49,9 @@
             android:id="@+id/rewardsEarned"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Rewards Earned"
+            android:text="rewards earned"
             android:gravity="center_horizontal"
-            style="@style/LabelSmallGray"/>
+            style="@style/Gray_15"/>
 
         <LinearLayout
             android:id="@+id/rewardLayout"
