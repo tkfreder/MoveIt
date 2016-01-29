@@ -383,7 +383,7 @@ public class MainActivity extends AppCompatActivity {
                 //unlock Navigation Drawer, originally locked when first launching MainActivity
                 MainActivity.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 
-                //TODO:  should the Message listener for GoogleApi be unregistered at this point
+                //Message listener for GoogleApi to be unregistered at this point
                 LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mMessageReceiver);
 
             }
@@ -393,10 +393,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        // get current fragment in container
-        //UserProfile userProfile = (UserProfile)getSupportFragmentManager().findFragmentByTag(UserProfile.USER_PROFILE_TAG);
-        //userProfile.onActivityResult(requestCode, resultCode, data);
 
         if(requestCode == EditUser.PICK_AVATAR_REQUEST){
 

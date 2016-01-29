@@ -38,19 +38,37 @@
             android:layout_toEndOf="@+id/points"
             android:layout_centerVertical="true"/>
     </RelativeLayout>
-    <LinearLayout
-        android:id="@+id/rewardLayout"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:id="@+id/rewardsEarnedLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_below="@+id/userLayout">
+        android:gravity="center_horizontal"
+        android:layout_below="@+id/userLayout"
+        android:paddingTop="@dimen/activity_vertical_margin">
+        <TextView
+            android:id="@+id/rewardsEarned"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Rewards Earned"
+            android:gravity="center_horizontal"
+            style="@style/LabelSmallGray"/>
 
-    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/rewardLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal"
+            android:layout_below="@+id/rewardsEarned"
+            >
+        </LinearLayout>
+    </RelativeLayout>
+
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/rewardLayout">
+        android:layout_below="@+id/rewardsEarnedLayout">
         <RelativeLayout
             android:id="@+id/arcChartLayout"
             android:layout_width="match_parent"

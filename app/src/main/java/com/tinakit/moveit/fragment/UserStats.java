@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -98,8 +99,9 @@ public class UserStats extends Fragment {
 
                     ImageView certificate = new ImageView(mFragmentActivity);
                     certificate.setImageResource(getResources().getIdentifier("ribbon", "drawable", mFragmentActivity.getPackageName()));
-                    certificate.setLayoutParams(new ViewGroup.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT));
-                    certificate.setMaxWidth(10);
+                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(100,100);
+                    layoutParams.gravity = Gravity.CENTER;
+                    certificate.setLayoutParams(layoutParams);
                     CheatSheet.setup(certificate,DateUtility.getDateFormattedRecent(reward.getDateEarned(), 7));
                     LinearLayout layout = (LinearLayout)rootView.findViewById(R.id.rewardLayout);
                     layout.addView(certificate);
