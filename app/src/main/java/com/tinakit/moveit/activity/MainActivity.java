@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.LocalBroadcastManager;
@@ -16,6 +17,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.RelativeLayout;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.api.GoogleApi;
@@ -29,6 +32,7 @@ import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.module.CustomApplication;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.inject.Inject;
 
@@ -157,6 +161,21 @@ public class MainActivity extends AppCompatActivity {
                         return true;
                     }
                 });
+
+        // set background image
+        Random randomGenerator = new Random();
+        int randomInt = randomGenerator.nextInt(8);
+
+
+        NavigationView navView = (NavigationView)findViewById(R.id.navigation_view);
+        View header = navView.getHeaderView(0);
+
+        //RelativeLayout drawerBackgroundLayout = (RelativeLayout)findViewById(R.id.navigation_view).findViewById(R.id.drawer_background);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            header.setBackground(getResources().getDrawable(getResources().getIdentifier("background_" + String.valueOf(randomInt), "drawable", getPackageName()), getTheme()));
+        else
+            header.setBackground(getResources().getDrawable(getResources().getIdentifier("background_" + String.valueOf(randomInt), "drawable", getPackageName())));
+
     }
 
     private void callMenuItemAction(int id){
@@ -246,13 +265,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
 
-        //displayStartScreen();
-
         int count = getSupportFragmentManager().getBackStackEntryCount();
 
         if (count == 0) {
 
-            displayStartScreen();
+            //displayStartScreen();
+            finish();
 
         } else {
 
