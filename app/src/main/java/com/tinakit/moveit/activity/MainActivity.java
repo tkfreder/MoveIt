@@ -140,6 +140,9 @@ public class MainActivity extends AppCompatActivity {
 
             setupDrawerContent(navigationView);
         }
+
+        //lock Navigation Drawer, until we gain connection to GoogleApi
+        MainActivity.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
     }
 
     private void setupDrawerContent(final NavigationView navigationView){
@@ -174,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
                 if (userStatsMain == null) {
 
                     userStatsMain = new UserStatsMain();
-                    //replace current fragment with Rewards fragment
+                    //replace current fragment
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, userStatsMain).commit();
 
                 }
@@ -363,7 +366,6 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
 
-            //TODO: change key to more generic name
             // message to indicate Google API Client connection
             message = intent.getStringExtra(ActivityTracker.ACTIVITY_TRACKER_BROADCAST_RECEIVER);
 
@@ -372,7 +374,14 @@ public class MainActivity extends AppCompatActivity {
                 //put a Fragment in the FragmentManager, so just need to call replace when click on nav items
                 // display ActivityChooser screen first
                 ActivityChooser activityChooser = new ActivityChooser();
-                getSupportFragmentManager().beginTransaction().add(R.id.fragmentContainer, activityChooser).commit();
+
+                if (getSupportFragmentManager().getBackStackEntryCount() == 0)
+                    getSupportFragmentManager().beginTransaction().add(R.id.fragmentContainer, activityChooser).commit();
+                else
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, activityChooser).commit();
+
+                //unlock Navigation Drawer, originally locked when first launching MainActivity
+                MainActivity.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 
                 //TODO:  should the Message listener for GoogleApi be unregistered at this point
                 LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mMessageReceiver);
