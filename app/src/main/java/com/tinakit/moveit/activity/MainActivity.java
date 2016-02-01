@@ -75,25 +75,20 @@ public class MainActivity extends AppCompatActivity {
         // DI
         ((CustomApplication)getApplication()).getAppComponent().inject(this);
 
+        // save state
+        //mSavedInstanceState = savedInstanceState;
+
         //end the activity if Google Play Services is not present
         //redirect user to Google Play Services
+        //mGoogleApi = new GoogleApi();
 
         if (!mGoogleApi.servicesAvailable(this))
             finish();
-        else{
+        else
+            mGoogleApi.buildGoogleApiClient(this);
 
-            getSupportActionBar().setTitle(getString(R.string.nav_menu_start));
-
-            // only call this if we haven't already connected with Google Api
-            if (!mGoogleApi.isConnectedToGoogle()){
-
-                mGoogleApi.buildGoogleApiClient(this);
-                LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver_GoogleApi, new IntentFilter(GoogleApi.GOOGLE_API_INTENT));
-
-            }
-        }
-
-        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(ActivityTracker.ACTIVITY_TRACKER_INTENT));
+        // instantiate databaseHelper
+        //mDatabaseHelper = FitnessDBHelper.getInstance(this);
 
         // get data before initializing UI, need data to pass to ViewPager
         fetchData();
@@ -307,19 +302,8 @@ public class MainActivity extends AppCompatActivity {
         if (DEBUG) Log.d(LOG, "onStart");
         super.onStart();
 
-        //LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(ActivityTracker.ACTIVITY_TRACKER_INTENT));
-        //LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver_GoogleApi, new IntentFilter(GoogleApi.GOOGLE_API_INTENT));
-
-    }
-
-    //**********************************************************************************************
-    //  onResume()
-    //**********************************************************************************************
-
-    @Override
-    protected void onResume() {
-        if (DEBUG) Log.d(LOG, "onResume");
-        super.onResume();
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(ActivityTracker.ACTIVITY_TRACKER_INTENT));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(GoogleApi.GOOGLE_API_INTENT));
 
     }
 
@@ -330,10 +314,21 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         if (DEBUG) Log.d(LOG, "onPause");
-        super.onPause();
-        //TODO:  should all Listeners be unregistered here?
-        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mMessageReceiver_GoogleApi);
 
+        //TODO:  should all Listeners be unregistered here?
+        super.onPause();
+    }
+
+    //**********************************************************************************************
+    //  onResume()
+    //**********************************************************************************************
+
+    @Override
+    protected void onResume() {
+        if (DEBUG) Log.d(LOG, "onResume");
+
+        //TODO:  should all Listeners be registered here?
+        super.onResume();
 
     }
 
@@ -389,7 +384,6 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
 
-            /*
             // message to indicate Google API Client connection
             message = intent.getStringExtra(ActivityTracker.ACTIVITY_TRACKER_BROADCAST_RECEIVER);
 
@@ -409,47 +403,6 @@ public class MainActivity extends AppCompatActivity {
 
                 //Message listener for GoogleApi to be unregistered at this point
                 LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mMessageReceiver);
-
-            }
-            */
-
-        }
-    };
-
-    // Handler for received Intents sent by various Fragments and Activities from the app
-    private BroadcastReceiver mMessageReceiver_GoogleApi = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String message = intent.getStringExtra(MAIN_ACTIVITY_BROADCAST_RECEIVER);
-
-            /*
-            if (DEBUG) Log.d(LOG, "BroadcastReceiver - onReceive(): message: " + message);
-
-            if(message != null && message.equals(ActivityTracker.ACTIVITY_TRACKER_INTENT)){
-
-                // when Tracker has started, close this Activity
-                finish();
-            }
-
-            // message to indicate Google API Client connection
-            message = intent.getStringExtra(ActivityTracker.ACTIVITY_TRACKER_BROADCAST_RECEIVER);
-            */
-            if(message != null && message.equals(GoogleApi.GOOGLE_API_INTENT)){
-
-                //put a Fragment in the FragmentManager, so just need to call replace when click on nav items
-                // display ActivityChooser screen first
-                ActivityChooser activityChooser = new ActivityChooser();
-
-                if (getSupportFragmentManager().getBackStackEntryCount() == 0)
-                    getSupportFragmentManager().beginTransaction().add(R.id.fragmentContainer, activityChooser).commit();
-                else
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, activityChooser).commit();
-
-                //unlock Navigation Drawer, originally locked when first launching MainActivity
-                MainActivity.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-
-                //Message listener for GoogleApi to be unregistered at this point
-                LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mMessageReceiver_GoogleApi);
 
             }
 
