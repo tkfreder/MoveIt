@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -60,7 +61,6 @@ public class MainActivity extends AppCompatActivity {
     //cache
     ArrayList<ActivityDetail> mActivityDetailList;
     ArrayList<User> mUserList;
-    //Bundle mSavedInstanceState;
 
     //**********************************************************************************************
     //  onCreate()
@@ -75,20 +75,13 @@ public class MainActivity extends AppCompatActivity {
         // DI
         ((CustomApplication)getApplication()).getAppComponent().inject(this);
 
-        // save state
-        //mSavedInstanceState = savedInstanceState;
-
         //end the activity if Google Play Services is not present
         //redirect user to Google Play Services
-        //mGoogleApi = new GoogleApi();
 
         if (!mGoogleApi.servicesAvailable(this))
             finish();
         else
             mGoogleApi.buildGoogleApiClient(this);
-
-        // instantiate databaseHelper
-        //mDatabaseHelper = FitnessDBHelper.getInstance(this);
 
         // get data before initializing UI, need data to pass to ViewPager
         fetchData();
@@ -120,15 +113,16 @@ public class MainActivity extends AppCompatActivity {
         // Toolbar
         setSupportActionBar((Toolbar)findViewById(R.id.toolBar));
 
+        // set title
+        getSupportActionBar().setTitle(getString(R.string.nav_menu_start));
+
+
         // Actionbar
         final ActionBar actionBar = getSupportActionBar();
 
         // enable ActionBar app icon to behave as action to toggle nav drawer
         actionBar.setHomeAsUpIndicator(R.drawable.ic_hamburger);
         actionBar.setDisplayHomeAsUpEnabled(true);
-
-        // Navigation Drawer
-        initializeNavigationDrawer();
 
     }
 
@@ -162,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-        // set background image
+        // set random background image
         Random randomGenerator = new Random();
         int randomInt = randomGenerator.nextInt(8);
 
@@ -171,10 +165,21 @@ public class MainActivity extends AppCompatActivity {
         View header = navView.getHeaderView(0);
 
         //RelativeLayout drawerBackgroundLayout = (RelativeLayout)findViewById(R.id.navigation_view).findViewById(R.id.drawer_background);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            header.setBackground(getResources().getDrawable(getResources().getIdentifier("background_" + String.valueOf(randomInt), "drawable", getPackageName()), getTheme()));
-        else
-            header.setBackground(getResources().getDrawable(getResources().getIdentifier("background_" + String.valueOf(randomInt), "drawable", getPackageName())));
+
+        //header.setBackground(ContextCompat.getDrawable(this, getResources().getIdentifier("background_" + String.valueOf(randomInt), "drawable", getPackageName())));
+
+        int resourceId = -1;
+
+        try{
+            resourceId = R.drawable.class.getField("background_" + String.valueOf(randomInt)).getInt(null);
+            header.setBackground(ContextCompat.getDrawable(this, resourceId));
+
+        } catch(NoSuchFieldException nsfe){
+            nsfe.printStackTrace();
+        } catch(IllegalAccessException iae){
+            iae.printStackTrace();
+        }
+
 
     }
 
@@ -302,6 +307,9 @@ public class MainActivity extends AppCompatActivity {
         if (DEBUG) Log.d(LOG, "onStart");
         super.onStart();
 
+        // Navigation Drawer
+        initializeNavigationDrawer();
+
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(ActivityTracker.ACTIVITY_TRACKER_INTENT));
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(GoogleApi.GOOGLE_API_INTENT));
 
@@ -315,7 +323,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         if (DEBUG) Log.d(LOG, "onPause");
 
-        //TODO:  should all Listeners be unregistered here?
         super.onPause();
     }
 
@@ -327,7 +334,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         if (DEBUG) Log.d(LOG, "onResume");
 
-        //TODO:  should all Listeners be registered here?
         super.onResume();
 
     }
@@ -339,8 +345,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         if (DEBUG) Log.d(LOG, "onDestroy");
-
         super.onDestroy();
+
+        // unresiter receiver
+        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mMessageReceiver);
+
     }
 
     @Override
@@ -389,20 +398,27 @@ public class MainActivity extends AppCompatActivity {
 
             if(message != null && message.equals(GoogleApi.GOOGLE_API_INTENT)){
 
-                //put a Fragment in the FragmentManager, so just need to call replace when click on nav items
-                // display ActivityChooser screen first
-                ActivityChooser activityChooser = new ActivityChooser();
 
-                if (getSupportFragmentManager().getBackStackEntryCount() == 0)
-                    getSupportFragmentManager().beginTransaction().add(R.id.fragmentContainer, activityChooser).commit();
-                else
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, activityChooser).commit();
+                ActivityChooser activityChooser = (ActivityChooser)getSupportFragmentManager().findFragmentByTag(ActivityChooser.ACTIVITY_CHOOSER_TAG);
+                if (activityChooser == null) {
 
-                //unlock Navigation Drawer, originally locked when first launching MainActivity
-                MainActivity.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                    //put a Fragment in the FragmentManager, so just need to call replace when click on nav items
+                    // display ActivityChooser screen first
+                    activityChooser = new ActivityChooser();
 
-                //Message listener for GoogleApi to be unregistered at this point
-                LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mMessageReceiver);
+                    // display ActivityChooser only after SaveInstanceState
+                    if (getSupportFragmentManager().getBackStackEntryCount() == 0)
+                        getSupportFragmentManager().beginTransaction().add(R.id.fragmentContainer, activityChooser).commit();
+                    else
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, activityChooser).commit();
+
+                    //unlock Navigation Drawer, originally locked when first launching MainActivity
+                    MainActivity.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+
+                    //Message listener for GoogleApi to be unregistered at this point
+                    LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mMessageReceiver);
+                }
+
 
             }
 
