@@ -124,6 +124,8 @@ public class MainActivity extends AppCompatActivity {
         actionBar.setHomeAsUpIndicator(R.drawable.ic_hamburger);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
+        // Navigation Drawer
+        initializeNavigationDrawer();
     }
 
     private void initializeNavigationDrawer(){
@@ -272,17 +274,14 @@ public class MainActivity extends AppCompatActivity {
 
         int count = getSupportFragmentManager().getBackStackEntryCount();
 
-        if (count == 0) {
+        if (count > 0){
 
-            //displayStartScreen();
-            finish();
-
-        } else {
-
-            getSupportActionBar().setTitle(getString(R.string.app_bar_header_admin));
-            getSupportFragmentManager().popBackStack();
+            displayStartScreen();
         }
+        else {
 
+            finish();
+        }
     }
 
     private void displayStartScreen(){
@@ -307,11 +306,19 @@ public class MainActivity extends AppCompatActivity {
         if (DEBUG) Log.d(LOG, "onStart");
         super.onStart();
 
-        // Navigation Drawer
-        initializeNavigationDrawer();
+    }
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(ActivityTracker.ACTIVITY_TRACKER_INTENT));
-        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(GoogleApi.GOOGLE_API_INTENT));
+
+    //**********************************************************************************************
+    //  onResume()
+    //**********************************************************************************************
+
+    @Override
+    protected void onResume() {
+        if (DEBUG) Log.d(LOG, "onResume");
+        super.onResume();
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(mGoogleApiReceiver, new IntentFilter(GoogleApi.GOOGLE_API_INTENT));
 
     }
 
@@ -322,23 +329,27 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         if (DEBUG) Log.d(LOG, "onPause");
-
         super.onPause();
+
+        // unresiter receiver
+        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mGoogleApiReceiver);
     }
 
     //**********************************************************************************************
-    //  onResume()
+    //  onStop()
     //**********************************************************************************************
 
     @Override
-    protected void onResume() {
-        if (DEBUG) Log.d(LOG, "onResume");
+    protected void onStop() {
+        if (DEBUG) Log.d(LOG, "onStop");
+        super.onStop();
 
-        super.onResume();
-
+        // destroy this activity, in the case where home button is pressed, this will force restart of MainActivity/fragments
+        // otherwise, there will be an extra ActivityChooser fragment
+        finish();
     }
 
-    //**********************************************************************************************
+//**********************************************************************************************
     //  onDestroy()
     //**********************************************************************************************
 
@@ -347,8 +358,8 @@ public class MainActivity extends AppCompatActivity {
         if (DEBUG) Log.d(LOG, "onDestroy");
         super.onDestroy();
 
-        // unresiter receiver
-        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mMessageReceiver);
+        // unregister receiver
+        //LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mMessageReceiver);
 
     }
 
@@ -381,17 +392,13 @@ public class MainActivity extends AppCompatActivity {
     //**********************************************************************************************
 
     // Handler for received Intents sent by various Fragments and Activities from the app
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver mGoogleApiReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String message = intent.getStringExtra(MAIN_ACTIVITY_BROADCAST_RECEIVER);
+
+            // message to indicate Google API Client connection
+            String message = intent.getStringExtra(ActivityTracker.ACTIVITY_TRACKER_BROADCAST_RECEIVER);
             if (DEBUG) Log.d(LOG, "BroadcastReceiver - onReceive(): message: " + message);
-
-            if(message != null && message.equals(ActivityTracker.ACTIVITY_TRACKER_INTENT)){
-
-                // when Tracker has started, close this Activity
-                finish();
-            }
 
             // message to indicate Google API Client connection
             message = intent.getStringExtra(ActivityTracker.ACTIVITY_TRACKER_BROADCAST_RECEIVER);
@@ -416,7 +423,7 @@ public class MainActivity extends AppCompatActivity {
                     MainActivity.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 
                     //Message listener for GoogleApi to be unregistered at this point
-                    LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mMessageReceiver);
+                    LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mGoogleApiReceiver);
                 }
 
 
