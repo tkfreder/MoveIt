@@ -100,6 +100,9 @@
     <string name="message_weight_empty">Please enter a weight.</string>
     <string name="message_delete_user">All data associated with this user will be lost.  Alternatively, you can Cancel and rename the User so as not to lose the associated data.  Then create a new User.</string>
     <string name="message_username_exists">That username is taken.  Try another.</string>
+    <string name="message_discard_activity_title">Discard Activity?</string>
+    <string name="message_discard_activity">Are you sure you want to discard this activity?</string>
+    <string name="message_no_location_data_restart">No location data collected. Restart activity?</string>
 
     <string name="title_activity_sensor_api">SensorAPI</string>
     <string name="title_activity_fused_location_api">FusedLocationApi</string>
@@ -152,5 +155,9 @@
 
     <string name="button_add">Add</string>
     <string name="fulfill">Fulfill</string>
+
+    <string name="link_avatar_attribution">&lt;a href=\"https://thenounproject.com/sachan/collection/animals/?oq=animal%20sachan&amp;cidx=8\"Sachan from The Noun Project&lt;/a>"</string>
+    <string name="sachan_link">Avatars by Sachan from The Noun Project</string>
+
 
 </resources>

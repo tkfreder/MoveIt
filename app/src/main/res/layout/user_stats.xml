@@ -51,7 +51,8 @@
             android:layout_height="wrap_content"
             android:text="rewards earned"
             android:gravity="center_horizontal"
-            style="@style/Gray_15"/>
+            style="@style/Gray_15"
+            android:visibility="gone"/>
 
         <LinearLayout
             android:id="@+id/rewardLayout"

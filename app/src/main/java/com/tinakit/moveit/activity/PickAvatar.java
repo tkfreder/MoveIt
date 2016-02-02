@@ -1,11 +1,18 @@
 package com.tinakit.moveit.activity;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.SpannableString;
+import android.text.style.UnderlineSpan;
+import android.view.View;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.adapter.PickAvatarRecyclerAdapter;
@@ -45,20 +52,16 @@ public class PickAvatar extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.recycler_view);
+        setContentView(R.layout.pick_avatar);
         setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // inject FitnessDBHelper
         ((CustomApplication)getApplication()).getAppComponent().inject(this);
 
-        //get databaseHelper instance
-        //mDatabaseHelper = FitnessDBHelper.getInstance(mFragmentActivity);
-
         // fetch data before initializing UI
         fetchData();
 
         initializeUI();
-
 
     }
 
@@ -79,14 +82,21 @@ public class PickAvatar extends AppCompatActivity {
         // Initialize recycler view
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true);
-
-        //LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mFragmentActivity);
-        //linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        //mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
 
+        TextView attribution = (TextView)findViewById(R.id.attributionLink);
+        SpannableString content = new SpannableString(getResources().getString(R.string.sachan_link));
+        content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+        attribution.setText(content);
 
+        attribution.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://thenounproject.com/sachan/collection/animals/?oq=animal%20sachan&;cidx=8"));
+                startActivity(browserIntent);
+            }
+        });
 
         // get array list of avatar filenames from string array resource
         List<String> avatarFileList = Arrays.asList(getResources().getStringArray(R.array.avatar_images));

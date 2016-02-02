@@ -11,7 +11,8 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme"
+        android:screenOrientation="portrait">
 
         <meta-data android:name="com.google.android.geo.API_KEY"
                    android:value="AIzaSyC5IJ88NXWXdHNazquwM6O5EDaCZ3Daf5Y"/>
@@ -29,7 +30,6 @@
 
         </activity>
 
-        <activity android:name=".activity.ActivityTracker"/>
         <activity android:name=".activity.PickAvatar"/>
         <activity android:name=".utility.AndroidDatabaseManager"
                   android:theme="@style/Theme.AppCompat.Light"/>

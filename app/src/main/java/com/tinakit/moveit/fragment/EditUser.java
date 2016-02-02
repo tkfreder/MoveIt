@@ -18,6 +18,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.PickAvatar;
@@ -57,7 +58,7 @@ public class EditUser extends Fragment {
     ImageView mEditAvatar;
     EditText mUserName;
     EditText mWeight;
-    CheckBox mAdmin;
+    TextView mAdmin;
     Button mSaveButton;
 
     @Nullable
@@ -85,7 +86,7 @@ public class EditUser extends Fragment {
         mEditAvatar = (ImageView)mRootView.findViewById(R.id.editAvatar);
         mUserName = (EditText)mRootView.findViewById(R.id.userName);
         mWeight = (EditText)mRootView.findViewById(R.id.weight);
-        mAdmin = (CheckBox)mRootView.findViewById(R.id.isAdmin);
+        mAdmin = (TextView)mRootView.findViewById(R.id.isAdmin);
         mSaveButton = (Button)mRootView.findViewById(R.id.saveButton);
     }
 
@@ -155,7 +156,8 @@ public class EditUser extends Fragment {
         if (!TextUtils.isEmpty(mUser.getAvatarFileName()))
             mAvatar.setImageResource(getResources().getIdentifier(user.getAvatarFileName(), "drawable", getActivity().getPackageName()));
         mWeight.setText(String.valueOf(user.getWeight()));
-        mAdmin.setChecked(user.isAdmin());
+        if (user.isAdmin())
+            mAdmin.setVisibility(View.VISIBLE);
     }
 
     private void setActionListeners(){
@@ -178,12 +180,11 @@ public class EditUser extends Fragment {
                 if (!TextUtils.isEmpty(mUser_previous.getUserName())){
 
                     boolean isSameUserName = s.toString().equals(mUser_previous.getUserName());
-                    if (!isSameUserName)
-                        mUserName.setError(getString(R.string.message_username_exists));
+                    if (!isSameUserName){
+                        if (existsUserName())
+                            mUserName.setError(getString(R.string.message_username_exists));
+                    }
                 }
-
-                if (existsUserName())
-                    mUserName.setError(getString(R.string.message_username_exists));
             }
         });
 
@@ -212,14 +213,6 @@ public class EditUser extends Fragment {
             }
         });
 
-        mAdmin.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mSaveButton.setEnabled(true);
-            }
-        });
-
-        //TODO:  set onClickListener on Avatar to browse images and/or go to camera
         //set tag on mAvatar to save filepath to avatar image
         mSaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -291,7 +284,6 @@ public class EditUser extends Fragment {
         // save any changes into User object
         mUser.setUserName(mUserName.getText().toString());
         mUser.setWeight(Integer.parseInt(mWeight.getText().toString()));
-        mUser.setIsAdmin(mAdmin.isChecked());
 
         //any change to avatar should already be saved in OnActivityResult
 

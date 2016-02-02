@@ -31,6 +31,7 @@ import com.tinakit.moveit.api.GoogleApi;
 import com.tinakit.moveit.api.LocationApi;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.fragment.ActivityChooser;
+import com.tinakit.moveit.fragment.BackHandledFragment;
 import com.tinakit.moveit.fragment.MapFragment;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.UnitSplit;
@@ -47,10 +48,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class ActivityTracker extends Fragment {
+public class ActivityTracker extends BackHandledFragment {
 
     //DEBUG
-    private static final String LOG = "ACTIVITY_TRACKER";
+    public static final String ACTIVITY_TRACKER_TAG = "ACTIVITY_TRACKER_TAG";
     private static final boolean DEBUG = true;
 
     //CONSTANTS
@@ -117,9 +118,39 @@ public class ActivityTracker extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mFragmentActivity  = (FragmentActivity)super.getActivity();
         rootView = inflater.inflate(R.layout.activity_tracker, container, false);
-        mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        return rootView;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        //super.onViewCreated(view, savedInstanceState);
+
+        mCounterLayout = (LinearLayout)rootView.findViewById(R.id.counterLayout);
+        mStartButton = (Button) rootView.findViewById(R.id.startButton);
+        mStopButton = (Button) rootView.findViewById(R.id.stopButton);
+        mPauseButton = (Button) rootView.findViewById(R.id.pauseButton);
+        mSaveButton = (Button) rootView.findViewById(R.id.saveButton);
+        mResumeButton = (Button) rootView.findViewById(R.id.resumeButton);
+        mCancelButton = (Button)rootView.findViewById(R.id.cancelButton);
+        mButtonLinearLayout = (LinearLayout)rootView.findViewById(R.id.buttonLayout);
+        mChronometer = (Chronometer) rootView.findViewById(R.id.chronometer);
+        mDistance = (TextView) rootView.findViewById(R.id.distance);
+        mCoins = (TextView) rootView.findViewById(R.id.coins);
+        mFeetPerMinute = (TextView) rootView.findViewById(R.id.feetPerMinute);
+        mMessage = (TextView) rootView.findViewById(R.id.message);
+
+        setButtonOnClickListeners();
+
+        initializeData();
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        mFragmentActivity  = (FragmentActivity)super.getActivity();
 
         // Dagger 2 injection
         ((CustomApplication)mFragmentActivity.getApplication()).getAppComponent().inject(this);
@@ -132,13 +163,13 @@ public class ActivityTracker extends Fragment {
             ArrayList<UserActivity> userActivityList = bundle.getParcelableArrayList(ActivityChooser.USER_ACTIVITY_LIST_KEY);
             mActivityDetail.setUserActivityList(userActivityList);
 
-            initializeUI();
+            //initializeUI();
 
-            initializeData();
+            //initializeData();
 
             bindApi(savedInstanceState);
         }
-        return rootView;
+
     }
 
     protected void bindApi(@Nullable Bundle savedInstanceState ){
@@ -169,6 +200,7 @@ public class ActivityTracker extends Fragment {
 
     }
 
+    /*
     protected void initializeUI(){
 
         mCounterLayout = (LinearLayout)rootView.findViewById(R.id.counterLayout);
@@ -186,7 +218,9 @@ public class ActivityTracker extends Fragment {
         mMessage = (TextView) rootView.findViewById(R.id.message);
 
         setButtonOnClickListeners();
+
     }
+    */
 
     //**********************************************************************************************
     //  setButtonOnClickListeners
@@ -204,7 +238,16 @@ public class ActivityTracker extends Fragment {
                 intent.putExtra(MainActivity.MAIN_ACTIVITY_BROADCAST_RECEIVER, ACTIVITY_TRACKER_INTENT);
                 LocalBroadcastManager.getInstance(mFragmentActivity.getApplicationContext()).sendBroadcast(intent);
 
-                //startRun();
+                // start run if this is a restart
+                if (mStartButton.getText().equals(getString(R.string.restart))){
+
+                    mChronometerUtility.resetTime();
+                    mFeetPerMinute.setText("0");
+                    mDistance.setText("0");
+                    mCoins.setText("0");
+                    startRun();
+                }
+
 
                 //set flag to save location data
                 mSaveLocationData = true;
@@ -260,7 +303,8 @@ public class ActivityTracker extends Fragment {
                     mCancelButton.setVisibility(View.VISIBLE);
 
                     //message:  no data to display
-                    mMessage.setText("No location data was collected. " + getString(R.string.restart) + "?");
+                    Snackbar.make(rootView.findViewById(R.id.main_layout), getString(R.string.message_no_location_data_restart), Snackbar.LENGTH_LONG)
+                            .show();
                     playSound(AUDIO_ADD_POINTS);
 
                 }
@@ -310,6 +354,9 @@ public class ActivityTracker extends Fragment {
 
     private void pauseTracking(){
 
+        // unregister intents with BroadcastReceiver
+        LocalBroadcastManager.getInstance(mFragmentActivity).unregisterReceiver(mMessageReceiver);
+
         //set the flag to not save location data
         mSaveLocationData = false;
 
@@ -327,9 +374,16 @@ public class ActivityTracker extends Fragment {
         mResumeButton.setVisibility(View.VISIBLE);
         mStopButton.setVisibility(View.VISIBLE);
         mCancelButton.setVisibility(View.GONE);
+
+
     }
 
     private void resumeTracking(){
+
+        //register api intents with BroadcastReceiver
+        LocalBroadcastManager.getInstance(mFragmentActivity).registerReceiver(mMessageReceiver, new IntentFilter(LocationApi.LOCATION_API_INTENT));
+        LocalBroadcastManager.getInstance(mFragmentActivity).registerReceiver(mMessageReceiver, new IntentFilter(Accelerometer.ACCELEROMETER_INTENT));
+
 
         //set flag to save location data
         mSaveLocationData = true;
@@ -501,7 +555,7 @@ public class ActivityTracker extends Fragment {
     //**********************************************************************************************
 
     private void  updateCache(Location location) {
-        if (DEBUG) Log.d(LOG, "updateCache()");
+        if (DEBUG) Log.d(ACTIVITY_TRACKER_TAG, "updateCache()");
 
         UnitSplit unitSplit = new UnitSplit(location);
 
@@ -527,7 +581,7 @@ public class ActivityTracker extends Fragment {
 
     @Override
     public void onStart() {
-        if (DEBUG) Log.d(LOG, "onStart");
+        if (DEBUG) Log.d(ACTIVITY_TRACKER_TAG, "onStart");
         super.onStart();
 
         LocalBroadcastManager.getInstance(mFragmentActivity).registerReceiver(mMessageReceiver, new IntentFilter(GoogleApi.GOOGLE_API_INTENT));
@@ -538,7 +592,7 @@ public class ActivityTracker extends Fragment {
     //**********************************************************************************************
     @Override
     public void onStop() {
-        if (DEBUG) Log.d(LOG, "onStop");
+        if (DEBUG) Log.d(ACTIVITY_TRACKER_TAG, "onStop");
         super.onStop();
     }
 
@@ -553,7 +607,7 @@ public class ActivityTracker extends Fragment {
 
             String message = intent.getStringExtra(ACTIVITY_TRACKER_BROADCAST_RECEIVER);
 
-            if (DEBUG) Log.d(LOG, "BroadcastReceiver - onReceive(): message: " + message);
+            if (DEBUG) Log.d(ACTIVITY_TRACKER_TAG, "BroadcastReceiver - onReceive(): message: " + message);
 
             // message to indicate Google API Client connection
             if(message.equals(GoogleApi.GOOGLE_API_INTENT)){
@@ -617,10 +671,9 @@ public class ActivityTracker extends Fragment {
 
     @Override
     public void onPause() {
-        if (DEBUG) Log.d(LOG, "onPause");
+        if (DEBUG) Log.d(ACTIVITY_TRACKER_TAG, "onPause");
         super.onPause();
 
-        // unregister intents with BroadcastReceiver
         LocalBroadcastManager.getInstance(mFragmentActivity).unregisterReceiver(mMessageReceiver);
     }
 
@@ -630,12 +683,13 @@ public class ActivityTracker extends Fragment {
 
     @Override
     public void onResume() {
-        if (DEBUG) Log.d(LOG, "onResume");
+        if (DEBUG) Log.d(ACTIVITY_TRACKER_TAG, "onResume");
         super.onResume();
 
         // register intents with BroadcastReceiver
         LocalBroadcastManager.getInstance(mFragmentActivity).registerReceiver(mMessageReceiver, new IntentFilter(LocationApi.LOCATION_API_INTENT));
         LocalBroadcastManager.getInstance(mFragmentActivity).registerReceiver(mMessageReceiver, new IntentFilter(Accelerometer.ACCELEROMETER_INTENT));
+
 
     }
 
@@ -654,10 +708,55 @@ public class ActivityTracker extends Fragment {
 
     @Override
     public void onDestroy() {
-        if (DEBUG) Log.d(LOG, "onDestroy");
+        if (DEBUG) Log.d(ACTIVITY_TRACKER_TAG, "onDestroy");
         super.onDestroy();
 
         //mAccelerometer.stop();
+    }
+
+    //**********************************************************************************************
+    //  BackHandledFragment methods
+    //**********************************************************************************************
+
+
+    @Override
+    public boolean onBackPressed() {
+
+        // if tracker is running, pause it
+        if (mPauseButton.getVisibility() == View.VISIBLE)
+            pauseTracking();
+
+
+        android.support.v7.app.AlertDialog alertDialog = new android.support.v7.app.AlertDialog.Builder(
+                mFragmentActivity,
+                R.style.AlertDialogCustom_Destructive)
+                .setPositiveButton(R.string.button_delete, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                        mFragmentActivity.finish();
+                        startActivity(new Intent(mFragmentActivity, MainActivity.class));
+                    }
+                })
+                .setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                        if (!mStartButton.getText().equals(getString(R.string.restart)))
+                            resumeTracking();
+
+                    }
+                })
+                .setTitle(R.string.message_discard_activity_title)
+                .setMessage(R.string.message_discard_activity)
+                .show();
+
+        return true;
+    }
+
+    @Override
+    public String getTagText() {
+        return ACTIVITY_TRACKER_TAG;
     }
 
     //**********************************************************************************************
@@ -701,9 +800,7 @@ public class ActivityTracker extends Fragment {
 
     private void displayCurrent(){
 
-        //TODO: replace references of mLocationList with mLocationTimeList
-        //if (DEBUG) Log.d(LOG, "displayCurrent: intervalCount" + mLocationList.size());
-        if (DEBUG) Log.d(LOG, "displayCurrent: intervalCount" + mUnitSplitList.size());
+        if (DEBUG) Log.d(ACTIVITY_TRACKER_TAG, "displayCurrent: intervalCount" + mUnitSplitList.size());
 
         if (mUnitSplitList.size() > 1){
 

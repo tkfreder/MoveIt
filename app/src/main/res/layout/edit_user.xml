@@ -88,12 +88,14 @@
                 android:layout_below="@id/weightLayout"
                 android:padding="@dimen/activity_horizontal_margin"
                 android:gravity="left">
-                <CheckBox
+                <TextView
                     android:id="@+id/isAdmin"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/admin"
+                    android:textColor="@color/red"
                     android:hint="@string/hint_admin"
+                    android:visibility="gone"
                     />
             </RelativeLayout>
 

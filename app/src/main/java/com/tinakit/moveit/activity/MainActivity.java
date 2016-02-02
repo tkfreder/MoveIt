@@ -3,16 +3,19 @@ package com.tinakit.moveit.activity;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -26,7 +29,9 @@ import com.tinakit.moveit.api.GoogleApi;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.fragment.ActivityChooser;
 import com.tinakit.moveit.fragment.Admin;
+import com.tinakit.moveit.fragment.BackHandledFragment;
 import com.tinakit.moveit.fragment.EditUser;
+import com.tinakit.moveit.fragment.UserProfile;
 import com.tinakit.moveit.fragment.UserStatsMain;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.User;
@@ -41,7 +46,7 @@ import javax.inject.Inject;
  * Created by Tina on 10/26/2015.
  */
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements BackHandledFragment.BackHandlerInterface {
 
     private static final String LOG = "MAINACTIVITY";
     private static final boolean DEBUG = true;
@@ -61,6 +66,8 @@ public class MainActivity extends AppCompatActivity {
     //cache
     ArrayList<ActivityDetail> mActivityDetailList;
     ArrayList<User> mUserList;
+    private BackHandledFragment selectedFragment;
+
 
     //**********************************************************************************************
     //  onCreate()
@@ -207,7 +214,11 @@ public class MainActivity extends AppCompatActivity {
 
                     userStatsMain = new UserStatsMain();
                     //replace current fragment
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, userStatsMain).commit();
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragmentContainer, userStatsMain,UserStatsMain.USER_STATS_TAG)
+                            .addToBackStack(null)
+                            .commit();
 
                 }
 
@@ -230,7 +241,11 @@ public class MainActivity extends AppCompatActivity {
 
                     admin = new Admin();
                     //replace current fragment with Rewards fragment
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, admin).commit();
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragmentContainer, admin, Admin.ADMIN_TAG)
+                            .addToBackStack(null)
+                            .commit();
 
                 }
 
@@ -273,20 +288,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public void setSelectedFragment(BackHandledFragment selectedFragment) {
+        this.selectedFragment = selectedFragment;
+    }
+
+    @Override
     public void onBackPressed() {
 
-        int count = getSupportFragmentManager().getBackStackEntryCount();
+        if(selectedFragment == null || !selectedFragment.onBackPressed()) {
+            // Selected fragment did not consume the back press event.
 
-        if (count > 0){
+            int count = getSupportFragmentManager().getBackStackEntryCount();
 
-            getSupportFragmentManager().popBackStack();
-            displayStartScreen();
+            if (count == 0 || count == 1)
+                finish();
+            else{
 
+                getSupportFragmentManager().popBackStack();
+
+                if (count == 2)
+                    getSupportActionBar().setTitle(getString(R.string.nav_menu_start));
+
+            }
         }
-        else {
 
-            finish();
-        }
+
     }
 
     private void displayStartScreen(){
@@ -295,11 +321,16 @@ public class MainActivity extends AppCompatActivity {
 
         // check whether UserProfile is already visible
         ActivityChooser activityChooser = (ActivityChooser)getSupportFragmentManager().findFragmentByTag(ActivityChooser.ACTIVITY_CHOOSER_TAG);
-        if (activityChooser == null){
-
-            activityChooser= new ActivityChooser ();
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, activityChooser).commit();
+        if (activityChooser == null) {
+            activityChooser = new ActivityChooser();
         }
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragmentContainer, activityChooser, ActivityChooser.ACTIVITY_CHOOSER_TAG)
+                .addToBackStack(null)
+                .commit();
+
     }
 
     //**********************************************************************************************
@@ -415,9 +446,17 @@ public class MainActivity extends AppCompatActivity {
 
                     // display ActivityChooser only after SaveInstanceState
                     if (getSupportFragmentManager().getBackStackEntryCount() == 0)
-                        getSupportFragmentManager().beginTransaction().add(R.id.fragmentContainer, activityChooser).addToBackStack(null).commit();
+                        getSupportFragmentManager()
+                                .beginTransaction()
+                                .add(R.id.fragmentContainer, activityChooser, ActivityChooser.ACTIVITY_CHOOSER_TAG)
+                                .addToBackStack(null)
+                                .commit();
                     else
-                        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, activityChooser).addToBackStack(null).commit();
+                        getSupportFragmentManager()
+                                .beginTransaction()
+                                .replace(R.id.fragmentContainer, activityChooser, ActivityChooser.ACTIVITY_CHOOSER_TAG)
+                                .addToBackStack(null)
+                                .commit();
 
                     //unlock Navigation Drawer, originally locked when first launching MainActivity
                     MainActivity.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
@@ -425,7 +464,12 @@ public class MainActivity extends AppCompatActivity {
                     //Message listener for GoogleApi to be unregistered at this point
                     LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mGoogleApiReceiver);
                 }
-
+                else
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragmentContainer, activityChooser, ActivityChooser.ACTIVITY_CHOOSER_TAG)
+                            .addToBackStack(null)
+                            .commit();
 
             }
 
@@ -441,6 +485,14 @@ public class MainActivity extends AppCompatActivity {
 
                 EditUser editUser = (EditUser)getSupportFragmentManager().findFragmentByTag(EditUser.EDIT_USER_TAG);
                 editUser.onActivityResult(requestCode, resultCode, data);
+            }
+        }
+        else if (requestCode == ActivityChooser.PICK_AVATAR_REQUEST){
+
+            if (resultCode == Activity.RESULT_OK){
+
+                ActivityChooser activityChooser = (ActivityChooser)getSupportFragmentManager().findFragmentByTag(ActivityChooser.ACTIVITY_CHOOSER_TAG);
+                activityChooser.onActivityResult(requestCode, resultCode, data);
             }
         }
 

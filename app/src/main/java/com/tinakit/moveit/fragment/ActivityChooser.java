@@ -1,6 +1,8 @@
 package com.tinakit.moveit.fragment;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -20,6 +22,8 @@ import android.widget.TextView;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.ActivityTracker;
+import com.tinakit.moveit.activity.MainActivity;
+import com.tinakit.moveit.activity.PickAvatar;
 import com.tinakit.moveit.api.GoogleApi;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.ActivityDetail;
@@ -45,6 +49,8 @@ public class ActivityChooser  extends Fragment {
     // CONSTANTS
     public static final String ACTIVITY_CHOOSER_TAG= "ACTIVITY_CHOOSER_TAG";
     public static final String USER_ACTIVITY_LIST_KEY = "USER_ACTIVITY_LIST_KEY";
+    public static final int PICK_AVATAR_REQUEST = 2;
+
 
     @Inject
     GoogleApi mGoogleApi;
@@ -57,8 +63,8 @@ public class ActivityChooser  extends Fragment {
     private View rootView;
     protected static List<ActivityType> mActivityTypeList;
     public static ActivityDetail mActivityDetail = new ActivityDetail();
-       ArrayList<UserActivity> mUserActivityList = new ArrayList<>();
-    List<UserActivity> mUserActivityList_previous;
+    protected ArrayList<UserActivity> mUserActivityList = new ArrayList<>();
+    protected List<UserActivity> mUserActivityList_previous;
     private static ActivityChooser mActivityChooser;
 
     // API
@@ -80,8 +86,6 @@ public class ActivityChooser  extends Fragment {
 
         // inject FitnessDBHelper
         ((CustomApplication)getActivity().getApplication()).getAppComponent().inject(this);
-        //get databaseHelper instance
-        //mDatabaseHelper = FitnessDBHelper.getInstance(mFragmentActivity);
 
         initializeUI();
 
@@ -113,7 +117,10 @@ public class ActivityChooser  extends Fragment {
                 bundle.putParcelableArrayList(USER_ACTIVITY_LIST_KEY, mUserActivityList);
                 ActivityTracker activityTracker = new ActivityTracker();
                 activityTracker.setArguments(bundle);
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, activityTracker).commit();
+                getActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragmentContainer, activityTracker,ActivityTracker.ACTIVITY_TRACKER_TAG)
+                        .commit();
             }
         });
     }
@@ -202,6 +209,11 @@ public class ActivityChooser  extends Fragment {
             return viewHolder;
         }
 
+        private void setList(List<User> userList){
+
+            mUserList = userList;
+        }
+
         @Override
         public void onBindViewHolder(MultiChooserRecyclerAdapter.CustomViewHolder customViewHolder, int i) {
 
@@ -210,6 +222,21 @@ public class ActivityChooser  extends Fragment {
 
             // Populate data from ActivityType data object
             customViewHolder.avatar.setImageResource(getResources().getIdentifier(user.getAvatarFileName(), "drawable", mFragmentActivity.getPackageName()));
+            customViewHolder.avatar.setTag(user);
+            customViewHolder.avatar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    //save the user in bundle
+                    Bundle args = new Bundle();
+                    args.putParcelable(PickAvatar.PICK_AVATAR_KEY_USER, (User)v.getTag());
+
+                    Intent intent = new Intent(getActivity(), PickAvatar.class);
+                    intent.putExtras(args);
+                    mFragmentActivity.startActivityForResult(intent, ActivityChooser.PICK_AVATAR_REQUEST);
+                }
+            });
+
             customViewHolder.userName.setText(user.getUserName());
 
             // set tag on radio group
@@ -281,6 +308,25 @@ public class ActivityChooser  extends Fragment {
             mNextButton.setEnabled(false);
             mNextButton.setBackgroundColor(ContextCompat.getColor(mFragmentActivity, R.color.grey));
         }
+    }
+
+
+    @Override
+     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == ActivityChooser.PICK_AVATAR_REQUEST){
+
+            if (resultCode == Activity.RESULT_OK) {
+
+                User user = data.getParcelableExtra(PickAvatar.PICK_AVATAR_KEY_USER);
+                mDatabaseHelper.updateUser(user);
+                mRecyclerViewAdapter.setList(mDatabaseHelper.getUsers());
+                mRecyclerViewAdapter.notifyDataSetChanged();
+
+            }
+        }
+
     }
 
     @Override

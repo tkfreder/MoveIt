@@ -143,7 +143,7 @@ public class UserProfileRecyclerAdapter extends RecyclerView.Adapter<UserProfile
             public void onClick(View v) {
 
                 // update app bar title
-                ((AppCompatActivity)mActivity).getSupportActionBar().setTitle(mActivity.getString(R.string.app_bar_header_admin) + " : " + mActivity.getString(R.string.app_bar_header_edit_user));
+                //((AppCompatActivity)mActivity).getSupportActionBar().setTitle(mActivity.getString(R.string.app_bar_header_admin) + " : " + mActivity.getString(R.string.app_bar_header_edit_user));
 
                 EditUser editUser= new EditUser();
 

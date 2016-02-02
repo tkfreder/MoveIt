@@ -88,24 +88,33 @@ public class UserStats extends Fragment {
             List<Reward> rewardList = mDatabaseHelper.getRewardsEarned(mUser);
             List<Reward> rewardListToFulfill = new ArrayList<>();
 
-            for (Reward reward : rewardList){
+            if (rewardList.size() > 0){
 
-                if(reward.getDateFulfilled() == null){
 
-                    rewardListToFulfill.add(reward);
+                for (Reward reward : rewardList){
 
-                }
-                else{
+                    if(reward.getDateFulfilled() == null){
 
-                    ImageView certificate = new ImageView(mFragmentActivity);
-                    certificate.setImageResource(getResources().getIdentifier("ribbon", "drawable", mFragmentActivity.getPackageName()));
-                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(100,100);
-                    certificate.setLayoutParams(layoutParams);
-                    CheatSheet.setup(certificate,DateUtility.getDateFormattedRecent(reward.getDateEarned(), 7));
-                    LinearLayout layout = (LinearLayout)rootView.findViewById(R.id.rewardLayout);
-                    layout.addView(certificate);
+                        rewardListToFulfill.add(reward);
+
+                    }
+                    // display ribbons for rewards already fulfilled
+                    else{
+
+                        TextView rewardsEarned = (TextView)rootView.findViewById(R.id.rewardsEarned);
+                        rewardsEarned.setVisibility(View.VISIBLE);
+
+                        ImageView certificate = new ImageView(mFragmentActivity);
+                        certificate.setImageResource(getResources().getIdentifier("ribbon", "drawable", mFragmentActivity.getPackageName()));
+                        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(100,100);
+                        certificate.setLayoutParams(layoutParams);
+                        CheatSheet.setup(certificate,DateUtility.getDateFormattedRecent(reward.getDateEarned(), 7));
+                        LinearLayout layout = (LinearLayout)rootView.findViewById(R.id.rewardLayout);
+                        layout.addView(certificate);
+                    }
                 }
             }
+
 
             // if reward is earned and has not been fulfilled yet, display ribbon
             if ( rewardListToFulfill.size() > 0 ){

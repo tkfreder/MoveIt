@@ -9,7 +9,8 @@
     <ImageView
         android:id="@+id/avatar"
         android:layout_width="48dp"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:background="@drawable/white_image_border"/>
     <TextView
         android:id="@+id/userName"
         android:layout_width="0dp"
