@@ -88,6 +88,9 @@ public class MainActivity extends AppCompatActivity {
 
         initializeUI();
 
+        // this should be called once, so defined in onCreate and not in onResume
+        LocalBroadcastManager.getInstance(this).registerReceiver(mGoogleApiReceiver, new IntentFilter(GoogleApi.GOOGLE_API_INTENT));
+
     }
 
     //**********************************************************************************************
@@ -276,7 +279,9 @@ public class MainActivity extends AppCompatActivity {
 
         if (count > 0){
 
+            getSupportFragmentManager().popBackStack();
             displayStartScreen();
+
         }
         else {
 
@@ -317,9 +322,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         if (DEBUG) Log.d(LOG, "onResume");
         super.onResume();
-
-        LocalBroadcastManager.getInstance(this).registerReceiver(mGoogleApiReceiver, new IntentFilter(GoogleApi.GOOGLE_API_INTENT));
-
     }
 
     //**********************************************************************************************
@@ -330,9 +332,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         if (DEBUG) Log.d(LOG, "onPause");
         super.onPause();
-
-        // unresiter receiver
-        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mGoogleApiReceiver);
     }
 
     //**********************************************************************************************
@@ -346,7 +345,8 @@ public class MainActivity extends AppCompatActivity {
 
         // destroy this activity, in the case where home button is pressed, this will force restart of MainActivity/fragments
         // otherwise, there will be an extra ActivityChooser fragment
-        finish();
+        //finish();
+
     }
 
 //**********************************************************************************************
@@ -415,9 +415,9 @@ public class MainActivity extends AppCompatActivity {
 
                     // display ActivityChooser only after SaveInstanceState
                     if (getSupportFragmentManager().getBackStackEntryCount() == 0)
-                        getSupportFragmentManager().beginTransaction().add(R.id.fragmentContainer, activityChooser).commit();
+                        getSupportFragmentManager().beginTransaction().add(R.id.fragmentContainer, activityChooser).addToBackStack(null).commit();
                     else
-                        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, activityChooser).commit();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, activityChooser).addToBackStack(null).commit();
 
                     //unlock Navigation Drawer, originally locked when first launching MainActivity
                     MainActivity.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
