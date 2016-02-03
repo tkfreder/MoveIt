@@ -141,6 +141,9 @@ public class ActivityTracker extends BackHandledFragment {
         mFeetPerMinute = (TextView) rootView.findViewById(R.id.feetPerMinute);
         mMessage = (TextView) rootView.findViewById(R.id.message);
 
+        mMapFragment = new MapFragment(getActivity().getSupportFragmentManager(), getActivity());
+        mMapFragment.addMap(R.id.map_container, mContainer);
+
         setButtonOnClickListeners();
 
         initializeData();
@@ -256,7 +259,7 @@ public class ActivityTracker extends BackHandledFragment {
                 mActivityDetail.setStartDate(new Date());
 
                 //set visibility
-                //mMapFragment.setVisibility(View.GONE);
+                mMapFragment.setVisibility(View.GONE);
 
                 //Restart
                 mCancelButton.setVisibility(View.GONE);
@@ -429,7 +432,7 @@ public class ActivityTracker extends BackHandledFragment {
         mActivityDetail.setStartDate(new Date());
 
         //set visibility
-        //mMapFragment.setVisibility(View.GONE);
+        mMapFragment.setVisibility(View.GONE);
 
         //Restart
         mCancelButton.setVisibility(View.GONE);
@@ -457,7 +460,7 @@ public class ActivityTracker extends BackHandledFragment {
         mCounterLayout.setVisibility(View.VISIBLE);
 
         //display map of starting point
-        //mMapFragment.displayStartMap();
+        mMapFragment.displayStartMap();
 
 
     }
@@ -569,7 +572,7 @@ public class ActivityTracker extends BackHandledFragment {
 
     private void displayResults(){
 
-        //mMapFragment.displayMap(mUnitSplitList, getDistance(1));
+        mMapFragment.displayMap(mUnitSplitList, getDistance(1));
 
         playSound(AUDIO_ADD_POINTS);
 

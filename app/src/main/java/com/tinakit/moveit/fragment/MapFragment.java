@@ -58,7 +58,7 @@ public class MapFragment implements OnMapReadyCallback {
 
         mMapFragment = SupportMapFragment.newInstance();
         FragmentTransaction transaction = mFragmentManager.beginTransaction();
-        transaction.add(containerId, mMapFragment).commit();
+        transaction.replace(containerId, mMapFragment).commit();
         mMapFragment.getMapAsync(this);
     }
 
