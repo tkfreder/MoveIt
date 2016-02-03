@@ -60,7 +60,7 @@
                     android:minWidth="@dimen/min_width_long_edit_text"
                     android:layout_height="wrap_content"
                     android:singleLine="true"
-                    android:hint="@string/username"/>
+                    android:hint="@string/name"/>
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -68,7 +68,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/userNameLayout"
-                android:padding="@dimen/activity_horizontal_margin"
                 android:gravity="left"
                 >
 
