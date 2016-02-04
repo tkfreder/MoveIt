@@ -693,14 +693,13 @@ public class ActivityTracker extends BackHandledFragment {
                             public void onClick(DialogInterface dialogInterface, int i) {
 
                                 resumeTracking();
+                                mHandler.postDelayed(mHandlerTask, 1000 * 3);
 
                             }
                         })
                         .setTitle(R.string.message_continue_tracker_title)
                         .setMessage(R.string.message_continue_tracker)
                         .show();
-
-                mHandler.postDelayed(mHandlerTask, 1000 * 3);
             }
             else {
 
@@ -711,9 +710,8 @@ public class ActivityTracker extends BackHandledFragment {
 
     void startRepeatingTask()
     {
-        //mHandlerTask.run();
-        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-        executor.schedule(mHandlerTask, 1, TimeUnit.SECONDS);
+        // delay before checking if we're polling data
+        mHandler.postDelayed(mHandlerTask, 1000 * 2);
     }
 
     void stopRepeatingTask() {
