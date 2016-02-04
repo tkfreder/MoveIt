@@ -251,10 +251,7 @@ public class ActivityTracker extends BackHandledFragment {
                 // start run if this is a restart
                 if (mStartButton.getText().equals(getString(R.string.restart))){
 
-                    mChronometerUtility.resetTime();
-                    mFeetPerMinute.setText("0");
-                    mDistance.setText("0");
-                    mCoins.setText("0");
+                    resetCounters();
                     startRun();
                 }
 
@@ -674,6 +671,7 @@ public class ActivityTracker extends BackHandledFragment {
             if (!mLocationApi.isPollingData()) {
 
                 pauseTracking();
+                resetCounters();
 
                 //display alert dialog, warning there may be weak connection
                 // move to a better location
@@ -1051,6 +1049,14 @@ public class ActivityTracker extends BackHandledFragment {
 
             saveToDB(mDatabaseHelper, mUnitSplitList, mActivityDetail, mTotalPoints, getDistance(1));
         }
+    }
+
+    private void resetCounters(){
+
+        mChronometerUtility.resetTime();
+        mFeetPerMinute.setText("0");
+        mDistance.setText("0");
+        mCoins.setText("0");
     }
 
 }

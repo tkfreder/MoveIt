@@ -176,7 +176,13 @@ public class EditUser extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
 
-                if (isChanged()){
+                // check for empty field
+                if (s.toString().trim().equals("")){
+                    mUserName.setError(getString(R.string.message_username_empty));
+                    mSaveButton.setEnabled(false);
+                }
+
+                else if (isChanged()){
 
                     if(validateForm()){
 
@@ -231,7 +237,13 @@ public class EditUser extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
 
-                if (isChanged()){
+                // check for empty field
+                if (s.toString().trim().equals("")){
+                    mWeight.setError(getString(R.string.message_weight_empty));
+                    mSaveButton.setEnabled(false);
+                }
+
+                else if (isChanged()){
 
                     if (validateForm())
                         mSaveButton.setEnabled(true);

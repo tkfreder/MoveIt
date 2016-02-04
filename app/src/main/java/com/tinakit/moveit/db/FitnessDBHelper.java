@@ -334,17 +334,17 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
 
         //TODO: DUMMY DATA
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Laura', 0, 50, 'avatar_3', 0, 1);");
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Lucy', 0, 40, 'avatar_1', 0, 1);");
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Alec', 0, 175, 'avatar_2', 0, 1);");
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Tina', 1, 100, 'avatar_4', 0, 1);");
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Child 1', 0, 50, 'avatar_3', 0, 1);");
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Child 2', 0, 75, 'avatar_1', 0, 1);");
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Parent 1', 0, 175, 'avatar_2', 0, 1);");
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Parent 2', 1, 125, 'avatar_4', 0, 1);");
 
         //TODO: DUMMY DATA
         //populate Rewards table
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (1, 'Animal Jam Diamonds', 1, 1);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (2, 'Pancake Dinner', 2, 2);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (3, 'Arclight Movie', 3, 3);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (4, 'Dinner Out', 4, 4);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (1, 'Reward 1', 100, 1);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (2, 'Reward 2', 100, 2);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (3, 'Reward 3', 100, 3);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (4, 'Reward 4', 100, 4);");
 
 
         /*
