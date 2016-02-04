@@ -29,6 +29,7 @@ public class LocationApi implements LocationListener, LifeCycle {
     private FragmentActivity mFragmentActivity;
     private Location mLocation;
     private GoogleApiClient mGoogleApiClient;
+    private boolean mIsPollingData = false;
 
     //LocationRequest settings
     private LocationRequest mLocationRequest;
@@ -58,11 +59,19 @@ public class LocationApi implements LocationListener, LifeCycle {
         return mLocation;
     }
 
+    public boolean isPollingData(){
+
+        return mIsPollingData;
+    }
+
     @Override
     public void onLocationChanged(Location location) {
         if (DEBUG) Log.d(LOG, "onLocationChanged");
 
         if (DEBUG) Log.d(LOG, "Accuracy: " + location.getAccuracy());
+
+        // set flag, when start receiving location data
+        mIsPollingData = true;
 
         // save location if meets minimum accuracy
         if (isAccurate(location)){

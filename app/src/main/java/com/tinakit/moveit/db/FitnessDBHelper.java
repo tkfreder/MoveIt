@@ -788,7 +788,9 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         return activityDetail;
     }
 
-    public ArrayList<ActivityDetail> getActivityDetailList(){
+    public ArrayList<ActivityDetail> getActivityDetailList(int days_ago){
+
+        int index = 0;
 
         //initialize ActivityType list
         ArrayList<ActivityDetail> activityDetailList = new ArrayList<>();
@@ -807,7 +809,8 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                         ,KEY_ACTIVITY_TYPE_NAME
                         ,KEY_ACTIVITY_TYPE_ICON_FILENAME
                         ,KEY_ACTIVITY_USERS_ACTIVITY_ID},
-                    null, null, null, null, KEY_ACTIVITY_USERS_ACTIVITY_ID);
+                    KEY_ACTIVITY_START_DATE + " < ?",
+                    new String[]{"date('now', '-" + String.valueOf(days_ago) + " day')"}, null, null, KEY_ACTIVITY_USERS_ACTIVITY_ID + " DESC");
 
 
 
@@ -853,6 +856,8 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                         activityDetail.addUserActivity(userActivity);
 
                         previousActivityId = activityId;
+
+                        index++;
 
                     } while (cursor.moveToNext());
 

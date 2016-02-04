@@ -37,6 +37,7 @@ public class ActivityHistory extends Fragment {
     public static final String ACTIVITY_HISTORY_TAG = "ACTIVIY_HISTORY_TAG";
     public static final String ACTIVITY_HISTORY_KEY = "ACTIVIY_HISTORY_KEY";
     private static final int APPROX_SIZE_AVATAR_IMAGES = 250;
+    public static final int DAYS_AGO = 7;
 
     @Inject
     FitnessDBHelper mDatabaseHelper;
@@ -89,7 +90,7 @@ public class ActivityHistory extends Fragment {
         else{
 
             // if this is the first time, fetch directly from the database
-            mActivityDetailList = mDatabaseHelper.getActivityDetailList();
+            mActivityDetailList = mDatabaseHelper.getActivityDetailList(DAYS_AGO);
 
             if (mActivityDetailList.size() == 0)
                 mNoActivities.setVisibility(View.VISIBLE);

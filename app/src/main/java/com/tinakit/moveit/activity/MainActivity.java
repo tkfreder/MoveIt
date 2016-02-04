@@ -28,6 +28,7 @@ import com.tinakit.moveit.R;
 import com.tinakit.moveit.api.GoogleApi;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.fragment.ActivityChooser;
+import com.tinakit.moveit.fragment.ActivityHistory;
 import com.tinakit.moveit.fragment.Admin;
 import com.tinakit.moveit.fragment.BackHandledFragment;
 import com.tinakit.moveit.fragment.EditUser;
@@ -107,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
     private void fetchData(){
 
         //data for ActivityHistory
-        mActivityDetailList = mDatabaseHelper.getActivityDetailList();
+        mActivityDetailList = mDatabaseHelper.getActivityDetailList(ActivityHistory.DAYS_AGO);
 
         // get user data
         mUserList = mDatabaseHelper.getUsers();

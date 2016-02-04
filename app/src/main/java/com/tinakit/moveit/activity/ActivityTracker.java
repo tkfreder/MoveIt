@@ -8,7 +8,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Location;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -45,6 +47,11 @@ import com.tinakit.moveit.utility.UnitConverter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -617,6 +624,10 @@ public class ActivityTracker extends BackHandledFragment {
 
                 startRun();
 
+
+                // check periodically for connection
+                startRepeatingTask();
+
             }
             else if (message.equals(LocationApi.LOCATION_API_INTENT)){
 
@@ -629,7 +640,7 @@ public class ActivityTracker extends BackHandledFragment {
                 }
 
                 /*
-                // auto-shutoff after reched time limit
+                // auto-shutoff after reached time limit
                 if(mChronometerUtility.getTimeByUnits(mChronometer.getText().toString(), 0) > STOP_SERVICE_TIME_LIMIT && !mIsTimeLimit){
                     mIsTimeLimit = true;
                     reachedTimeLimit();
@@ -648,6 +659,85 @@ public class ActivityTracker extends BackHandledFragment {
             }
         }
     };
+
+    //**********************************************************************************************
+    //  HandlerTask - checks whether polling for location has started, indicating there is a good signal
+    //**********************************************************************************************
+
+    Handler mHandler = new Handler();
+
+    Runnable mHandlerTask = new Runnable()
+    {
+        @Override
+        public void run() {
+
+            if (!mLocationApi.isPollingData()) {
+
+                pauseTracking();
+
+                //display alert dialog, warning there may be weak connection
+                // move to a better location
+                android.support.v7.app.AlertDialog alertDialog = new android.support.v7.app.AlertDialog.Builder(
+                        mFragmentActivity,
+                        R.style.AlertDialogCustom_Destructive)
+                        .setPositiveButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                                mFragmentActivity.finish();
+                                startActivity(new Intent(mFragmentActivity, MainActivity.class));
+                            }
+                        })
+                        .setNegativeButton(R.string.button_wait, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                                resumeTracking();
+
+                            }
+                        })
+                        .setTitle(R.string.message_continue_tracker_title)
+                        .setMessage(R.string.message_continue_tracker)
+                        .show();
+
+                mHandler.postDelayed(mHandlerTask, 1000 * 3);
+            }
+            else {
+
+                stopRepeatingTask();
+            }
+        }
+    };
+
+    void startRepeatingTask()
+    {
+        //mHandlerTask.run();
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+        executor.schedule(mHandlerTask, 1, TimeUnit.SECONDS);
+    }
+
+    void stopRepeatingTask() {
+        mHandler.removeCallbacksAndMessages(mHandlerTask);
+    }
+
+    //**********************************************************************************************
+    //  ConnectionTask
+    //**********************************************************************************************
+
+    private class ConnectionTask extends AsyncTask<Void,Void,Boolean>{
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            super.onPostExecute(aBoolean);
+        }
+    }
+
+
 
     private void displayNoMovementWarning(){
 
