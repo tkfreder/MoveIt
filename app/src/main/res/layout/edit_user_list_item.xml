@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             style="@style/LabelListItemPurple"
             android:inputType="text"
-            android:layout_alignParentLeft="true"
+            android:gravity="center_horizontal"
             android:enabled="false"/>
         <TextView
             android:id="@+id/isAdmin"

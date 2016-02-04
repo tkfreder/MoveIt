@@ -92,10 +92,16 @@ public class ActivityHistory extends Fragment {
             // if this is the first time, fetch directly from the database
             mActivityDetailList = mDatabaseHelper.getActivityDetailList(DAYS_AGO);
 
-            if (mActivityDetailList.size() == 0)
+            TextView pastDays = (TextView)rootView.findViewById(R.id.pastDays);
+
+            if (mActivityDetailList.size() == 0){
                 mNoActivities.setVisibility(View.VISIBLE);
-            else
+                pastDays.setVisibility(View.GONE);
+            }
+            else{
                 mNoActivities.setVisibility(View.GONE);
+                pastDays.setVisibility(View.VISIBLE);
+            }
 
         }
 

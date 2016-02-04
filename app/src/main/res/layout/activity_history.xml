@@ -11,10 +11,26 @@
         style="@style/Gray_15"
         android:visibility="gone"/>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler_view"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"/>
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/pastDays"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Activities from past 7 days"
+            android:gravity="center_horizontal"
+            style="@style/LabelSmallGray"
+            android:visibility="gone"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_below="@+id/pastDays"/>
+    </RelativeLayout>
+
 
 </RelativeLayout>
