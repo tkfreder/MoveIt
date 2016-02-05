@@ -25,6 +25,7 @@ import com.tinakit.moveit.activity.ActivityTracker;
 import com.tinakit.moveit.activity.MainActivity;
 import com.tinakit.moveit.activity.PickAvatar;
 import com.tinakit.moveit.api.GoogleApi;
+import com.tinakit.moveit.api.LocationApi;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.ActivityType;
@@ -51,6 +52,8 @@ public class ActivityChooser  extends Fragment {
     public static final String ACTIVITY_CHOOSER_BACKSTACK_TAG= "Start";
     public static final String USER_ACTIVITY_LIST_KEY = "USER_ACTIVITY_LIST_KEY";
     public static final int PICK_AVATAR_REQUEST = 2;
+    public static final int ENABLE_GPS = 3;
+
 
 
     @Inject
@@ -70,6 +73,7 @@ public class ActivityChooser  extends Fragment {
 
     // API
     private MapFragment mMapFragment;
+    private LocationApi mLocationApi;
 
     // UI COMPONENTS
     protected RecyclerView mRecyclerView;
@@ -88,9 +92,20 @@ public class ActivityChooser  extends Fragment {
         // inject FitnessDBHelper
         ((CustomApplication)getActivity().getApplication()).getAppComponent().inject(this);
 
-        initializeUI();
+        // check Location Services is turned on for this device
+        if (!mGoogleApi.servicesAvailable(mFragmentActivity))
+            mFragmentActivity.finish();
+        else
+            mGoogleApi.buildGoogleApiClient(mFragmentActivity);
 
-        setActionListeners();
+        mLocationApi = new LocationApi(mFragmentActivity, mGoogleApi.client());
+
+        if(mLocationApi.hasLocationService()){
+
+            initializeUI();
+            setActionListeners();
+
+        }
 
         return rootView;
     }
@@ -327,7 +342,6 @@ public class ActivityChooser  extends Fragment {
 
             }
         }
-
     }
 
     @Override

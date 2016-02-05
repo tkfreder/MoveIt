@@ -633,6 +633,7 @@ public class ActivityTracker extends BackHandledFragment {
                 // check periodically for connection
                 startRepeatingTask();
 
+
             }
             else if (message.equals(LocationApi.LOCATION_API_INTENT)){
 

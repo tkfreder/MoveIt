@@ -514,6 +514,14 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
                 activityChooser.onActivityResult(requestCode, resultCode, data);
             }
         }
+        else if (requestCode == ActivityChooser.ENABLE_GPS){
+
+            // Back button pressed = RESULT_CANCELLED
+            if (resultCode == Activity.RESULT_CANCELED){
+
+                finish();
+            }
+        }
 
     }
 
