@@ -48,6 +48,7 @@ public class ActivityChooser  extends Fragment {
 
     // CONSTANTS
     public static final String ACTIVITY_CHOOSER_TAG= "ACTIVITY_CHOOSER_TAG";
+    public static final String ACTIVITY_CHOOSER_BACKSTACK_TAG= "Start";
     public static final String USER_ACTIVITY_LIST_KEY = "USER_ACTIVITY_LIST_KEY";
     public static final int PICK_AVATAR_REQUEST = 2;
 

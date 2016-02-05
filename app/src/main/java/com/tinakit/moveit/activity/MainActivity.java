@@ -214,14 +214,14 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
                 if (userStatsMain == null) {
 
                     userStatsMain = new UserStatsMain();
-                    //replace current fragment
-                    getSupportFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.fragmentContainer, userStatsMain,UserStatsMain.USER_STATS_TAG)
-                            .addToBackStack(null)
-                            .commit();
 
                 }
+                //replace current fragment
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragmentContainer, userStatsMain, UserStatsMain.USER_STATS_TAG)
+                        .addToBackStack(UserStatsMain.USER_STATS_BACKSTACK_NAME)
+                        .commit();
 
                 break;
 
@@ -241,14 +241,15 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
                 if (admin == null) {
 
                     admin = new Admin();
-                    //replace current fragment with Rewards fragment
-                    getSupportFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.fragmentContainer, admin, Admin.ADMIN_TAG)
-                            .addToBackStack(null)
-                            .commit();
 
                 }
+
+                //replace current fragment with Admin fragment
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragmentContainer, admin, Admin.ADMIN_TAG)
+                        .addToBackStack(Admin.ADMIN_BACKSTACK_NAME)
+                        .commit();
 
                 break;
 
@@ -303,12 +304,13 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
 
             if (count == 0 || count == 1)
                 finish();
+
             else{
 
                 getSupportFragmentManager().popBackStack();
 
-                if (count == 2)
-                    getSupportActionBar().setTitle(getString(R.string.nav_menu_start));
+                int size = getSupportFragmentManager().getBackStackEntryCount();
+                getSupportActionBar().setTitle(getSupportFragmentManager().getBackStackEntryAt(size - 2).getName());
 
             }
         }
@@ -329,7 +331,7 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragmentContainer, activityChooser, ActivityChooser.ACTIVITY_CHOOSER_TAG)
-                .addToBackStack(null)
+                .addToBackStack(ActivityChooser.ACTIVITY_CHOOSER_BACKSTACK_TAG)
                 .commit();
 
     }

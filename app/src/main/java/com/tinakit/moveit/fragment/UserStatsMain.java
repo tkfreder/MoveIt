@@ -30,6 +30,7 @@ public class UserStatsMain extends Fragment{
 
     // CONSTANTS
     public static final String USER_STATS_TAG = "USER_STATS_TAG";
+    public static final String USER_STATS_BACKSTACK_NAME = "Coins";
     public static final String USER_STATS_LIST_KEY = "USER_STATS_LIST";
 
     @Inject

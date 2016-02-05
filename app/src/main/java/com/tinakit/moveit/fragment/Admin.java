@@ -22,6 +22,7 @@ public class Admin extends Fragment{
 
     // CONSTANTS
     public static final String ADMIN_TAG = "ADMIN_TAG";
+    public static final String ADMIN_BACKSTACK_NAME = "Admin";
 
     //@Inject
     //FitnessDBHelper mDatabaseHelper;
