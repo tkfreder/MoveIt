@@ -202,6 +202,8 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
 
             case R.id.nav_start:
 
+                removeChildFragment();
+
                 displayStartScreen();
 
                 break;
@@ -209,6 +211,8 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
              case R.id.nav_coins:
 
                 getSupportActionBar().setTitle(getString(R.string.nav_menu_coins));
+
+                removeChildFragment();
 
                 UserStatsMain userStatsMain = (UserStatsMain)getSupportFragmentManager().findFragmentByTag(UserStatsMain.USER_STATS_TAG);
                 if (userStatsMain == null) {
@@ -236,6 +240,8 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
             case R.id.action_settings:
 
                 getSupportActionBar().setTitle(getString(R.string.nav_menu_admin));
+
+                removeChildFragment();
 
                 Admin admin = (Admin)getSupportFragmentManager().findFragmentByTag(Admin.ADMIN_TAG);
                 if (admin == null) {
@@ -285,6 +291,16 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
                 break;
 
 */
+
+        }
+    }
+
+    private void removeChildFragment(){
+
+        EditUser editUser = (EditUser) getSupportFragmentManager().findFragmentByTag(EditUser.EDIT_USER_TAG);
+        if (editUser != null && editUser.isVisible()) {
+
+            getSupportFragmentManager().popBackStack();
 
         }
     }
