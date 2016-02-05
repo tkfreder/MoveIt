@@ -284,6 +284,9 @@ public class ActivityTracker extends BackHandledFragment {
 
                 stopRun();
 
+                // cancel HandlerTask if it's running
+                stopRepeatingTask();
+
                 //get timestamp of end
                 mActivityDetail.setEndDate(new Date());
 
@@ -448,12 +451,10 @@ public class ActivityTracker extends BackHandledFragment {
         mStopButton.setVisibility(View.VISIBLE);
         mPauseButton.setVisibility(View.VISIBLE);
 
-        //startServices(mGoogleApi.client());
-        mLocationApi.start();
         //mAccelerometer.start();
 
         //register api intents with BroadcastReceiver
-        LocalBroadcastManager.getInstance(mFragmentActivity).registerReceiver(mMessageReceiver, new IntentFilter(LocationApi.LOCATION_API_INTENT));
+        //LocalBroadcastManager.getInstance(mFragmentActivity).registerReceiver(mMessageReceiver, new IntentFilter(LocationApi.LOCATION_API_INTENT));
         LocalBroadcastManager.getInstance(mFragmentActivity).registerReceiver(mMessageReceiver, new IntentFilter(Accelerometer.ACCELEROMETER_INTENT));
 
         //initialize ChronometerUtility, start timer
@@ -466,6 +467,14 @@ public class ActivityTracker extends BackHandledFragment {
         //display map of starting point
         mMapFragment.displayStartMap();
 
+
+    }
+
+    private void startLocationApi(){
+
+        mLocationApi.start();
+        //register api intents with BroadcastReceiver
+        LocalBroadcastManager.getInstance(mFragmentActivity).registerReceiver(mMessageReceiver, new IntentFilter(LocationApi.LOCATION_API_INTENT));
 
     }
 
@@ -619,8 +628,7 @@ public class ActivityTracker extends BackHandledFragment {
             // message to indicate Google API Client connection
             if(message.equals(GoogleApi.GOOGLE_API_INTENT)){
 
-                startRun();
-
+                startLocationApi();
 
                 // check periodically for connection
                 startRepeatingTask();
@@ -657,25 +665,42 @@ public class ActivityTracker extends BackHandledFragment {
         }
     };
 
+
+    void startAnim(){
+        rootView.findViewById(R.id.avloadingIndicatorView).setVisibility(View.VISIBLE);
+        rootView.findViewById(R.id.loading_layout).setVisibility(View.VISIBLE);
+        rootView.findViewById(R.id.map_container).setVisibility(View.GONE);
+    }
+
+    void stopAnim(){
+
+        rootView.findViewById(R.id.avloadingIndicatorView).setVisibility(View.GONE);
+        rootView.findViewById(R.id.loading_layout).setVisibility(View.GONE);
+        rootView.findViewById(R.id.map_container).setVisibility(View.VISIBLE);
+
+
+    }
+
     //**********************************************************************************************
     //  HandlerTask - checks whether polling for location has started, indicating there is a good signal
     //**********************************************************************************************
 
     Handler mHandler = new Handler();
 
+    android.support.v7.app.AlertDialog alertDialog;
+
     Runnable mHandlerTask = new Runnable()
     {
         @Override
         public void run() {
 
-            if (!mLocationApi.isPollingData()) {
+            startAnim();
 
-                pauseTracking();
-                resetCounters();
+            if (!mLocationApi.isPollingData()) {
 
                 //display alert dialog, warning there may be weak connection
                 // move to a better location
-                android.support.v7.app.AlertDialog alertDialog = new android.support.v7.app.AlertDialog.Builder(
+                alertDialog = new android.support.v7.app.AlertDialog.Builder(
                         mFragmentActivity,
                         R.style.AlertDialogCustom_Destructive)
                         .setPositiveButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
@@ -690,7 +715,7 @@ public class ActivityTracker extends BackHandledFragment {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
 
-                                resumeTracking();
+                                //resumeTracking();
                                 mHandler.postDelayed(mHandlerTask, 1000 * 3);
 
                             }
@@ -701,7 +726,11 @@ public class ActivityTracker extends BackHandledFragment {
             }
             else {
 
+                if (alertDialog != null)
+                    alertDialog.dismiss();
+                stopAnim();
                 stopRepeatingTask();
+                startRun();
             }
         }
     };
