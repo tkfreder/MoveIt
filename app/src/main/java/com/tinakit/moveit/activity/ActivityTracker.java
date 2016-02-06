@@ -75,6 +75,7 @@ public class ActivityTracker extends BackHandledFragment {
 
     private static final float FEET_COIN_CONVERSION = 1.0f;//  # coins per feet (1 coin/50 ft = 0.02)
     private static long STOP_SERVICE_TIME_LIMIT = 30 * 60 * 1000 * 60; // 30 minutes in seconds
+    private static int DATA_COUNT_MINIMUM = 2; // minimum number of data required before enabling tracker
 
     // cache
     protected FragmentActivity mFragmentActivity;
@@ -697,7 +698,7 @@ public class ActivityTracker extends BackHandledFragment {
 
             startAnim();
 
-            if (!mLocationApi.isPollingData()) {
+            if (!mLocationApi.isPollingData(DATA_COUNT_MINIMUM)) {
 
                 //display alert dialog, warning there may be weak connection
                 // move to a better location
