@@ -1,15 +1,19 @@
 package com.tinakit.moveit.fragment;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,6 +28,7 @@ import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.ActivityTracker;
 import com.tinakit.moveit.activity.MainActivity;
 import com.tinakit.moveit.activity.PickAvatar;
+import com.tinakit.moveit.api.Accelerometer;
 import com.tinakit.moveit.api.GoogleApi;
 import com.tinakit.moveit.api.LocationApi;
 import com.tinakit.moveit.db.FitnessDBHelper;
@@ -48,6 +53,7 @@ public class ActivityChooser  extends Fragment {
 
 
     // CONSTANTS
+    private static final boolean DEBUG = true;
     public static final String ACTIVITY_CHOOSER_TAG= "ACTIVITY_CHOOSER_TAG";
     public static final String ACTIVITY_CHOOSER_BACKSTACK_TAG= "Start";
     public static final String USER_ACTIVITY_LIST_KEY = "USER_ACTIVITY_LIST_KEY";
@@ -104,7 +110,6 @@ public class ActivityChooser  extends Fragment {
 
             initializeUI();
             setActionListeners();
-
         }
 
         return rootView;
@@ -161,10 +166,32 @@ public class ActivityChooser  extends Fragment {
         mMapFragment = new MapFragment(getActivity().getSupportFragmentManager(), getActivity());
         mMapFragment.addMap(R.id.map_container, mContainer);
 
+        LocalBroadcastManager.getInstance(mFragmentActivity).registerReceiver(mMessageReceiver, new IntentFilter(GoogleApi.GOOGLE_API_INTENT));
+
         //display map of starting point
         //mMapFragment.displayStartMap();
 
     }
+
+    // Handler for received Intents.
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            String message = intent.getStringExtra(ActivityTracker.ACTIVITY_TRACKER_BROADCAST_RECEIVER);
+
+            if (DEBUG) Log.d(ACTIVITY_CHOOSER_TAG, "BroadcastReceiver - onReceive(): message: " + message);
+
+            // message to indicate Google API Client connection
+            if(message.equals(GoogleApi.GOOGLE_API_INTENT)){
+
+                mMapFragment.displayStartMap();
+
+            }
+
+        }
+    };
+
 
     public class MultiChooserRecyclerAdapter extends RecyclerView.Adapter<MultiChooserRecyclerAdapter.CustomViewHolder> {
 
