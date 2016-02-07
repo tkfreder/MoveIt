@@ -16,10 +16,12 @@ public class User  implements Parcelable, ParentListItem {
     private int mUserId;
     private String mUserName;
     private int mIsAdmin;
+    private String mEmail;
+    private String mPassword;
     private int mWeight;
     private String mAvatarFileName;
     private int mPoints;
-    private boolean mIsParticipant;
+    private boolean mIsEnabled;
     private List<Reward> mRewardList;
     private boolean mInitiallyExpanded;
 
@@ -50,6 +52,14 @@ public class User  implements Parcelable, ParentListItem {
         mIsAdmin = isAdmin ? 1 : 0;
     }
 
+    public void setEmail(String email) { mEmail = email;}
+
+    public void setPassword(String password){ mPassword = password;}
+
+    public String getPassword(){ return mPassword;}
+
+    public String getEmail () { return mEmail;}
+
     public int getWeight() {
         return mWeight;
     }
@@ -74,12 +84,12 @@ public class User  implements Parcelable, ParentListItem {
         mPoints = points;
     }
 
-    public boolean isParticipant() {
-        return mIsParticipant;
+    public boolean isEnabled() {
+        return mIsEnabled;
     }
 
-    public void setIsParticipant(boolean isParticipant) {
-        mIsParticipant = isParticipant;
+    public void setIsEnabled(boolean isEnabled) {
+        mIsEnabled = isEnabled;
     }
 
     public boolean hasSameProfile(User user){
@@ -133,10 +143,12 @@ public class User  implements Parcelable, ParentListItem {
             mUserId = in.readInt();
             mUserName = in.readString();
             mIsAdmin = in.readInt();
+            mEmail = in.readString();
+            mPassword = in.readString();
             mWeight = in.readInt();
             mAvatarFileName = in.readString();
             mPoints = in.readInt();
-            mIsParticipant = in.readByte() != 0x00;
+            mIsEnabled = in.readByte() != 0x00;
             if (in.readByte() == 0x01) {
                 mRewardList = new ArrayList<Reward>();
                 in.readList(mRewardList, Reward.class.getClassLoader());
@@ -156,10 +168,12 @@ public class User  implements Parcelable, ParentListItem {
             dest.writeInt(mUserId);
             dest.writeString(mUserName);
             dest.writeInt(mIsAdmin);
+            dest.writeString(mEmail);
+            dest.writeString(mPassword);
             dest.writeInt(mWeight);
             dest.writeString(mAvatarFileName);
             dest.writeInt(mPoints);
-            dest.writeByte((byte) (mIsParticipant ? 0x01 : 0x00));
+            dest.writeByte((byte) (mIsEnabled ? 0x01 : 0x00));
             if (mRewardList == null) {
                 dest.writeByte((byte) (0x00));
             } else {

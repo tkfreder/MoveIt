@@ -14,6 +14,7 @@ import com.tinakit.moveit.fragment.MapFragment;
 import com.tinakit.moveit.fragment.UserProfile;
 import com.tinakit.moveit.fragment.UserStats;
 import com.tinakit.moveit.fragment.UserStatsMain;
+import com.tinakit.moveit.model.RegisterDialogFragment;
 
 import javax.inject.Singleton;
 
@@ -50,4 +51,5 @@ public interface AppComponent {
     void inject(EditUser editUser);
     void inject(UserStats userStats);
     void inject(AdminInBox adminInBox);
+    void inject(RegisterDialogFragment registerDialogFragment);
 }

@@ -54,6 +54,8 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     private static final String TABLE_USERS = "Users";
     private static final String KEY_USER_ID = "_id";
     private static final String KEY_USER_NAME = "userName";
+    private static final String KEY_USER_EMAIL = "email";
+    private static final String KEY_USER_PASSWORD = "password";
     private static final String KEY_USER_IS_ADMIN = "isAdmin";
     private static final String KEY_USER_WEIGHT = "weight";
     private static final String KEY_USER_AVATAR_FILENAME = "avatarFileName";
@@ -177,7 +179,9 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 KEY_USER_WEIGHT  + " INTEGER, " +
                 KEY_USER_AVATAR_FILENAME + " TEXT, " +
                 KEY_USER_POINTS + " INTEGER, " +
-                KEY_USER_IS_ENABLED + " INTEGER " +
+                KEY_USER_IS_ENABLED + " INTEGER, " +
+                KEY_USER_EMAIL + " TEXT, " +
+                KEY_USER_PASSWORD + " TEXT " +
                 ")";
 
         String CREATE_ACTIVITY_USERS_TABLE = "CREATE TABLE " + TABLE_ACTIVITY_USERS +
@@ -334,10 +338,10 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
 
         //TODO: DUMMY DATA
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Child 1', 0, 50, 'avatar_3', 0, 1);");
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Child 2', 0, 75, 'avatar_1', 0, 1);");
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Parent 1', 0, 175, 'avatar_2', 0, 1);");
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Parent 2', 1, 125, 'avatar_4', 0, 1);");
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Child 1', 0, 50, 'avatar_3', 0, 1, null, null);");
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Child 2', 0, 75, 'avatar_1', 0, 1, null, null);");
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Parent 1', 0, 175, 'avatar_2', 0, 1, null, null);");
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Parent 2', 1, 125, 'avatar_4', 0, 1, null, null);");
 
         //TODO: DUMMY DATA
         //populate Rewards table
@@ -553,6 +557,8 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             ContentValues values = new ContentValues();
             values.put(KEY_USER_NAME, user.getUserName());
             values.put(KEY_USER_IS_ADMIN, user.isAdmin());
+            values.put(KEY_USER_EMAIL, user.getEmail());
+            values.put(KEY_USER_PASSWORD, user.getPassword());
             values.put(KEY_USER_WEIGHT, user.getWeight());
             values.put(KEY_USER_AVATAR_FILENAME, user.getAvatarFileName());
             values.put(KEY_USER_POINTS, user.getPoints());;

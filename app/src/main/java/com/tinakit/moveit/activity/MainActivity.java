@@ -6,9 +6,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -35,6 +39,7 @@ import com.tinakit.moveit.fragment.EditUser;
 import com.tinakit.moveit.fragment.UserProfile;
 import com.tinakit.moveit.fragment.UserStatsMain;
 import com.tinakit.moveit.model.ActivityDetail;
+import com.tinakit.moveit.model.RegisterDialogFragment;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.module.CustomApplication;
 
@@ -47,9 +52,11 @@ import javax.inject.Inject;
  * Created by Tina on 10/26/2015.
  */
 
-public class MainActivity extends AppCompatActivity implements BackHandledFragment.BackHandlerInterface {
+public class MainActivity extends AppCompatActivity implements BackHandledFragment.BackHandlerInterface,
+                                                RegisterDialogFragment.RegisterDialogListener{
 
     private static final String LOG = "MAINACTIVITY";
+    private static final String INSTALL_SCREEN_TAG = "INSTALL_SCREEN_TAG";
     private static final boolean DEBUG = true;
     public static final String MAIN_ACTIVITY_BROADCAST_RECEIVER = "MAIN_ACTIVITY_BROADCAST_RECEIVER";
 
@@ -68,6 +75,8 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
     ArrayList<ActivityDetail> mActivityDetailList;
     ArrayList<User> mUserList;
     private BackHandledFragment selectedFragment;
+    protected final String welcomeScreenShownPref = "welcomeScreenShown";
+    SharedPreferences mPrefs;
 
 
     //**********************************************************************************************
@@ -78,7 +87,13 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        //setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        // is this the first time app is launched
+        checkHasLaunched();
+    }
+
+    private void initialize(){
 
         // DI
         ((CustomApplication)getApplication()).getAppComponent().inject(this);
@@ -523,6 +538,69 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
             }
         }
 
+    }
+
+    //TODO: http://developer.android.com/guide/topics/ui/dialogs.html
+    //TODO: http://stackoverflow.com/questions/3976406/how-to-display-a-one-time-welcome-screen
+    public void checkHasLaunched(){
+
+        mPrefs = getPreferences(Context.MODE_PRIVATE);
+
+        if (mPrefs.contains(INSTALL_SCREEN_TAG)){
+
+            boolean hasLaunched = mPrefs.getBoolean(INSTALL_SCREEN_TAG, true);
+
+            if (!hasLaunched){
+
+                SharedPreferences.Editor editor = mPrefs.edit();
+                editor.putBoolean(INSTALL_SCREEN_TAG, true);
+                editor.commit(); // Very important to save the preference
+                showRegisterDialog();
+            }
+            else
+                initialize();
+
+        } else {
+
+            // second argument is the default to use if the preference can't be found
+            Boolean welcomeScreenShown = mPrefs.getBoolean(INSTALL_SCREEN_TAG, false);
+
+            if (!welcomeScreenShown) {
+
+                SharedPreferences.Editor editor = mPrefs.edit();
+                editor.putBoolean(INSTALL_SCREEN_TAG, true);
+                editor.commit(); // Very important to save the preference
+                showRegisterDialog();
+            }
+        }
+    }
+
+    public void showRegisterDialog() {
+        // Create an instance of the dialog fragment and show it
+        DialogFragment dialog = new RegisterDialogFragment();
+        dialog.show(getSupportFragmentManager(), RegisterDialogFragment.REGISTER_DIALOG_TAG);
+    }
+
+    // The dialog fragment receives a reference to this Activity through the
+    // Fragment.onAttach() callback, which it uses to call the following methods
+    // defined by the RegisterDialogFragment.NoticeDialogListener interface
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+
+        // registration succeeded
+        Snackbar.make(findViewById(R.id.drawer_layout), getString(R.string.message_registration_success), Snackbar.LENGTH_LONG)
+                .show();
+
+        initialize();
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+
+        // registration failed
+
+        Snackbar.make(findViewById(R.id.drawer_layout), getString(R.string.message_registration_failed), Snackbar.LENGTH_LONG)
+                .show();
     }
 
 }

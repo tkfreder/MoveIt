@@ -59,6 +59,8 @@
         <item>avatar_8</item>
     </string-array>
 
+    <!-- UI Labels -->
+
     <!-- navigation drawer menu names -->
     <string name="nav_menu_start">Start</string>
     <string name="nav_menu_coins">Coins</string>
@@ -75,6 +77,10 @@
     <!-- button names -->
     <string name="button_save">Save</string>
     <string name="button_continue">Continue</string>
+    <string name="button_signin">Sign In</string>
+
+    <!-- header names -->
+    <string name="header_admin_signin">Admin Sign In</string>
 
     <!-- hint messages -->
     <string name="hint_delete_user">delete user</string>
@@ -107,6 +113,9 @@
     <string name="message_same_user_settings">These are the same original settings.</string>
     <string name="message_continue_tracker">Signal too weak to get location.  Please be sure you are outside and away from obstructions. Cancel activity or wait for connection?</string>
     <string name="message_continue_tracker_title">Continue?</string>
+    <string name="message_registration_failed">Registration failed.  Please try again.</string>
+    <string name="message_registration_success">Registration complete.</string>
+
 
     <string name="title_activity_sensor_api">SensorAPI</string>
     <string name="title_activity_fused_location_api">FusedLocationApi</string>
@@ -142,6 +151,8 @@
     <string name="choose_avatar">Choose Avatar</string>
     <string name="avatar">avatar</string>
     <string name="name">name</string>
+    <string name="password">password</string>
+    <string name="email">email address</string>
     <string name="is_admin">is admin</string>
     <string name="admin">Admin</string>
     <string name="astericks">*</string>
