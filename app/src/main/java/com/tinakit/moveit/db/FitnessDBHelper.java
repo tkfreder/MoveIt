@@ -337,28 +337,19 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         //db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 'swim', 2.3,'1990 world record, swimming speed meters/second', 6,'swim_48', 1);");
 
 
-        //TODO: DUMMY DATA
+        //PLACEHOLDER DATA FOR USERS
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Parent 1', 1, 125, 'avatar_5', 0, 1, null, null);"); // ADMIN, third column = 1
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Parent 2', 0, 175, 'avatar_4', 0, 1, null, null);");
         db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Child 1', 0, 50, 'avatar_3', 0, 1, null, null);");
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Child 2', 0, 75, 'avatar_1', 0, 1, null, null);");
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Parent 1', 0, 175, 'avatar_2', 0, 1, null, null);");
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Parent 2', 1, 125, 'avatar_4', 0, 1, null, null);");
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Child 2', 0, 75, 'avatar_2', 0, 1, null, null);");
 
-        //TODO: DUMMY DATA
-        //populate Rewards table
+        //PLACEHOLDER DATA FOR REWARDS
         db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (1, 'Reward 1', 100, 1);");
         db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (2, 'Reward 2', 100, 2);");
         db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (3, 'Reward 3', 100, 3);");
         db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (4, 'Reward 4', 100, 4);");
 
 
-        /*
-        //TODO: DUMMY DATA
-
-        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 1, 1);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 2, 2);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 3, 3);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDUSER + " VALUES (null, 4, 4);");
-*/
     }
 
     @Override
@@ -509,6 +500,38 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         }
 
         return user;
+    }
+
+    public boolean validateAdmin(String username, String password)
+    {
+        // Create and/or open the database for writing
+        //SQLiteDatabase db = getReadableDatabase();
+
+        int rowsReturned = 0;
+
+        try {
+
+            Cursor cursor = db.query(TABLE_USERS,
+                    new String[]{KEY_USER_ID},
+                    KEY_USER_NAME + " = ? AND " + KEY_USER_PASSWORD + " = ?", new String[]{username, password}, null, null, null);
+
+            try{
+
+                rowsReturned = cursor.getCount();
+
+            } finally{
+
+                if (cursor != null && !cursor.isClosed())
+                {
+                    cursor.close();
+                }
+            }
+
+        } catch (Exception e) {
+            Log.d(LOGTAG, "Error during validateAdmin()");
+        }
+
+        return rowsReturned == 1;
     }
 
     public boolean hasUser(User user) {

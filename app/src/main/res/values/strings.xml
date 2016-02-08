@@ -59,6 +59,13 @@
         <item>avatar_8</item>
     </string-array>
 
+    <!-- admin login preferences -->
+    <string-array name="admin_login_preferences">
+        <item>Require admin login when click on Admin menu</item>
+        <item>Require admin login once per session</item>
+        <item>Disable admin login</item>
+    </string-array>
+
     <!-- UI Labels -->
 
     <!-- navigation drawer menu names -->
@@ -74,13 +81,19 @@
     <string name="admin_tab_history">History</string>
     <string name="admin_tab_settings">Settings</string>
 
+    <!-- checkbox labels -->
+    <string name="admin_remember_login">Remember username and password</string>
+
     <!-- button names -->
     <string name="button_save">Save</string>
     <string name="button_continue">Continue</string>
     <string name="button_signin">Sign In</string>
 
     <!-- header names -->
-    <string name="header_admin_signin">Admin Sign In</string>
+    <string name="header_admin_registration">Admin Registration</string>
+    <string name="header_admin_password">Admin Autorization</string>
+
+    <string name="admin_role_description">An Admin is required for this app.  The Admin has the permission to add/edit/delete users, manages rewards for users, and can delete activities.</string>
 
     <!-- hint messages -->
     <string name="hint_delete_user">delete user</string>
@@ -115,7 +128,9 @@
     <string name="message_continue_tracker_title">Continue?</string>
     <string name="message_registration_failed">Registration failed.  Please try again.</string>
     <string name="message_registration_success">Registration complete.</string>
-
+    <string name="message_password_mismatch">Password does not match.</string>
+    <string name="message_email_mismatch">Email does not match.</string>
+    <string name="message_admin_login_failed">Admin login failed.</string>
 
     <string name="title_activity_sensor_api">SensorAPI</string>
     <string name="title_activity_fused_location_api">FusedLocationApi</string>
@@ -152,9 +167,12 @@
     <string name="avatar">avatar</string>
     <string name="name">name</string>
     <string name="password">password</string>
+    <string name="retype_password">retype your password</string>
     <string name="email">email address</string>
+    <string name="retype_email">retype your email</string>
     <string name="is_admin">is admin</string>
     <string name="admin">Admin</string>
+    <string name="admin_name">admin name</string>
     <string name="astericks">*</string>
     <string name="history">History</string>
     <string name="youEarned">You earned</string>
