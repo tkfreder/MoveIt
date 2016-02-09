@@ -9,11 +9,20 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="@dimen/dialog_header_height"
-            android:gravity="center"
             style="@style/LabelSmallWhite"
+            android:gravity="center"
             android:text="@string/header_admin_registration"/>
 
     </RelativeLayout>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/admin_role_description"
+        style="@style/Gray_15"
+        android:layout_marginTop="4dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginBottom="16dp"/>
     <EditText
         android:id="@+id/username"
         android:inputType="text"
@@ -36,7 +45,7 @@
         android:fontFamily="sans-serif"
         android:hint="@string/password"/>
     <EditText
-        android:id="@+id/passwordRepeat"
+        android:id="@+id/passwordConfirm"
         android:inputType="textPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -45,7 +54,7 @@
         android:layout_marginRight="4dp"
         android:layout_marginBottom="16dp"
         android:fontFamily="sans-serif"
-        android:hint="@string/retype_password"
+        android:hint="@string/confirm_password"
         />
     <EditText
         android:id="@+id/email"
@@ -59,7 +68,7 @@
         android:fontFamily="sans-serif"
         android:hint="@string/email"/>
     <EditText
-        android:id="@+id/emailRepeat"
+        android:id="@+id/emailConfirm"
         android:inputType="textEmailAddress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -68,5 +77,5 @@
         android:layout_marginRight="4dp"
         android:layout_marginBottom="16dp"
         android:fontFamily="sans-serif"
-        android:hint="@string/retype_email"/>
+        android:hint="@string/confirm_email"/>
 </LinearLayout>

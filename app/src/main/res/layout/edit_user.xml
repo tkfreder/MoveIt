@@ -30,10 +30,21 @@
                 android:layout_alignParentRight="true"
                 android:background="@drawable/white_image_border"
                 />
+
         </RelativeLayout>
 
     </RelativeLayout>
-
+    <TextView
+        android:id="@+id/isAdmin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/admin"
+        android:textColor="@color/red"
+        android:hint="@string/hint_admin"
+        android:visibility="visible"
+        android:layout_below="@id/avatarLayout"
+        android:gravity="center_horizontal"
+        />
 
         <RelativeLayout
             android:id="@+id/formLayout"
@@ -50,9 +61,9 @@
 
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/userNameLayout"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="left">
+                    android:gravity="center">
 
                     <EditText
                         android:id="@+id/userName"
@@ -66,42 +77,56 @@
 
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/weightLayout"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/userNameLayout"
-                    android:gravity="left"
+                    android:gravity="center"
                     >
 
                     <EditText
                         android:id="@+id/weight"
                         android:layout_width="wrap_content"
-                        android:minWidth="@dimen/min_width_short_edit_text"
+                        android:minWidth="@dimen/min_width_long_edit_text"
                         android:layout_height="wrap_content"
                         android:inputType="number"
                         android:hint="@string/weight_hint"
                         />
                 </android.support.design.widget.TextInputLayout>
-                <TextView
-                    android:id="@+id/isAdmin"
-                    android:layout_width="wrap_content"
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/passwordLayout"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/admin"
-                    android:textColor="@color/red"
-                    android:hint="@string/hint_admin"
-                    android:visibility="gone"
                     android:layout_below="@id/weightLayout"
-                    android:gravity="left"
+                    android:gravity="center"
+                    >
+                <EditText
+                    android:id="@+id/password"
+                    android:layout_width="wrap_content"
+                    android:minWidth="@dimen/min_width_long_edit_text"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:hint="@string/password"
                     />
+                </android.support.design.widget.TextInputLayout>
+
 
             </RelativeLayout>
 
         </RelativeLayout>
+    <Spinner
+        android:id="@+id/admin_preference_list"
+        android:layout_width="wrap_content"
+        android:maxWidth="@dimen/min_width_long_edit_text"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/formLayout"
+        android:layout_centerInParent="true"/>
     <Button
         android:id="@+id/saveButton"
         android:layout_width="@dimen/button_short"
         android:layout_height="wrap_content"
         android:text="@string/save"
-        android:layout_below="@id/formLayout"
+        android:layout_below="@id/admin_preference_list"
         android:layout_centerInParent="true"
         android:padding="@dimen/activity_horizontal_margin"
         android:background="@drawable/button_background"

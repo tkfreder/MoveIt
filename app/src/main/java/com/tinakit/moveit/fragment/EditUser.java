@@ -1,7 +1,9 @@
 package com.tinakit.moveit.fragment;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -13,11 +15,14 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.tinakit.moveit.R;
@@ -54,12 +59,14 @@ public class EditUser extends Fragment {
     private List<User> mUserList;
 
     // UI Widgets
-    ImageView mAvatar;
-    ImageView mEditAvatar;
-    EditText mUserName;
-    EditText mWeight;
-    TextView mAdmin;
-    Button mSaveButton;
+    protected ImageView mAvatar;
+    protected ImageView mEditAvatar;
+    protected EditText mUserName;
+    protected EditText mWeight;
+    protected TextView mAdmin;
+    protected Button mSaveButton;
+    protected EditText mPassword;
+    protected Spinner mAdminLoginPrefs;
 
     @Nullable
     @Override
@@ -88,6 +95,12 @@ public class EditUser extends Fragment {
         mWeight = (EditText)mRootView.findViewById(R.id.weight);
         mAdmin = (TextView)mRootView.findViewById(R.id.isAdmin);
         mSaveButton = (Button)mRootView.findViewById(R.id.saveButton);
+        mPassword = (EditText)mRootView.findViewById(R.id.password);
+        mAdminLoginPrefs = (Spinner)mRootView.findViewById(R.id.admin_preference_list);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.admin_login_preferences));
+        mAdminLoginPrefs.setAdapter(adapter);
+
     }
 
     private void fetchData(){
@@ -156,8 +169,21 @@ public class EditUser extends Fragment {
         if (!TextUtils.isEmpty(mUser.getAvatarFileName()))
             mAvatar.setImageResource(getResources().getIdentifier(user.getAvatarFileName(), "drawable", getActivity().getPackageName()));
         mWeight.setText(String.valueOf(user.getWeight()));
-        if (user.isAdmin())
+        if (user.isAdmin()){
+
             mAdmin.setVisibility(View.VISIBLE);
+
+            mPassword.setText(mUser.getPassword());
+
+            // check SharedPreferences for auto-populate fields
+            SharedPreferences sharedPreferences = getActivity().getPreferences(Context.MODE_PRIVATE);
+            int pref = sharedPreferences.getInt(AdminLoginDialogFragment.ADMIN_LOGIN_PREFS, 0);
+
+            mAdminLoginPrefs.setSelection(pref);
+        }
+
+
+
     }
 
     private void setActionListeners(){
@@ -278,6 +304,16 @@ public class EditUser extends Fragment {
             @Override
             public void onClick(View v) {
 
+                // if this is admin, save username and password in SharedPreferences
+                if (mUser.isAdmin()){
+
+                    SharedPreferences sharedPreferences = getActivity().getPreferences(Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString(AdminLoginDialogFragment.ADMIN_USERNAME, mUser.getUserName());
+                    editor.putString(AdminLoginDialogFragment.ADMIN_PASSWORD, mUser.getPassword());
+                    editor.commit();
+                }
+
                 saveUser();
 
                 if (mIsNewUser) {
@@ -315,6 +351,58 @@ public class EditUser extends Fragment {
             }
 
         });
+
+        mAdminLoginPrefs.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                SharedPreferences sharedPreferences = getActivity().getPreferences(Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putInt(AdminLoginDialogFragment.ADMIN_LOGIN_PREFS, position);
+
+                // if position = 1, want auto-populate fields, cache login details
+                editor.putString(AdminLoginDialogFragment.ADMIN_USERNAME, mUser.getUserName());
+                editor.putString(AdminLoginDialogFragment.ADMIN_PASSWORD, mUser.getPassword());
+
+                editor.commit();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        mPassword.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                mSaveButton.setEnabled(true);
+            }
+        });
+
+        mAdminLoginPrefs.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                mSaveButton.setEnabled(true);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
 
@@ -341,6 +429,9 @@ public class EditUser extends Fragment {
         // save any changes into User object
         mUser.setUserName(mUserName.getText().toString());
         mUser.setWeight(Integer.parseInt(mWeight.getText().toString()));
+
+        if(mUser.isAdmin())
+            mUser.setPassword(mPassword.getText().toString());
 
         //any change to avatar should already be saved in OnActivityResult
 
@@ -379,11 +470,20 @@ public class EditUser extends Fragment {
 
         if(isValidWeight() && isValidUserName()) {
 
-           return true;
+            if(mAdmin.isSelected()){
+
+                if(mPassword.getText().toString().equals("")){
+                    mPassword.setError(getString(R.string.message_enter_password));
+                    return false;
+                }
+                else
+                    return true;
+            }
+            else
+                return true;
         }
         else
             return false;
-
     }
 
     public boolean isValidWeight(){

@@ -202,11 +202,6 @@ public class AdminLoginDialogFragment extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
 
-                        // register user as admin
-
-                        // build user for admin
-                        // admin is hard-coded at userid = 4, as defined in FitnessDBHelper.onCreate()
-
                         boolean isValidAdmin =  mDatabaseHelper.validateAdmin(username.getText().toString(), password.getText().toString());
 
                         if (isValidAdmin){

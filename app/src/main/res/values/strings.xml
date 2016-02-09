@@ -61,12 +61,35 @@
 
     <!-- admin login preferences -->
     <string-array name="admin_login_preferences">
-        <item>Require admin login when click on Admin menu</item>
-        <item>Require admin login once per session</item>
-        <item>Disable admin login</item>
+        <item>Require re-type login</item>
+        <item>Remember login</item>
+        <item>Disable login</item>
     </string-array>
 
-    <!-- UI Labels -->
+    <!-- activity history search options -->
+    <string-array name="activity_history_search_options">
+        <item>this week</item>
+        <item>last week</item>
+        <item>this month</item>
+        <item>last 3 months</item>
+    </string-array>
+
+    <!-- months -->
+    <string-array name="months_short">
+        <item>Jan</item>
+        <item>Feb</item>
+        <item>Mar</item>
+        <item>Apr</item>
+        <item>May</item>
+        <item>June</item>
+        <item>July</item>
+        <item>Aug</item>
+        <item>Sept</item>
+        <item>Oct</item>
+        <item>Nov</item>
+        <item>Dec</item>
+    </string-array>
+
 
     <!-- navigation drawer menu names -->
     <string name="nav_menu_start">Start</string>
@@ -88,12 +111,13 @@
     <string name="button_save">Save</string>
     <string name="button_continue">Continue</string>
     <string name="button_signin">Sign In</string>
+    <string name="button_search">Search</string>
 
     <!-- header names -->
     <string name="header_admin_registration">Admin Registration</string>
-    <string name="header_admin_password">Admin Autorization</string>
+    <string name="header_admin_login">Admin Login</string>
 
-    <string name="admin_role_description">An Admin is required for this app.  The Admin has the permission to add/edit/delete users, manages rewards for users, and can delete activities.</string>
+    <string name="admin_role_description">You are the Admin for this app.  The Admin has the ability to manage Users, Rewards, and Activities.</string>
 
     <!-- hint messages -->
     <string name="hint_delete_user">delete user</string>
@@ -103,7 +127,7 @@
     <string name="hint_points"># coins</string>
     <string name="hint_reward_title">reward title</string>
 
-    <!-- hint messages -->
+    <!-- app_bar -->
     <string name="app_bar_header_admin">Admin</string>
     <string name="app_bar_header_new_user">New User</string>
     <string name="app_bar_header_edit_user">Edit User</string>
@@ -131,6 +155,7 @@
     <string name="message_password_mismatch">Password does not match.</string>
     <string name="message_email_mismatch">Email does not match.</string>
     <string name="message_admin_login_failed">Admin login failed.</string>
+    <string name="message_enter_password">Please enter a password</string>
 
     <string name="title_activity_sensor_api">SensorAPI</string>
     <string name="title_activity_fused_location_api">FusedLocationApi</string>
@@ -167,9 +192,9 @@
     <string name="avatar">avatar</string>
     <string name="name">name</string>
     <string name="password">password</string>
-    <string name="retype_password">retype your password</string>
+    <string name="confirm_password">confirm password</string>
     <string name="email">email address</string>
-    <string name="retype_email">retype your email</string>
+    <string name="confirm_email">confirm email</string>
     <string name="is_admin">is admin</string>
     <string name="admin">Admin</string>
     <string name="admin_name">admin name</string>
