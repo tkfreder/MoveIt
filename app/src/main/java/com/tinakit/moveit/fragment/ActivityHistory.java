@@ -10,8 +10,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.tinakit.moveit.R;
@@ -24,6 +28,8 @@ import com.tinakit.moveit.utility.DateUtility;
 import com.tinakit.moveit.utility.Map;
 import com.tinakit.moveit.utility.UnitConverter;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -51,9 +57,12 @@ public class ActivityHistory extends Fragment {
 
 
     // UI COMPONENTS
-    View rootView;
-    RecyclerView mRecyclerView;
-    TextView mNoActivities;
+    protected View rootView;
+    protected RecyclerView mRecyclerView;
+    protected TextView mNoActivities;
+    protected Spinner mMonthSpinner;
+    protected Spinner mYearSpinner;
+    protected Button mSearch;
 
     @Nullable
     @Override
@@ -61,7 +70,7 @@ public class ActivityHistory extends Fragment {
         mFragmentActivity  = (FragmentActivity)super.getActivity();
         rootView = inflater.inflate(R.layout.activity_history, container, false);
 
-        mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        //mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // Dagger 2 injection
         ((CustomApplication)getActivity().getApplication()).getAppComponent().inject(this);
@@ -92,15 +101,12 @@ public class ActivityHistory extends Fragment {
             // if this is the first time, fetch directly from the database
             mActivityDetailList = mDatabaseHelper.getActivityDetailList(DAYS_AGO);
 
-            TextView pastDays = (TextView)rootView.findViewById(R.id.pastDays);
-
             if (mActivityDetailList.size() == 0){
-                mNoActivities.setVisibility(View.VISIBLE);
-                pastDays.setVisibility(View.GONE);
+                //mNoActivities.setVisibility(View.VISIBLE);
+                mNoActivities.setVisibility(View.GONE);
             }
             else{
                 mNoActivities.setVisibility(View.GONE);
-                pastDays.setVisibility(View.VISIBLE);
             }
 
         }
@@ -127,8 +133,82 @@ public class ActivityHistory extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mFragmentActivity);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(linearLayoutManager);
-        mActivityHistoryRecyclerAdapter = new ActivityHistoryRecyclerAdapter(mFragmentActivity, mActivityDetailList);
-        mRecyclerView.setAdapter(mActivityHistoryRecyclerAdapter);
+
+
+        mMonthSpinner = (Spinner)rootView.findViewById(R.id.month);
+        ArrayAdapter<String> adapterMonth = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.months_short));
+        mMonthSpinner.setAdapter(adapterMonth);
+
+        // default to current month
+        java.util.Date date= new Date();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        int month = cal.get(Calendar.MONTH);
+        mMonthSpinner.setSelection(month);
+
+        mMonthSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                // increment month so month index is 1-based, not 0-based
+                int startMonth = mMonthSpinner.getSelectedItemPosition();
+                startMonth++;
+
+                int startYear = Integer.parseInt(mYearSpinner.getSelectedItem().toString());
+
+                int endMonth = startMonth++;
+                int endYear = startYear;
+
+                // if month is December (index = 12), then endMonth is January of following year
+                if (startMonth == 12){
+
+                    endMonth = 1;
+                    endYear++;
+
+                }
+
+
+                // startdate
+                Calendar cal = Calendar.getInstance();
+                cal.setTimeInMillis(0);
+                cal.set(startYear, startMonth, 1, 0, 0, 0);
+                Date startDate = cal.getTime();
+
+                // enddate
+                cal.setTimeInMillis(0);
+                cal.set(endYear, endMonth, 1, 0, 0, 0);
+                Date endDate = cal.getTime();
+
+
+                List<ActivityDetail> activityDetailList = mDatabaseHelper.getActivityDetailList(startDate, endDate);
+
+                mActivityHistoryRecyclerAdapter = new ActivityHistoryRecyclerAdapter(mFragmentActivity, mActivityDetailList);
+                mRecyclerView.setAdapter(mActivityHistoryRecyclerAdapter);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        int year = Calendar.getInstance().get(Calendar.YEAR);
+        String[] yearList = new String[]{String.valueOf(year), String.valueOf(year - 1)};
+        ArrayAdapter<String> adapterYear = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, yearList);
+        mYearSpinner = (Spinner)rootView.findViewById(R.id.year);
+        mYearSpinner.setAdapter(adapterYear);
+
+        mYearSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
     }
 

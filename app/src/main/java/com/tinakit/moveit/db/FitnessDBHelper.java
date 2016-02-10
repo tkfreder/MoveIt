@@ -22,6 +22,7 @@ import com.tinakit.moveit.model.UserActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -819,6 +820,121 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         }
 
         return activityDetail;
+    }
+
+    /**
+     *
+     * @param startDate
+     * @param endDate up to this date, non-inclusive
+     * @return
+     */
+    public ArrayList<ActivityDetail> getActivityDetailList(Date startDate, Date endDate){
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(startDate);
+
+        int startDay = cal.get(Calendar.DATE);
+        int startMonth = cal.get(Calendar.MONTH);
+        int startYear = cal.get(Calendar.YEAR);
+
+        cal.setTime(endDate);
+        int endDay = cal.get(Calendar.DATE);
+        int endMonth = cal.get(Calendar.MONTH);
+        int endYear = cal.get(Calendar.YEAR);
+
+        int index = 0;
+
+        //initialize ActivityType list
+        ArrayList<ActivityDetail> activityDetailList = new ArrayList<>();
+
+        try {
+
+            Cursor cursor = db.query(VIEW_ACTIVITY_USERS_DETAIL,
+                    new String[]{KEY_ACTIVITY_START_DATE
+                            ,KEY_ACTIVITY_END_DATE
+                            ,KEY_ACTIVITY_START_LATITUDE
+                            ,KEY_ACTIVITY_START_LONGITUDE
+                            ,KEY_ACTIVITY_USERS_CALORIE
+                            ,KEY_ACTIVITY_USERS_POINTS
+                            ,KEY_USER_NAME
+                            ,KEY_USER_AVATAR_FILENAME
+                            ,KEY_ACTIVITY_TYPE_NAME
+                            ,KEY_ACTIVITY_TYPE_ICON_FILENAME
+                            ,KEY_ACTIVITY_USERS_ACTIVITY_ID},
+                    KEY_ACTIVITY_START_DATE + " > ? AND " + KEY_ACTIVITY_START_DATE + " < ? ",
+                    new String[]{"date('" + String.valueOf(startYear) + "-" + String.valueOf(startMonth) + "-" + String.valueOf(startDay) + "')",
+                            "date('" + String.valueOf(endYear) + "-" + String.valueOf(endMonth) + "-" + String.valueOf(endDay) + "')"}, null, null, KEY_ACTIVITY_USERS_ACTIVITY_ID + " DESC");
+
+            try {
+
+                if (cursor.moveToFirst()) {
+                    int previousActivityId = 0;
+
+                    //List<UserActivity> userActivityList = new ArrayList<>();
+                    ActivityDetail activityDetail = new ActivityDetail();
+
+                    do {
+                        int activityId = cursor.getInt(cursor.getColumnIndex(KEY_ACTIVITY_USERS_ACTIVITY_ID));
+
+                        //start of new record
+                        if (previousActivityId != activityId) {
+
+                            // finished populating userActivityList from previous iteration, now add it to the list
+                            if (activityDetail.getUserActivityList().size() > 0) {
+                                activityDetailList.add(activityDetail);
+                                activityDetail = new ActivityDetail();
+                            }
+
+                            //activityDetail.setUserActivityList(userActivityList);
+                            activityDetail.setActivityId(activityId);
+                            activityDetail.setStartDate(new SimpleDateFormat(DATE_FORMAT).parse(cursor.getString(cursor.getColumnIndex(KEY_ACTIVITY_START_DATE))));
+                            activityDetail.setEndDate(new SimpleDateFormat(DATE_FORMAT).parse(cursor.getString(cursor.getColumnIndex(KEY_ACTIVITY_END_DATE))));
+                            activityDetail.setStartLocation(new LatLng(cursor.getDouble(cursor.getColumnIndex((KEY_ACTIVITY_START_LATITUDE))),cursor.getDouble(cursor.getColumnIndex((KEY_ACTIVITY_START_LONGITUDE)))));
+                        }
+
+                        //build User
+                        User user = new User();
+                        user.setUserName(cursor.getString(cursor.getColumnIndex(KEY_USER_NAME)));
+                        user.setAvatarFileName(cursor.getString(cursor.getColumnIndex(KEY_USER_AVATAR_FILENAME)));
+
+                        //build UserActivity
+                        UserActivity userActivity = new UserActivity(user);
+                        ActivityType activityType = new ActivityType();
+                        activityType.setActivityName(cursor.getString(cursor.getColumnIndex(KEY_ACTIVITY_TYPE_NAME)));
+                        activityType.setIconFileName(cursor.getString(cursor.getColumnIndex(KEY_ACTIVITY_TYPE_ICON_FILENAME)));
+                        userActivity.setActivityType(activityType);
+                        //userActivityList.add(userActivity);
+                        activityDetail.addUserActivity(userActivity);
+
+                        previousActivityId = activityId;
+
+                        index++;
+
+                    } while (cursor.moveToNext());
+
+                    //this adds the last activityDetail that was populated
+                    activityDetailList.add(activityDetail);
+                }
+
+
+            }catch(Exception exception) {
+
+                exception.printStackTrace();
+
+            } finally{
+
+                if (cursor != null && !cursor.isClosed())
+                {
+                    cursor.close();
+                }
+            }
+
+        } catch (Exception e) {
+            Log.d(LOGTAG, "Error during getActivityDetailList()");
+        }
+
+        return activityDetailList;
+
     }
 
     public ArrayList<ActivityDetail> getActivityDetailList(int days_ago){

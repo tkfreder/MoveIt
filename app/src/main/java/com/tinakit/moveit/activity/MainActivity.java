@@ -91,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
 
         // is this the first time app is launched
         checkHasLaunched();
+
     }
 
     private void initialize(){
@@ -221,6 +222,7 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
 
                 displayStartScreen();
 
+
                 break;
 
              case R.id.nav_coins:
@@ -244,13 +246,6 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
 
                 break;
 
-             /*
-            case R.id.nav_charts:
-
-                getSupportActionBar().setTitle(getString(R.string.nav_menu_charts));
-
-                break;
-*/
             case R.id.nav_admin:
             case R.id.action_settings:
 

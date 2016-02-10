@@ -1,37 +1,49 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             android:padding="@dimen/activity_vertical_margin">
-
-    <TextView
-        android:id="@+id/noActivities"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="You have not tracked any activites yet."
-        style="@style/Gray_15"
-        android:visibility="gone"/>
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:padding="@dimen/activity_vertical_margin">
 
     <RelativeLayout
+        android:id="@+id/searchLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/pastDays"
-            android:layout_width="match_parent"
+        <Spinner
+            android:id="@+id/month"
+            android:layout_width="@dimen/min_width_short_edit_text"
             android:layout_height="wrap_content"
-            android:text="Activities from past 7 days"
-            android:gravity="center_horizontal"
-            style="@style/LabelSmallGray"
-            android:visibility="gone"
-            android:paddingBottom="@dimen/activity_horizontal_margin"/>
+            />
+        <Spinner
+            android:id="@+id/year"
+            android:layout_width="@dimen/min_width_short_edit_text"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/month"/>
+        <Button
+            android:id="@+id/searchButton"
+            android:layout_width="@dimen/button_width_minimum"
+            android:layout_height="wrap_content"
+            android:background="@color/blue"
+            android:textColor="@color/white"
+            android:text="@string/button_search"
+            android:layout_toRightOf="@+id/year"
+            android:layout_alignParentRight="true"/>
 
+    </RelativeLayout>
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:layout_below="@+id/pastDays"/>
-    </RelativeLayout>
+            android:layout_below="@+id/searchLayout"/>
 
-
+        <TextView
+            android:id="@+id/noActivities"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_below="@+id/recycler_view"
+            android:text="You have not tracked any activites yet."
+            style="@style/Gray_15"
+            android:visibility="gone"/>
 </RelativeLayout>
