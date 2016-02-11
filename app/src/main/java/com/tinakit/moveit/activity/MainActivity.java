@@ -92,6 +92,19 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
         // is this the first time app is launched
         checkHasLaunched();
 
+        /*
+        displayStartScreen();
+
+        ActivityHistory activityHistory = new ActivityHistory();
+        //replace current fragment
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragmentContainer, activityHistory, ActivityHistory.ACTIVITY_HISTORY_TAG)
+                .addToBackStack(null)
+                .commit();
+                */
+
+
     }
 
     private void initialize(){

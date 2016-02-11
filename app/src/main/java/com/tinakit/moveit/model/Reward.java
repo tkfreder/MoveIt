@@ -16,6 +16,7 @@ public class Reward implements Parcelable {
     private int mUserId;
     private Date mDateEarned;
     private Date mDateFulfilled;
+    private int mActivityId;
 
     public Reward (){}
 
@@ -67,6 +68,14 @@ public class Reward implements Parcelable {
         mDateFulfilled = dateFulfilled;
     }
 
+    public int getActivityId() {
+        return mActivityId;
+    }
+
+    public void setActivityId(int activityId) {
+        mActivityId = activityId;
+    }
+
     protected Reward(Parcel in) {
         mRewardId = in.readInt();
         mName = in.readString();
@@ -76,6 +85,7 @@ public class Reward implements Parcelable {
         mDateEarned = tmpMDateEarned != -1 ? new Date(tmpMDateEarned) : null;
         long tmpMDateFulfilled = in.readLong();
         mDateFulfilled = tmpMDateFulfilled != -1 ? new Date(tmpMDateFulfilled) : null;
+        mActivityId = in.readInt();
     }
 
     @Override
@@ -91,6 +101,7 @@ public class Reward implements Parcelable {
         dest.writeInt(mUserId);
         dest.writeLong(mDateEarned != null ? mDateEarned.getTime() : -1L);
         dest.writeLong(mDateFulfilled != null ? mDateFulfilled.getTime() : -1L);
+        dest.writeInt(mActivityId);
     }
 
     @SuppressWarnings("unused")

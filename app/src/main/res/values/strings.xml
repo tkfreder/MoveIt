@@ -126,6 +126,7 @@
     <string name="hint_user_reward">description of reward for this user</string>
     <string name="hint_points"># coins</string>
     <string name="hint_reward_title">reward title</string>
+    <string name="hint_delete_activity">delete activity</string>
 
     <!-- app_bar -->
     <string name="app_bar_header_admin">Admin</string>
@@ -143,6 +144,7 @@
     <string name="message_username_empty">Please enter a username.</string>
     <string name="message_weight_empty">Please enter a weight.</string>
     <string name="message_delete_user">All data associated with this user will be lost.  Alternatively, you can Cancel and rename the User so as not to lose the associated data.  Then create a new User.</string>
+    <string name="message_delete_activity">All data associated with this activity will be lost, including points earned and rewards earned.</string>
     <string name="message_username_exists">That username is taken.  Try another.</string>
     <string name="message_discard_activity_title">Discard Activity?</string>
     <string name="message_discard_activity">Are you sure you want to discard this activity?</string>
@@ -156,6 +158,7 @@
     <string name="message_email_mismatch">Email does not match.</string>
     <string name="message_admin_login_failed">Admin login failed.</string>
     <string name="message_enter_password">Please enter a password</string>
+    <string name="message_activity_deleted">Activity deleted.</string>
 
     <string name="title_activity_sensor_api">SensorAPI</string>
     <string name="title_activity_fused_location_api">FusedLocationApi</string>
@@ -210,6 +213,7 @@
     <string name="button_cancel">CANCEL</string>
     <string name="button_wait">WAIT</string>
     <string name="title_delete_user">Are you sure you want to delete this user?</string>
+    <string name="title_delete_activity">Are you sure you want to delete this activity?</string>
     <string name="hint_admin">Parent or Admin</string>
 
     <string name="button_add">Add</string>

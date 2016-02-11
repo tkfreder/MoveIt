@@ -24,7 +24,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Tina on 9/28/2015.
@@ -346,9 +348,9 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Brother', 0, 75, 'avatar_2', 0, 1, null, null);");
 
         //PLACEHOLDER DATA FOR REWARDS
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (1, 'Reward 1', 100, 1);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (2, 'Reward 2', 100, 2);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (3, 'Reward 3', 100, 3);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (1, 'Reward 1', 1, 1);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (2, 'Reward 2', 5, 2);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (3, 'Reward 3', 10, 3);");
         db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (4, 'Reward 4', 100, 4);");
 
 
@@ -467,9 +469,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
     public User getUser(String userName)
     {
-        // Create and/or open the database for writing
-        //SQLiteDatabase db = getReadableDatabase();
-
         User user = new User();
 
         try {
@@ -506,10 +505,70 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         return user;
     }
 
+    public User getUser(int userId)
+    {
+        User user = new User();
+
+        try {
+
+            Cursor cursor = db.query(TABLE_USERS,
+                    new String[]{KEY_USER_ID, KEY_USER_NAME, KEY_USER_IS_ADMIN, KEY_USER_WEIGHT, KEY_USER_AVATAR_FILENAME, KEY_USER_POINTS},
+                    KEY_USER_ID + " = ?", new String[]{String.valueOf(userId)}, null, null, null);
+
+            try{
+
+                if (cursor.moveToFirst())
+                {
+                    user.setUserId(cursor.getInt(cursor.getColumnIndex(KEY_USER_ID)));
+                    user.setUserName(cursor.getString(cursor.getColumnIndex(KEY_USER_NAME)));
+                    user.setIsAdmin(cursor.getInt(cursor.getColumnIndex(KEY_USER_IS_ADMIN)) > 0 ? true : false);
+                    user.setWeight(cursor.getInt(cursor.getColumnIndex(KEY_USER_WEIGHT)));
+                    user.setAvatarFileName(cursor.getString(cursor.getColumnIndex(KEY_USER_AVATAR_FILENAME)));
+                    user.setPoints(cursor.getInt(cursor.getColumnIndex(KEY_USER_POINTS)));
+                    user.setPassword(cursor.getString(cursor.getColumnIndex(KEY_USER_PASSWORD)));
+                }
+
+            } finally{
+
+                if (cursor != null && !cursor.isClosed())
+                {
+                    cursor.close();
+                }
+            }
+
+        } catch (Exception e) {
+            Log.d(LOGTAG, "Error during getUser(userId)");
+        }
+
+        return user;
+    }
+
+    public int updateUserPoints(User user, int deltaPoints){
+
+        int rowsAffected = 0;
+
+            db.beginTransaction();
+
+            try {
+
+                ContentValues values = new ContentValues();
+                values.put(KEY_USER_POINTS, user.getPoints() + deltaPoints);
+
+                rowsAffected = db.update(TABLE_USERS, values, KEY_USER_ID + "= ? ", new String[]{String.valueOf(user.getUserId())});
+
+                db.setTransactionSuccessful();
+            } catch (Exception e) {
+                Log.d(LOGTAG, "Error during updateUserPoints()");
+            } finally {
+                db.endTransaction();
+            }
+
+        return rowsAffected;
+    }
+
+
     public boolean validateAdmin(String username, String password)
     {
-        // Create and/or open the database for writing
-        //SQLiteDatabase db = getReadableDatabase();
 
         int rowsReturned = 0;
 
@@ -604,9 +663,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     }
 
     public long disableUser(User user){
-
-        // Create and/or open the database for writing
-        //SQLiteDatabase db = getWritableDatabase();
 
         long rowsAffected = 0;
 
@@ -770,6 +826,88 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         return activityId;
     }
 
+    public int getRewardPoints(int userId, boolean isFulfilled){
+
+        int points = -1;
+
+        String stringFulfilled = "";
+
+        stringFulfilled = KEY_REWARDSEARNED_DATE_FULFILLED + (isFulfilled ? " IS NOT NULL " : KEY_REWARDSEARNED_DATE_FULFILLED + " IS NULL ");
+
+        try {
+
+            Cursor cursor = db.query(TABLE_REWARDS_EARNED,
+                    new String[]{KEY_REWARDSEARNED_REWARD_POINTS},
+                    KEY_REWARDSEARNED_USER_ID_FK + " = ? AND " + stringFulfilled,
+                    new String[]{String.valueOf(userId)}, null, null, null);
+
+            try{
+
+                if (cursor.moveToFirst())
+                {
+                    points = cursor.getInt(cursor.getColumnIndex(KEY_REWARDSEARNED_REWARD_POINTS));
+                }
+
+            }catch(Exception exception) {
+
+                exception.printStackTrace();
+
+            } finally{
+
+                if (cursor != null && !cursor.isClosed())
+                {
+                    cursor.close();
+                }
+            }
+
+        } catch (Exception e) {
+            Log.d(LOGTAG, "Error during getRewardPoints()");
+        }
+
+        return points;
+    }
+
+
+    public Map<Integer, Integer> getActivityUsers(int activityId){
+
+        Map<Integer, Integer> userPointList = new HashMap<>();
+
+        try {
+
+            Cursor cursor = db.query(TABLE_ACTIVITY_USERS,
+                    new String[]{KEY_ACTIVITY_USERS_USER_ID
+                            ,KEY_ACTIVITY_USERS_POINTS},
+                    KEY_ACTIVITY_ID + " = ?",
+                    new String[]{String.valueOf(activityId)}, null, null, KEY_ACTIVITY_START_DATE);
+
+            try{
+
+                do
+                {
+                    userPointList.put(cursor.getInt(cursor.getColumnIndex(KEY_ACTIVITY_USERS_USER_ID)), cursor.getInt(cursor.getColumnIndex(KEY_ACTIVITY_USERS_POINTS)) );
+
+                }while (cursor.moveToNext());
+
+            }catch(Exception exception) {
+
+                exception.printStackTrace();
+
+            } finally{
+
+                if (cursor != null && !cursor.isClosed())
+                {
+                    cursor.close();
+                }
+            }
+
+        } catch (Exception e) {
+            Log.d(LOGTAG, "Error during getActivityUsers()");
+        }
+
+        return userPointList;
+    }
+
+
     public ActivityDetail getActivityDetail(int activityId){
 
         // Create and/or open the database for writing
@@ -820,6 +958,29 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         }
 
         return activityDetail;
+    }
+
+    public boolean deleteActivity(int activityId){
+
+        int rowsActivities = 0;
+        int rowsActivityUsers = 0;
+        int rowsLocationData = 0;
+
+        db.beginTransaction();
+        try {
+
+            rowsActivities = db.delete(TABLE_ACTIVITIES, KEY_ACTIVITY_ID + "= ? ", new String[]{String.valueOf(activityId)});
+            rowsActivityUsers = db.delete(TABLE_ACTIVITY_USERS, KEY_ACTIVITY_ID + "= ? ", new String[]{String.valueOf(activityId)});
+            rowsLocationData = db.delete(TABLE_ACTIVITY_LOCATION_DATA, KEY_ACTIVITY_ID + "= ? ", new String[]{String.valueOf(activityId)});
+
+        } catch (Exception e) {
+            Log.d(LOGTAG, "Error during deleteActivity()");
+        } finally {
+            db.endTransaction();
+        }
+
+
+        return (rowsActivities > 0 && rowsActivityUsers > 0 && rowsLocationData > 0);
     }
 
     /**
@@ -1231,7 +1392,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             //KEY_REWARDUSER_REWARD_STATUS_ID + " INTEGER " +
             ")";
 
-    public void insertRewardEarned(String rewardName, int rewardPoints, int userId){
+    public void insertRewardEarned(String rewardName, int rewardPoints, int userId, int activityId){
 
         db.beginTransaction();
         try {
@@ -1260,7 +1421,12 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
             // RewardsEarnedId is not the same as RewardId
             Cursor cursor = db.query(TABLE_REWARDS_EARNED,
-                    new String[]{KEY_REWARDSEARNED__ID,KEY_REWARDSEARNED_REWARD_NAME,KEY_REWARDSEARNED_REWARD_POINTS,KEY_REWARDSEARNED_TIMESTAMP,KEY_REWARDSEARNED_DATE_FULFILLED, KEY_REWARDSEARNED_USER_ID_FK},
+                    new String[]{KEY_REWARDSEARNED__ID
+                            ,KEY_REWARDSEARNED_REWARD_NAME
+                            ,KEY_REWARDSEARNED_REWARD_POINTS
+                            ,KEY_REWARDSEARNED_TIMESTAMP
+                            ,KEY_REWARDSEARNED_DATE_FULFILLED
+                            , KEY_REWARDSEARNED_USER_ID_FK},
                     KEY_REWARDSEARNED_DATE_FULFILLED + " is null",
                     null, null, null, null);
 

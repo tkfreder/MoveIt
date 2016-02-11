@@ -41,9 +41,9 @@ public class LocationApi implements LocationListener, LifeCycle {
     //LocationRequest settings
     private LocationRequest mLocationRequest;
     private Location mBestReading;
-    private static long POLLING_FREQUENCY = 2 * 1000; // in milliseconds, standard is 5 seconds
+    private static long POLLING_FREQUENCY = 3 * 1000; // in milliseconds, standard is 5 seconds
     private static long FASTEST_POLLING_FREQUENCY = 5 * 1000; // in milliseconds
-    private static final long LOCATION_ACCURACY = 4; //within # meter accuracy, standard is 20 meters
+    private static final long LOCATION_ACCURACY = 10; //within # meter accuracy, standard is 20 meters
     private boolean mIsTimeLimit = false;
 
 

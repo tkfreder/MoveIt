@@ -106,6 +106,11 @@ public class AdminLoginDialogFragment extends DialogFragment {
             @Override
             public void afterTextChanged(Editable s) {
 
+                // save username changes
+                SharedPreferences.Editor editor = mSharedPreferences.edit();
+                editor.putString(ADMIN_USERNAME, username.getText().toString());
+                editor.commit();
+
                 if(!username.getText().toString().equals("") && !password.getText().toString().equals(""))
                     button.setEnabled(true);
             }
@@ -124,6 +129,11 @@ public class AdminLoginDialogFragment extends DialogFragment {
 
             @Override
             public void afterTextChanged(Editable s) {
+
+                // save password changes
+                SharedPreferences.Editor editor = mSharedPreferences.edit();
+                editor.putString(ADMIN_PASSWORD, password.getText().toString());
+                editor.commit();
 
                 if(!username.getText().toString().equals("") && !password.getText().toString().equals(""))
                     button.setEnabled(true);

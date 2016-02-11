@@ -1,10 +1,13 @@
 package com.tinakit.moveit.fragment;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -62,7 +65,7 @@ public class ActivityHistory extends Fragment {
     protected TextView mNoActivities;
     protected Spinner mMonthSpinner;
     protected Spinner mYearSpinner;
-    protected Button mSearch;
+    protected ImageView mSearch;
 
     @Nullable
     @Override
@@ -93,8 +96,6 @@ public class ActivityHistory extends Fragment {
         if (bundle != null && bundle.containsKey(ACTIVITY_HISTORY_KEY)){
 
             mActivityDetailList = bundle.getParcelableArrayList(ACTIVITY_HISTORY_KEY);
-
-
         }
         else{
 
@@ -112,10 +113,7 @@ public class ActivityHistory extends Fragment {
         }
 
         // get number of users
-
         mUserList = mDatabaseHelper.getUsers();
-
-
     }
 
     private void initializeUI(){
@@ -150,40 +148,7 @@ public class ActivityHistory extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                // increment month so month index is 1-based, not 0-based
-                int startMonth = mMonthSpinner.getSelectedItemPosition();
-                startMonth++;
 
-                int startYear = Integer.parseInt(mYearSpinner.getSelectedItem().toString());
-
-                int endMonth = startMonth++;
-                int endYear = startYear;
-
-                // if month is December (index = 12), then endMonth is January of following year
-                if (startMonth == 12){
-
-                    endMonth = 1;
-                    endYear++;
-
-                }
-
-
-                // startdate
-                Calendar cal = Calendar.getInstance();
-                cal.setTimeInMillis(0);
-                cal.set(startYear, startMonth, 1, 0, 0, 0);
-                Date startDate = cal.getTime();
-
-                // enddate
-                cal.setTimeInMillis(0);
-                cal.set(endYear, endMonth, 1, 0, 0, 0);
-                Date endDate = cal.getTime();
-
-
-                List<ActivityDetail> activityDetailList = mDatabaseHelper.getActivityDetailList(startDate, endDate);
-
-                mActivityHistoryRecyclerAdapter = new ActivityHistoryRecyclerAdapter(mFragmentActivity, mActivityDetailList);
-                mRecyclerView.setAdapter(mActivityHistoryRecyclerAdapter);
             }
 
             @Override
@@ -210,6 +175,18 @@ public class ActivityHistory extends Fragment {
             }
         });
 
+        mSearch = (ImageView)rootView.findViewById(R.id.search);
+        mSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                doSearch();
+            }
+        });
+
+        // display search results for current month
+        doSearch();
+
     }
 
     public class ActivityHistoryRecyclerAdapter extends RecyclerView.Adapter<ActivityHistoryRecyclerAdapter.CustomViewHolder> {
@@ -234,6 +211,7 @@ public class ActivityHistory extends Fragment {
             TextView minutesElapsed;
             TextView place;
             LinearLayout userLinearLayout;
+            ImageView deleteButton;
 
             public CustomViewHolder(View view) {
 
@@ -242,8 +220,10 @@ public class ActivityHistory extends Fragment {
                 this.minutesElapsed = (TextView)view.findViewById(R.id.minutesElapsed);
                 this.place = (TextView)view.findViewById(R.id.place);
                 this.userLinearLayout = (LinearLayout)view.findViewById(R.id.userLinearLayout);
+                this.deleteButton = (ImageView)view.findViewById(R.id.deleteButton);
             }
         }
+
 
         @Override
         public ActivityHistoryRecyclerAdapter.CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
@@ -278,6 +258,126 @@ public class ActivityHistory extends Fragment {
 
             }
 
+            customViewHolder.deleteButton.setTag(activityDetail.getActivityId());
+            customViewHolder.deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    final int activityId = (int)v.getTag();
+
+                    AlertDialog alertDialog = new AlertDialog.Builder(
+                            mFragmentActivity,
+                            R.style.AlertDialogCustom_Destructive)
+                            .setPositiveButton(R.string.button_delete, new DialogInterface.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+
+                                    java.util.Map<Integer,Integer> userIdList = mDatabaseHelper.getActivityUsers(activityId);
+
+                                    for (java.util.Map.Entry<Integer,Integer> entry : userIdList.entrySet()){
+
+                                        // check if user has a reward earned but not fulfilled, if so, remove that reward
+                                        boolean isFulfilled = false;
+                                        int rewardPoints = mDatabaseHelper.getRewardPoints(entry.getKey(), isFulfilled);
+
+                                        // update user total points
+                                        if (rewardPoints != -1){
+
+                                            User user = mDatabaseHelper.getUser(entry.getKey());
+
+                                            // if the point value of the reward is greater than the points earned from the activity
+                                            if (rewardPoints > entry.getValue()){
+
+                                                mDatabaseHelper.updateUserPoints(user, rewardPoints - entry.getValue());
+                                            }
+                                            else{
+
+                                                mDatabaseHelper.updateUserPoints(user, -(entry.getKey() - rewardPoints));
+                                            }
+                                        }
+
+                                        // check if user has enough points to earn their reward
+                                        // get latest user data
+                                        User user = mDatabaseHelper.getUser(entry.getKey());
+
+                                        if (user.getPoints() >= user.getChildItemList().get(0).getPoints()) {
+
+                                            user.setPoints(user.getPoints() - user.getChildItemList().get(0).getPoints());
+
+                                            // insert Reward Earned
+                                            mDatabaseHelper.insertRewardEarned(user.getChildItemList().get(0).getName(), user.getChildItemList().get(0).getPoints(), user.getUserId(), activityId);
+                                        }
+
+                                        mDatabaseHelper.updateUser(user);
+
+                                        //TODO: delete references to this activity in Activities, ActivityUsers
+                                        if(mDatabaseHelper.deleteActivity(activityId)){
+
+                                            Snackbar.make(rootView.findViewById(R.id.main_layout), getString(R.string.message_activity_deleted), Snackbar.LENGTH_LONG)
+                                            .show();
+                                        }
+
+                                    }
+
+
+                                }
+                            })
+                            .setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    // Cancel Action
+                                    //don't do anything
+
+                                }
+                            })
+                            .setTitle(R.string.title_delete_activity)
+                            .setMessage(R.string.message_delete_activity)
+                            .show();
+
+
+                }
+            });
+
         }
+    }
+
+    private void doSearch(){
+
+        // increment month so month index is 1-based, not 0-based
+        int startMonth = mMonthSpinner.getSelectedItemPosition();
+        startMonth++;
+
+        int startYear = Integer.parseInt(mYearSpinner.getSelectedItem().toString());
+
+        int endMonth = startMonth + 1;
+        int endYear = startYear;
+
+        // if month is December (index = 12), then endMonth is January of following year
+        if (startMonth == 12){
+
+            endMonth = 1;
+            endYear++;
+
+        }
+
+
+        // startdate
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(0);
+        cal.set(startYear, startMonth, 1, 0, 0, 0);
+        Date startDate = cal.getTime();
+
+        // enddate
+        cal.setTimeInMillis(0);
+        cal.set(endYear, endMonth, 1, 0, 0, 0);
+        Date endDate = cal.getTime();
+
+
+        List<ActivityDetail> activityDetailList = mDatabaseHelper.getActivityDetailList(startDate, endDate);
+
+        mActivityHistoryRecyclerAdapter = new ActivityHistoryRecyclerAdapter(mFragmentActivity, mActivityDetailList);
+        mRecyclerView.setAdapter(mActivityHistoryRecyclerAdapter);
+        mActivityHistoryRecyclerAdapter.notifyDataSetChanged();
     }
 }

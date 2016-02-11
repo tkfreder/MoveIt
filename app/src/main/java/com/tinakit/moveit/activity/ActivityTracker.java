@@ -558,7 +558,7 @@ public class ActivityTracker extends BackHandledFragment {
                 user.setPoints(user.getPoints() - user.getChildItemList().get(0).getPoints());
 
                 // insert Reward Earned
-                databaseHelper.insertRewardEarned(user.getChildItemList().get(0).getName(), user.getChildItemList().get(0).getPoints(), user.getUserId());
+                databaseHelper.insertRewardEarned(user.getChildItemList().get(0).getName(), user.getChildItemList().get(0).getPoints(), user.getUserId(), activityDetail.getActivityId());
             }
 
             databaseHelper.updateUser(user);
