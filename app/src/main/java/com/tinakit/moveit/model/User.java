@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by Tina on 7/2/2015.
  */
-public class User  implements Parcelable, ParentListItem {
+public class User  implements Parcelable {
 
     private int mUserId;
     private String mUserName;
@@ -22,7 +22,8 @@ public class User  implements Parcelable, ParentListItem {
     private String mAvatarFileName;
     private int mPoints;
     private boolean mIsEnabled;
-    private List<Reward> mRewardList;
+    //private List<Reward> mRewardList;
+    private Reward mReward;
     private boolean mInitiallyExpanded;
 
 
@@ -105,6 +106,15 @@ public class User  implements Parcelable, ParentListItem {
             return false;
     }
 
+    public Reward getReward() {
+        return mReward;
+    }
+
+    public void setReward(Reward reward) {
+        mReward = reward;
+    }
+
+    /*
     @Override
     public List<Reward> getChildItemList() {
         return mRewardList;
@@ -113,15 +123,7 @@ public class User  implements Parcelable, ParentListItem {
     public void setChildItemList(List<Reward> childItemList) {
         mRewardList = childItemList;
     }
-
-    @Override
-    public boolean isInitiallyExpanded() {
-        return true;
-    }
-
-    public void setInitiallyExpanded(boolean initiallyExpanded) {
-        mInitiallyExpanded = initiallyExpanded;
-    }
+*/
 
     @Override
     public boolean equals(Object o) {
@@ -136,8 +138,7 @@ public class User  implements Parcelable, ParentListItem {
 
     @Override
     public int hashCode() {
-        return mUserName != null ? mUserName.hashCode() : 0;
-    }
+        return mUserName != null ? mUserName.hashCode() : 0;}
 
         protected User(Parcel in) {
             mUserId = in.readInt();
@@ -149,13 +150,7 @@ public class User  implements Parcelable, ParentListItem {
             mAvatarFileName = in.readString();
             mPoints = in.readInt();
             mIsEnabled = in.readByte() != 0x00;
-            if (in.readByte() == 0x01) {
-                mRewardList = new ArrayList<Reward>();
-                in.readList(mRewardList, Reward.class.getClassLoader());
-            } else {
-                mRewardList = null;
-            }
-            mInitiallyExpanded = in.readByte() != 0x00;
+            mReward = (Reward) in.readValue(Reward.class.getClassLoader());
         }
 
         @Override
@@ -174,13 +169,7 @@ public class User  implements Parcelable, ParentListItem {
             dest.writeString(mAvatarFileName);
             dest.writeInt(mPoints);
             dest.writeByte((byte) (mIsEnabled ? 0x01 : 0x00));
-            if (mRewardList == null) {
-                dest.writeByte((byte) (0x00));
-            } else {
-                dest.writeByte((byte) (0x01));
-                dest.writeList(mRewardList);
-            }
-            dest.writeByte((byte) (mInitiallyExpanded ? 0x01 : 0x00));
+            dest.writeValue(mReward);
         }
 
         @SuppressWarnings("unused")

@@ -280,12 +280,12 @@ public class ActivityHistory extends Fragment {
                                         // get latest user data
                                         User user = mDatabaseHelper.getUser(entry.getKey());
 
-                                        if (user.getPoints() >= user.getChildItemList().get(0).getPoints()) {
+                                        if (user.getPoints() >= user.getReward().getPoints()) {
 
-                                            user.setPoints(user.getPoints() - user.getChildItemList().get(0).getPoints());
+                                            user.setPoints(user.getPoints() - user.getReward().getPoints());
 
                                             // insert Reward Earned
-                                            mDatabaseHelper.insertRewardEarned(user.getChildItemList().get(0).getName(), user.getChildItemList().get(0).getPoints(), user.getUserId(), activityId);
+                                            mDatabaseHelper.insertRewardEarned(user.getReward().getName(), user.getReward().getPoints(), user.getUserId(), activityId);
                                         }
 
                                         mDatabaseHelper.updateUser(user);

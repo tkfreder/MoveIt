@@ -297,6 +297,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 ",t." + KEY_ACTIVITY_TYPE_NAME + " AS " + KEY_ACTIVITY_TYPE_NAME +
                 ",t." + KEY_ACTIVITY_TYPE_ICON_FILENAME + " AS " + KEY_ACTIVITY_TYPE_ICON_FILENAME +
                 ",a." + KEY_ACTIVITY_USERS_ACTIVITY_ID + " AS " + KEY_ACTIVITY_USERS_ACTIVITY_ID +
+                ",a." + KEY_ACTIVITY_USERS_USER_ID + " AS " + KEY_ACTIVITY_USERS_USER_ID +
                 " FROM " + TABLE_ACTIVITIES  + " d" +
                 " INNER JOIN " + TABLE_ACTIVITY_USERS + " a on a." + KEY_ACTIVITY_USERS_ACTIVITY_ID + " = d." + KEY_ACTIVITY_ID +
                 " INNER JOIN " + TABLE_USERS + " u on u." + KEY_ACTIVITY_USERS_ID + " = a." + KEY_ACTIVITY_USERS_USER_ID +
@@ -354,13 +355,13 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (4, 'Reward 4', 100, 4);");
 
         // ie, 2016-02-11 13:19:06:449
-
+/*
         db.execSQL("INSERT INTO " + TABLE_ACTIVITIES + " VALUES (null, 100, 100, '2016-01-01 00:00:00:000', '2016-01-01 00:00:00:000', 1, 1);");
         db.execSQL("INSERT INTO " + TABLE_ACTIVITY_USERS + " VALUES (null, 2, 1, 1, 10, 5);");
 
         db.execSQL("INSERT INTO " + TABLE_ACTIVITIES + " VALUES (null, 100, 100, '2016-02-11 00:00:00:000', '2016-02-11 00:00:00:000', 1, 1);");
         db.execSQL("INSERT INTO " + TABLE_ACTIVITY_USERS + " VALUES (null, 1, 1, 1, 10, 5);");
-
+*/
 
 
 
@@ -455,9 +456,8 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                         Reward reward = new Reward();
                         reward.setName(cursor.getString(cursor.getColumnIndex(KEY_REWARD_NAME)));
                         reward.setPoints(cursor.getInt(cursor.getColumnIndex(KEY_REWARD_POINTS)));
-                        List<Reward> rewardList = new ArrayList<Reward>();
-                        rewardList.add(reward);
-                        user.setChildItemList(rewardList);
+                        user.setReward(reward);
+
                         userList.add(user);
                     }while (cursor.moveToNext());
                 }
@@ -521,21 +521,32 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
         try {
 
-            Cursor cursor = db.query(TABLE_USERS,
+            /*Cursor cursor = db.query(TABLE_USERS,
                     new String[]{KEY_USER_ID, KEY_USER_NAME, KEY_USER_IS_ADMIN, KEY_USER_WEIGHT, KEY_USER_AVATAR_FILENAME, KEY_USER_POINTS},
                     KEY_USER_ID + " = ?", new String[]{String.valueOf(userId)}, null, null, null);
+            */
+
+            Cursor cursor = db.query(VIEW_USERS_REWARDS_DETAIL,
+                    new String[]{KEY_REWARDUSER_USER_ID_FK, KEY_USER_NAME, KEY_USER_IS_ADMIN, KEY_USER_WEIGHT, KEY_USER_AVATAR_FILENAME, KEY_USER_POINTS, KEY_REWARD_NAME, KEY_REWARD_POINTS, KEY_USER_PASSWORD},
+                    KEY_USER_IS_ENABLED + "= ?", new String[]{"1"}, null, null, KEY_REWARDUSER_USER_ID_FK);
 
             try{
 
                 if (cursor.moveToFirst())
                 {
-                    user.setUserId(cursor.getInt(cursor.getColumnIndex(KEY_USER_ID)));
+                    user.setUserId(cursor.getInt(cursor.getColumnIndex(KEY_REWARDUSER_USER_ID_FK)));
                     user.setUserName(cursor.getString(cursor.getColumnIndex(KEY_USER_NAME)));
-                    user.setIsAdmin(cursor.getInt(cursor.getColumnIndex(KEY_USER_IS_ADMIN)) > 0 ? true : false);
+                    user.setIsAdmin(cursor.getInt(cursor.getColumnIndex(KEY_USER_IS_ADMIN)) == 1 ? true : false);
                     user.setWeight(cursor.getInt(cursor.getColumnIndex(KEY_USER_WEIGHT)));
                     user.setAvatarFileName(cursor.getString(cursor.getColumnIndex(KEY_USER_AVATAR_FILENAME)));
                     user.setPoints(cursor.getInt(cursor.getColumnIndex(KEY_USER_POINTS)));
                     user.setPassword(cursor.getString(cursor.getColumnIndex(KEY_USER_PASSWORD)));
+
+                    // create Reward
+                    Reward reward = new Reward();
+                    reward.setName(cursor.getString(cursor.getColumnIndex(KEY_REWARD_NAME)));
+                    reward.setPoints(cursor.getInt(cursor.getColumnIndex(KEY_REWARD_POINTS)));
+                    user.setReward(reward);
                 }
 
             } finally{
@@ -877,6 +888,24 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         return points;
     }
 
+    String CREATE_VIEW_ACTIVITY_USERS_DETAIL = "CREATE VIEW " + VIEW_ACTIVITY_USERS_DETAIL + " AS" +
+            " SELECT d." + KEY_ACTIVITY_START_DATE + " AS " + KEY_ACTIVITY_START_DATE +
+            ",d." + KEY_ACTIVITY_END_DATE + " AS " + KEY_ACTIVITY_END_DATE +
+            ",d." + KEY_ACTIVITY_START_LATITUDE + " AS " + KEY_ACTIVITY_START_LATITUDE +
+            ",d." + KEY_ACTIVITY_START_LONGITUDE + " AS " + KEY_ACTIVITY_START_LONGITUDE +
+            ",a." + KEY_ACTIVITY_USERS_CALORIE + " AS " + KEY_ACTIVITY_USERS_CALORIE +
+            ",a." + KEY_ACTIVITY_USERS_POINTS + " AS " + KEY_ACTIVITY_USERS_POINTS +
+            ",u." + KEY_USER_NAME + " AS " + KEY_USER_NAME +
+            ",u." + KEY_USER_AVATAR_FILENAME + " AS " + KEY_USER_AVATAR_FILENAME +
+            ",u." + KEY_USER_ID + " AS " + KEY_ACTIVITY_USERS_USER_ID +
+            ",t." + KEY_ACTIVITY_TYPE_NAME + " AS " + KEY_ACTIVITY_TYPE_NAME +
+            ",t." + KEY_ACTIVITY_TYPE_ICON_FILENAME + " AS " + KEY_ACTIVITY_TYPE_ICON_FILENAME +
+            ",a." + KEY_ACTIVITY_USERS_ACTIVITY_ID + " AS " + KEY_ACTIVITY_USERS_ACTIVITY_ID +
+            " FROM " + TABLE_ACTIVITIES  + " d" +
+            " INNER JOIN " + TABLE_ACTIVITY_USERS + " a on a." + KEY_ACTIVITY_USERS_ACTIVITY_ID + " = d." + KEY_ACTIVITY_ID +
+            " INNER JOIN " + TABLE_USERS + " u on u." + KEY_ACTIVITY_USERS_ID + " = a." + KEY_ACTIVITY_USERS_USER_ID +
+            " INNER JOIN " + TABLE_ACTIVITY_TYPE + " t on t." + KEY_ACTIVITY_TYPE_ID + " = a." + KEY_ACTIVITY_USERS_ACTIVITY_TYPE_ID_FK;
+
 
     public Map<Integer, Integer> getActivityUsers(int activityId){
 
@@ -884,19 +913,20 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
         try {
 
-            Cursor cursor = db.query(TABLE_ACTIVITY_USERS,
-                    new String[]{KEY_ACTIVITY_USERS_USER_ID
+            Cursor cursor = db.query(VIEW_ACTIVITY_USERS_DETAIL,
+                    new String[]{KEY_ACTIVITY_START_DATE,KEY_ACTIVITY_USERS_USER_ID
                             ,KEY_ACTIVITY_USERS_POINTS},
-                    KEY_ACTIVITY_ID + " = ?",
+                    KEY_ACTIVITY_USERS_ACTIVITY_ID + " = ?",
                     new String[]{String.valueOf(activityId)}, null, null, KEY_ACTIVITY_START_DATE);
 
             try{
 
-                do
-                {
-                    userPointList.put(cursor.getInt(cursor.getColumnIndex(KEY_ACTIVITY_USERS_USER_ID)), cursor.getInt(cursor.getColumnIndex(KEY_ACTIVITY_USERS_POINTS)) );
+                if (cursor.moveToFirst()) {
+                    do {
+                        userPointList.put(cursor.getInt(cursor.getColumnIndex(KEY_ACTIVITY_USERS_USER_ID)), cursor.getInt(cursor.getColumnIndex(KEY_ACTIVITY_USERS_POINTS)));
 
-                }while (cursor.moveToNext());
+                    } while (cursor.moveToNext());
+                }
 
             }catch(Exception exception) {
 
