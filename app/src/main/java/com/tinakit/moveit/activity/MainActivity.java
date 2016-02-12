@@ -90,10 +90,9 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
         //setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // is this the first time app is launched
-        checkHasLaunched();
+        //checkHasLaunched();
 
-        /*
-        displayStartScreen();
+        //displayStartScreen();
 
         ActivityHistory activityHistory = new ActivityHistory();
         //replace current fragment
@@ -102,8 +101,6 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
                 .replace(R.id.fragmentContainer, activityHistory, ActivityHistory.ACTIVITY_HISTORY_TAG)
                 .addToBackStack(null)
                 .commit();
-                */
-
 
     }
 
@@ -137,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
     private void fetchData(){
 
         //data for ActivityHistory
-        mActivityDetailList = mDatabaseHelper.getActivityDetailList(ActivityHistory.DAYS_AGO);
+        mActivityDetailList = mDatabaseHelper.getActivityDetailList(ActivityHistory.ACTIVITY_LIMIT_COUNT);
 
         // get user data
         mUserList = mDatabaseHelper.getUsers();

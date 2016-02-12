@@ -2,74 +2,60 @@
 <android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="50dp">
+    android:layout_height="@dimen/list_item_height">
 
     <TextView
         android:id="@+id/date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         style="@style/LabelListItemPurple"
-        app:layout_widthPercent="15%"
+        app:layout_widthPercent="25%"
+        android:gravity="center_vertical"
         />
 
-    <RelativeLayout
-        android:id="@+id/timeLayout"
+    <TextView
+        android:id="@+id/minutesElapsed"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         app:layout_widthPercent="15%"
         android:layout_toRightOf="@+id/date"
         android:layout_toEndOf="@+id/date"
-        android:paddingLeft="4dp"
-        android:background="@drawable/white_image_border">
-        <TextView
-            android:id="@+id/minutesElapsed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/LabelListItemPurple"/>
+        style="@style/LabelListItemPurple"
+        android:gravity="center_vertical"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="min"
-            style="@style/LabelListItemPurple"
-            android:paddingLeft="2dp"
-            android:layout_toRightOf="@+id/minutesElapsed"
-            android:layout_toEndOf="@+id/minutesElapsed"/>
-
-    </RelativeLayout>
 
     <TextView
         android:id="@+id/place"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         style="@style/LabelListItemPurple"
-        android:layout_toRightOf="@+id/timeLayout"
-        android:layout_toEndOf="@+id/timeLayout"
-        app:layout_widthPercent="40%"
-        android:background="@drawable/white_image_border"
+        android:layout_toRightOf="@+id/minutesElapsed"
+        android:layout_toEndOf="@+id/minutesElapsed"
+        app:layout_widthPercent="25%"
+        android:gravity="center_vertical"
+        android:paddingLeft="2dp"
             />
 
     <LinearLayout
         android:id="@+id/userLinearLayout"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="horizontal"
         android:layout_toRightOf="@+id/place"
         android:layout_toEndOf="@+id/place"
-        app:layout_widthPercent="20%"
-        android:background="@drawable/white_image_border">
+        app:layout_widthPercent="25%"
+        android:gravity="center_vertical">
     </LinearLayout>
     <ImageView
         android:id="@+id/deleteButton"
         android:layout_width="wrap_content"
         app:layout_widthPercent="10%"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:src="@drawable/ic_action_discard"
         android:hint="@string/hint_delete_activity"
         android:layout_toRightOf="@+id/userLinearLayout"
         android:layout_toEndOf="@+id/userLinearLayout"
         android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:background="@drawable/white_image_border"
+        android:gravity="center_vertical"
         />
 </android.support.percent.PercentRelativeLayout>

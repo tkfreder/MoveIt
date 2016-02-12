@@ -46,7 +46,8 @@ public class ActivityHistory extends Fragment {
     public static final String ACTIVITY_HISTORY_TAG = "ACTIVIY_HISTORY_TAG";
     public static final String ACTIVITY_HISTORY_KEY = "ACTIVIY_HISTORY_KEY";
     private static final int APPROX_SIZE_AVATAR_IMAGES = 250;
-    public static final int DAYS_AGO = 7;
+    public static final int ACTIVITY_LIMIT_COUNT = 5;
+    private static final int PLACE_NUM_CHARS = 10;
 
     @Inject
     FitnessDBHelper mDatabaseHelper;
@@ -55,17 +56,15 @@ public class ActivityHistory extends Fragment {
     private FragmentActivity mFragmentActivity;
 
     private ActivityHistoryRecyclerAdapter mActivityHistoryRecyclerAdapter;
-    private List<ActivityDetail> mActivityDetailList;
     private List<User> mUserList;
+    private List<ActivityDetail> mActivityDetailList;
 
 
     // UI COMPONENTS
     protected View rootView;
     protected RecyclerView mRecyclerView;
     protected TextView mNoActivities;
-    protected Spinner mMonthSpinner;
-    protected Spinner mYearSpinner;
-    protected ImageView mSearch;
+    protected Spinner mLimitCountSpinner;
 
     @Nullable
     @Override
@@ -90,6 +89,7 @@ public class ActivityHistory extends Fragment {
 
     private void fetchData(){
 
+
         // get UserActivityList from intent
 
         Bundle bundle = this.getArguments();
@@ -100,7 +100,7 @@ public class ActivityHistory extends Fragment {
         else{
 
             // if this is the first time, fetch directly from the database
-            mActivityDetailList = mDatabaseHelper.getActivityDetailList(DAYS_AGO);
+            mActivityDetailList = mDatabaseHelper.getActivityDetailList(ACTIVITY_LIMIT_COUNT);
 
             if (mActivityDetailList.size() == 0){
                 //mNoActivities.setVisibility(View.VISIBLE);
@@ -114,6 +114,13 @@ public class ActivityHistory extends Fragment {
 
         // get number of users
         mUserList = mDatabaseHelper.getUsers();
+
+        // display search results for current month
+        //List<ActivityDetail> activityDetailList = mDatabaseHelper.getActivityDetailList(startDate, endDate);
+
+        mActivityHistoryRecyclerAdapter = new ActivityHistoryRecyclerAdapter(mFragmentActivity, mActivityDetailList);
+        mRecyclerView.setAdapter(mActivityHistoryRecyclerAdapter);
+        mActivityHistoryRecyclerAdapter.notifyDataSetChanged();
     }
 
     private void initializeUI(){
@@ -133,76 +140,41 @@ public class ActivityHistory extends Fragment {
         mRecyclerView.setLayoutManager(linearLayoutManager);
 
 
-        mMonthSpinner = (Spinner)rootView.findViewById(R.id.month);
-        ArrayAdapter<String> adapterMonth = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.months_short));
-        mMonthSpinner.setAdapter(adapterMonth);
+        mLimitCountSpinner = (Spinner)rootView.findViewById(R.id.numActivities);
+        ArrayAdapter<String> adapterMonth = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.activity_count));
+        mLimitCountSpinner.setAdapter(adapterMonth);
 
-        // default to current month
-        java.util.Date date= new Date();
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        int month = cal.get(Calendar.MONTH);
-        mMonthSpinner.setSelection(month);
-
-        mMonthSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        mLimitCountSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        int year = Calendar.getInstance().get(Calendar.YEAR);
-        String[] yearList = new String[]{String.valueOf(year), String.valueOf(year - 1)};
-        ArrayAdapter<String> adapterYear = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, yearList);
-        mYearSpinner = (Spinner)rootView.findViewById(R.id.year);
-        mYearSpinner.setAdapter(adapterYear);
-
-        mYearSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        mSearch = (ImageView)rootView.findViewById(R.id.search);
-        mSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
                 doSearch();
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
             }
         });
-
-        // display search results for current month
-        doSearch();
 
     }
 
     public class ActivityHistoryRecyclerAdapter extends RecyclerView.Adapter<ActivityHistoryRecyclerAdapter.CustomViewHolder> {
 
         private Context mContext;
+        private List<ActivityDetail> activityDetailList;
 
 
         public ActivityHistoryRecyclerAdapter(Context context, List<ActivityDetail> activityDetailList) {
 
             mContext = context;
-            mActivityDetailList = activityDetailList;
+            this.activityDetailList = activityDetailList;
         }
 
         @Override
         public int getItemCount() {
-            return (null != mActivityDetailList ? mActivityDetailList.size() : 0);
+            return (null != activityDetailList ? activityDetailList.size() : 0);
         }
 
         public class CustomViewHolder extends RecyclerView.ViewHolder {
@@ -237,14 +209,23 @@ public class ActivityHistory extends Fragment {
         @Override
         public void onBindViewHolder(ActivityHistoryRecyclerAdapter.CustomViewHolder customViewHolder, int i) {
 
-            ActivityDetail activityDetail = mActivityDetailList.get(i);
+            ActivityDetail activityDetail = activityDetailList.get(i);
 
             customViewHolder.date.setText(DateUtility.getDateFormattedRecent(activityDetail.getStartDate(), 7));
             float minutes = UnitConverter.convertMillisecondsToUnits(activityDetail.getEndDate().getTime() - activityDetail.getStartDate().getTime(), UnitConverter.TimeUnits.MINUTES);
-            String minutesElapsed = String.valueOf(Math.round(minutes));
+
+            float hour = 0;
+            if (minutes > 60){
+
+                // hour
+                hour = minutes / 60;
+            }
+            String minutesElapsed = String.format("%02d", Math.round(hour)) + ":" + String.format("%02d", Math.round(minutes));
             customViewHolder.minutesElapsed.setText(minutesElapsed);
 
-            customViewHolder.place.setText(Map.getLocationDetailByParams(mContext, activityDetail.getStartLocation(), 0));
+            String street = Map.getLocationDetailByParams(mContext, activityDetail.getStartLocation(), 0);
+
+            customViewHolder.place.setText(street.substring(0, street.length() > PLACE_NUM_CHARS ? PLACE_NUM_CHARS : street.length()) + "...");
 
             int imageSize = APPROX_SIZE_AVATAR_IMAGES / mUserList.size();
 
@@ -263,35 +244,33 @@ public class ActivityHistory extends Fragment {
                 @Override
                 public void onClick(View v) {
 
-                    final int activityId = (int)v.getTag();
+                    final int activityId = (int) v.getTag();
 
                     AlertDialog alertDialog = new AlertDialog.Builder(
                             mFragmentActivity,
                             R.style.AlertDialogCustom_Destructive)
-                            .setPositiveButton(R.string.button_delete, new DialogInterface.OnClickListener()
-                            {
+                            .setPositiveButton(R.string.button_delete, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
 
-                                    java.util.Map<Integer,Integer> userIdList = mDatabaseHelper.getActivityUsers(activityId);
+                                    java.util.Map<Integer, Integer> userIdList = mDatabaseHelper.getActivityUsers(activityId);
 
-                                    for (java.util.Map.Entry<Integer,Integer> entry : userIdList.entrySet()){
+                                    for (java.util.Map.Entry<Integer, Integer> entry : userIdList.entrySet()) {
 
                                         // check if user has a reward earned but not fulfilled, if so, remove that reward
                                         boolean isFulfilled = false;
                                         int rewardPoints = mDatabaseHelper.getRewardPoints(entry.getKey(), isFulfilled);
 
                                         // update user total points
-                                        if (rewardPoints != -1){
+                                        if (rewardPoints != -1) {
 
                                             User user = mDatabaseHelper.getUser(entry.getKey());
 
                                             // if the point value of the reward is greater than the points earned from the activity
-                                            if (rewardPoints > entry.getValue()){
+                                            if (rewardPoints > entry.getValue()) {
 
                                                 mDatabaseHelper.updateUserPoints(user, rewardPoints - entry.getValue());
-                                            }
-                                            else{
+                                            } else {
 
                                                 mDatabaseHelper.updateUserPoints(user, -(entry.getKey() - rewardPoints));
                                             }
@@ -312,14 +291,13 @@ public class ActivityHistory extends Fragment {
                                         mDatabaseHelper.updateUser(user);
 
                                         //TODO: delete references to this activity in Activities, ActivityUsers
-                                        if(mDatabaseHelper.deleteActivity(activityId)){
+                                        if (mDatabaseHelper.deleteActivity(activityId)) {
 
                                             Snackbar.make(rootView.findViewById(R.id.main_layout), getString(R.string.message_activity_deleted), Snackbar.LENGTH_LONG)
-                                            .show();
+                                                    .show();
                                         }
 
                                     }
-
 
                                 }
                             })
@@ -344,39 +322,10 @@ public class ActivityHistory extends Fragment {
 
     private void doSearch(){
 
-        // increment month so month index is 1-based, not 0-based
-        int startMonth = mMonthSpinner.getSelectedItemPosition();
-        startMonth++;
+        //List<ActivityDetail> activityDetailList = mDatabaseHelper.getActivityDetailList(startDate, endDate);
+        List<ActivityDetail> activityDetailList = mDatabaseHelper.getActivityDetailList(Integer.parseInt(mLimitCountSpinner.getSelectedItem().toString()));
 
-        int startYear = Integer.parseInt(mYearSpinner.getSelectedItem().toString());
-
-        int endMonth = startMonth + 1;
-        int endYear = startYear;
-
-        // if month is December (index = 12), then endMonth is January of following year
-        if (startMonth == 12){
-
-            endMonth = 1;
-            endYear++;
-
-        }
-
-
-        // startdate
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(0);
-        cal.set(startYear, startMonth, 1, 0, 0, 0);
-        Date startDate = cal.getTime();
-
-        // enddate
-        cal.setTimeInMillis(0);
-        cal.set(endYear, endMonth, 1, 0, 0, 0);
-        Date endDate = cal.getTime();
-
-
-        List<ActivityDetail> activityDetailList = mDatabaseHelper.getActivityDetailList(startDate, endDate);
-
-        mActivityHistoryRecyclerAdapter = new ActivityHistoryRecyclerAdapter(mFragmentActivity, mActivityDetailList);
+        mActivityHistoryRecyclerAdapter = new ActivityHistoryRecyclerAdapter(mFragmentActivity, activityDetailList);
         mRecyclerView.setAdapter(mActivityHistoryRecyclerAdapter);
         mActivityHistoryRecyclerAdapter.notifyDataSetChanged();
     }

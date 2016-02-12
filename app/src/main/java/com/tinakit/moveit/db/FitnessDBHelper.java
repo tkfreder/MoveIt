@@ -342,7 +342,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
 
         //PLACEHOLDER DATA FOR USERS
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Admin', 1, 125, 'avatar_5', 0, 1, null, null);"); // ADMIN, third column = 1
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'tina', 1, 125, 'avatar_5', 0, 1, 'tina.k.fredericks@gmail.com', 'tina');"); // ADMIN, third column = 1
         db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Parent', 0, 175, 'avatar_4', 0, 1, null, null);");
         db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Sister', 0, 50, 'avatar_3', 0, 1, null, null);");
         db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Brother', 0, 75, 'avatar_2', 0, 1, null, null);");
@@ -352,6 +352,16 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (2, 'Reward 2', 5, 2);");
         db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (3, 'Reward 3', 10, 3);");
         db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (4, 'Reward 4', 100, 4);");
+
+        // ie, 2016-02-11 13:19:06:449
+
+        db.execSQL("INSERT INTO " + TABLE_ACTIVITIES + " VALUES (null, 100, 100, '2016-01-01 00:00:00:000', '2016-01-01 00:00:00:000', 1, 1);");
+        db.execSQL("INSERT INTO " + TABLE_ACTIVITY_USERS + " VALUES (null, 2, 1, 1, 10, 5);");
+
+        db.execSQL("INSERT INTO " + TABLE_ACTIVITIES + " VALUES (null, 100, 100, '2016-02-11 00:00:00:000', '2016-02-11 00:00:00:000', 1, 1);");
+        db.execSQL("INSERT INTO " + TABLE_ACTIVITY_USERS + " VALUES (null, 1, 1, 1, 10, 5);");
+
+
 
 
     }
@@ -1010,6 +1020,12 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
         try {
 
+            String str1 = KEY_ACTIVITY_START_DATE + " >= ? AND " + KEY_ACTIVITY_START_DATE + " < ? ";
+            //String str1 = KEY_ACTIVITY_START_DATE + " > ? ";
+            String str2 = "'" + String.valueOf(startYear) + "-" + String.format("%02d", startMonth) + "-" + String.format("%02d", startDay) + "'";
+            //String str2 = "'" + String.valueOf(startYear) + "-" + String.format("%02d", startMonth) + "-" + String.format("%02d", startDay) + "'";
+            String str3 = "'" + String.valueOf(endYear) + "-" + String.format("%02d", endMonth) + "-" + String.format("%02d", endDay) + "'";
+
             Cursor cursor = db.query(VIEW_ACTIVITY_USERS_DETAIL,
                     new String[]{KEY_ACTIVITY_START_DATE
                             ,KEY_ACTIVITY_END_DATE
@@ -1021,10 +1037,9 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                             ,KEY_USER_AVATAR_FILENAME
                             ,KEY_ACTIVITY_TYPE_NAME
                             ,KEY_ACTIVITY_TYPE_ICON_FILENAME
-                            ,KEY_ACTIVITY_USERS_ACTIVITY_ID},
-                    KEY_ACTIVITY_START_DATE + " > ? AND " + KEY_ACTIVITY_START_DATE + " < ? ",
-                    new String[]{"date('" + String.valueOf(startYear) + "-" + String.valueOf(startMonth) + "-" + String.valueOf(startDay) + "')",
-                            "date('" + String.valueOf(endYear) + "-" + String.valueOf(endMonth) + "-" + String.valueOf(endDay) + "')"}, null, null, KEY_ACTIVITY_USERS_ACTIVITY_ID + " DESC");
+                            ,KEY_ACTIVITY_USERS_ACTIVITY_ID},str1
+                    ,
+                    new String[]{str2,str3}, null, null, KEY_ACTIVITY_USERS_ACTIVITY_ID + " DESC");
 
             try {
 
@@ -1098,7 +1113,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
     }
 
-    public ArrayList<ActivityDetail> getActivityDetailList(int days_ago){
+    public ArrayList<ActivityDetail> getActivityDetailList(int limitCount){
 
         int index = 0;
 
@@ -1119,8 +1134,8 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                         ,KEY_ACTIVITY_TYPE_NAME
                         ,KEY_ACTIVITY_TYPE_ICON_FILENAME
                         ,KEY_ACTIVITY_USERS_ACTIVITY_ID},
-                    KEY_ACTIVITY_START_DATE + " < ?",
-                    new String[]{"date('now', '-" + String.valueOf(days_ago) + " day')"}, null, null, KEY_ACTIVITY_USERS_ACTIVITY_ID + " DESC");
+                    null,
+                    null, null, null, KEY_ACTIVITY_START_DATE + " DESC LIMIT "  + String.valueOf(limitCount));
 
 
 

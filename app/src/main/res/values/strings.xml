@@ -90,6 +90,15 @@
         <item>Dec</item>
     </string-array>
 
+    <!-- activity history search options -->
+    <string-array name="activity_count">
+        <item>5</item>
+        <item>10</item>
+        <item>25</item>
+        <item>50</item>
+    </string-array>
+
+
 
     <!-- navigation drawer menu names -->
     <string name="nav_menu_start">Start</string>
@@ -104,14 +113,17 @@
     <string name="admin_tab_history">History</string>
     <string name="admin_tab_settings">Settings</string>
 
-    <!-- checkbox labels -->
+    <!-- UI labels -->
     <string name="admin_remember_login">Remember username and password</string>
+    <string name="number_activities"># activities to display:</string>
+
 
     <!-- button names -->
     <string name="button_save">Save</string>
     <string name="button_continue">Continue</string>
     <string name="button_signin">Sign In</string>
     <string name="button_search">Search</string>
+    <string name="button_display">Display</string>
 
     <!-- header names -->
     <string name="header_admin_registration">Admin Registration</string>
