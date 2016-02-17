@@ -48,7 +48,7 @@ public class ActivityHistory extends Fragment {
     private static final int APPROX_SIZE_AVATAR_IMAGES = 250;
     public static final int ACTIVITY_LIMIT_COUNT = 5;
     private static final int PLACE_NUM_CHARS = 10;
-
+    private static final int DEFAULT_USER_LIST_SIZE = 4;
     @Inject
     FitnessDBHelper mDatabaseHelper;
 
@@ -56,10 +56,7 @@ public class ActivityHistory extends Fragment {
     private FragmentActivity mFragmentActivity;
 
     private ActivityHistoryRecyclerAdapter mActivityHistoryRecyclerAdapter;
-    private List<User> mUserList;
     private List<ActivityDetail> mActivityDetailList;
-    private ArrayList<IAdminFragmentObserver> mObserverList;
-
 
     // UI COMPONENTS
     protected View rootView;
@@ -79,9 +76,6 @@ public class ActivityHistory extends Fragment {
 
         // Dagger 2 injection
         ((CustomApplication)getActivity().getApplication()).getAppComponent().inject(this);
-
-        //get databaseHelper instance
-        //mDatabaseHelper = FitnessDBHelper.getInstance(mFragmentActivity);
 
         initializeUI();
 
@@ -115,15 +109,8 @@ public class ActivityHistory extends Fragment {
 
         }
 
-        // get number of users
-        mUserList = mDatabaseHelper.getUsers();
+        setAdapter();
 
-        // display search results for current month
-        //List<ActivityDetail> activityDetailList = mDatabaseHelper.getActivityDetailList(startDate, endDate);
-
-        mActivityHistoryRecyclerAdapter = new ActivityHistoryRecyclerAdapter(mFragmentActivity, mActivityDetailList);
-        mRecyclerView.setAdapter(mActivityHistoryRecyclerAdapter);
-        mActivityHistoryRecyclerAdapter.notifyDataSetChanged();
     }
 
     private void initializeUI(){
@@ -237,7 +224,7 @@ public class ActivityHistory extends Fragment {
 
             customViewHolder.place.setText(street.substring(0, street.length() > PLACE_NUM_CHARS ? PLACE_NUM_CHARS : street.length()) + "...");
 
-            int imageSize = APPROX_SIZE_AVATAR_IMAGES / mUserList.size();
+            int imageSize = APPROX_SIZE_AVATAR_IMAGES / DEFAULT_USER_LIST_SIZE;
 
             for (UserActivity userActivity : activityDetail.getUserActivityList()){
 
@@ -276,6 +263,9 @@ public class ActivityHistory extends Fragment {
                                         // update user total points, if we were able to get a valid point value for the reward
                                         if (reward != null) {
 
+                                            // delete the reward associated with this user
+                                            mDatabaseHelper.deleteRewardEarned(reward.getRewardId());
+
                                             User user = mDatabaseHelper.getUser(entry.getKey());
 
                                             // if the point value of the reward is greater than the points earned from the activity,
@@ -299,8 +289,6 @@ public class ActivityHistory extends Fragment {
                                                 mDatabaseHelper.updateUser(user);
                                             }
 
-                                            // delete reward
-                                            mDatabaseHelper.deleteRewardEarned(reward.getRewardId());
                                         }
 
                                     }
@@ -316,12 +304,7 @@ public class ActivityHistory extends Fragment {
 
                                         int position = (int) deleteButton.getTag(R.id.TAG_ACTIVITY_HISTORY_DELETE);
                                         mActivityDetailList.remove(position);
-                                        mRecyclerView.removeViewAt(position);
                                         mActivityHistoryRecyclerAdapter.notifyItemRemoved(position);
-                                        mActivityHistoryRecyclerAdapter.notifyItemRangeChanged(position, mActivityDetailList.size());
-                                        mRecyclerView.invalidate();
-
-
                                     }
 
                                 }
@@ -347,13 +330,18 @@ public class ActivityHistory extends Fragment {
 
     private void doSearch(){
 
-        //List<ActivityDetail> activityDetailList = mDatabaseHelper.getActivityDetailList(startDate, endDate);
-        List<ActivityDetail> activityDetailList = mDatabaseHelper.getActivityDetailList(Integer.parseInt(mLimitCountSpinner.getSelectedItem().toString()));
+        mActivityDetailList = mDatabaseHelper.getActivityDetailList(Integer.parseInt(mLimitCountSpinner.getSelectedItem().toString()));
 
-        mActivityHistoryRecyclerAdapter = new ActivityHistoryRecyclerAdapter(mFragmentActivity, activityDetailList);
-        mRecyclerView.setAdapter(mActivityHistoryRecyclerAdapter);
-        mActivityHistoryRecyclerAdapter.notifyDataSetChanged();
+        setAdapter();
     }
 
+    private void setAdapter(){
+
+        mActivityDetailList = mDatabaseHelper.getActivityDetailList(ACTIVITY_LIMIT_COUNT);
+        mActivityHistoryRecyclerAdapter = new ActivityHistoryRecyclerAdapter(mFragmentActivity, mActivityDetailList);
+        mRecyclerView.setAdapter(mActivityHistoryRecyclerAdapter);
+        mActivityHistoryRecyclerAdapter.notifyDataSetChanged();
+
+    }
 
 }

@@ -482,6 +482,22 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+
+        // unregister receiver to prevent illegal state exception with FragmentManager operations
+        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mGoogleApiReceiver);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+
+        super.onRestoreInstanceState(savedInstanceState);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mGoogleApiReceiver, new IntentFilter(GoogleApi.GOOGLE_API_INTENT));
+
+    }
+
     //**********************************************************************************************
     //  BroadcastReceiver mMessageReceiver
     //**********************************************************************************************

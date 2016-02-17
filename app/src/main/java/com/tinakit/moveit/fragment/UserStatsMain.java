@@ -47,7 +47,6 @@ public class UserStatsMain extends Fragment{
     protected SeriesItem seriesItem2;
     protected TextView textPercentage;
     List<SeriesItem> mSeriesItemList;
-    protected ViewPager mViewPager;
     protected UserStatsPagerAdapter mUserStatsPagerAdapter;
 
     @Nullable
@@ -71,7 +70,8 @@ public class UserStatsMain extends Fragment{
         // get user data
         mUserList = mDatabaseHelper.getUsers();
 
-        mViewPager = (ViewPager)rootView.findViewById(R.id.viewpager_user_stats);
+        final ViewPager mViewPager = (ViewPager)rootView.findViewById(R.id.viewpager_user_stats);
+        mViewPager.setOffscreenPageLimit(0);
         if (mViewPager != null){
             setupViewPager(mViewPager);
         }
