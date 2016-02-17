@@ -5,20 +5,23 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.adapter.ViewPagerAdapter;
+import com.tinakit.moveit.model.ActivityDetail;
+import com.tinakit.moveit.model.IAdminFragmentObserver;
 import com.tinakit.moveit.tab.SlidingTabLayout;
 
-    // source reference: http://blog.grafixartist.com/material-design-tabs-with-android-design-support-library/
+import java.util.List;
+
+// source reference: http://blog.grafixartist.com/material-design-tabs-with-android-design-support-library/
 /**
  * Created by Tina on 1/12/2016.
  */
-public class Admin extends Fragment{
+public class Admin extends Fragment {
 
     // CONSTANTS
     public static final String ADMIN_TAG = "ADMIN_TAG";
@@ -32,7 +35,7 @@ public class Admin extends Fragment{
     private View rootView;
 
     // SlidingTabLayout
-    private ViewPager mViewPager;
+    protected ViewPager mViewPager;
     protected ViewPagerAdapter mViewPagerAdapter;
     private SlidingTabLayout mSlidingTabLayout;
 
@@ -101,11 +104,12 @@ public class Admin extends Fragment{
         mViewPagerAdapter.addFrag(new AdminInBox(), getString(R.string.admin_tab_inbox));
         mViewPagerAdapter.addFrag(new EditReward(), getString(R.string.admin_tab_rewards));
         mViewPagerAdapter.addFrag(new UserProfile(), getString(R.string.admin_tab_users));
+        //ActivityHistory activityHistory = new ActivityHistory();
+        //activityHistory.registerObserver(this);
         mViewPagerAdapter.addFrag(new ActivityHistory(), getString(R.string.admin_tab_history));
         //mViewPagerAdapter.addFrag(new AdminSettings(), getString(R.string.admin_tab_settings));
         viewPager.setAdapter(mViewPagerAdapter);
 
     }
-
 
 }

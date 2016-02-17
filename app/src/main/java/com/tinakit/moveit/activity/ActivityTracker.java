@@ -36,6 +36,7 @@ import com.tinakit.moveit.fragment.ActivityChooser;
 import com.tinakit.moveit.fragment.BackHandledFragment;
 import com.tinakit.moveit.fragment.MapFragment;
 import com.tinakit.moveit.model.ActivityDetail;
+import com.tinakit.moveit.model.Reward;
 import com.tinakit.moveit.model.UnitSplit;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.model.UserActivity;
@@ -553,12 +554,18 @@ public class ActivityTracker extends BackHandledFragment {
 
             user.setPoints(totalPoints + user.getPoints());
 
-            if (user.getPoints() >= user.getChildItemList().get(0).getPoints()) {
+            // if don't already have a reward, check if user has enough points to earn a reward
+            Reward reward = mDatabaseHelper.getRewardEarned(user.getUserId(), false);
+            // if reward points is 0 then user has not earned a reward yet
+            if (reward.getPoints() == 0){
 
-                user.setPoints(user.getPoints() - user.getChildItemList().get(0).getPoints());
+                if (user.getPoints() >= user.getReward().getPoints()) {
 
-                // insert Reward Earned
-                databaseHelper.insertRewardEarned(user.getChildItemList().get(0).getName(), user.getChildItemList().get(0).getPoints(), user.getUserId(), activityDetail.getActivityId());
+                    user.setPoints(user.getPoints() - user.getReward().getPoints());
+
+                    // insert Reward Earned
+                    databaseHelper.insertRewardEarned(user.getReward().getName(), user.getReward().getPoints(), user.getUserId(), activityDetail.getActivityId());
+                }
             }
 
             databaseHelper.updateUser(user);

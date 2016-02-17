@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
@@ -15,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -24,6 +22,9 @@ import android.widget.TextView;
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.ActivityDetail;
+import com.tinakit.moveit.model.IAdminFragmentListener;
+import com.tinakit.moveit.model.IAdminFragmentObserver;
+import com.tinakit.moveit.model.Reward;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.model.UserActivity;
 import com.tinakit.moveit.module.CustomApplication;
@@ -31,8 +32,7 @@ import com.tinakit.moveit.utility.DateUtility;
 import com.tinakit.moveit.utility.Map;
 import com.tinakit.moveit.utility.UnitConverter;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -58,6 +58,7 @@ public class ActivityHistory extends Fragment {
     private ActivityHistoryRecyclerAdapter mActivityHistoryRecyclerAdapter;
     private List<User> mUserList;
     private List<ActivityDetail> mActivityDetailList;
+    private ArrayList<IAdminFragmentObserver> mObserverList;
 
 
     // UI COMPONENTS
@@ -65,6 +66,8 @@ public class ActivityHistory extends Fragment {
     protected RecyclerView mRecyclerView;
     protected TextView mNoActivities;
     protected Spinner mLimitCountSpinner;
+
+
 
     @Nullable
     @Override
@@ -206,6 +209,13 @@ public class ActivityHistory extends Fragment {
             return viewHolder;
         }
 
+        private void setList(List<ActivityDetail> activityDetailList){
+
+            mActivityDetailList = activityDetailList;
+            notifyDataSetChanged();
+
+        }
+
         @Override
         public void onBindViewHolder(ActivityHistoryRecyclerAdapter.CustomViewHolder customViewHolder, int i) {
 
@@ -239,8 +249,10 @@ public class ActivityHistory extends Fragment {
 
             }
 
-            customViewHolder.deleteButton.setTag(activityDetail.getActivityId());
-            customViewHolder.deleteButton.setOnClickListener(new View.OnClickListener() {
+            final ImageView deleteButton = customViewHolder.deleteButton;
+            deleteButton.setTag(activityDetail.getActivityId());
+            deleteButton.setTag(R.id.TAG_ACTIVITY_HISTORY_DELETE, i);
+            deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
@@ -259,43 +271,56 @@ public class ActivityHistory extends Fragment {
 
                                         // check if user has a reward earned but not fulfilled, if so, remove that reward
                                         boolean isFulfilled = false;
-                                        int rewardPoints = mDatabaseHelper.getRewardPoints(entry.getKey(), isFulfilled);
+                                        Reward reward = mDatabaseHelper.getRewardEarned(entry.getKey(), isFulfilled);
 
-                                        // update user total points
-                                        if (rewardPoints != -1) {
+                                        // update user total points, if we were able to get a valid point value for the reward
+                                        if (reward != null) {
 
                                             User user = mDatabaseHelper.getUser(entry.getKey());
 
-                                            // if the point value of the reward is greater than the points earned from the activity
-                                            if (rewardPoints > entry.getValue()) {
+                                            // if the point value of the reward is greater than the points earned from the activity,
+                                            // credit the difference to the user
+                                            if (reward.getPoints() > entry.getValue()) {
 
-                                                mDatabaseHelper.updateUserPoints(user, rewardPoints - entry.getValue());
-                                            } else {
-
-                                                mDatabaseHelper.updateUserPoints(user, -(entry.getKey() - rewardPoints));
+                                                mDatabaseHelper.updateUserPoints(user, reward.getPoints() - entry.getValue());
                                             }
+
+                                            // after crediting or debiting points, check if user's total points earns her a reward
+                                            // get the latest user data
+                                            user = mDatabaseHelper.getUser(entry.getKey());
+
+                                            if (user.getPoints() >= user.getReward().getPoints()) {
+
+                                                user.setPoints(user.getPoints() - user.getReward().getPoints());
+
+                                                // insert Reward Earned
+                                                mDatabaseHelper.insertRewardEarned(user.getReward().getName(), user.getReward().getPoints(), user.getUserId(), activityId);
+
+                                                mDatabaseHelper.updateUser(user);
+                                            }
+
+                                            // delete reward
+                                            mDatabaseHelper.deleteRewardEarned(reward.getRewardId());
                                         }
 
-                                        // check if user has enough points to earn their reward
-                                        // get latest user data
-                                        User user = mDatabaseHelper.getUser(entry.getKey());
+                                    }
 
-                                        if (user.getPoints() >= user.getReward().getPoints()) {
+                                    // delete references to this activity in Activities, ActivityUsers, ActivityLocationData
+                                    if (mDatabaseHelper.deleteActivity(activityId)) {
 
-                                            user.setPoints(user.getPoints() - user.getReward().getPoints());
+                                        //Snackbar.make(rootView.findViewById(R.id.main_layout), getString(R.string.message_activity_deleted), Snackbar.LENGTH_LONG)
+                                        //        .show();
+                                        //setList(mDatabaseHelper.getActivityDetailList(ACTIVITY_LIMIT_COUNT));
+                                        //mActivityHistoryRecyclerAdapter.notifyItemRemoved((int) deleteButton.getTag(R.id.TAG_ACTIVITY_HISTORY_DELETE));
 
-                                            // insert Reward Earned
-                                            mDatabaseHelper.insertRewardEarned(user.getReward().getName(), user.getReward().getPoints(), user.getUserId(), activityId);
-                                        }
 
-                                        mDatabaseHelper.updateUser(user);
+                                        int position = (int) deleteButton.getTag(R.id.TAG_ACTIVITY_HISTORY_DELETE);
+                                        mActivityDetailList.remove(position);
+                                        mRecyclerView.removeViewAt(position);
+                                        mActivityHistoryRecyclerAdapter.notifyItemRemoved(position);
+                                        mActivityHistoryRecyclerAdapter.notifyItemRangeChanged(position, mActivityDetailList.size());
+                                        mRecyclerView.invalidate();
 
-                                        //TODO: delete references to this activity in Activities, ActivityUsers
-                                        if (mDatabaseHelper.deleteActivity(activityId)) {
-
-                                            Snackbar.make(rootView.findViewById(R.id.main_layout), getString(R.string.message_activity_deleted), Snackbar.LENGTH_LONG)
-                                                    .show();
-                                        }
 
                                     }
 
@@ -329,4 +354,6 @@ public class ActivityHistory extends Fragment {
         mRecyclerView.setAdapter(mActivityHistoryRecyclerAdapter);
         mActivityHistoryRecyclerAdapter.notifyDataSetChanged();
     }
+
+
 }

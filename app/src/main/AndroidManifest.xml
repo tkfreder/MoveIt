@@ -31,7 +31,7 @@
         </activity>
 
         <activity android:name=".activity.PickAvatar"/>
-        <activity android:name=".utility.AndroidDatabaseManager"
+        <activity android:name=".activity.AndroidDatabaseManager"
                   android:theme="@style/Theme.AppCompat.Light"/>
     </application>
 

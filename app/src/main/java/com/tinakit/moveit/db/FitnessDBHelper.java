@@ -222,7 +222,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         String CREATE_ACTIVITY_LOCATION_DATA_TABLE = "CREATE TABLE " + TABLE_ACTIVITY_LOCATION_DATA +
                 "(" +
                 KEY_ACTIVITY_LOCATION_DATA_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // Define a primary key
-                KEY_ACTIVITY_LOCATION_DATA_ACTIVITY_ID_FK + " INTEGER REFERENCES " + TABLE_ACTIVITIES + "," + // Define a foreign key
+                KEY_ACTIVITY_LOCATION_DATA_ACTIVITY_ID_FK + " INTEGER ," +
                 KEY_ACTIVITY_LOCATION_DATA_TIMESTAMP  + " TEXT, " +
                 KEY_ACTIVITY_LOCATION_DATA_LATITUDE  + " REAL, " +
                 KEY_ACTIVITY_LOCATION_DATA_LONGITUDE  + " REAL, " +
@@ -847,18 +847,24 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         return activityId;
     }
 
-    public int getRewardPoints(int userId, boolean isFulfilled){
+    public Reward getRewardEarned(int userId, boolean isFulfilled){
 
         int points = -1;
+        Reward reward = new Reward();
 
         String stringFulfilled = "";
 
-        stringFulfilled = KEY_REWARDSEARNED_DATE_FULFILLED + (isFulfilled ? " IS NOT NULL " : KEY_REWARDSEARNED_DATE_FULFILLED + " IS NULL ");
+        stringFulfilled = KEY_REWARDSEARNED_DATE_FULFILLED + (isFulfilled ? " IS NOT NULL " : " = '' ");
 
         try {
 
             Cursor cursor = db.query(TABLE_REWARDS_EARNED,
-                    new String[]{KEY_REWARDSEARNED_REWARD_POINTS},
+                    new String[]{KEY_REWARDSEARNED__ID
+                            , KEY_REWARDSEARNED_REWARD_NAME
+                            , KEY_REWARDSEARNED_REWARD_POINTS
+                            ,KEY_REWARDSEARNED_TIMESTAMP
+                            ,KEY_REWARDSEARNED_DATE_FULFILLED
+                            ,KEY_REWARDSEARNED_USER_ID_FK },
                     KEY_REWARDSEARNED_USER_ID_FK + " = ? AND " + stringFulfilled,
                     new String[]{String.valueOf(userId)}, null, null, null);
 
@@ -866,7 +872,13 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
                 if (cursor.moveToFirst())
                 {
-                    points = cursor.getInt(cursor.getColumnIndex(KEY_REWARDSEARNED_REWARD_POINTS));
+                    // using rewardId to store rewardEarnedId
+                    reward.setRewardId(cursor.getInt(cursor.getColumnIndex(KEY_REWARDSEARNED__ID)));
+                    reward.setName(cursor.getString(cursor.getColumnIndex(KEY_REWARDSEARNED_REWARD_NAME)));
+                    reward.setPoints(cursor.getInt(cursor.getColumnIndex(KEY_REWARDSEARNED_REWARD_POINTS)));
+                    if (!cursor.getString(cursor.getColumnIndex(KEY_REWARDSEARNED_DATE_FULFILLED)).equals(""))
+                        reward.setDateFulfilled(new SimpleDateFormat(DATE_FORMAT).parse(cursor.getString(cursor.getColumnIndex(KEY_REWARDSEARNED_DATE_FULFILLED ))));
+                    reward.setUserId(cursor.getInt(cursor.getColumnIndex(KEY_REWARDSEARNED_USER_ID_FK)));
                 }
 
             }catch(Exception exception) {
@@ -885,7 +897,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             Log.d(LOGTAG, "Error during getRewardPoints()");
         }
 
-        return points;
+        return reward;
     }
 
     String CREATE_VIEW_ACTIVITY_USERS_DETAIL = "CREATE VIEW " + VIEW_ACTIVITY_USERS_DETAIL + " AS" +
@@ -1009,9 +1021,12 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         db.beginTransaction();
         try {
 
+            rowsActivityUsers = db.delete(TABLE_ACTIVITY_USERS, KEY_ACTIVITY_USERS_ACTIVITY_ID + "= ? ", new String[]{String.valueOf(activityId)});
+            rowsLocationData = db.delete(TABLE_ACTIVITY_LOCATION_DATA, KEY_ACTIVITY_LOCATION_DATA_ACTIVITY_ID_FK + "= ? ", new String[]{String.valueOf(activityId)});
+
+            // delete activityId in Activities last due to foreign key constraint for above tables
             rowsActivities = db.delete(TABLE_ACTIVITIES, KEY_ACTIVITY_ID + "= ? ", new String[]{String.valueOf(activityId)});
-            rowsActivityUsers = db.delete(TABLE_ACTIVITY_USERS, KEY_ACTIVITY_ID + "= ? ", new String[]{String.valueOf(activityId)});
-            rowsLocationData = db.delete(TABLE_ACTIVITY_LOCATION_DATA, KEY_ACTIVITY_ID + "= ? ", new String[]{String.valueOf(activityId)});
+            db.setTransactionSuccessful();
 
         } catch (Exception e) {
             Log.d(LOGTAG, "Error during deleteActivity()");
@@ -1447,6 +1462,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             values.put(KEY_REWARDSEARNED_REWARD_POINTS, rewardPoints);
             values.put(KEY_REWARDSEARNED_USER_ID_FK, userId);
             values.put(KEY_REWARDSEARNED_TIMESTAMP, new SimpleDateFormat(DATE_FORMAT).format(new Date()));
+            values.put(KEY_REWARDSEARNED_DATE_FULFILLED, "");
 
             db.insertOrThrow(TABLE_REWARDS_EARNED, null, values);
             db.setTransactionSuccessful();
@@ -1472,7 +1488,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                             ,KEY_REWARDSEARNED_TIMESTAMP
                             ,KEY_REWARDSEARNED_DATE_FULFILLED
                             , KEY_REWARDSEARNED_USER_ID_FK},
-                    KEY_REWARDSEARNED_DATE_FULFILLED + " is null",
+                    KEY_REWARDSEARNED_DATE_FULFILLED + " = '' ",
                     null, null, null, null);
 
             try{
@@ -1521,7 +1537,12 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
             // RewardsEarnedId is not the same as RewardId
             Cursor cursor = db.query(TABLE_REWARDS_EARNED,
-                    new String[]{KEY_REWARDSEARNED__ID,KEY_REWARDSEARNED_REWARD_NAME,KEY_REWARDSEARNED_REWARD_POINTS,KEY_REWARDSEARNED_TIMESTAMP,KEY_REWARDSEARNED_DATE_FULFILLED, KEY_REWARDSEARNED_USER_ID_FK},
+                    new String[]{KEY_REWARDSEARNED__ID
+                            ,KEY_REWARDSEARNED_REWARD_NAME
+                            ,KEY_REWARDSEARNED_REWARD_POINTS
+                            ,KEY_REWARDSEARNED_TIMESTAMP
+                            ,KEY_REWARDSEARNED_DATE_FULFILLED
+                            , KEY_REWARDSEARNED_USER_ID_FK},
                     KEY_REWARDSEARNED_USER_ID_FK + " = ?",
                     new String[]{String.valueOf(user.getUserId())}, null, null, null);
 
@@ -1536,7 +1557,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                         reward.setName(cursor.getString(cursor.getColumnIndex(KEY_REWARDSEARNED_REWARD_NAME)));
                         reward.setPoints(cursor.getInt(cursor.getColumnIndex(KEY_REWARDSEARNED_REWARD_POINTS)));
                         reward.setDateEarned(new SimpleDateFormat(DATE_FORMAT).parse(cursor.getString(cursor.getColumnIndex(KEY_REWARDSEARNED_TIMESTAMP))));
-                        if(cursor.getString(cursor.getColumnIndex(KEY_REWARDSEARNED_DATE_FULFILLED)) != null)
+                        if(!cursor.getString(cursor.getColumnIndex(KEY_REWARDSEARNED_DATE_FULFILLED)).equals(""))
                             reward.setDateFulfilled(new SimpleDateFormat(DATE_FORMAT).parse(cursor.getString(cursor.getColumnIndex(KEY_REWARDSEARNED_DATE_FULFILLED))));
                         reward.setUserId(cursor.getInt(cursor.getColumnIndex(KEY_REWARDSEARNED_USER_ID_FK)));
                         rewardList.add(reward);
@@ -1742,17 +1763,12 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         return rowsAffected;
     }
 
-    public boolean deleteReward(int rewardId){
+    public boolean deleteReward(Reward reward){
 
-        // Create and/or open the database for writing
-        //SQLiteDatabase db = getWritableDatabase();
-
-        // It's a good idea to wrap the delete in a transaction. This helps with performance and ensures
-        // consistency of the database.
         db.beginTransaction();
         try {
 
-            return db.delete(TABLE_REWARDS, KEY_REWARD_ID + "= ? ", new String[]{String.valueOf(rewardId)}) > 0;
+            return db.delete(TABLE_REWARDS, KEY_REWARD_ID + "= ? ", new String[]{String.valueOf(reward.getRewardId())}) > 0;
 
         } catch (Exception e) {
             Log.d(LOGTAG, "Error during deleteReward()");
@@ -1762,6 +1778,26 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
 
         return false;
+    }
+
+    public boolean deleteRewardEarned(int rewardEarnedId){
+
+        int rowsAffected = -1;
+
+        db.beginTransaction();
+        try {
+
+            rowsAffected = db.delete(TABLE_REWARDS_EARNED, KEY_REWARDSEARNED__ID + "= ? ", new String[]{String.valueOf(rewardEarnedId)});
+            db.setTransactionSuccessful();
+
+        } catch (Exception e) {
+            Log.d(LOGTAG, "Error during deleteRewardEarned()");
+        } finally {
+            db.endTransaction();
+        }
+
+
+        return rowsAffected == 1;
     }
 
 

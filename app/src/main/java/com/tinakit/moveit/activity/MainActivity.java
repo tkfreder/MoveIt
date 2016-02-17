@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // is this the first time app is launched
         checkHasLaunched();
@@ -236,6 +236,10 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
 
 
                 break;
+
+            case R.id.nav_charts:
+
+                startActivity(new Intent(this, AndroidDatabaseManager.class));
 
              case R.id.nav_coins:
 

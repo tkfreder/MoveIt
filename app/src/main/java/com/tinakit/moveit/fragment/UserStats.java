@@ -139,7 +139,7 @@ public class UserStats extends Fragment {
             mColorList.add(Color.argb(255,211,47,47));
 
             textPercentage = (TextView) rootView.findViewById(R.id.textPercentage);
-            mRewardPoints = mUser.getChildItemList().get(0).getPoints();
+            mRewardPoints = mUser.getReward().getPoints();
 
             TextView userName = (TextView)rootView.findViewById(R.id.userName);
             userName.setText(mUser.getUserName());
@@ -148,7 +148,7 @@ public class UserStats extends Fragment {
             points.setText(String.valueOf(mUser.getPoints()));
 
             TextView rewardName = (TextView)rootView.findViewById(R.id.rewardName);
-            rewardName.setText(mUser.getChildItemList().get(0).getName());
+            rewardName.setText(mUser.getReward().getName());
 
             DecoView decoView = (DecoView) rootView.findViewById(R.id.dynamicArcView);
 
