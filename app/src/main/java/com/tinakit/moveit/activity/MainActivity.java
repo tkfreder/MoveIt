@@ -273,29 +273,9 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
 
                 if (sharedPreferences.contains(AdminLoginDialogFragment.ADMIN_LOGIN_PREFS)){
 
-                    switch(sharedPreferences.getInt(AdminLoginDialogFragment.ADMIN_LOGIN_PREFS, 0)){
-
-                        case 0:
-
-                            showAdminLoginDialog();
-                            break;
-
-                        case 1:
-
-                            // show dialog auto-populated
-                            showAdminLoginDialog();
-                            break;
-
-                        case 2:
-
-                            displayAdminScreen();
-                            break;
+                    showAdminLoginDialog();
                     }
 
-
-
-
-                    }
                 else {
 
                     editor.putInt(AdminLoginDialogFragment.ADMIN_LOGIN_PREFS, 0);

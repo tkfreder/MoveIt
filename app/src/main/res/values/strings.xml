@@ -63,7 +63,6 @@
     <string-array name="admin_login_preferences">
         <item>Require re-type login</item>
         <item>Remember login</item>
-        <item>Disable login</item>
     </string-array>
 
     <!-- activity history search options -->
