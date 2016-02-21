@@ -312,6 +312,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 " , u." + KEY_USER_AVATAR_FILENAME + " AS " + KEY_USER_AVATAR_FILENAME +
                 " , u." + KEY_USER_POINTS + " AS " + KEY_USER_POINTS +
                 " , u." + KEY_USER_PASSWORD + " AS " + KEY_USER_PASSWORD +
+                " , u." + KEY_USER_EMAIL + " AS " + KEY_USER_EMAIL +
                 " , r." + KEY_REWARD_POINTS + " AS " + KEY_REWARD_POINTS +
                 " , r." + KEY_REWARD_NAME + " AS " + KEY_REWARD_NAME +
                 " FROM " + TABLE_USERS + " u" +
@@ -436,7 +437,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         try {
 
             Cursor cursor = db.query(VIEW_USERS_REWARDS_DETAIL,
-                    new String[]{KEY_REWARDUSER_USER_ID_FK, KEY_USER_NAME, KEY_USER_IS_ADMIN, KEY_USER_WEIGHT, KEY_USER_AVATAR_FILENAME, KEY_USER_POINTS, KEY_REWARD_NAME, KEY_REWARD_POINTS, KEY_USER_PASSWORD},
+                    new String[]{KEY_REWARDUSER_USER_ID_FK, KEY_USER_NAME, KEY_USER_IS_ADMIN, KEY_USER_WEIGHT, KEY_USER_AVATAR_FILENAME, KEY_USER_POINTS, KEY_REWARD_NAME, KEY_REWARD_POINTS, KEY_USER_PASSWORD, KEY_USER_EMAIL},
                     KEY_USER_IS_ENABLED + "= ?", new String[]{"1"}, null, null, KEY_REWARDUSER_USER_ID_FK);
             try{
 
@@ -451,6 +452,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                         user.setAvatarFileName(cursor.getString(cursor.getColumnIndex(KEY_USER_AVATAR_FILENAME)));
                         user.setPoints(cursor.getInt(cursor.getColumnIndex(KEY_USER_POINTS)));
                         user.setPassword(cursor.getString(cursor.getColumnIndex(KEY_USER_PASSWORD)));
+                        user.setEmail(cursor.getString(cursor.getColumnIndex(KEY_USER_EMAIL)));
 
                         // create Reward
                         Reward reward = new Reward();

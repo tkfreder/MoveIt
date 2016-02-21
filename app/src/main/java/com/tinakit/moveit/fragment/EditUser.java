@@ -66,6 +66,7 @@ public class EditUser extends Fragment {
     protected TextView mAdmin;
     protected Button mSaveButton;
     protected EditText mPassword;
+    protected TextView mEmail;
     protected Spinner mAdminLoginPrefs;
 
     @Nullable
@@ -96,6 +97,7 @@ public class EditUser extends Fragment {
         mAdmin = (TextView)mRootView.findViewById(R.id.isAdmin);
         mSaveButton = (Button)mRootView.findViewById(R.id.saveButton);
         mPassword = (EditText)mRootView.findViewById(R.id.password);
+        mEmail = (TextView)mRootView.findViewById(R.id.email);
         mAdminLoginPrefs = (Spinner)mRootView.findViewById(R.id.admin_preference_list);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.admin_login_preferences));
@@ -173,8 +175,13 @@ public class EditUser extends Fragment {
 
             mAdmin.setVisibility(View.VISIBLE);
 
+            mPassword.setVisibility(View.VISIBLE);
             mPassword.setText(mUser.getPassword());
 
+            mEmail.setVisibility(View.VISIBLE);
+            mEmail.setText(mUser.getEmail());
+
+            mAdminLoginPrefs.setVisibility(View.VISIBLE);
             // check SharedPreferences for auto-populate fields
             SharedPreferences sharedPreferences = getActivity().getPreferences(Context.MODE_PRIVATE);
             int pref = sharedPreferences.getInt(AdminLoginDialogFragment.ADMIN_LOGIN_PREFS, 0);
@@ -309,8 +316,8 @@ public class EditUser extends Fragment {
 
                     SharedPreferences sharedPreferences = getActivity().getPreferences(Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString(AdminLoginDialogFragment.ADMIN_USERNAME, mUser.getUserName());
-                    editor.putString(AdminLoginDialogFragment.ADMIN_PASSWORD, mUser.getPassword());
+                    editor.putString(AdminLoginDialogFragment.ADMIN_USERNAME, mUserName.getText().toString());
+                    editor.putString(AdminLoginDialogFragment.ADMIN_PASSWORD, mPassword.getText().toString());
                     editor.commit();
                 }
 
@@ -352,26 +359,30 @@ public class EditUser extends Fragment {
 
         });
 
-        mAdminLoginPrefs.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        if (mUser.isAdmin()){
 
-                SharedPreferences sharedPreferences = getActivity().getPreferences(Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putInt(AdminLoginDialogFragment.ADMIN_LOGIN_PREFS, position);
+            mAdminLoginPrefs.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                // if position = 1, want auto-populate fields, cache login details
-                editor.putString(AdminLoginDialogFragment.ADMIN_USERNAME, mUser.getUserName());
-                editor.putString(AdminLoginDialogFragment.ADMIN_PASSWORD, mUser.getPassword());
+                    SharedPreferences sharedPreferences = getActivity().getPreferences(Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putInt(AdminLoginDialogFragment.ADMIN_LOGIN_PREFS, position);
 
-                editor.commit();
-            }
+                    // if position = 1, want auto-populate fields, cache login details
+                    editor.putString(AdminLoginDialogFragment.ADMIN_USERNAME, mUser.getUserName());
+                    editor.putString(AdminLoginDialogFragment.ADMIN_PASSWORD, mUser.getPassword());
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
+                    editor.commit();
+                }
 
-            }
-        });
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+
+        }
 
         mPassword.addTextChangedListener(new TextWatcher() {
             @Override
