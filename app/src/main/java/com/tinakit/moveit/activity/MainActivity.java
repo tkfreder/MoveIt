@@ -237,10 +237,12 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
 
                 break;
 
+            /*
+            // DEBUG: display Database tables
             case R.id.nav_charts:
 
                 startActivity(new Intent(this, AndroidDatabaseManager.class));
-
+                */
              case R.id.nav_coins:
 
                 getSupportActionBar().setTitle(getString(R.string.nav_menu_coins));
@@ -516,43 +518,15 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
 
             if(message != null && message.equals(GoogleApi.GOOGLE_API_INTENT)){
 
+                displayStartScreen();
 
-                ActivityChooser activityChooser = (ActivityChooser)getSupportFragmentManager().findFragmentByTag(ActivityChooser.ACTIVITY_CHOOSER_TAG);
-                if (activityChooser == null) {
+                //unlock Navigation Drawer, originally locked when first launching MainActivity
+                MainActivity.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 
-                    //put a Fragment in the FragmentManager, so just need to call replace when click on nav items
-                    // display ActivityChooser screen first
-                    activityChooser = new ActivityChooser();
-
-                    // display ActivityChooser only after SaveInstanceState
-                    if (getSupportFragmentManager().getBackStackEntryCount() == 0)
-                        getSupportFragmentManager()
-                                .beginTransaction()
-                                .add(R.id.fragmentContainer, activityChooser, ActivityChooser.ACTIVITY_CHOOSER_TAG)
-                                .addToBackStack(null)
-                                .commit();
-                    else
-                        getSupportFragmentManager()
-                                .beginTransaction()
-                                .replace(R.id.fragmentContainer, activityChooser, ActivityChooser.ACTIVITY_CHOOSER_TAG)
-                                .addToBackStack(null)
-                                .commit();
-
-                    //unlock Navigation Drawer, originally locked when first launching MainActivity
-                    MainActivity.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-
-                    //Message listener for GoogleApi to be unregistered at this point
-                    LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mGoogleApiReceiver);
-                }
-                else
-                    getSupportFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.fragmentContainer, activityChooser, ActivityChooser.ACTIVITY_CHOOSER_TAG)
-                            .addToBackStack(null)
-                            .commit();
+                //Message listener for GoogleApi to be unregistered at this point
+                LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mGoogleApiReceiver);
 
             }
-
         }
     };
 
