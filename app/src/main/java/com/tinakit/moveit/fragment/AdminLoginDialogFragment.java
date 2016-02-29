@@ -70,12 +70,12 @@ public class AdminLoginDialogFragment extends DialogFragment {
 
         // Verify that the host activity implements the callback interface
         try {
-            // Instantiate the NoticeDialogListener so we can send events to the host
+            // Instantiate the AdminDialogListener so we can send events to the host
             mListener = (AdminLoginDialogListener) activity;
         } catch (ClassCastException e) {
             // The activity doesn't implement the interface, throw exception
             throw new ClassCastException(activity.toString()
-                    + " must implement NoticeDialogListener");
+                    + " must implement AdminDialogListener");
         }
     }
 
@@ -150,6 +150,8 @@ public class AdminLoginDialogFragment extends DialogFragment {
             }
 
             if(mSharedPreferences.contains(ADMIN_PASSWORD)){
+
+                password.setEnabled(false);
                 password.setText(mSharedPreferences.getString(ADMIN_PASSWORD, ""));
             }
 

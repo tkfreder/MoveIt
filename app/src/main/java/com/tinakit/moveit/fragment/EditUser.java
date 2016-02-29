@@ -66,7 +66,8 @@ public class EditUser extends Fragment {
     protected TextView mAdmin;
     protected Button mSaveButton;
     protected EditText mPassword;
-    protected TextView mEmail;
+    protected EditText mSecretAnswer;
+    protected EditText mEmail;
     protected Spinner mAdminLoginPrefs;
 
     @Nullable
@@ -97,7 +98,8 @@ public class EditUser extends Fragment {
         mAdmin = (TextView)mRootView.findViewById(R.id.isAdmin);
         mSaveButton = (Button)mRootView.findViewById(R.id.saveButton);
         mPassword = (EditText)mRootView.findViewById(R.id.password);
-        mEmail = (TextView)mRootView.findViewById(R.id.email);
+        mSecretAnswer = (EditText)mRootView.findViewById(R.id.secretAnswer);
+        mEmail = (EditText)mRootView.findViewById(R.id.email);
         mAdminLoginPrefs = (Spinner)mRootView.findViewById(R.id.admin_preference_list);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.admin_login_preferences));
@@ -176,7 +178,7 @@ public class EditUser extends Fragment {
             mAdmin.setVisibility(View.VISIBLE);
 
             mPassword.setVisibility(View.VISIBLE);
-            mPassword.setText(mUser.getPassword());
+            //mPassword.setText(mUser.getPassword());
 
             mEmail.setVisibility(View.VISIBLE);
             mEmail.setText(mUser.getEmail());
@@ -208,6 +210,8 @@ public class EditUser extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
+
+                displaySecretQuestion();
 
                 // check for empty field
                 if (s.toString().trim().equals("")){
@@ -250,6 +254,64 @@ public class EditUser extends Fragment {
                     }
                 }
                 */
+            }
+        });
+
+        mPassword.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                displaySecretQuestion();
+            }
+        });
+
+        mEmail.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                displaySecretQuestion();
+            }
+        });
+
+        mSecretAnswer.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                if(mUser.getSecretAnswer().equals(s)){
+                    mSaveButton.setEnabled(true);
+                }
+                else
+                    mSaveButton.setEnabled(false);
             }
         });
 
@@ -557,6 +619,30 @@ public class EditUser extends Fragment {
             return getString(R.string.app_bar_header_new_user);
         else
             return getString(R.string.app_bar_header_edit_user);
+    }
+
+    public static User checkRewardEarned(User user, FitnessDBHelper fitnessDBHelper){
+
+        if (user.getPoints() >= user.getReward().getPoints()) {
+
+            user.setPoints(user.getPoints() - user.getReward().getPoints());
+
+            // insert Reward Earned
+            fitnessDBHelper.insertRewardEarned(user.getReward().getName(), user.getReward().getPoints(), user.getUserId());
+
+            fitnessDBHelper.updateUser(user);
+        }
+
+        return user;
+    }
+
+    private void displaySecretQuestion(){
+
+        // ask for secret answer
+        mSecretAnswer.setVisibility(View.VISIBLE);
+        mSecretAnswer.setError(mUser.getSecretQuestion());
+
+        mSaveButton.setEnabled(false);
     }
 
 }

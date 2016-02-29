@@ -97,7 +97,12 @@
         <item>50</item>
     </string-array>
 
-
+    <!-- activity history search options -->
+    <string-array name="secret_questions">
+        <item>What was the last name of your third grade teacher?</item>
+        <item>What was the name of your childhood crush?</item>
+        <item>Who was your childhood hero?</item>
+    </string-array>
 
     <!-- navigation drawer menu names -->
     <string name="nav_menu_start">Start</string>
@@ -166,6 +171,8 @@
     <string name="message_registration_failed">Registration failed.  Please try again.</string>
     <string name="message_registration_success">Registration complete.</string>
     <string name="message_password_mismatch">Password does not match.</string>
+    <string name="secret_question">Pick a secret question to answer</string>
+    <string name="secret_answer">answer to the secret question</string>
     <string name="message_email_mismatch">Email does not match.</string>
     <string name="message_admin_login_failed">Admin login failed.</string>
     <string name="message_enter_password">Please enter a password</string>
@@ -206,6 +213,7 @@
     <string name="avatar">avatar</string>
     <string name="name">name</string>
     <string name="password">password</string>
+    <string name="new_password">new password</string>
     <string name="confirm_password">confirm password</string>
     <string name="email">email address</string>
     <string name="confirm_email">confirm email</string>

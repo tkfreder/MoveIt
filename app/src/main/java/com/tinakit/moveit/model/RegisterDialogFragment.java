@@ -15,7 +15,10 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.tinakit.moveit.R;
@@ -37,12 +40,14 @@ public class RegisterDialogFragment extends DialogFragment {
     public static final String REGISTER_DIALOG_TAG = "REGISTER_DIALOG_TAG";
 
     // UI components
-    View mView;
-    TextView mUserName;
-    TextView mPassword;
-    TextView mPasswordConfirm;
-    TextView mEmail;
-    TextView mEmailConfirm;
+    protected View mView;
+    protected TextView mUserName;
+    protected TextView mPassword;
+    protected TextView mPasswordConfirm;
+    protected TextView mEmail;
+    protected TextView mEmailConfirm;
+    protected Spinner mSecretQuestion;
+    protected EditText mSecretAnswer;
 
     @Inject
     FitnessDBHelper mDatabaseHelper;
@@ -87,6 +92,12 @@ public class RegisterDialogFragment extends DialogFragment {
         mPasswordConfirm = (TextView)mView.findViewById(R.id.passwordConfirm);
         mEmail = (TextView)mView.findViewById(R.id.email);
         mEmailConfirm = (TextView)mView.findViewById(R.id.emailConfirm);
+        mSecretQuestion = (Spinner)mView.findViewById(R.id.secretQuestion);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.secret_questions));
+        mSecretQuestion.setAdapter(adapter);
+
+        mSecretAnswer = (EditText)mView.findViewById(R.id.secretAnswer);
 
         // Inflate and set the layout for the dialog
         // Pass null as the parent view because its going in the dialog layout
@@ -110,6 +121,8 @@ public class RegisterDialogFragment extends DialogFragment {
                         user.setUserName(mUserName.getText().toString());
                         user.setEmail(mEmail.getText().toString());
                         user.setPassword(mPassword.getText().toString());
+                        user.setSecretQuestion(mSecretQuestion.getSelectedItem().toString());
+                        user.setSecretAnswer(mSecretAnswer.getText().toString());
 
                         // save username and password in SharedPreferences in case admin wants to auto-populate login in the future
                         SharedPreferences sharedPreferences = getActivity().getPreferences(Context.MODE_PRIVATE);

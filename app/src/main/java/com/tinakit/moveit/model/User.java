@@ -22,10 +22,9 @@ public class User  implements Parcelable {
     private String mAvatarFileName;
     private int mPoints;
     private boolean mIsEnabled;
-    //private List<Reward> mRewardList;
     private Reward mReward;
-    private boolean mInitiallyExpanded;
-
+    private String mSecretQuestion;
+    private String mSecretAnswer;
 
     public User(){}
 
@@ -53,11 +52,11 @@ public class User  implements Parcelable {
         mIsAdmin = isAdmin ? 1 : 0;
     }
 
-    public void setEmail(String email) { mEmail = email;}
-
     public void setPassword(String password){ mPassword = password;}
 
     public String getPassword(){ return mPassword;}
+
+    public void setEmail(String email) { mEmail = email;}
 
     public String getEmail () { return mEmail;}
 
@@ -93,6 +92,14 @@ public class User  implements Parcelable {
         mIsEnabled = isEnabled;
     }
 
+    public void setSecretQuestion(String secretQuestion) { mSecretQuestion = secretQuestion;}
+
+    public String getSecretQuestion () { return mSecretQuestion;}
+
+    public void setSecretAnswer(String secretAnswer) { mSecretAnswer = secretAnswer;}
+
+    public String getSecretAnswer () { return mSecretAnswer;}
+
     public boolean hasSameProfile(User user){
 
         if(this.getAvatarFileName().equals(user.getAvatarFileName())
@@ -113,17 +120,6 @@ public class User  implements Parcelable {
     public void setReward(Reward reward) {
         mReward = reward;
     }
-
-    /*
-    @Override
-    public List<Reward> getChildItemList() {
-        return mRewardList;
-    }
-
-    public void setChildItemList(List<Reward> childItemList) {
-        mRewardList = childItemList;
-    }
-*/
 
     @Override
     public boolean equals(Object o) {
@@ -151,6 +147,8 @@ public class User  implements Parcelable {
             mPoints = in.readInt();
             mIsEnabled = in.readByte() != 0x00;
             mReward = (Reward) in.readValue(Reward.class.getClassLoader());
+            mSecretAnswer = in.readString();
+            mSecretQuestion = in.readString();
         }
 
         @Override
@@ -170,6 +168,8 @@ public class User  implements Parcelable {
             dest.writeInt(mPoints);
             dest.writeByte((byte) (mIsEnabled ? 0x01 : 0x00));
             dest.writeValue(mReward);
+            dest.writeString(mSecretAnswer);
+            dest.writeString(mSecretQuestion);
         }
 
         @SuppressWarnings("unused")

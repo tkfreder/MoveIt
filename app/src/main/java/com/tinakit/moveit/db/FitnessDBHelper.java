@@ -64,6 +64,8 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     private static final String KEY_USER_AVATAR_FILENAME = "avatarFileName";
     private static final String KEY_USER_POINTS = "points";
     private static final String KEY_USER_IS_ENABLED = "isEnabled";
+    private static final String KEY_USER_SECRET_QUESTION = "secretQuestion";
+    private static final String KEY_USER_SECRET_ANSWER = "secretAnswer";
 
     //ACTIVITIES TABLE
     private static final String TABLE_ACTIVITIES = "Activities";
@@ -184,7 +186,9 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 KEY_USER_POINTS + " INTEGER, " +
                 KEY_USER_IS_ENABLED + " INTEGER, " +
                 KEY_USER_EMAIL + " TEXT, " +
-                KEY_USER_PASSWORD + " TEXT " +
+                KEY_USER_PASSWORD + " TEXT, " +
+                KEY_USER_SECRET_ANSWER + " TEXT, " +
+                KEY_USER_SECRET_QUESTION + " TEXT " +
                 ")";
 
         String CREATE_ACTIVITY_USERS_TABLE = "CREATE TABLE " + TABLE_ACTIVITY_USERS +
@@ -313,6 +317,8 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 " , u." + KEY_USER_POINTS + " AS " + KEY_USER_POINTS +
                 " , u." + KEY_USER_PASSWORD + " AS " + KEY_USER_PASSWORD +
                 " , u." + KEY_USER_EMAIL + " AS " + KEY_USER_EMAIL +
+                " , u." + KEY_USER_SECRET_QUESTION + " AS " + KEY_USER_SECRET_QUESTION +
+                " , u." + KEY_USER_SECRET_ANSWER + " AS " + KEY_USER_SECRET_ANSWER +
                 " , r." + KEY_REWARD_POINTS + " AS " + KEY_REWARD_POINTS +
                 " , r." + KEY_REWARD_NAME + " AS " + KEY_REWARD_NAME +
                 " FROM " + TABLE_USERS + " u" +
@@ -344,10 +350,10 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
 
         //PLACEHOLDER DATA FOR USERS
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'tina', 1, 125, 'avatar_5', 0, 1, 'tina.k.fredericks@gmail.com', 'tina');"); // ADMIN, third column = 1
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Parent', 0, 175, 'avatar_4', 0, 1, null, null);");
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Sister', 0, 50, 'avatar_3', 0, 1, null, null);");
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Brother', 0, 75, 'avatar_2', 0, 1, null, null);");
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'tina', 1, 125, 'avatar_5', 0, 1, 'tina.k.fredericks@gmail.com', 'tina', null, null);"); // ADMIN, third column = 1
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Parent', 0, 175, 'avatar_4', 0, 1, null, null, null, null);");
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Sister', 0, 50, 'avatar_3', 0, 1, null, null, null, null);");
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Brother', 0, 75, 'avatar_2', 0, 1, null, null, null, null);");
 
         //PLACEHOLDER DATA FOR REWARDS
         db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (1, 'Reward 1', 1, 1);");
@@ -437,7 +443,17 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         try {
 
             Cursor cursor = db.query(VIEW_USERS_REWARDS_DETAIL,
-                    new String[]{KEY_REWARDUSER_USER_ID_FK, KEY_USER_NAME, KEY_USER_IS_ADMIN, KEY_USER_WEIGHT, KEY_USER_AVATAR_FILENAME, KEY_USER_POINTS, KEY_REWARD_NAME, KEY_REWARD_POINTS, KEY_USER_PASSWORD, KEY_USER_EMAIL},
+                    new String[]{KEY_REWARDUSER_USER_ID_FK
+                            , KEY_USER_NAME
+                            , KEY_USER_IS_ADMIN
+                            , KEY_USER_WEIGHT
+                            , KEY_USER_AVATAR_FILENAME
+                            , KEY_USER_POINTS, KEY_REWARD_NAME
+                            , KEY_REWARD_POINTS
+                            , KEY_USER_PASSWORD
+                            , KEY_USER_EMAIL
+                            , KEY_USER_SECRET_QUESTION
+                            , KEY_USER_SECRET_ANSWER},
                     KEY_USER_IS_ENABLED + "= ?", new String[]{"1"}, null, null, KEY_REWARDUSER_USER_ID_FK);
             try{
 
@@ -453,6 +469,9 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                         user.setPoints(cursor.getInt(cursor.getColumnIndex(KEY_USER_POINTS)));
                         user.setPassword(cursor.getString(cursor.getColumnIndex(KEY_USER_PASSWORD)));
                         user.setEmail(cursor.getString(cursor.getColumnIndex(KEY_USER_EMAIL)));
+                        user.setSecretQuestion(cursor.getString(cursor.getColumnIndex(KEY_USER_SECRET_QUESTION)));
+                        user.setSecretAnswer(cursor.getString(cursor.getColumnIndex(KEY_USER_SECRET_ANSWER)));
+
 
                         // create Reward
                         Reward reward = new Reward();
@@ -473,7 +492,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             }
 
         } catch (Exception e) {
-            Log.d(LOGTAG, "Error while trying to get user to database");
+            Log.d(LOGTAG, "Error during getUsers()");
         }
 
         return userList;
@@ -486,7 +505,15 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         try {
 
             Cursor cursor = db.query(TABLE_USERS,
-                    new String[]{KEY_USER_ID, KEY_USER_NAME, KEY_USER_IS_ADMIN, KEY_USER_WEIGHT, KEY_USER_AVATAR_FILENAME, KEY_USER_POINTS},
+                    new String[]{KEY_USER_ID
+                            , KEY_USER_NAME
+                            , KEY_USER_IS_ADMIN
+                            , KEY_USER_WEIGHT
+                            , KEY_USER_AVATAR_FILENAME
+                            , KEY_USER_POINTS
+                            , KEY_USER_EMAIL
+                            , KEY_USER_SECRET_QUESTION
+                            , KEY_USER_SECRET_ANSWER},
                     KEY_USER_NAME + " = ?", new String[]{userName}, null, null, null);
 
             try{
@@ -500,6 +527,9 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                     user.setAvatarFileName(cursor.getString(cursor.getColumnIndex(KEY_USER_AVATAR_FILENAME)));
                     user.setPoints(cursor.getInt(cursor.getColumnIndex(KEY_USER_POINTS)));
                     user.setPassword(cursor.getString(cursor.getColumnIndex(KEY_USER_PASSWORD)));
+                    user.setEmail(cursor.getString(cursor.getColumnIndex(KEY_USER_EMAIL)));
+                    user.setSecretQuestion(cursor.getString(cursor.getColumnIndex(KEY_USER_SECRET_QUESTION)));
+                    user.setSecretAnswer(cursor.getString(cursor.getColumnIndex(KEY_USER_SECRET_ANSWER)));
                 }
 
             } finally{
@@ -511,7 +541,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             }
 
         } catch (Exception e) {
-            Log.d(LOGTAG, "Error while trying to get user to database");
+            Log.d(LOGTAG, "Error during getUser()");
         }
 
         return user;
@@ -529,7 +559,17 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             */
 
             Cursor cursor = db.query(VIEW_USERS_REWARDS_DETAIL,
-                    new String[]{KEY_REWARDUSER_USER_ID_FK, KEY_USER_NAME, KEY_USER_IS_ADMIN, KEY_USER_WEIGHT, KEY_USER_AVATAR_FILENAME, KEY_USER_POINTS, KEY_REWARD_NAME, KEY_REWARD_POINTS, KEY_USER_PASSWORD},
+                    new String[]{KEY_REWARDUSER_USER_ID_FK
+                            , KEY_USER_NAME
+                            , KEY_USER_IS_ADMIN
+                            , KEY_USER_WEIGHT
+                            , KEY_USER_AVATAR_FILENAME
+                            , KEY_USER_POINTS
+                            , KEY_REWARD_NAME
+                            , KEY_REWARD_POINTS
+                            , KEY_USER_PASSWORD
+                            , KEY_USER_SECRET_QUESTION
+                            , KEY_USER_SECRET_ANSWER},
                     KEY_USER_IS_ENABLED + "= ?", new String[]{"1"}, null, null, KEY_REWARDUSER_USER_ID_FK);
 
             try{
@@ -543,6 +583,52 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                     user.setAvatarFileName(cursor.getString(cursor.getColumnIndex(KEY_USER_AVATAR_FILENAME)));
                     user.setPoints(cursor.getInt(cursor.getColumnIndex(KEY_USER_POINTS)));
                     user.setPassword(cursor.getString(cursor.getColumnIndex(KEY_USER_PASSWORD)));
+                    user.setSecretQuestion(cursor.getString(cursor.getColumnIndex(KEY_USER_SECRET_QUESTION)));
+                    user.setSecretAnswer(cursor.getString(cursor.getColumnIndex(KEY_USER_SECRET_ANSWER)));
+
+                    // create Reward
+                    Reward reward = new Reward();
+                    reward.setName(cursor.getString(cursor.getColumnIndex(KEY_REWARD_NAME)));
+                    reward.setPoints(cursor.getInt(cursor.getColumnIndex(KEY_REWARD_POINTS)));
+                    user.setReward(reward);
+                }
+
+            } finally{
+
+                if (cursor != null && !cursor.isClosed())
+                {
+                    cursor.close();
+                }
+            }
+
+        } catch (Exception e) {
+            Log.d(LOGTAG, "Error during getUser(userId)");
+        }
+
+        return user;
+    }
+
+    public User getSecret(User user)
+    {
+
+        try {
+
+            /*Cursor cursor = db.query(TABLE_USERS,
+                    new String[]{KEY_USER_ID, KEY_USER_NAME, KEY_USER_IS_ADMIN, KEY_USER_WEIGHT, KEY_USER_AVATAR_FILENAME, KEY_USER_POINTS},
+                    KEY_USER_ID + " = ?", new String[]{String.valueOf(userId)}, null, null, null);
+            */
+
+            Cursor cursor = db.query(TABLE_USERS,
+                    new String[]{KEY_USER_SECRET_QUESTION
+                            , KEY_USER_SECRET_ANSWER},
+                    KEY_USER_ID + "= ?", new String[]{String.valueOf(user.getUserId())}, null, null, KEY_REWARDUSER_USER_ID_FK);
+
+            try{
+
+                if (cursor.moveToFirst())
+                {
+                    user.setSecretQuestion(cursor.getString(cursor.getColumnIndex(KEY_USER_SECRET_QUESTION)));
+                    user.setSecretAnswer(cursor.getString(cursor.getColumnIndex(KEY_USER_SECRET_ANSWER)));
 
                     // create Reward
                     Reward reward = new Reward();
@@ -672,6 +758,8 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             values.put(KEY_USER_AVATAR_FILENAME, user.getAvatarFileName());
             values.put(KEY_USER_POINTS, user.getPoints());
             values.put(KEY_USER_PASSWORD, user.getPassword());
+            values.put(KEY_USER_SECRET_QUESTION, user.getSecretQuestion());
+            values.put(KEY_USER_SECRET_ANSWER, user.getSecretAnswer());
 
             rowsAffected = db.update(TABLE_USERS, values, KEY_USER_ID + "= ?", new String[]{String.valueOf(user.getUserId())});
 
@@ -1454,7 +1542,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             //KEY_REWARDUSER_REWARD_STATUS_ID + " INTEGER " +
             ")";
 
-    public void insertRewardEarned(String rewardName, int rewardPoints, int userId, int activityId){
+    public void insertRewardEarned(String rewardName, int rewardPoints, int userId){
 
         db.beginTransaction();
         try {

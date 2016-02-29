@@ -106,16 +106,33 @@
                     android:minWidth="@dimen/min_width_long_edit_text"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword"
-                    android:hint="@string/password"
+                    android:hint="@string/new_password"
                     android:visibility="gone"
                     />
+                </android.support.design.widget.TextInputLayout>
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/secretAnswerLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/passwordLayout"
+                    android:gravity="center"
+                    >
+                    <EditText
+                        android:id="@+id/secretAnswer"
+                        android:layout_width="wrap_content"
+                        android:minWidth="@dimen/min_width_long_edit_text"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:hint="@string/secret_answer"
+                        android:visibility="gone"
+                        />
                 </android.support.design.widget.TextInputLayout>
 
 
             </RelativeLayout>
 
         </RelativeLayout>
-    <TextView
+    <EditText
         android:id="@+id/email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -78,4 +78,15 @@
         android:layout_marginBottom="16dp"
         android:fontFamily="sans-serif"
         android:hint="@string/confirm_email"/>
+    <Spinner
+        android:id="@+id/secretQuestion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/secret_question"></Spinner>
+    <EditText
+        android:id="@+id/secretAnswer"
+        android:layout_width="@dimen/button_long"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:hint="@string/secret_answer"/>
 </LinearLayout>

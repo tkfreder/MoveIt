@@ -90,6 +90,22 @@ public class EditReward extends Fragment {
                     Snackbar.make(mRootView.findViewById(R.id.main_layout), getString(R.string.error_message_update_reward), Snackbar.LENGTH_LONG)
                             .show();
                 }
+
+
+                //check whether user does not already have a reward.  if so, check whether user has enough points to earn their reward
+                List<User> userList = mDatabaseHelper.getUsers();
+
+                for (User user : userList){
+                    boolean isFulfilled = false;
+                    Reward reward = mDatabaseHelper.getRewardEarned(user.getUserId(), isFulfilled);
+
+                    // update user total points, if we were able to get a valid point value for the reward
+                    if (reward != null) {
+
+                        user = EditUser.checkRewardEarned(user, mDatabaseHelper);
+                    }
+
+                }
             }
         });
 

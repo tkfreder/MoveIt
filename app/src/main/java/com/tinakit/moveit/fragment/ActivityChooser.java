@@ -51,7 +51,6 @@ import fr.ganfra.materialspinner.MaterialSpinner;
  */
 public class ActivityChooser  extends Fragment {
 
-
     // CONSTANTS
     private static final boolean DEBUG = true;
     public static final String ACTIVITY_CHOOSER_TAG= "ACTIVITY_CHOOSER_TAG";
@@ -59,8 +58,6 @@ public class ActivityChooser  extends Fragment {
     public static final String USER_ACTIVITY_LIST_KEY = "USER_ACTIVITY_LIST_KEY";
     public static final int PICK_AVATAR_REQUEST = 2;
     public static final int ENABLE_GPS = 3;
-
-
 
     @Inject
     GoogleApi mGoogleApi;
@@ -87,7 +84,6 @@ public class ActivityChooser  extends Fragment {
     protected Button mNextButton;
     private ViewGroup mContainer;
 
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -107,11 +103,9 @@ public class ActivityChooser  extends Fragment {
         mLocationApi = new LocationApi(mFragmentActivity, mGoogleApi.client());
 
         if(mLocationApi.hasLocationService()){
-
             initializeUI();
             setActionListeners();
         }
-
         return rootView;
     }
 
@@ -129,11 +123,8 @@ public class ActivityChooser  extends Fragment {
                 intent.putParcelableArrayListExtra(USER_ACTIVITY_LIST_KEY, mUserActivityList);
                 startActivity(intent);
 */
-
-
                 // sort activity list first
                 Collections.sort(mUserActivityList);
-
                 Bundle bundle = new Bundle();
                 bundle.putParcelableArrayList(USER_ACTIVITY_LIST_KEY, mUserActivityList);
                 ActivityTracker activityTracker = new ActivityTracker();

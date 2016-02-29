@@ -12,6 +12,7 @@ import com.tinakit.moveit.fragment.AdminLoginDialogFragment;
 import com.tinakit.moveit.fragment.EditReward;
 import com.tinakit.moveit.fragment.EditUser;
 import com.tinakit.moveit.fragment.MapFragment;
+import com.tinakit.moveit.fragment.SecretQuestionDialogFragment;
 import com.tinakit.moveit.fragment.UserProfile;
 import com.tinakit.moveit.fragment.UserStats;
 import com.tinakit.moveit.fragment.UserStatsMain;
@@ -54,4 +55,5 @@ public interface AppComponent {
     void inject(AdminInBox adminInBox);
     void inject(RegisterDialogFragment registerDialogFragment);
     void inject(AdminLoginDialogFragment adminLoginDialogFragment);
+    void inject(SecretQuestionDialogFragment secretQuestionDialogFragment);
 }

@@ -498,14 +498,13 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
 
             if(message != null && message.equals(GoogleApi.GOOGLE_API_INTENT)){
 
-                displayStartScreen();
-
                 //unlock Navigation Drawer, originally locked when first launching MainActivity
                 MainActivity.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 
                 //Message listener for GoogleApi to be unregistered at this point
                 LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mGoogleApiReceiver);
 
+                displayStartScreen();
             }
         }
     };
