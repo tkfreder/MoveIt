@@ -64,100 +64,66 @@ public class ActivityHistory extends Fragment {
     protected TextView mNoActivities;
     protected Spinner mLimitCountSpinner;
 
-
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mFragmentActivity  = (FragmentActivity)super.getActivity();
         rootView = inflater.inflate(R.layout.activity_history, container, false);
-
-        //mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
         // Dagger 2 injection
         ((CustomApplication)getActivity().getApplication()).getAppComponent().inject(this);
-
         initializeUI();
-
         fetchData();
 
         return rootView;
     }
 
     private void fetchData(){
-
-
         // get UserActivityList from intent
-
         Bundle bundle = this.getArguments();
         if (bundle != null && bundle.containsKey(ACTIVITY_HISTORY_KEY)){
-
             mActivityDetailList = bundle.getParcelableArrayList(ACTIVITY_HISTORY_KEY);
         }
         else{
-
             // if this is the first time, fetch directly from the database
             mActivityDetailList = mDatabaseHelper.getActivityDetailList(ACTIVITY_LIMIT_COUNT);
-
             if (mActivityDetailList.size() == 0){
-                //mNoActivities.setVisibility(View.VISIBLE);
                 mNoActivities.setVisibility(View.GONE);
             }
             else{
                 mNoActivities.setVisibility(View.GONE);
             }
-
         }
-
         setAdapter();
-
     }
 
     private void initializeUI(){
-
-
-        //List<ActivityDetail> activityDetailList = mDatabaseHelper.getActivityDetailList();
-
         //noActivities TextView
         mNoActivities = (TextView)rootView.findViewById(R.id.noActivities);
-
         // Initialize recycler view
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true); //child items have fixed dimensions, allows the RecyclerView to optimize better by figuring out the exact height and width of the entire list based on the adapter.
-
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mFragmentActivity);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(linearLayoutManager);
-
-
         mLimitCountSpinner = (Spinner)rootView.findViewById(R.id.numActivities);
-        ArrayAdapter<String> adapterMonth = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.activity_count));
-        mLimitCountSpinner.setAdapter(adapterMonth);
-
+        mLimitCountSpinner.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.activity_count)));
         mLimitCountSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
                 doSearch();
-
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
             }
         });
-
     }
 
     public class ActivityHistoryRecyclerAdapter extends RecyclerView.Adapter<ActivityHistoryRecyclerAdapter.CustomViewHolder> {
-
         private Context mContext;
         private List<ActivityDetail> activityDetailList;
 
-
         public ActivityHistoryRecyclerAdapter(Context context, List<ActivityDetail> activityDetailList) {
-
             mContext = context;
             this.activityDetailList = activityDetailList;
         }
@@ -168,7 +134,6 @@ public class ActivityHistory extends Fragment {
         }
 
         public class CustomViewHolder extends RecyclerView.ViewHolder {
-
             TextView date;
             TextView minutesElapsed;
             TextView place;
@@ -176,7 +141,6 @@ public class ActivityHistory extends Fragment {
             ImageView deleteButton;
 
             public CustomViewHolder(View view) {
-
                 super(view);
                 this.date = (TextView)view.findViewById(R.id.date);
                 this.minutesElapsed = (TextView)view.findViewById(R.id.minutesElapsed);
@@ -189,51 +153,38 @@ public class ActivityHistory extends Fragment {
 
         @Override
         public ActivityHistoryRecyclerAdapter.CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-
             View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.activity_history_list_item, viewGroup, false);
             CustomViewHolder viewHolder = new CustomViewHolder(view);
-
             return viewHolder;
         }
 
         private void setList(List<ActivityDetail> activityDetailList){
-
             mActivityDetailList = activityDetailList;
             notifyDataSetChanged();
-
         }
 
         @Override
         public void onBindViewHolder(ActivityHistoryRecyclerAdapter.CustomViewHolder customViewHolder, int i) {
-
             ActivityDetail activityDetail = activityDetailList.get(i);
-
             customViewHolder.date.setText(DateUtility.getDateFormattedRecent(activityDetail.getStartDate(), 7));
             float minutes = UnitConverter.convertMillisecondsToUnits(activityDetail.getEndDate().getTime() - activityDetail.getStartDate().getTime(), UnitConverter.TimeUnits.MINUTES);
-
             float hour = 0;
             if (minutes > 60){
-
                 // hour
                 hour = minutes / 60;
             }
             String minutesElapsed = String.format("%02d", Math.round(hour)) + ":" + String.format("%02d", Math.round(minutes));
             customViewHolder.minutesElapsed.setText(minutesElapsed);
-
             String street = Map.getLocationDetailByParams(mContext, activityDetail.getStartLocation(), 0);
-
             customViewHolder.place.setText(street.substring(0, street.length() > PLACE_NUM_CHARS ? PLACE_NUM_CHARS : street.length()) + "...");
 
             int imageSize = APPROX_SIZE_AVATAR_IMAGES / DEFAULT_USER_LIST_SIZE;
-
             for (UserActivity userActivity : activityDetail.getUserActivityList()){
-
                 ImageView avatar = new ImageView(mContext);
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(imageSize,imageSize);
                 avatar.setLayoutParams(params);
                 avatar.setImageResource(getResources().getIdentifier(userActivity.getUser().getAvatarFileName(), "drawable", mFragmentActivity.getPackageName()));
                 customViewHolder.userLinearLayout.addView(avatar);
-
             }
 
             final ImageView deleteButton = customViewHolder.deleteButton;
@@ -242,9 +193,7 @@ public class ActivityHistory extends Fragment {
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
                     final int activityId = (int) v.getTag();
-
                     AlertDialog alertDialog = new AlertDialog.Builder(
                             mFragmentActivity,
                             R.style.AlertDialogCustom_Destructive)
@@ -265,48 +214,39 @@ public class ActivityHistory extends Fragment {
 
                                             // delete the reward associated with this user
                                             mDatabaseHelper.deleteRewardEarned(reward.getRewardId());
-
                                             User user = mDatabaseHelper.getUser(entry.getKey());
-
                                             // if the point value of the reward is greater than the points earned from the activity,
                                             // credit the difference to the user
                                             if (reward.getPoints() > entry.getValue()) {
-
                                                 mDatabaseHelper.updateUserPoints(user, reward.getPoints() - entry.getValue());
                                             }
-
                                             // after crediting or debiting points, check if user's total points earns her a reward
                                             // get the latest user data
                                             user = mDatabaseHelper.getUser(entry.getKey());
-
+                                            user = EditUser.checkRewardEarned(user, mDatabaseHelper);
+                                            /*
                                             if (user.getPoints() >= user.getReward().getPoints()) {
 
                                                 user.setPoints(user.getPoints() - user.getReward().getPoints());
 
                                                 // insert Reward Earned
-                                                mDatabaseHelper.insertRewardEarned(user.getReward().getName(), user.getReward().getPoints(), user.getUserId(), activityId);
+                                                mDatabaseHelper.insertRewardEarned(user.getReward().getName(), user.getReward().getPoints(), user.getUserId());
 
                                                 mDatabaseHelper.updateUser(user);
                                             }
-
+                                            */
                                         }
-
                                     }
-
                                     // delete references to this activity in Activities, ActivityUsers, ActivityLocationData
                                     if (mDatabaseHelper.deleteActivity(activityId)) {
-
                                         //Snackbar.make(rootView.findViewById(R.id.main_layout), getString(R.string.message_activity_deleted), Snackbar.LENGTH_LONG)
                                         //        .show();
                                         //setList(mDatabaseHelper.getActivityDetailList(ACTIVITY_LIMIT_COUNT));
                                         //mActivityHistoryRecyclerAdapter.notifyItemRemoved((int) deleteButton.getTag(R.id.TAG_ACTIVITY_HISTORY_DELETE));
-
-
                                         int position = (int) deleteButton.getTag(R.id.TAG_ACTIVITY_HISTORY_DELETE);
                                         mActivityDetailList.remove(position);
                                         mActivityHistoryRecyclerAdapter.notifyItemRemoved(position);
                                     }
-
                                 }
                             })
                             .setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
@@ -314,34 +254,25 @@ public class ActivityHistory extends Fragment {
                                 public void onClick(DialogInterface dialogInterface, int i) {
                                     // Cancel Action
                                     //don't do anything
-
                                 }
                             })
                             .setTitle(R.string.title_delete_activity)
                             .setMessage(R.string.message_delete_activity)
                             .show();
-
-
                 }
             });
-
         }
     }
 
     private void doSearch(){
-
         mActivityDetailList = mDatabaseHelper.getActivityDetailList(Integer.parseInt(mLimitCountSpinner.getSelectedItem().toString()));
-
         setAdapter();
     }
 
     private void setAdapter(){
-
         mActivityDetailList = mDatabaseHelper.getActivityDetailList(ACTIVITY_LIMIT_COUNT);
         mActivityHistoryRecyclerAdapter = new ActivityHistoryRecyclerAdapter(mFragmentActivity, mActivityDetailList);
         mRecyclerView.setAdapter(mActivityHistoryRecyclerAdapter);
         mActivityHistoryRecyclerAdapter.notifyDataSetChanged();
-
     }
-
 }
