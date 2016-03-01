@@ -201,28 +201,28 @@ public class ActivityHistory extends Fragment {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
 
-                                    java.util.Map<Integer, Integer> userIdList = mDatabaseHelper.getActivityUsers(activityId);
+                                    android.util.SparseArray<Integer> userIdList = mDatabaseHelper.getActivityUsers(activityId);
 
-                                    for (java.util.Map.Entry<Integer, Integer> entry : userIdList.entrySet()) {
+                                    for (int index = 0; index < userIdList.size(); index++) {
 
                                         // check if user has a reward earned but not fulfilled, if so, remove that reward
                                         boolean isFulfilled = false;
-                                        Reward reward = mDatabaseHelper.getRewardEarned(entry.getKey(), isFulfilled);
+                                        Reward reward = mDatabaseHelper.getRewardEarned(index, isFulfilled);
 
                                         // update user total points, if we were able to get a valid point value for the reward
                                         if (reward != null) {
 
                                             // delete the reward associated with this user
                                             mDatabaseHelper.deleteRewardEarned(reward.getRewardId());
-                                            User user = mDatabaseHelper.getUser(entry.getKey());
+                                            User user = mDatabaseHelper.getUser(index);
                                             // if the point value of the reward is greater than the points earned from the activity,
                                             // credit the difference to the user
-                                            if (reward.getPoints() > entry.getValue()) {
-                                                mDatabaseHelper.updateUserPoints(user, reward.getPoints() - entry.getValue());
+                                            if (reward.getPoints() > userIdList.get(index)) {
+                                                mDatabaseHelper.updateUserPoints(user, reward.getPoints() - userIdList.get(index));
                                             }
                                             // after crediting or debiting points, check if user's total points earns her a reward
                                             // get the latest user data
-                                            user = mDatabaseHelper.getUser(entry.getKey());
+                                            user = mDatabaseHelper.getUser(index);
                                             user = EditUser.checkRewardEarned(user, mDatabaseHelper);
                                             /*
                                             if (user.getPoints() >= user.getReward().getPoints()) {

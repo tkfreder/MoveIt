@@ -11,6 +11,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
 import android.util.Log;
+import android.util.SparseArray;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.tinakit.moveit.model.ActivityDetail;
@@ -1009,9 +1010,9 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
             " INNER JOIN " + TABLE_ACTIVITY_TYPE + " t on t." + KEY_ACTIVITY_TYPE_ID + " = a." + KEY_ACTIVITY_USERS_ACTIVITY_TYPE_ID_FK;
 
 
-    public Map<Integer, Integer> getActivityUsers(int activityId){
+    public SparseArray<Integer> getActivityUsers(int activityId){
 
-        Map<Integer, Integer> userPointList = new HashMap<>();
+        SparseArray<Integer> userPointList = new SparseArray<>();
 
         try {
 
