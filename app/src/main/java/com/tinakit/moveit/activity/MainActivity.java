@@ -65,7 +65,6 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
     public static DrawerLayout mDrawerLayout;
     private Menu mMenu;
 
-
     @Inject
     GoogleApi mGoogleApi;
 
@@ -91,23 +90,17 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
     }
 
     private void initialize(){
-
         // DI
         ((CustomApplication)getApplication()).getAppComponent().inject(this);
-
         //end the activity if Google Play Services is not present
         //redirect user to Google Play Services
-
         if (!mGoogleApi.servicesAvailable(this))
             finish();
         else
             mGoogleApi.buildGoogleApiClient(this);
-
         // get data before initializing UI, need data to pass to ViewPager
         fetchData();
-
         initializeUI();
-
         // this should be called once, so defined in onCreate and not in onResume
         LocalBroadcastManager.getInstance(this).registerReceiver(mGoogleApiReceiver, new IntentFilter(GoogleApi.GOOGLE_API_INTENT));
 
@@ -132,44 +125,32 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
     //**********************************************************************************************
 
     private void initializeUI(){
-
         // Toolbar
         setSupportActionBar((Toolbar)findViewById(R.id.toolBar));
-
         // set title
         getSupportActionBar().setTitle(getString(R.string.nav_menu_start));
-
-
         // Actionbar
         final ActionBar actionBar = getSupportActionBar();
-
         // enable ActionBar app icon to behave as action to toggle nav drawer
         actionBar.setHomeAsUpIndicator(R.drawable.ic_hamburger);
         actionBar.setDisplayHomeAsUpEnabled(true);
-
         // Navigation Drawer
         initializeNavigationDrawer();
     }
 
     private void initializeNavigationDrawer(){
-
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-
         NavigationView navigationView = (NavigationView)findViewById(R.id.navigation_view);
         navigationView.setItemIconTintList(null);
-
         if (navigationView != null){
-
             setupDrawerContent(navigationView);
         }
-
         //lock Navigation Drawer, until we gain connection to GoogleApi
         MainActivity.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
     }
 
     private void setupDrawerContent(final NavigationView navigationView){
-
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
@@ -180,32 +161,23 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
                         return true;
                     }
                 });
-
         // set random background image
         Random randomGenerator = new Random();
         int randomInt = randomGenerator.nextInt(8);
-
-
         NavigationView navView = (NavigationView)findViewById(R.id.navigation_view);
         View header = navView.getHeaderView(0);
-
         //RelativeLayout drawerBackgroundLayout = (RelativeLayout)findViewById(R.id.navigation_view).findViewById(R.id.drawer_background);
-
         //header.setBackground(ContextCompat.getDrawable(this, getResources().getIdentifier("background_" + String.valueOf(randomInt), "drawable", getPackageName())));
-
         int resourceId = -1;
 
         try{
             resourceId = R.drawable.class.getField("background_" + String.valueOf(randomInt)).getInt(null);
             header.setBackground(ContextCompat.getDrawable(this, resourceId));
-
         } catch(NoSuchFieldException nsfe){
             nsfe.printStackTrace();
         } catch(IllegalAccessException iae){
             iae.printStackTrace();
         }
-
-
     }
 
     private void callMenuItemAction(int id){
@@ -249,20 +221,6 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
                         .replace(R.id.fragmentContainer, admin, Admin.ADMIN_TAG)
                         .addToBackStack(Admin.ADMIN_BACKSTACK_NAME)
                         .commit();
-                /*
-                // check admin login preferences to see if we need to display login
-                SharedPreferences sharedPreferences = getPreferences(Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                if (sharedPreferences.contains(AdminLoginDialogFragment.ADMIN_LOGIN_PREFS)){
-                    showAdminLoginDialog();
-                    }
-                else {
-                    editor.putInt(AdminLoginDialogFragment.ADMIN_LOGIN_PREFS, 0);
-                    editor.commit();
-                    showAdminLoginDialog();
-                }
-                break;
-                */
         }
     }
 
@@ -294,21 +252,17 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
     }
 
     private void displayStartScreen(){
-
         getSupportActionBar().setTitle(getString(R.string.nav_menu_start));
-
         // check whether UserProfile is already visible
         ActivityChooser activityChooser = (ActivityChooser)getSupportFragmentManager().findFragmentByTag(ActivityChooser.ACTIVITY_CHOOSER_TAG);
         if (activityChooser == null) {
             activityChooser = new ActivityChooser();
         }
-
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragmentContainer, activityChooser, ActivityChooser.ACTIVITY_CHOOSER_TAG)
                 .addToBackStack(ActivityChooser.ACTIVITY_CHOOSER_BACKSTACK_TAG)
                 .commit();
-
     }
 
     //**********************************************************************************************
@@ -369,16 +323,13 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
 
         // unregister receiver
         //LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mMessageReceiver);
-
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
-
         // save menu
         mMenu = menu;
-
         return true;
     }
 
@@ -388,17 +339,13 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
             case android.R.id.home:
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
-
         }
-
         callMenuItemAction(item.getItemId());
-
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-
         // unregister receiver to prevent illegal state exception with FragmentManager operations
         LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mGoogleApiReceiver);
         super.onSaveInstanceState(outState);
@@ -406,10 +353,8 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
-
         super.onRestoreInstanceState(savedInstanceState);
         LocalBroadcastManager.getInstance(this).registerReceiver(mGoogleApiReceiver, new IntentFilter(GoogleApi.GOOGLE_API_INTENT));
-
     }
 
     //**********************************************************************************************
@@ -443,31 +388,23 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
         if(requestCode == EditUser.PICK_AVATAR_REQUEST){
-
             if (resultCode == Activity.RESULT_OK){
-
                 EditUser editUser = (EditUser)getSupportFragmentManager().findFragmentByTag(EditUser.EDIT_USER_TAG);
                 editUser.onActivityResult(requestCode, resultCode, data);
             }
         }
         else if (requestCode == ActivityChooser.PICK_AVATAR_REQUEST){
-
             if (resultCode == Activity.RESULT_OK){
-
                 ActivityChooser activityChooser = (ActivityChooser)getSupportFragmentManager().findFragmentByTag(ActivityChooser.ACTIVITY_CHOOSER_TAG);
                 activityChooser.onActivityResult(requestCode, resultCode, data);
             }
         }
         else if (requestCode == ActivityChooser.ENABLE_GPS){
-
             // Back button pressed = RESULT_CANCELLED
             if (resultCode == Activity.RESULT_CANCELED){
-
                 finish();
             }
         }
-
     }
 }
