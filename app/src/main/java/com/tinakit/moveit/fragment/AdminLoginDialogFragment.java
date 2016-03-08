@@ -41,14 +41,11 @@ public class AdminLoginDialogFragment extends DialogFragment {
     public static final String ADMIN_PASSWORD = "ADMIN_PASSWORD";
 
     protected SharedPreferences mSharedPreferences;
-
     protected Spinner mSpinner;
     protected View mView;
 
-
     @Inject
     FitnessDBHelper mDatabaseHelper;
-
     /* The activity that creates an instance of this dialog fragment must
         * implement this interface in order to receive event callbacks.
         * Each method passes the DialogFragment in case the host needs to query it. */

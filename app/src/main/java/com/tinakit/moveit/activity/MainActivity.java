@@ -225,18 +225,11 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
     }
 
     private void callMenuItemAction(int id){
-
         switch(id){
-
             case R.id.nav_start:
-
                 removeChildFragment();
-
                 displayStartScreen();
-
-
                 break;
-
             /*
             // DEBUG: display Database tables
             case R.id.nav_charts:
@@ -244,16 +237,11 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
                 startActivity(new Intent(this, AndroidDatabaseManager.class));
                 */
              case R.id.nav_coins:
-
                 getSupportActionBar().setTitle(getString(R.string.nav_menu_coins));
-
                 removeChildFragment();
-
                 UserStatsMain userStatsMain = (UserStatsMain)getSupportFragmentManager().findFragmentByTag(UserStatsMain.USER_STATS_TAG);
                 if (userStatsMain == null) {
-
                     userStatsMain = new UserStatsMain();
-
                 }
                 //replace current fragment
                 getSupportFragmentManager()
@@ -261,74 +249,43 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
                         .replace(R.id.fragmentContainer, userStatsMain, UserStatsMain.USER_STATS_TAG)
                         .addToBackStack(UserStatsMain.USER_STATS_BACKSTACK_NAME)
                         .commit();
-
                 break;
 
             case R.id.nav_admin:
             case R.id.action_settings:
-
+                getSupportActionBar().setTitle(getString(R.string.nav_menu_admin));
+                removeChildFragment();
+                Admin admin = (Admin)getSupportFragmentManager().findFragmentByTag(Admin.ADMIN_TAG);
+                if (admin == null) {
+                    admin = new Admin();
+                }
+                //replace current fragment
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragmentContainer, admin, Admin.ADMIN_TAG)
+                        .addToBackStack(Admin.ADMIN_BACKSTACK_NAME)
+                        .commit();
+                /*
                 // check admin login preferences to see if we need to display login
                 SharedPreferences sharedPreferences = getPreferences(Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-
                 if (sharedPreferences.contains(AdminLoginDialogFragment.ADMIN_LOGIN_PREFS)){
-
                     showAdminLoginDialog();
                     }
-
                 else {
-
                     editor.putInt(AdminLoginDialogFragment.ADMIN_LOGIN_PREFS, 0);
                     editor.commit();
                     showAdminLoginDialog();
                 }
-
-
                 break;
-
-            /*
-            case R.id.nav_history:
-
-                getSupportActionBar().setTitle(getString(R.string.history));
-
-                ActivityHistory activityHistory = (ActivityHistory)getSupportFragmentManager().findFragmentByTag(ActivityHistory.ACTIVITY_HISTORY_TAG);
-                if (activityHistory == null) {
-
-                    activityHistory = new ActivityHistory();
-                    //replace current fragment with Rewards fragment
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, activityHistory).commit();
-
-                }
-
-                break;
-
-            case R.id.nav_user_profiles:
-
-                getSupportActionBar().setTitle(getString(R.string.user_profiles));
-
-                // check whether UserProfile does not exist
-                UserProfile userProfile = (UserProfile)getSupportFragmentManager().findFragmentByTag(UserProfile.USER_PROFILE_TAG);
-                if (userProfile == null){
-
-                    userProfile= new UserProfile ();
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, userProfile).commit();
-
-                }
-
-                break;
-
-*/
-
+                */
         }
     }
 
     private void removeChildFragment(){
-
         EditUser editUser = (EditUser) getSupportFragmentManager().findFragmentByTag(EditUser.EDIT_USER_TAG);
         if (editUser != null && editUser.isVisible()) {
-
             getSupportFragmentManager().popBackStack();
-
         }
     }
 
@@ -339,26 +296,17 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
 
     @Override
     public void onBackPressed() {
-
         if(selectedFragment == null || !selectedFragment.onBackPressed()) {
             // Selected fragment did not consume the back press event.
-
             int count = getSupportFragmentManager().getBackStackEntryCount();
-
             if (count == 0 || count == 1)
                 finish();
-
             else{
-
                 getSupportFragmentManager().popBackStack();
-
                 int size = getSupportFragmentManager().getBackStackEntryCount();
                 getSupportActionBar().setTitle(getSupportFragmentManager().getBackStackEntryAt(size - 2).getName());
-
             }
         }
-
-
     }
 
     private void displayStartScreen(){
