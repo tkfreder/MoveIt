@@ -35,7 +35,7 @@
     </style>
 
     <style name="HeaderFont">
-        <item name="android:textSize">40sp</item>
+        <item name="android:textSize">35sp</item>
         <item name="android:textColor">#551a8b</item>
         <item name="android:typeface">serif</item>
     </style>

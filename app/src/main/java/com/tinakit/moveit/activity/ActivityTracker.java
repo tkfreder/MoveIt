@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.location.Location;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -44,6 +45,7 @@ import com.tinakit.moveit.module.CustomApplication;
 import com.tinakit.moveit.utility.CalorieCalculator;
 import com.tinakit.moveit.utility.ChronometerUtility;
 import com.tinakit.moveit.utility.UnitConverter;
+import com.tinakit.moveit.utility.DialogUtility;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -90,8 +92,6 @@ public class ActivityTracker extends BackHandledFragment {
     private int mTotalPoints = 0;
     protected static boolean mRequestedService = false;
     private long mTimeElapsed = 0; //in seconds
-    private boolean mIsTimeLimit = false;
-    private Intent mIntent;
     private static boolean mWarningIsVisible = false;
 
     // APIs
@@ -120,6 +120,7 @@ public class ActivityTracker extends BackHandledFragment {
     private TextView mFeetPerMinute;
     private TextView mMessage;
     private ViewGroup mContainer;
+    private TextView mBatteryLevel;
 
     // INSTANCE FIELDS
     private ActivityDetail mActivityDetail;
@@ -154,6 +155,7 @@ public class ActivityTracker extends BackHandledFragment {
         mMessage = (TextView) rootView.findViewById(R.id.message);
         mMapFragment = new MapFragment(getActivity().getSupportFragmentManager(), getActivity());
         mMapFragment.addMap(R.id.map_container, mContainer);
+        mBatteryLevel = (TextView)rootView.findViewById(R.id.batteryLevel);
 
         setButtonOnClickListeners();
         initializeData();
@@ -244,6 +246,8 @@ public class ActivityTracker extends BackHandledFragment {
 
             public void onClick(View v) {
                 stopRun();
+
+                /*
                 // cancel HandlerTask if it's running
                 stopRepeatingTask();
                 //get timestamp of end
@@ -271,6 +275,7 @@ public class ActivityTracker extends BackHandledFragment {
                             .show();
                     playSound(AUDIO_ADD_POINTS);
                 }
+                */
             }
         });
 
@@ -385,6 +390,57 @@ public class ActivityTracker extends BackHandledFragment {
 
         //display map of starting point
         mMapFragment.displayStartMap();
+
+        // register battery charge listener
+        getActivity().registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+
+        //TODO: DEBUG
+        startScheduledExecutorService();
+        // register receiver for low battery level
+        getActivity().registerReceiver(mBatteryLowReceiver, new IntentFilter(
+                Intent.ACTION_BATTERY_CHANGED));
+    }
+
+    private BroadcastReceiver mBatteryLowReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            stopRun();
+            DialogUtility.displayAlertDialog(getActivity(), getString(R.string.title_battery_low), getString(R.string.message_battery_low_auto_shutoff), getString(R.string.ok));
+            getActivity().unregisterReceiver(mBatteryLowReceiver);
+        }
+    };
+
+    private void startScheduledExecutorService() {
+        final ScheduledExecutorService scheduler
+                = Executors.newScheduledThreadPool(1);
+
+        scheduler.scheduleAtFixedRate(
+                new Runnable() {
+                    int counter = 0;
+                    @Override
+                    public void run() {
+                        counter++;
+                        IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+                        Intent batteryStatus = getActivity().registerReceiver(null, ifilter);
+                        int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+                        int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+                        final float batteryPct = level / (float)scale;
+
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                                    public void run() {
+                                        mBatteryLevel.setText("Battery: (" + String.valueOf(counter) + ")"
+                                        + String.format("%.2f", batteryPct));
+                            }
+                        });
+
+                        if (batteryPct < 1)
+                            scheduler.shutdown();
+                    }
+                },
+                1,
+                1,
+                TimeUnit.SECONDS);
     }
 
     private void startLocationApi() {
@@ -403,6 +459,33 @@ public class ActivityTracker extends BackHandledFragment {
         mChronometerUtility.stop();
         //save elapsed time
         mTimeElapsed = Math.round(mChronometerUtility.getTimeByUnits(mChronometer.getText().toString(), 0));
+        // cancel HandlerTask if it's running
+        stopRepeatingTask();
+        //get timestamp of end
+        mActivityDetail.setEndDate(new Date());
+        //set button visibility
+        mStopButton.setVisibility(View.GONE);
+        mPauseButton.setVisibility(View.GONE);
+        mResumeButton.setVisibility(View.GONE);
+        //save Activity Detail data
+        if (mUnitSplitList.size() > 1) {
+            mCancelButton.setVisibility(View.VISIBLE);
+            mSaveButton.setVisibility(View.VISIBLE);
+
+            //display number of coins
+            displayResults();
+        } else {
+            //not enough data
+            mStartButton.setVisibility(View.VISIBLE);
+            mStartButton.setText(getString(R.string.restart));
+
+            mCancelButton.setVisibility(View.VISIBLE);
+
+            //message:  no data to display
+            Snackbar.make(rootView.findViewById(R.id.main_layout), getString(R.string.message_no_location_data_restart), Snackbar.LENGTH_LONG)
+                    .show();
+            playSound(AUDIO_ADD_POINTS);
+        }
     }
 
     private void playSound(String audioFileName) {
@@ -513,7 +596,8 @@ public class ActivityTracker extends BackHandledFragment {
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String message = intent.getStringExtra(ACTIVITY_TRACKER_BROADCAST_RECEIVER);
+
+           String message = intent.getStringExtra(ACTIVITY_TRACKER_BROADCAST_RECEIVER);
             if (DEBUG)
                 Log.d(ACTIVITY_TRACKER_TAG, "BroadcastReceiver - onReceive(): message: " + message);
             // message to indicate Google API Client connection
@@ -768,7 +852,7 @@ public class ActivityTracker extends BackHandledFragment {
         displayAlertDialog(getString(R.string.time_limit), getString(R.string.reached_time_limit_30_minutes));
         stopRun();
         //display number of coins earned
-        displayResults();
+        //displayResults();
     }
 
     private void displayAlertDialog(String title, String message) {

@@ -63,7 +63,6 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
 
     // UI widgets
     public static DrawerLayout mDrawerLayout;
-    private Menu mMenu;
 
     @Inject
     GoogleApi mGoogleApi;
@@ -328,8 +327,6 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        // save menu
-        mMenu = menu;
         return true;
     }
 
