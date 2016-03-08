@@ -15,6 +15,7 @@
     <dimen name="button_width_minimum">64dp</dimen>
     <dimen name="button_external_padding">8dp</dimen>
     <dimen name="padding_top_body">64dp</dimen>
+    <dimen name="height_spinner_item">48dp</dimen>
     <dimen name="dialog_header_height">64dp</dimen>
     <dimen name="list_item_height">64dp</dimen>
 

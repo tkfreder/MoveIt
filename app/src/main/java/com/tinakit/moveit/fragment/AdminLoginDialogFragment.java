@@ -150,19 +150,13 @@ public class AdminLoginDialogFragment extends DialogFragment {
             }
 
             if(mSharedPreferences.contains(ADMIN_PASSWORD)){
-
-                password.setEnabled(false);
                 password.setText(mSharedPreferences.getString(ADMIN_PASSWORD, ""));
             }
-
             button.setEnabled(true);
-
         }
-
         mSpinner = (Spinner) mView.findViewById(R.id.admin_preference_list);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.admin_login_preferences));
         mSpinner.setAdapter(adapter);
-
         mSpinner.setSelection(pref);
     }
 

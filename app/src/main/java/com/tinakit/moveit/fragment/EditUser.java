@@ -7,14 +7,18 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -57,6 +61,7 @@ public class EditUser extends Fragment {
     private User mUser_previous;
     private boolean mIsNewUser = false;
     private List<User> mUserList;
+    private boolean mHasNewPassword = false;
 
     // UI Widgets
     protected ImageView mAvatar;
@@ -68,7 +73,6 @@ public class EditUser extends Fragment {
     protected EditText mPassword;
     protected EditText mSecretAnswer;
     protected EditText mEmail;
-    protected Spinner mAdminLoginPrefs;
 
     @Nullable
     @Override
@@ -100,11 +104,6 @@ public class EditUser extends Fragment {
         mPassword = (EditText)mRootView.findViewById(R.id.password);
         mSecretAnswer = (EditText)mRootView.findViewById(R.id.secretAnswer);
         mEmail = (EditText)mRootView.findViewById(R.id.email);
-        mAdminLoginPrefs = (Spinner)mRootView.findViewById(R.id.admin_preference_list);
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.admin_login_preferences));
-        mAdminLoginPrefs.setAdapter(adapter);
-
     }
 
     private void fetchData(){
@@ -182,17 +181,7 @@ public class EditUser extends Fragment {
 
             mEmail.setVisibility(View.VISIBLE);
             mEmail.setText(mUser.getEmail());
-
-            mAdminLoginPrefs.setVisibility(View.VISIBLE);
-            // check SharedPreferences for auto-populate fields
-            SharedPreferences sharedPreferences = getActivity().getPreferences(Context.MODE_PRIVATE);
-            int pref = sharedPreferences.getInt(AdminLoginDialogFragment.ADMIN_LOGIN_PREFS, 0);
-
-            mAdminLoginPrefs.setSelection(pref);
         }
-
-
-
     }
 
     private void setActionListeners(){
@@ -270,8 +259,24 @@ public class EditUser extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
+                mHasNewPassword = true;
+            }
+        });
 
-                displaySecretQuestion();
+        mPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_NEXT || event.getKeyCode() == KeyEvent.FLAG_EDITOR_ACTION){
+                    // Check if no view has focus:
+                    View view = getActivity().getCurrentFocus();
+                    if (view != null) {
+                        displaySecretQuestion();
+                        // close softkeyboard which obscures the hint on TextInputLayout
+                        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                    }
+                }
+                return true;
             }
         });
 
@@ -288,7 +293,6 @@ public class EditUser extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-
                 displaySecretQuestion();
             }
         });
@@ -306,8 +310,8 @@ public class EditUser extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-
-                if(mUser.getSecretAnswer().equals(s)){
+                mSecretAnswer.setError(mUser.getSecretQuestion());
+                if(mUser.getSecretAnswer().equals(s.toString())){
                     mSaveButton.setEnabled(true);
                 }
                 else
@@ -415,36 +419,28 @@ public class EditUser extends Fragment {
 
                         Snackbar.make(mRootView.findViewById(R.id.main_layout), getString(R.string.message_saved_changes), Snackbar.LENGTH_LONG)
                                 .show();
+
+                        // send email notification that user changed password
+                        if(mHasNewPassword){
+                            Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+                            emailIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            //emailIntent.setType("plain/text");
+                            emailIntent.setType("message/rfc822");
+                            emailIntent.putExtra(Intent.EXTRA_EMAIL  , new String[]{mUser.getEmail()});
+                            emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.admin_password_changed_subject));
+                            emailIntent.putExtra(Intent.EXTRA_TEXT   , getString(R.string.admin_password_changed_body));
+                            try {
+                                startActivity(emailIntent);
+                            } catch (android.content.ActivityNotFoundException ex) {
+                                Snackbar.make(mRootView.findViewById(R.id.main_layout), getString(R.string.message_admin_password_changed), Snackbar.LENGTH_LONG)
+                                        .show();
+                            }
+                        }
                     }
                 }
             }
 
         });
-
-        if (mUser.isAdmin()){
-
-            mAdminLoginPrefs.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                    SharedPreferences sharedPreferences = getActivity().getPreferences(Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putInt(AdminLoginDialogFragment.ADMIN_LOGIN_PREFS, position);
-
-                    // if position = 1, want auto-populate fields, cache login details
-                    editor.putString(AdminLoginDialogFragment.ADMIN_USERNAME, mUser.getUserName());
-                    editor.putString(AdminLoginDialogFragment.ADMIN_PASSWORD, mUser.getPassword());
-
-                    editor.commit();
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-
-                }
-            });
-
-        }
 
         mPassword.addTextChangedListener(new TextWatcher() {
             @Override
@@ -460,20 +456,8 @@ public class EditUser extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
 
-                mSaveButton.setEnabled(true);
-            }
-        });
-
-        mAdminLoginPrefs.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                mSaveButton.setEnabled(true);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
+                if (mUser.getSecretAnswer().equals(s.toString()))
+                    mSaveButton.setEnabled(true);
             }
         });
     }
@@ -503,7 +487,9 @@ public class EditUser extends Fragment {
         mUser.setUserName(mUserName.getText().toString());
         mUser.setWeight(Integer.parseInt(mWeight.getText().toString()));
 
-        if(mUser.isAdmin())
+        if(mUser.isAdmin()){
+            mHasNewPassword = true;
+        }
             mUser.setPassword(mPassword.getText().toString());
 
         //any change to avatar should already be saved in OnActivityResult
@@ -629,7 +615,6 @@ public class EditUser extends Fragment {
 
             // insert Reward Earned
             fitnessDBHelper.insertRewardEarned(user.getReward().getName(), user.getReward().getPoints(), user.getUserId());
-
             fitnessDBHelper.updateUser(user);
         }
 
@@ -637,11 +622,9 @@ public class EditUser extends Fragment {
     }
 
     private void displaySecretQuestion(){
-
         // ask for secret answer
         mSecretAnswer.setVisibility(View.VISIBLE);
         mSecretAnswer.setError(mUser.getSecretQuestion());
-
         mSaveButton.setEnabled(false);
     }
 

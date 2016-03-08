@@ -99,7 +99,7 @@
 
     <!-- activity history search options -->
     <string-array name="secret_questions">
-        <item>What was the last name of your third grade teacher?</item>
+        <item>What was your third grade teacher\'s last name?</item>
         <item>What was the name of your childhood crush?</item>
         <item>Who was your childhood hero?</item>
     </string-array>
@@ -111,7 +111,7 @@
     <string name="nav_menu_admin">Admin</string>
 
     <!-- navigation drawer: Admin : tab menu names -->
-    <string name="admin_tab_inbox">Inbox</string>
+    <string name="admin_tab_requests">Requests</string>
     <string name="admin_tab_rewards">Rewards</string>
     <string name="admin_tab_users">Users</string>
     <string name="admin_tab_history">History</string>
@@ -177,6 +177,7 @@
     <string name="message_admin_login_failed">Admin login failed.</string>
     <string name="message_enter_password">Please enter a password</string>
     <string name="message_activity_deleted">Activity deleted.</string>
+    <string name="message_admin_password_changed">Your password has been updated.</string>
 
     <string name="title_activity_sensor_api">SensorAPI</string>
     <string name="title_activity_fused_location_api">FusedLocationApi</string>
@@ -224,6 +225,11 @@
     <string name="history">History</string>
     <string name="youEarned">You earned</string>
 
+<!-- email messages -->
+
+    <string name="admin_password_changed_subject">Family Fit: Admin Password Changed</string>
+    <string name="admin_password_changed_body">This is an email notifying you that someone has changed the admin password for Family Fit app.</string>
+
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="save">save</string>
@@ -236,7 +242,7 @@
     <string name="hint_admin">Parent or Admin</string>
 
     <string name="button_add">Add</string>
-    <string name="fulfill">Fulfill</string>
+    <string name="fulfill">Fulfilled</string>
 
     <string name="link_avatar_attribution">&lt;a href=\"https://thenounproject.com/sachan/collection/animals/?oq=animal%20sachan&amp;cidx=8\"Sachan from The Noun Project&lt;/a>"</string>
     <string name="sachan_link">Avatars by Sachan from The Noun Project</string>

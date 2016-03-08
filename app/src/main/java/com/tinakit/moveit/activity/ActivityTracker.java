@@ -559,7 +559,6 @@ public class ActivityTracker extends BackHandledFragment {
     //**********************************************************************************************
     //  HandlerTask - checks whether polling for location has started, indicating there is a good signal
     //**********************************************************************************************
-
     void runHandlerTask() {
         ExecutorService executorService = Executors.newFixedThreadPool(10);
         executorService.execute(mHandlerTask);
