@@ -54,8 +54,7 @@ import javax.inject.Inject;
  * Created by Tina on 10/26/2015.
  */
 
-public class MainActivity extends AppCompatActivity implements BackHandledFragment.BackHandlerInterface,
-                                                RegisterDialogFragment.RegisterDialogListener, AdminLoginDialogFragment.AdminLoginDialogListener{
+public class MainActivity extends AppCompatActivity implements BackHandledFragment.BackHandlerInterface{
 
     private static final String LOG = "MAINACTIVITY";
     private static final String INSTALL_SCREEN_TAG = "INSTALL_SCREEN_TAG";
@@ -88,22 +87,7 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
-        // is this the first time app is launched
-        checkHasLaunched();
-
-        /*
-        displayStartScreen();
-
-        ActivityHistory activityHistory = new ActivityHistory();
-        //replace current fragment
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragmentContainer, activityHistory, ActivityHistory.ACTIVITY_HISTORY_TAG)
-                .addToBackStack(null)
-                .commit();
-                */
-
+        initialize();
     }
 
     private void initialize(){
@@ -486,117 +470,4 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
         }
 
     }
-
-
-    //TODO: http://developer.android.com/guide/topics/ui/dialogs.html
-    //TODO: http://stackoverflow.com/questions/3976406/how-to-display-a-one-time-welcome-screen
-    public void checkHasLaunched(){
-
-        SharedPreferences mPrefs = getPreferences(Context.MODE_PRIVATE);
-
-        if (mPrefs.contains(INSTALL_SCREEN_TAG)){
-
-            boolean hasLaunched = mPrefs.getBoolean(INSTALL_SCREEN_TAG, true);
-
-            if (!hasLaunched){
-
-                SharedPreferences.Editor editor = mPrefs.edit();
-                editor.putBoolean(INSTALL_SCREEN_TAG, true);
-                editor.commit(); // Very important to save the preference
-                showRegisterDialog();
-            }
-            else
-                initialize();
-
-        } else {
-
-            // second argument is the default to use if the preference can't be found
-            Boolean welcomeScreenShown = mPrefs.getBoolean(INSTALL_SCREEN_TAG, false);
-
-            if (!welcomeScreenShown) {
-
-                SharedPreferences.Editor editor = mPrefs.edit();
-                editor.putBoolean(INSTALL_SCREEN_TAG, true);
-                editor.commit(); // Very important to save the preference
-                showRegisterDialog();
-            }
-        }
-    }
-
-    public void showRegisterDialog() {
-        // Create an instance of the dialog fragment and show it
-        DialogFragment dialog = new RegisterDialogFragment();
-        dialog.show(getSupportFragmentManager(), RegisterDialogFragment.REGISTER_DIALOG_TAG);
-    }
-
-    // The dialog fragment receives a reference to this Activity through the
-    // Fragment.onAttach() callback, which it uses to call the following methods
-    // defined by the RegisterDialogFragment.NoticeDialogListener interface
-    @Override
-    public void onDialogPositiveClick(DialogFragment dialog) {
-
-        // registration succeeded
-        Snackbar.make(findViewById(R.id.drawer_layout), getString(R.string.message_registration_success), Snackbar.LENGTH_LONG)
-                .show();
-
-        initialize();
-    }
-
-    @Override
-    public void onDialogNegativeClick(DialogFragment dialog) {
-
-        // registration failed
-
-        Snackbar.make(findViewById(R.id.drawer_layout), getString(R.string.message_registration_failed), Snackbar.LENGTH_LONG)
-                .show();
-    }
-
-
-    public void showAdminLoginDialog() {
-        // Create an instance of the dialog fragment and show it
-        DialogFragment dialog = new AdminLoginDialogFragment();
-        dialog.show(getSupportFragmentManager(), AdminLoginDialogFragment.ADMIN_LOGIN_DIALOG_TAG);
-
-    }
-
-    // The dialog fragment receives a reference to this Activity through the
-    // Fragment.onAttach() callback, which it uses to call the following methods
-    // defined by the RegisterDialogFragment.NoticeDialogListener interface
-    @Override
-    public void onAdminLoginDialogPositiveClick(DialogFragment dialog) {
-
-        displayAdminScreen();
-
-    }
-
-    @Override
-    public void onAdminLoginDialogNegativeClick(DialogFragment dialog) {
-
-        // login failed
-        Snackbar.make(findViewById(R.id.drawer_layout), getString(R.string.message_admin_login_failed), Snackbar.LENGTH_LONG)
-                .show();
-    }
-
-    private void displayAdminScreen(){
-
-        getSupportActionBar().setTitle(getString(R.string.nav_menu_admin));
-
-        // login succeeded
-        removeChildFragment();
-
-        Admin admin = (Admin)getSupportFragmentManager().findFragmentByTag(Admin.ADMIN_TAG);
-        if (admin == null) {
-
-            admin = new Admin();
-
-        }
-
-        //replace current fragment with Admin fragment
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragmentContainer, admin, Admin.ADMIN_TAG)
-                .addToBackStack(Admin.ADMIN_BACKSTACK_NAME)
-                .commit();
-    }
-
 }
