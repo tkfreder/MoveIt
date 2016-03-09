@@ -60,8 +60,6 @@ public class Accelerometer implements SensorEventListener{
                 float speedY = Math.abs(y - last_y)/diffTime * 10000;
                 float speedZ = Math.abs(z - last_z)/diffTime * 10000;
 
-
-
                 //check for inactivity, below shake threshold
                 //if (speed < SHAKE_THRESHOLD){
                 if (!(speedX > SHAKE_THRESHOLD || speedY > SHAKE_THRESHOLD || speedZ > SHAKE_THRESHOLD)) {

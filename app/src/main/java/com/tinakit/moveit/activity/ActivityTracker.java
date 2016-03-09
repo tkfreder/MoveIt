@@ -98,7 +98,7 @@ public class ActivityTracker extends BackHandledFragment {
 
     // APIs
     private LocationApi mLocationApi;
-    //private Accelerometer mAccelerometer;
+    private Accelerometer mAccelerometer;
     private MapFragment mMapFragment;
 
     // Request code to use when launching the resolution activity
@@ -129,6 +129,7 @@ public class ActivityTracker extends BackHandledFragment {
     private long mTimeWhenStopped;
     private boolean mSaveLocationData = false;
     private boolean mHasMapFragment = false;
+    private long mDateOfInactivity;
 
     @Nullable
     @Override
@@ -195,7 +196,7 @@ public class ActivityTracker extends BackHandledFragment {
         mLocationApi = new LocationApi(mFragmentActivity, mGoogleApi.client());
 
         // accelerometer
-        //mAccelerometer = new Accelerometer(mFragmentActivity);
+        mAccelerometer = new Accelerometer(mFragmentActivity);
 
         //check savedInstanceState not null
         mResolvingError = savedInstanceState != null
@@ -322,7 +323,7 @@ public class ActivityTracker extends BackHandledFragment {
         mTimeWhenStopped = mChronometerUtility.getTime() - SystemClock.elapsedRealtime();
 
         //disable accelerometer listener
-        //mAccelerometer.stop();
+        mAccelerometer.stop();
 
         //set button visibility
         mPauseButton.setVisibility(View.GONE);
@@ -338,7 +339,7 @@ public class ActivityTracker extends BackHandledFragment {
         //set flag to save location data
         mSaveLocationData = true;
         //start accelerometer listener, after a delay of ACCELEROMETER_DELAY
-        //mAccelerometer.start();
+        mAccelerometer.start();
         //chronometer settings, set base time to time when paused ChronometerUtility.elapsedTime()
         mChronometerUtility.resume(mTimeWhenStopped);
         //set button visibility
@@ -377,7 +378,7 @@ public class ActivityTracker extends BackHandledFragment {
         mStopButton.setVisibility(View.VISIBLE);
         mPauseButton.setVisibility(View.VISIBLE);
 
-        //mAccelerometer.start();
+        mAccelerometer.start();
 
         //register api intents with BroadcastReceiver
         //LocalBroadcastManager.getInstance(mFragmentActivity).registerReceiver(mMessageReceiver, new IntentFilter(LocationApi.LOCATION_API_INTENT));
@@ -471,7 +472,7 @@ public class ActivityTracker extends BackHandledFragment {
     private void stopRun() {
         //stopServices(mGoogleApi.client());
         mLocationApi.stop();
-        //mAccelerometer.stop();
+        mAccelerometer.stop();
         // unregister intents with BroadcastReceiver
         LocalBroadcastManager.getInstance(mFragmentActivity).unregisterReceiver(mMessageReceiver);
         //stop chronometer
@@ -625,8 +626,8 @@ public class ActivityTracker extends BackHandledFragment {
                 // check periodically for connection
                 startRepeatingTask();
             } else if (message.equals(LocationApi.LOCATION_API_INTENT)) {
-                //only track data when it has high level of accuracy && not Pause mode
-                if (mSaveLocationData) {
+                //only track data when it has high level of accuracy && has not been inactive within the last second
+                if (mSaveLocationData && (System.currentTimeMillis() - mDateOfInactivity < 1000)) {
                     //update cache
                     updateCache(mLocationApi.location());
                     refreshData();
@@ -639,10 +640,13 @@ public class ActivityTracker extends BackHandledFragment {
                     stopRun();
                 }
                 */
+                // detected inactivity
             } else if (message.equals(Accelerometer.ACCELEROMETER_INTENT) && mWarningIsVisible == false) {
-                playSound(AUDIO_NO_MOVEMENT);
-                pauseTracking();
-                displayNoMovementWarning();
+                //playSound(AUDIO_NO_MOVEMENT);
+                //pauseTracking();
+                //displayNoMovementWarning();
+
+                mDateOfInactivity = System.currentTimeMillis();
             }
         }
     };
@@ -824,7 +828,7 @@ public class ActivityTracker extends BackHandledFragment {
     public void onDestroy() {
         if (DEBUG) Log.d(ACTIVITY_TRACKER_TAG, "onDestroy");
         super.onDestroy();
-        //mAccelerometer.stop();
+        mAccelerometer.stop();
     }
 
     //**********************************************************************************************
