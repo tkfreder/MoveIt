@@ -37,8 +37,6 @@ public class EditReward extends Fragment {
     FitnessDBHelper mDatabaseHelper;
 
     private FragmentActivity mFragmentActivity;
-    private User mUser;
-    private boolean mIsNewReward = false;
     private List<Reward> mRewardList;
 
     // UI widgets
@@ -46,7 +44,6 @@ public class EditReward extends Fragment {
     private EditRewardRecyclerAdapter mEditRewardRecyclerAdapter;
     private RecyclerView mRecyclerView;
     private Button mSaveButton;
-
 
     @Nullable
     @Override
@@ -63,7 +60,6 @@ public class EditReward extends Fragment {
         // Initialize recycler view
         mRecyclerView = (RecyclerView)mRootView.findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true); //child items have fixed dimensions, allows the RecyclerView to optimize better by figuring out the exact height and width of the entire list based on the adapter.
-
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mFragmentActivity);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(linearLayoutManager);
@@ -71,52 +67,37 @@ public class EditReward extends Fragment {
         mRewardList = mDatabaseHelper.getAllRewards();
         mEditRewardRecyclerAdapter = new EditRewardRecyclerAdapter(inflater.getContext(), mFragmentActivity, mRewardList);
         mRecyclerView.setAdapter(mEditRewardRecyclerAdapter);
-
         mSaveButton = (Button)mRootView.findViewById(R.id.saveButton);
         mSaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 List<Reward> rewardList = mEditRewardRecyclerAdapter.getRewardList();
                 int rowsAffected = mDatabaseHelper.updateAllRewards(rewardList);
-
                 if(rowsAffected > 0){
-
                     Snackbar.make(mRootView.findViewById(R.id.main_layout), getString(R.string.message_update_reward), Snackbar.LENGTH_LONG)
                             .show();
                 }
                 else{
-
                     Snackbar.make(mRootView.findViewById(R.id.main_layout), getString(R.string.error_message_update_reward), Snackbar.LENGTH_LONG)
                             .show();
                 }
-
-
                 //check whether user does not already have a reward.  if so, check whether user has enough points to earn their reward
                 List<User> userList = mDatabaseHelper.getUsers();
-
                 for (User user : userList){
                     boolean isFulfilled = false;
                     Reward reward = mDatabaseHelper.getRewardEarned(user.getUserId(), isFulfilled);
-
                     // update user total points, if we were able to get a valid point value for the reward
                     if (reward != null) {
-
-                        user = EditUser.checkRewardEarned(user, mDatabaseHelper);
+                        EditUser.checkRewardEarned(user, mDatabaseHelper);
                     }
-
                 }
             }
         });
-
         return mRootView;
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-
-
     }
-
 }

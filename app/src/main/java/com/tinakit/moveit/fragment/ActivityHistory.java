@@ -223,18 +223,7 @@ public class ActivityHistory extends Fragment {
                                             // after crediting or debiting points, check if user's total points earns her a reward
                                             // get the latest user data
                                             user = mDatabaseHelper.getUser(index);
-                                            user = EditUser.checkRewardEarned(user, mDatabaseHelper);
-                                            /*
-                                            if (user.getPoints() >= user.getReward().getPoints()) {
-
-                                                user.setPoints(user.getPoints() - user.getReward().getPoints());
-
-                                                // insert Reward Earned
-                                                mDatabaseHelper.insertRewardEarned(user.getReward().getName(), user.getReward().getPoints(), user.getUserId());
-
-                                                mDatabaseHelper.updateUser(user);
-                                            }
-                                            */
+                                            EditUser.checkRewardEarned(user, mDatabaseHelper);
                                         }
                                     }
                                     // delete references to this activity in Activities, ActivityUsers, ActivityLocationData
