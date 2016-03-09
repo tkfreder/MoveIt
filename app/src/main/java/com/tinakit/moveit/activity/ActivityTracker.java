@@ -351,23 +351,15 @@ public class ActivityTracker extends BackHandledFragment {
         //register api intents with BroadcastReceiver
         //LocalBroadcastManager.getInstance(mFragmentActivity).registerReceiver(mMessageReceiver, new IntentFilter(LocationApi.LOCATION_API_INTENT));
         LocalBroadcastManager.getInstance(mFragmentActivity).registerReceiver(mMessageReceiver, new IntentFilter(Accelerometer.ACCELEROMETER_INTENT));
-
         //initialize ChronometerUtility, start timer
         mChronometerUtility = new ChronometerUtility(mChronometer);
         mChronometerUtility.start();
-
         //display counters
         mCounterLayout.setVisibility(View.VISIBLE);
-
         //display map of starting point
         mMapFragment.displayStartMap();
-
         // register battery charge listener
         getActivity().registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-
-        //TODO: DEBUG
-        //startScheduledExecutorService();
-
         // register receiver for low battery level
         getActivity().registerReceiver(mBatteryLowReceiver, new IntentFilter(
                 Intent.ACTION_BATTERY_LOW));
@@ -381,39 +373,6 @@ public class ActivityTracker extends BackHandledFragment {
             getActivity().unregisterReceiver(mBatteryLowReceiver);
         }
     };
-
-    private void startScheduledExecutorService() {
-        final ScheduledExecutorService scheduler
-                = Executors.newScheduledThreadPool(1);
-
-        scheduler.scheduleAtFixedRate(
-                new Runnable() {
-                    int counter = 0;
-                    @Override
-                    public void run() {
-                        counter++;
-                        IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-                        Intent batteryStatus = getActivity().registerReceiver(null, ifilter);
-                        int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-                        int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-                        final float batteryPct = level / (float)scale;
-
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                                    public void run() {
-                                        mBatteryLevel.setText("Battery: (" + String.valueOf(counter) + ")"
-                                        + String.format("%.2f", batteryPct));
-                            }
-                        });
-
-                        if (batteryPct < 1)
-                            scheduler.shutdown();
-                    }
-                },
-                1,
-                1,
-                TimeUnit.SECONDS);
-    }
 
     private void startLocationApi() {
         mLocationApi.start();
