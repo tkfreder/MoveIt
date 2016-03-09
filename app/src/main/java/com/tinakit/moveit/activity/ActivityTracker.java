@@ -86,8 +86,7 @@ public class ActivityTracker extends BackHandledFragment {
     private static final int SERVICE_TIMEOUT_MILLISECONDS = 60*1000;
 
     // cache
-    protected FragmentActivity mFragmentActivity;
-    private View rootView;
+
 
     //save all location points during location updates
     private List<UnitSplit> mUnitSplitList = new ArrayList<>();
@@ -123,6 +122,9 @@ public class ActivityTracker extends BackHandledFragment {
     private TextView mMessage;
     private ViewGroup mContainer;
     private TextView mBatteryLevel;
+    private android.support.v7.app.AlertDialog alertDialog;
+    protected FragmentActivity mFragmentActivity;
+    private View rootView;
 
     // INSTANCE FIELDS
     private ActivityDetail mActivityDetail;
@@ -130,6 +132,7 @@ public class ActivityTracker extends BackHandledFragment {
     private boolean mSaveLocationData = false;
     private boolean mHasMapFragment = false;
     private boolean mIsInactive = false;
+    private ScheduledExecutorService executorService;
 
     @Nullable
     @Override
@@ -573,18 +576,15 @@ public class ActivityTracker extends BackHandledFragment {
         rootView.findViewById(R.id.map_container).setVisibility(View.VISIBLE);
     }
 
+    // reference: http://stackoverflow.com/questions/7462098/handlerthread-vs-executor-when-is-one-more-appropriate-over-the-other
     //**********************************************************************************************
     //  HandlerTask - checks whether polling for location has started, indicating there is a good signal
     //**********************************************************************************************
     void runHandlerTask() {
-        ExecutorService executorService = Executors.newFixedThreadPool(10);
-        executorService.execute(mHandlerTask);
-        executorService.shutdown();
+        executorService = Executors.newSingleThreadScheduledExecutor();
+        executorService.scheduleWithFixedDelay(mHandlerTask, 1, 1, TimeUnit.SECONDS);
     }
 
-    Handler mHandler = new Handler();
-
-    android.support.v7.app.AlertDialog alertDialog;
     Runnable mHandlerTask = new Runnable() {
         @Override
         public void run() {
@@ -595,11 +595,6 @@ public class ActivityTracker extends BackHandledFragment {
                     Calendar.getInstance().getTimeInMillis()-t<SERVICE_TIMEOUT_MILLISECONDS) {
                 if(DEBUG) Log.d("Activity Tracker", "Waiting for polling information");
                 if(DEBUG) Log.d("Activity Tracker", mLocationApi.isPollingData(DATA_COUNT_MINIMUM) ? "YES" : "NO");
-                try {
-                    Thread.sleep(500); //Good night sweet prince for a half a second
-                } catch (InterruptedException e) {
-                    break; //In case of exception, break loop.
-                }
             }
             //If polling data failed to go through
             if (!mLocationApi.isPollingData(DATA_COUNT_MINIMUM)) {
@@ -614,8 +609,6 @@ public class ActivityTracker extends BackHandledFragment {
             } else { //Else go to the running page
                 if (alertDialog != null)
                     alertDialog.dismiss();
-                //stopAnim();
-                //startRun();
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -642,9 +635,7 @@ public class ActivityTracker extends BackHandledFragment {
                 .setNegativeButton(R.string.button_wait, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        //resumeTracking();
                         runHandlerTask();
-                        //mHandler.postDelayed(mHandlerTask, 1000 * 3);
                     }
                 })
                 .setTitle(R.string.message_continue_tracker_title)
@@ -653,13 +644,11 @@ public class ActivityTracker extends BackHandledFragment {
     }
 
     void startRepeatingTask() {
-        // delay before checking if we're polling data
-        //mHandler.postDelayed(mHandlerTask, 1000 * 2);
         runHandlerTask();
     }
 
     void stopRepeatingTask() {
-        mHandler.removeCallbacksAndMessages(mHandlerTask);
+        executorService.shutdownNow();
     }
 
     //**********************************************************************************************
@@ -681,11 +670,8 @@ public class ActivityTracker extends BackHandledFragment {
 
 
     private void displayNoMovementWarning() {
-
         mWarningIsVisible = true;
-
         AlertDialog.Builder alert = new AlertDialog.Builder(mFragmentActivity);
-
         alert.setTitle(getString(R.string.warning));
         alert.setMessage(getString(R.string.msg_activity_tracker_no_movement));
         alert.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
