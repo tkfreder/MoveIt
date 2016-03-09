@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Resources;
 import android.location.Location;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
@@ -46,6 +47,7 @@ import com.tinakit.moveit.utility.CalorieCalculator;
 import com.tinakit.moveit.utility.ChronometerUtility;
 import com.tinakit.moveit.utility.UnitConverter;
 import com.tinakit.moveit.utility.DialogUtility;
+import com.tinakit.moveit.R;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -395,18 +397,35 @@ public class ActivityTracker extends BackHandledFragment {
         getActivity().registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
 
         //TODO: DEBUG
-        startScheduledExecutorService();
+        //startScheduledExecutorService();
+
+        //TODO: DEBUG
+        //get the low battery level
+        int mLowBatteryWarningLevel = getResources().getInteger(Resources.getSystem().getIdentifier("config_lowBatteryWarningLevel","integer","android"));
+        mBatteryLevel.setText(String.valueOf(mLowBatteryWarningLevel));
+
         // register receiver for low battery level
         getActivity().registerReceiver(mBatteryLowReceiver, new IntentFilter(
-                Intent.ACTION_BATTERY_CHANGED));
+                Intent.ACTION_BATTERY_LOW));
     }
 
     private BroadcastReceiver mBatteryLowReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             stopRun();
-            DialogUtility.displayAlertDialog(getActivity(), getString(R.string.title_battery_low), getString(R.string.message_battery_low_auto_shutoff), getString(R.string.ok));
-            getActivity().unregisterReceiver(mBatteryLowReceiver);
+
+            // TODO:DEBUG
+            IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+            Intent batteryStatus = getActivity().registerReceiver(null, ifilter);
+            int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+            int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+            final float batteryPct = level / (float)scale;
+            mBatteryLevel.setText(String.valueOf(batteryPct));
+            if (batteryPct < 100){
+                DialogUtility.displayAlertDialog(getActivity(), getString(R.string.title_battery_low), getString(R.string.message_battery_low_auto_shutoff), getString(R.string.ok));
+                getActivity().unregisterReceiver(mBatteryLowReceiver);
+            }
+
         }
     };
 
