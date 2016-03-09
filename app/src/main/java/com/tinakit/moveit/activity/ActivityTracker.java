@@ -368,11 +368,6 @@ public class ActivityTracker extends BackHandledFragment {
         //TODO: DEBUG
         //startScheduledExecutorService();
 
-        //TODO: DEBUG
-        //get the low battery level
-        int mLowBatteryWarningLevel = getResources().getInteger(Resources.getSystem().getIdentifier("config_lowBatteryWarningLevel","integer","android"));
-        mBatteryLevel.setText(String.valueOf(mLowBatteryWarningLevel));
-
         // register receiver for low battery level
         getActivity().registerReceiver(mBatteryLowReceiver, new IntentFilter(
                 Intent.ACTION_BATTERY_LOW));
@@ -382,19 +377,8 @@ public class ActivityTracker extends BackHandledFragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             stopRun();
-
-            // TODO:DEBUG
-            IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-            Intent batteryStatus = getActivity().registerReceiver(null, ifilter);
-            int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-            int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-            final float batteryPct = level / (float)scale;
-            mBatteryLevel.setText(String.valueOf(batteryPct));
-            if (batteryPct < 100){
-                DialogUtility.displayAlertDialog(getActivity(), getString(R.string.title_battery_low), getString(R.string.message_battery_low_auto_shutoff), getString(R.string.ok));
-                getActivity().unregisterReceiver(mBatteryLowReceiver);
-            }
-
+            DialogUtility.displayAlertDialog(getActivity(), getString(R.string.title_battery_low), getString(R.string.message_battery_low_auto_shutoff), getString(R.string.ok));
+            getActivity().unregisterReceiver(mBatteryLowReceiver);
         }
     };
 
