@@ -129,7 +129,7 @@ public class ActivityTracker extends BackHandledFragment {
     private long mTimeWhenStopped;
     private boolean mSaveLocationData = false;
     private boolean mHasMapFragment = false;
-    private long mDateOfInactivity;
+    private boolean mIsInactive = false;
 
     @Nullable
     @Override
@@ -194,10 +194,8 @@ public class ActivityTracker extends BackHandledFragment {
 
         // location listener
         mLocationApi = new LocationApi(mFragmentActivity, mGoogleApi.client());
-
         // accelerometer
         mAccelerometer = new Accelerometer(mFragmentActivity);
-
         //check savedInstanceState not null
         mResolvingError = savedInstanceState != null
                 && savedInstanceState.getBoolean(STATE_RESOLVING_ERROR, false);
@@ -249,36 +247,6 @@ public class ActivityTracker extends BackHandledFragment {
 
             public void onClick(View v) {
                 stopRun();
-
-                /*
-                // cancel HandlerTask if it's running
-                stopRepeatingTask();
-                //get timestamp of end
-                mActivityDetail.setEndDate(new Date());
-                //set button visibility
-                mStopButton.setVisibility(View.GONE);
-                mPauseButton.setVisibility(View.GONE);
-                mResumeButton.setVisibility(View.GONE);
-                //save Activity Detail data
-                if (mUnitSplitList.size() > 1) {
-                    mCancelButton.setVisibility(View.VISIBLE);
-                    mSaveButton.setVisibility(View.VISIBLE);
-
-                    //display number of coins
-                    displayResults();
-                } else {
-                    //not enough data
-                    mStartButton.setVisibility(View.VISIBLE);
-                    mStartButton.setText(getString(R.string.restart));
-
-                    mCancelButton.setVisibility(View.VISIBLE);
-
-                    //message:  no data to display
-                    Snackbar.make(rootView.findViewById(R.id.main_layout), getString(R.string.message_no_location_data_restart), Snackbar.LENGTH_LONG)
-                            .show();
-                    playSound(AUDIO_ADD_POINTS);
-                }
-                */
             }
         });
 
@@ -627,7 +595,7 @@ public class ActivityTracker extends BackHandledFragment {
                 startRepeatingTask();
             } else if (message.equals(LocationApi.LOCATION_API_INTENT)) {
                 //only track data when it has high level of accuracy && has not been inactive within the last second
-                if (mSaveLocationData && (System.currentTimeMillis() - mDateOfInactivity < 1000)) {
+                if (mSaveLocationData && !mIsInactive) {
                     //update cache
                     updateCache(mLocationApi.location());
                     refreshData();
@@ -642,11 +610,10 @@ public class ActivityTracker extends BackHandledFragment {
                 */
                 // detected inactivity
             } else if (message.equals(Accelerometer.ACCELEROMETER_INTENT) && mWarningIsVisible == false) {
-                //playSound(AUDIO_NO_MOVEMENT);
-                //pauseTracking();
-                //displayNoMovementWarning();
-
-                mDateOfInactivity = System.currentTimeMillis();
+                playSound(AUDIO_NO_MOVEMENT);
+                pauseTracking();
+                displayNoMovementWarning();
+                mIsInactive = false;
             }
         }
     };
