@@ -207,11 +207,14 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
+        // don't do anything
+        /*
         tvX.setText("" + (mSeekBarX.getProgress() + 1));
         tvY.setText("" + (mSeekBarY.getProgress()));
 
         setData(mSeekBarX.getProgress() + 1, mSeekBarY.getProgress());
         mChart.invalidate();
+        */
     }
 
     @Override
@@ -228,18 +231,33 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
 
     private void setData(int count, float range) {
 
+
         ArrayList<String> xVals = new ArrayList<String>();
+        xVals.add("Laura");
+        xVals.add("Lucy");
+        xVals.add("Alec");
+        xVals.add("Tina");
+
+        /*
         for (int i = 0; i < count; i++) {
             xVals.add(mMonths[i % 12]);
         }
+        */
 
         ArrayList<BarEntry> yVals1 = new ArrayList<BarEntry>();
 
+        yVals1.add(new BarEntry(20.0f, 0));
+        yVals1.add(new BarEntry(30.0f, 1));
+        yVals1.add(new BarEntry(40.0f, 2));
+        yVals1.add(new BarEntry(50.0f, 3));
+
+        /*
         for (int i = 0; i < count; i++) {
             float mult = (range + 1);
             float val = (float) (Math.random() * mult);
             yVals1.add(new BarEntry(val, i));
         }
+        */
 
         BarDataSet set1 = new BarDataSet(yVals1, "DataSet");
         set1.setBarSpacePercent(35f);
