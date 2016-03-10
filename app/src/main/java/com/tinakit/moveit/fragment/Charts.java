@@ -1,11 +1,13 @@
 package com.tinakit.moveit.fragment;
 
 import android.annotation.SuppressLint;
+import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
@@ -29,11 +31,13 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.filter.Approximator;
 import com.github.mikephil.charting.data.filter.Approximator.ApproximatorType;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.formatter.YAxisValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.interfaces.datasets.IDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.fragment.MyYAxisValueFormatter;
 import com.tinakit.moveit.fragment.DemoBase;
@@ -71,11 +75,15 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
         mChart.setDrawBarShadow(false);
         mChart.setDrawValueAboveBar(true);
 
-        mChart.setDescription("");
+        mChart.setDescription("Hours of Activity This Week");
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        mChart.setDescriptionPosition( size.x / 2, 64);
 
         // if more than 60 entries are displayed in the chart, no values will be
         // drawn
-        mChart.setMaxVisibleValueCount(60);
+        //mChart.setMaxVisibleValueCount(60);
 
         // scaling can now only be done on x- and y-axis separately
         mChart.setPinchZoom(false);
@@ -93,19 +101,23 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
 
         YAxisValueFormatter custom = new MyYAxisValueFormatter();
 
+
         YAxis leftAxis = mChart.getAxisLeft();
-        leftAxis.setTypeface(mTf);
+        leftAxis.setDrawLabels(false);
+        //leftAxis.setTypeface(mTf);
         leftAxis.setLabelCount(8, false);
-        leftAxis.setValueFormatter(custom);
-        leftAxis.setPosition(YAxisLabelPosition.OUTSIDE_CHART);
-        leftAxis.setSpaceTop(15f);
-        leftAxis.setAxisMinValue(0f); // this replaces setStartAtZero(true)
+        //leftAxis.setValueFormatter(custom);
+        //leftAxis.setPosition(YAxisLabelPosition.OUTSIDE_CHART);
+        //leftAxis.setSpaceTop(15f);
+        //leftAxis.setAxisMinValue(0f); // this replaces setStartAtZero(true)
+
 
         YAxis rightAxis = mChart.getAxisRight();
+        rightAxis.setDrawLabels(false);
         rightAxis.setDrawGridLines(false);
         rightAxis.setTypeface(mTf);
         rightAxis.setLabelCount(8, false);
-        rightAxis.setValueFormatter(custom);
+        //rightAxis.setValueFormatter(custom);
         rightAxis.setSpaceTop(15f);
         rightAxis.setAxisMinValue(0f); // this replaces setStartAtZero(true)
 
@@ -115,10 +127,10 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
         l.setFormSize(9f);
         l.setTextSize(11f);
         l.setXEntrySpace(4f);
-        // l.setExtra(ColorTemplate.VORDIPLOM_COLORS, new String[] { "abc",
+        //l.setExtra(ColorTemplate.VORDIPLOM_COLORS, new String[] { "abc",
         // "def", "ghj", "ikl", "mno" });
-        // l.setCustom(ColorTemplate.VORDIPLOM_COLORS, new String[] { "abc",
-        // "def", "ghj", "ikl", "mno" });
+         l.setCustom(ColorTemplate.VORDIPLOM_COLORS, new String[] { "abc",
+         "def", "ghj", "ikl", "mno" });
 
         setData(12, 50);
 
@@ -246,10 +258,10 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
 
         ArrayList<BarEntry> yVals1 = new ArrayList<BarEntry>();
 
-        yVals1.add(new BarEntry(20.0f, 0));
-        yVals1.add(new BarEntry(30.0f, 1));
-        yVals1.add(new BarEntry(40.0f, 2));
-        yVals1.add(new BarEntry(50.0f, 3));
+        yVals1.add(new BarEntry(10, 0));
+        yVals1.add(new BarEntry(30, 1));
+        yVals1.add(new BarEntry(40, 2));
+        yVals1.add(new BarEntry(100, 3));
 
         /*
         for (int i = 0; i < count; i++) {
