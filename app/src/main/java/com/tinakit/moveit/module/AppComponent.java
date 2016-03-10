@@ -9,6 +9,7 @@ import com.tinakit.moveit.fragment.ActivityChooser;
 import com.tinakit.moveit.fragment.ActivityHistory;
 import com.tinakit.moveit.fragment.AdminInBox;
 import com.tinakit.moveit.fragment.AdminLoginDialogFragment;
+import com.tinakit.moveit.fragment.Charts;
 import com.tinakit.moveit.fragment.EditReward;
 import com.tinakit.moveit.fragment.EditUser;
 import com.tinakit.moveit.fragment.MapFragment;
@@ -56,4 +57,5 @@ public interface AppComponent {
     void inject(RegisterDialogFragment registerDialogFragment);
     void inject(AdminLoginDialogFragment adminLoginDialogFragment);
     void inject(SecretQuestionDialogFragment secretQuestionDialogFragment);
+    void inject(Charts charts);
 }

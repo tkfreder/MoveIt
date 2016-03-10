@@ -37,6 +37,7 @@ import com.tinakit.moveit.fragment.ActivityHistory;
 import com.tinakit.moveit.fragment.Admin;
 import com.tinakit.moveit.fragment.AdminLoginDialogFragment;
 import com.tinakit.moveit.fragment.BackHandledFragment;
+import com.tinakit.moveit.fragment.Charts;
 import com.tinakit.moveit.fragment.EditUser;
 import com.tinakit.moveit.fragment.UserProfile;
 import com.tinakit.moveit.fragment.UserStatsMain;
@@ -185,12 +186,13 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
                 removeChildFragment();
                 displayStartScreen();
                 break;
-            /*
+
             // DEBUG: display Database tables
             case R.id.nav_charts:
 
-                startActivity(new Intent(this, AndroidDatabaseManager.class));
-                */
+                startActivity(new Intent(this, Charts.class));
+                //startActivity(new Intent(this, AndroidDatabaseManager.class));
+
              case R.id.nav_coins:
                 getSupportActionBar().setTitle(getString(R.string.nav_menu_coins));
                 removeChildFragment();

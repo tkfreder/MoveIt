@@ -7,6 +7,7 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -39,16 +40,26 @@ import com.github.mikephil.charting.interfaces.datasets.IDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.tinakit.moveit.R;
+import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.fragment.MyYAxisValueFormatter;
 import com.tinakit.moveit.fragment.DemoBase;
+import com.tinakit.moveit.module.CustomApplication;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
+import javax.inject.Inject;
 
 /**
  * Created by Tina on 3/9/2016.
  */
 public class Charts extends DemoBase implements OnSeekBarChangeListener,
         OnChartValueSelectedListener {
+
+    @Inject
+    FitnessDBHelper mDatabaseHelper;
 
     protected BarChart mChart;
     private SeekBar mSeekBarX, mSeekBarY;
@@ -62,6 +73,9 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_barchart);
+
+        // DI
+        ((CustomApplication)getApplication()).getAppComponent().inject(this);
 
         tvX = (TextView) findViewById(R.id.tvXMax);
         tvY = (TextView) findViewById(R.id.tvYMax);
@@ -258,10 +272,22 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
 
         ArrayList<BarEntry> yVals1 = new ArrayList<BarEntry>();
 
+        int i = 1;
+        Calendar cal = new GregorianCalendar();
+        cal.add(Calendar.DAY_OF_MONTH, -7 * i);
+        Date sevenDaysAgo = cal.getTime();
+
+        SparseArray<Integer> timeList = mDatabaseHelper.getActivityTimes(new Date(), sevenDaysAgo);
+        for (int index = 0; i < timeList.size(); index++){
+            int key = timeList.keyAt(index);
+            yVals1.add(new BarEntry(timeList.get(key), index));
+        }
+        /*
         yVals1.add(new BarEntry(10, 0));
         yVals1.add(new BarEntry(30, 1));
         yVals1.add(new BarEntry(40, 2));
         yVals1.add(new BarEntry(100, 3));
+        */
 
         /*
         for (int i = 0; i < count; i++) {

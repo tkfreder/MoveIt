@@ -204,6 +204,8 @@ public class ActivityHistory extends Fragment {
                                     android.util.SparseArray<Integer> userIdList = mDatabaseHelper.getActivityUsers(activityId);
 
                                     for (int index = 0; index < userIdList.size(); index++) {
+                                        int key = userIdList.keyAt(i);
+                                        int pointValue = userIdList.get(key);
 
                                         // check if user has a reward earned but not fulfilled, if so, remove that reward
                                         boolean isFulfilled = false;
@@ -217,8 +219,8 @@ public class ActivityHistory extends Fragment {
                                             User user = mDatabaseHelper.getUser(index);
                                             // if the point value of the reward is greater than the points earned from the activity,
                                             // credit the difference to the user
-                                            if (reward.getPoints() > userIdList.get(index)) {
-                                                mDatabaseHelper.updateUserPoints(user, reward.getPoints() - userIdList.get(index));
+                                            if (reward.getPoints() > pointValue) {
+                                                mDatabaseHelper.updateUserPoints(user, reward.getPoints() - pointValue);
                                             }
                                             // after crediting or debiting points, check if user's total points earns her a reward
                                             // get the latest user data

@@ -131,6 +131,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
     private static final String VIEW_FIRST_LOCATION_POINTS = "FirstLocationPoints";
     private static final String VIEW_ACTIVITY_USERS_DETAIL = "ActivityUsersDetail";
     private static final String VIEW_USERS_REWARDS_DETAIL = "UsersRewardsDetail";
+    private static final String VIEW_USER_STATS_LIST = "UserStatsList";
 
     private static Context mContext;
     private SQLiteDatabase db;
@@ -307,6 +308,11 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 " INNER JOIN " + TABLE_ACTIVITY_USERS + " a on a." + KEY_ACTIVITY_USERS_ACTIVITY_ID + " = d." + KEY_ACTIVITY_ID +
                 " INNER JOIN " + TABLE_USERS + " u on u." + KEY_ACTIVITY_USERS_ID + " = a." + KEY_ACTIVITY_USERS_USER_ID +
                 " INNER JOIN " + TABLE_ACTIVITY_TYPE + " t on t." + KEY_ACTIVITY_TYPE_ID + " = a." + KEY_ACTIVITY_USERS_ACTIVITY_TYPE_ID_FK;
+
+        String CREATE_VIEW_USER_STATS_LIST = "CREATE VIEW " + VIEW_USER_STATS_LIST + " AS" +
+                "SELECT strftime('%s', " + KEY_ACTIVITY_START_DATE +
+                ", " + KEY_ACTIVITY_USERS_USER_ID +
+                " FROM " + VIEW_ACTIVITY_USERS_DETAIL;
 
         String CREATE_VIEW_USERS_REWARDS_DETAIL = "CREATE VIEW " + VIEW_USERS_REWARDS_DETAIL + " AS" +
                 " SELECT u._id AS " + KEY_REWARDUSER_USER_ID_FK +
@@ -607,6 +613,46 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         }
 
         return user;
+    }
+
+    /**
+     *
+     * @param startDate
+     * @param endDate up to this date, non-inclusive
+     * @return
+     */
+    public SparseArray<Integer> getActivityTimes(Date startDate, Date endDate){
+
+        SparseArray<Integer> activityTimeList = null;
+
+        try {
+               Cursor cursor = db.query(VIEW_ACTIVITY_USERS_DETAIL,
+                    new String[]{KEY_ACTIVITY_START_DATE
+                            ,KEY_ACTIVITY_USERS_USER_ID
+                            }
+                       ,null,null, null, null, KEY_ACTIVITY_USERS_USER_ID);
+            try {
+                if (cursor.moveToFirst()) {
+                    activityTimeList = new SparseArray<>();
+                    do {
+                        activityTimeList.put(cursor.getInt(cursor.getColumnIndex(KEY_ACTIVITY_USERS_USER_ID)), cursor.getInt(cursor.getColumnIndex(KEY_ACTIVITY_START_DATE)));
+                    } while (cursor.moveToNext());
+                }
+            }catch(Exception exception) {
+                exception.printStackTrace();
+            } finally{
+                if (cursor != null && !cursor.isClosed())
+                {
+                    cursor.close();
+                }
+            }
+
+        } catch (Exception e) {
+            Log.d(LOGTAG, "Error during getActivityDetailList()");
+        }
+
+        return activityTimeList;
+
     }
 
     public User getSecret(User user)
