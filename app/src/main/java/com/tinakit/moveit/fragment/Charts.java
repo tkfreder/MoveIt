@@ -45,6 +45,7 @@ import com.tinakit.moveit.fragment.MyYAxisValueFormatter;
 import com.tinakit.moveit.fragment.DemoBase;
 import com.tinakit.moveit.module.CustomApplication;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -281,7 +282,8 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
         for (int index = 0; index < timeList.size(); index++){
             int key = timeList.keyAt(index);
             //String str = timeList.get(key);
-            yVals1.add(new BarEntry(timeList.get(key), index));
+            DecimalFormat df = new DecimalFormat("#.##");
+            yVals1.add(new BarEntry(Float.valueOf(df.format(timeList.get(key))), index));
         }
         /*
         yVals1.add(new BarEntry(10, 0));

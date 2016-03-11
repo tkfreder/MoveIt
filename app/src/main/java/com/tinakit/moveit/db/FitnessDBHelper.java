@@ -317,7 +317,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 ", a." + KEY_ACTIVITY_USERS_USER_ID +
                 " FROM " + TABLE_ACTIVITIES  + " d" +
                 " INNER JOIN " + TABLE_ACTIVITY_USERS + " a on a." + KEY_ACTIVITY_USERS_ACTIVITY_ID + " = d." + KEY_ACTIVITY_ID +
-                " RIGHT JOIN " + TABLE_USERS + " u on u." + KEY_ACTIVITY_USERS_ID + " = a." + KEY_ACTIVITY_USERS_USER_ID +
+                " LEFT JOIN " + TABLE_USERS + " u on u." + KEY_ACTIVITY_USERS_ID + " = a." + KEY_ACTIVITY_USERS_USER_ID +
                 " GROUP BY " + " a." + KEY_ACTIVITY_USERS_USER_ID;
 
         String CREATE_VIEW_USERS_REWARDS_DETAIL = "CREATE VIEW " + VIEW_USERS_REWARDS_DETAIL + " AS" +
