@@ -90,13 +90,13 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
         mChart.setDrawBarShadow(false);
         mChart.setDrawValueAboveBar(true);
 
-        /*
-        mChart.setDescription("Minutes of Activity");
+
+        mChart.setDescription("Time");
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
         mChart.setDescriptionPosition( size.x / 2, 64);
-        */
+
         // if more than 60 entries are displayed in the chart, no values will be
         // drawn
         //mChart.setMaxVisibleValueCount(60);
@@ -264,10 +264,13 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
         int index = 0;
         for (User user : userList){
             DecimalFormat df = new DecimalFormat("#.##");
-            if (timeList.get(user.getUserId()) != null){
-                yVals1.add(new BarEntry(Float.valueOf(df.format(timeList.get(user.getUserId()))), index));
-                index++;
-            }
+            if(timeList != null){
+                if (timeList.get(user.getUserId()) != null){
+                    yVals1.add(new BarEntry(Float.valueOf(df.format(timeList.get(user.getUserId()))), index));
+                }
+            }else
+                yVals1.add(new BarEntry(0f, index));
+            index++;
         }
 
         BarDataSet set1 = new BarDataSet(yVals1, "Minutes of Activity");

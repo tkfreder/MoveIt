@@ -187,13 +187,16 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
                 displayStartScreen();
                 break;
 
-            // DEBUG: display Database tables
             case R.id.nav_charts:
-
                 startActivity(new Intent(this, Charts.class));
-                //startActivity(new Intent(this, AndroidDatabaseManager.class));
+                break;
 
-             case R.id.nav_coins:
+            // TODO:DEBUG: display Database tables
+            case R.id.database:
+                startActivity(new Intent(this, AndroidDatabaseManager.class));
+                break;
+
+            case R.id.nav_coins:
                 getSupportActionBar().setTitle(getString(R.string.nav_menu_coins));
                 removeChildFragment();
                 UserStatsMain userStatsMain = (UserStatsMain)getSupportFragmentManager().findFragmentByTag(UserStatsMain.USER_STATS_TAG);
