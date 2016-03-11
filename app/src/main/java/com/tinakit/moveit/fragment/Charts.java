@@ -277,10 +277,11 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
         cal.add(Calendar.DAY_OF_MONTH, -7 * i);
         Date sevenDaysAgo = cal.getTime();
 
-        SparseArray<Integer> timeList = mDatabaseHelper.getActivityTimes(new Date(), sevenDaysAgo);
-        for (int index = 0; i < timeList.size(); index++){
+        SparseArray<String> timeList = mDatabaseHelper.getActivityTimes(sevenDaysAgo, new Date());
+        for (int index = 0; index < timeList.size(); index++){
             int key = timeList.keyAt(index);
-            yVals1.add(new BarEntry(timeList.get(key), index));
+            String str = timeList.get(key);
+            //yVals1.add(new BarEntry((float)timeList.get(key), index));
         }
         /*
         yVals1.add(new BarEntry(10, 0));

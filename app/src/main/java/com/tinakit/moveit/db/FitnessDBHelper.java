@@ -44,6 +44,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
     //FORMATTING
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss:SSS";
+    //public static final String DATE_FORMAT_SHORT = "yyyy-MM-dd";
 
     //ACTIVITY_USERS TABLE
     private static final String TABLE_ACTIVITY_USERS = "ActivityUsers";
@@ -309,10 +310,13 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 " INNER JOIN " + TABLE_USERS + " u on u." + KEY_ACTIVITY_USERS_ID + " = a." + KEY_ACTIVITY_USERS_USER_ID +
                 " INNER JOIN " + TABLE_ACTIVITY_TYPE + " t on t." + KEY_ACTIVITY_TYPE_ID + " = a." + KEY_ACTIVITY_USERS_ACTIVITY_TYPE_ID_FK;
 
-        String CREATE_VIEW_USER_STATS_LIST = "CREATE VIEW " + VIEW_USER_STATS_LIST + " AS" +
-                "SELECT strftime('%s', " + KEY_ACTIVITY_START_DATE +
-                ", " + KEY_ACTIVITY_USERS_USER_ID +
-                " FROM " + VIEW_ACTIVITY_USERS_DETAIL;
+        String CREATE_VIEW_USER_STATS_LIST = "CREATE VIEW " + VIEW_USER_STATS_LIST + " AS " +
+                "SELECT " + KEY_ACTIVITY_START_DATE +
+                ", " + KEY_ACTIVITY_END_DATE +
+                ", a." + KEY_ACTIVITY_USERS_USER_ID +
+                " FROM " + TABLE_ACTIVITIES  + " d" +
+                " INNER JOIN " + TABLE_ACTIVITY_USERS + " a on a." + KEY_ACTIVITY_USERS_ACTIVITY_ID + " = d." + KEY_ACTIVITY_ID +
+                " INNER JOIN " + TABLE_USERS + " u on u." + KEY_ACTIVITY_USERS_ID + " = a." + KEY_ACTIVITY_USERS_USER_ID;
 
         String CREATE_VIEW_USERS_REWARDS_DETAIL = "CREATE VIEW " + VIEW_USERS_REWARDS_DETAIL + " AS" +
                 " SELECT u._id AS " + KEY_REWARDUSER_USER_ID_FK +
@@ -346,6 +350,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_VIEW_FIRST_LOCATION_POINTS);
         db.execSQL(CREATE_VIEW_ACTIVITY_USERS_DETAIL);
         db.execSQL(CREATE_VIEW_USERS_REWARDS_DETAIL);
+        db.execSQL(CREATE_VIEW_USER_STATS_LIST);
 
         //populate ActivityType table
         db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 'walk', 4.6, '1995 world record, walking speed meters/second', 1,'walk_48',1);");
@@ -621,21 +626,24 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
      * @param endDate up to this date, non-inclusive
      * @return
      */
-    public SparseArray<Integer> getActivityTimes(Date startDate, Date endDate){
+    public SparseArray<String> getActivityTimes(Date startDate, Date endDate){
 
-        SparseArray<Integer> activityTimeList = null;
+        SparseArray<String> activityTimeList = null;
 
         try {
-               Cursor cursor = db.query(VIEW_ACTIVITY_USERS_DETAIL,
-                    new String[]{KEY_ACTIVITY_START_DATE
-                            ,KEY_ACTIVITY_USERS_USER_ID
-                            }
-                       ,null,null, null, null, KEY_ACTIVITY_USERS_USER_ID);
+            Cursor cursor = db.query(VIEW_USER_STATS_LIST,
+                    new String[]{KEY_ACTIVITY_START_DATE, KEY_ACTIVITY_END_DATE,KEY_ACTIVITY_USERS_USER_ID}
+                    , KEY_ACTIVITY_START_DATE + " BETWEEN ? AND ?"
+                    , new String[]{new SimpleDateFormat(DATE_FORMAT).format(startDate), new SimpleDateFormat(DATE_FORMAT).format(endDate)}
+                    , null
+                    , null
+                    , KEY_REWARDUSER_USER_ID_FK);
+
             try {
                 if (cursor.moveToFirst()) {
                     activityTimeList = new SparseArray<>();
                     do {
-                        activityTimeList.put(cursor.getInt(cursor.getColumnIndex(KEY_ACTIVITY_USERS_USER_ID)), cursor.getInt(cursor.getColumnIndex(KEY_ACTIVITY_START_DATE)));
+                        activityTimeList.put(cursor.getInt(cursor.getColumnIndex(KEY_ACTIVITY_USERS_USER_ID)), new SimpleDateFormat(DATE_FORMAT).format(startDate));
                     } while (cursor.moveToNext());
                 }
             }catch(Exception exception) {
