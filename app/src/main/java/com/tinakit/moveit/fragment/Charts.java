@@ -43,6 +43,7 @@ import com.tinakit.moveit.R;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.fragment.MyYAxisValueFormatter;
 import com.tinakit.moveit.fragment.DemoBase;
+import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.module.CustomApplication;
 
 import java.text.DecimalFormat;
@@ -50,6 +51,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -63,8 +65,8 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
     FitnessDBHelper mDatabaseHelper;
 
     protected BarChart mChart;
-    private SeekBar mSeekBarX, mSeekBarY;
-    private TextView tvX, tvY;
+    private SeekBar mSeekBarX;
+    private TextView tvX;
 
     private Typeface mTf;
 
@@ -79,10 +81,8 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
         ((CustomApplication)getApplication()).getAppComponent().inject(this);
 
         tvX = (TextView) findViewById(R.id.tvXMax);
-        tvY = (TextView) findViewById(R.id.tvYMax);
 
         mSeekBarX = (SeekBar) findViewById(R.id.seekBar1);
-        mSeekBarY = (SeekBar) findViewById(R.id.seekBar2);
 
         mChart = (BarChart) findViewById(R.id.chart1);
         mChart.setOnChartValueSelectedListener(this);
@@ -90,12 +90,13 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
         mChart.setDrawBarShadow(false);
         mChart.setDrawValueAboveBar(true);
 
-        mChart.setDescription("Minutes of Activity This Week");
+        /*
+        mChart.setDescription("Minutes of Activity");
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
         mChart.setDescriptionPosition( size.x / 2, 64);
-
+        */
         // if more than 60 entries are displayed in the chart, no values will be
         // drawn
         //mChart.setMaxVisibleValueCount(60);
@@ -116,7 +117,6 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
 
         YAxisValueFormatter custom = new MyYAxisValueFormatter();
 
-
         YAxis leftAxis = mChart.getAxisLeft();
         leftAxis.setDrawLabels(false);
         //leftAxis.setTypeface(mTf);
@@ -136,6 +136,7 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
         rightAxis.setSpaceTop(15f);
         rightAxis.setAxisMinValue(0f); // this replaces setStartAtZero(true)
 
+        /*
         Legend l = mChart.getLegend();
         l.setPosition(LegendPosition.BELOW_CHART_LEFT);
         l.setForm(LegendForm.SQUARE);
@@ -146,16 +147,13 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
         // "def", "ghj", "ikl", "mno" });
          l.setCustom(ColorTemplate.VORDIPLOM_COLORS, new String[] { "abc",
          "def", "ghj", "ikl", "mno" });
-
-        setData(12, 50);
+        */
+        setData(7, 0);
 
         // setting data
-        mSeekBarY.setProgress(50);
-        mSeekBarX.setProgress(12);
-
-        mSeekBarY.setOnSeekBarChangeListener(this);
+        mSeekBarX.setProgress(7);
+        tvX.setText("7");
         mSeekBarX.setOnSeekBarChangeListener(this);
-
         // mChart.setDrawLegend(false);
     }
 
@@ -233,74 +231,46 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
-        // don't do anything
-        /*
         tvX.setText("" + (mSeekBarX.getProgress() + 1));
-        tvY.setText("" + (mSeekBarY.getProgress()));
-
-        setData(mSeekBarX.getProgress() + 1, mSeekBarY.getProgress());
+        setData(mSeekBarX.getProgress() + 1, 0);
         mChart.invalidate();
-        */
     }
 
     @Override
     public void onStartTrackingTouch(SeekBar seekBar) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
         // TODO Auto-generated method stub
-
     }
 
     private void setData(int count, float range) {
-
+        List<User> userList = mDatabaseHelper.getUsers();
 
         ArrayList<String> xVals = new ArrayList<String>();
-        xVals.add("Laura");
-        xVals.add("Lucy");
-        xVals.add("Alec");
-        xVals.add("Tina");
-
-        /*
-        for (int i = 0; i < count; i++) {
-            xVals.add(mMonths[i % 12]);
+        for (User user : userList){
+            xVals.add(user.getUserName());
         }
-        */
 
         ArrayList<BarEntry> yVals1 = new ArrayList<BarEntry>();
 
-        int i = 1;
         Calendar cal = new GregorianCalendar();
-        cal.add(Calendar.DAY_OF_MONTH, -7 * i);
-        Date sevenDaysAgo = cal.getTime();
+        cal.add(Calendar.DAY_OF_MONTH, -1 * count);
+        Date daysAgo = cal.getTime();
 
-        SparseArray<Float> timeList = mDatabaseHelper.getActivityTimes(sevenDaysAgo, new Date());
-        for (int index = 0; index < timeList.size(); index++){
-            int key = timeList.keyAt(index);
-            //String str = timeList.get(key);
+        SparseArray<Float> timeList = mDatabaseHelper.getActivityTimes(daysAgo, new Date());
+        int index = 0;
+        for (User user : userList){
             DecimalFormat df = new DecimalFormat("#.##");
-            yVals1.add(new BarEntry(Float.valueOf(df.format(timeList.get(key))), index));
+            if (timeList.get(user.getUserId()) != null){
+                yVals1.add(new BarEntry(Float.valueOf(df.format(timeList.get(user.getUserId()))), index));
+                index++;
+            }
         }
-        /*
-        yVals1.add(new BarEntry(10, 0));
-        yVals1.add(new BarEntry(30, 1));
-        yVals1.add(new BarEntry(40, 2));
-        yVals1.add(new BarEntry(100, 3));
-        */
 
-        /*
-        for (int i = 0; i < count; i++) {
-            float mult = (range + 1);
-            float val = (float) (Math.random() * mult);
-            yVals1.add(new BarEntry(val, i));
-        }
-        */
-
-        BarDataSet set1 = new BarDataSet(yVals1, "DataSet");
+        BarDataSet set1 = new BarDataSet(yVals1, "Minutes of Activity");
         set1.setBarSpacePercent(35f);
 
         ArrayList<IBarDataSet> dataSets = new ArrayList<IBarDataSet>();
