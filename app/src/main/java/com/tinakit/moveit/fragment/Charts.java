@@ -136,7 +136,6 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
         rightAxis.setSpaceTop(15f);
         rightAxis.setAxisMinValue(0f); // this replaces setStartAtZero(true)
 
-        /*
         Legend l = mChart.getLegend();
         l.setPosition(LegendPosition.BELOW_CHART_LEFT);
         l.setForm(LegendForm.SQUARE);
@@ -145,9 +144,8 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
         l.setXEntrySpace(4f);
         //l.setExtra(ColorTemplate.VORDIPLOM_COLORS, new String[] { "abc",
         // "def", "ghj", "ikl", "mno" });
-        // l.setCustom(ColorTemplate.VORDIPLOM_COLORS, new String[] { "abc",
-        // "def", "ghj", "ikl", "mno" });
-        */
+         l.setCustom(ColorTemplate.VORDIPLOM_COLORS, new String[] { "abc",
+         "def", "ghj", "ikl", "mno" });
 
         setData(12, 50);
 
@@ -244,8 +242,6 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
         setData(mSeekBarX.getProgress() + 1, mSeekBarY.getProgress());
         mChart.invalidate();
         */
-
-        setData(mSeekBarX.getProgress() + 1, 0);
     }
 
     @Override
@@ -261,6 +257,8 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
     }
 
     private void setData(int count, float range) {
+
+
         ArrayList<String> xVals = new ArrayList<String>();
         xVals.add("Laura");
         xVals.add("Lucy");
@@ -275,8 +273,9 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
 
         ArrayList<BarEntry> yVals1 = new ArrayList<BarEntry>();
 
+        int i = 1;
         Calendar cal = new GregorianCalendar();
-        cal.add(Calendar.DAY_OF_MONTH, -1 * count);
+        cal.add(Calendar.DAY_OF_MONTH, -7 * i);
         Date sevenDaysAgo = cal.getTime();
 
         SparseArray<Float> timeList = mDatabaseHelper.getActivityTimes(sevenDaysAgo, new Date());
