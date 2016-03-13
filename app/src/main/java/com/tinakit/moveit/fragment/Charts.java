@@ -67,8 +67,9 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
     protected BarChart mChart;
     private SeekBar mSeekBarX;
     private TextView tvX;
-
     private Typeface mTf;
+    private List<User> userList;
+    private ArrayList<String> xVals;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,6 +149,12 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
          l.setCustom(ColorTemplate.VORDIPLOM_COLORS, new String[] { "abc",
          "def", "ghj", "ikl", "mno" });
         */
+
+        userList = mDatabaseHelper.getUsers();
+        xVals = new ArrayList<String>();
+        for (User user : userList){
+            xVals.add(user.getUserName());
+        }
         setData(7, 0);
 
         // setting data
@@ -247,12 +254,6 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
     }
 
     private void setData(int count, float range) {
-        List<User> userList = mDatabaseHelper.getUsers();
-
-        ArrayList<String> xVals = new ArrayList<String>();
-        for (User user : userList){
-            xVals.add(user.getUserName());
-        }
 
         ArrayList<BarEntry> yVals1 = new ArrayList<BarEntry>();
 
@@ -264,10 +265,11 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
         int index = 0;
         for (User user : userList){
             DecimalFormat df = new DecimalFormat("#.##");
-            if(timeList != null){
-                if (timeList.get(user.getUserId()) != null){
-                    yVals1.add(new BarEntry(Float.valueOf(df.format(timeList.get(user.getUserId()))), index));
-                }
+            if(timeList != null) {
+                if (timeList.get(user.getUserId()) != null) {
+                    yVals1.add(new BarEntry(Float.valueOf(df.format(timeList.get(user.getUserId()) / 60)), index));
+                } else
+                    yVals1.add(new BarEntry(0f, index));
             }else
                 yVals1.add(new BarEntry(0f, index));
             index++;

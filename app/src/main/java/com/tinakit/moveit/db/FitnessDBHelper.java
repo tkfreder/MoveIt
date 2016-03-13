@@ -312,7 +312,8 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 " INNER JOIN " + TABLE_ACTIVITY_TYPE + " t on t." + KEY_ACTIVITY_TYPE_ID + " = a." + KEY_ACTIVITY_USERS_ACTIVITY_TYPE_ID_FK;
 
         String CREATE_VIEW_USER_STATS_LIST = "CREATE VIEW " + VIEW_USER_STATS_LIST + " AS " +
-                "SELECT SUM((strftime('%s'," + KEY_ACTIVITY_END_DATE + ") - strftime('%s'," + KEY_ACTIVITY_START_DATE + "))/60.0) as diffTime " + " , " + KEY_ACTIVITY_START_DATE +
+//                "SELECT SUM((strftime('%s'," + KEY_ACTIVITY_END_DATE + ") - strftime('%s'," + KEY_ACTIVITY_START_DATE + "))/60.0) as diffTime " + " , " + KEY_ACTIVITY_START_DATE +
+                "SELECT SUM(strftime('%s'," + KEY_ACTIVITY_END_DATE + ") - strftime('%s'," + KEY_ACTIVITY_START_DATE + ")) as diffTime " + " , " + KEY_ACTIVITY_START_DATE +
                 ", " + KEY_ACTIVITY_END_DATE +
                 ", a." + KEY_ACTIVITY_USERS_USER_ID +
                 " FROM " + TABLE_ACTIVITIES  + " d" +
@@ -626,13 +627,13 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
      *
      * @param startDate
      * @param endDate up to this date, non-inclusive
-     * @return
+     * @return sum of elapsed time in seconds by user for a given time period
      */
     public SparseArray<Float> getActivityTimes(Date startDate, Date endDate){
 
         SparseArray<Float> activityTimeList = null;
 
-        try {
+        try {   
             Cursor cursor = db.query(VIEW_USER_STATS_LIST,
                     new String[]{"diffTime", KEY_ACTIVITY_START_DATE, KEY_ACTIVITY_END_DATE,KEY_ACTIVITY_USERS_USER_ID}
                     , KEY_ACTIVITY_START_DATE + " BETWEEN ? AND ?"
