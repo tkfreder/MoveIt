@@ -188,7 +188,18 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
                 break;
 
             case R.id.nav_charts:
-                startActivity(new Intent(this, Charts.class));
+                getSupportActionBar().setTitle(getString(R.string.nav_menu_charts));
+                removeChildFragment();
+                Charts charts = (Charts)getSupportFragmentManager().findFragmentByTag(Charts.CHARTS_TAG);
+                if (charts == null) {
+                    charts = new Charts();
+                }
+                //replace current fragment
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragmentContainer, charts, Charts.CHARTS_TAG)
+                        .addToBackStack(Charts.CHARTS_BACKSTACK_NAME)
+                        .commit();
                 break;
 
             // TODO:DEBUG: display Database tables

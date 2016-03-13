@@ -1,16 +1,24 @@
 package com.tinakit.moveit.fragment;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Context;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.Display;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -58,8 +66,11 @@ import javax.inject.Inject;
 /**
  * Created by Tina on 3/9/2016.
  */
-public class Charts extends DemoBase implements OnSeekBarChangeListener,
+public class Charts extends Fragment implements OnSeekBarChangeListener,
         OnChartValueSelectedListener {
+
+    public static final String CHARTS_TAG= "CHARTS_TAG";
+    public static final String CHARTS_BACKSTACK_NAME = "Charts";
 
     @Inject
     FitnessDBHelper mDatabaseHelper;
@@ -70,22 +81,37 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
     private Typeface mTf;
     private List<User> userList;
     private ArrayList<String> xVals;
+    private View mRootView;
+    private FragmentActivity mFragmentActivity;
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        mRootView = inflater.inflate(R.layout.activity_barchart, container, false);
+        mFragmentActivity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        return mRootView;
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(R.layout.activity_barchart);
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof FragmentActivity){
+            mFragmentActivity=(FragmentActivity) context;
+            // DI
+            ((CustomApplication)mFragmentActivity.getApplication()).getAppComponent().inject(this);
+        }
+    }
 
-        // DI
-        ((CustomApplication)getApplication()).getAppComponent().inject(this);
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        tvX = (TextView) findViewById(R.id.tvXMax);
+        tvX = (TextView)mRootView.findViewById(R.id.tvXMax);
 
-        mSeekBarX = (SeekBar) findViewById(R.id.seekBar1);
+        mSeekBarX = (SeekBar)mRootView.findViewById(R.id.seekBar1);
 
-        mChart = (BarChart) findViewById(R.id.chart1);
+        mChart = (BarChart)mRootView.findViewById(R.id.chart1);
         mChart.setOnChartValueSelectedListener(this);
 
         mChart.setDrawBarShadow(false);
@@ -93,7 +119,7 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
 
 
         mChart.setDescription("Time");
-        Display display = getWindowManager().getDefaultDisplay();
+        Display display = mFragmentActivity.getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
         mChart.setDescriptionPosition( size.x / 2, 64);
@@ -108,7 +134,7 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
         mChart.setDrawGridBackground(false);
         // mChart.setDrawYLabels(false);
 
-        mTf = Typeface.createFromAsset(getAssets(), "OpenSans-Regular.ttf");
+        mTf = Typeface.createFromAsset(mFragmentActivity.getAssets(), "OpenSans-Regular.ttf");
 
         XAxis xAxis = mChart.getXAxis();
         xAxis.setPosition(XAxisPosition.BOTTOM);
@@ -165,12 +191,6 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.bar, menu);
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
@@ -221,15 +241,6 @@ public class Charts extends DemoBase implements OnSeekBarChangeListener,
             case R.id.animateXY: {
 
                 mChart.animateXY(3000, 3000);
-                break;
-            }
-            case R.id.actionSave: {
-                if (mChart.saveToGallery("title" + System.currentTimeMillis(), 50)) {
-                    Toast.makeText(getApplicationContext(), "Saving SUCCESSFUL!",
-                            Toast.LENGTH_SHORT).show();
-                } else
-                    Toast.makeText(getApplicationContext(), "Saving FAILED!", Toast.LENGTH_SHORT)
-                            .show();
                 break;
             }
         }
