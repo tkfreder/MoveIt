@@ -72,8 +72,6 @@ public class Charts extends Fragment implements OnSeekBarChangeListener,
 
     public static final String CHARTS_TAG= "CHARTS_TAG";
     public static final String CHARTS_BACKSTACK_NAME = "Charts";
-    private static final String STRING_FORMAT_HMS = "%02d:%02d:%02d";
-    private static final String STRING_FORMAT_MS = "%02d:%02d";
 
     @Inject
     FitnessDBHelper mDatabaseHelper;
@@ -82,6 +80,8 @@ public class Charts extends Fragment implements OnSeekBarChangeListener,
     private SeekBar mSeekBarX;
     private TextView tvX;
     private Typeface mTf;
+    private List<User> userList;
+    private ArrayList<String> xVals;
     private View mRootView;
     private FragmentActivity mFragmentActivity;
 
@@ -114,9 +114,12 @@ public class Charts extends Fragment implements OnSeekBarChangeListener,
 
         mChart = (BarChart)mRootView.findViewById(R.id.chart1);
         mChart.setOnChartValueSelectedListener(this);
+
         mChart.setDrawBarShadow(false);
         mChart.setDrawValueAboveBar(true);
-        mChart.setDescription("This Week");
+
+
+        mChart.setDescription("Time");
         Display display = mFragmentActivity.getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
@@ -174,6 +177,11 @@ public class Charts extends Fragment implements OnSeekBarChangeListener,
          "def", "ghj", "ikl", "mno" });
         */
 
+        userList = mDatabaseHelper.getUsers();
+        xVals = new ArrayList<String>();
+        for (User user : userList){
+            xVals.add(user.getUserName());
+        }
         setData(7, 0);
 
         // setting data
@@ -232,6 +240,7 @@ public class Charts extends Fragment implements OnSeekBarChangeListener,
                 break;
             }
             case R.id.animateXY: {
+
                 mChart.animateXY(3000, 3000);
                 break;
             }
@@ -264,22 +273,18 @@ public class Charts extends Fragment implements OnSeekBarChangeListener,
         cal.add(Calendar.DAY_OF_MONTH, -1 * count);
         Date daysAgo = cal.getTime();
 
-        Calendar calendar =Calendar.getInstance();
-        calendar.add( Calendar.DAY_OF_WEEK, -(calendar.get(Calendar.DAY_OF_WEEK)-1));
-        Date startDate = calendar.getTime();
-
         SparseArray<Float> timeList = mDatabaseHelper.getActivityTimes(daysAgo, new Date());
         int index = 0;
-        List<User> userList = mDatabaseHelper.getUsers();
-        List<String> xVals = new ArrayList<String>();
         for (User user : userList){
-            xVals.add(user.getUserName());
-        }
-        for (User user : userList){
-            if(timeList != null && timeList.get(user.getUserId()) != null) {
-                yVals1.add(new BarEntry((float) timeList.get(user.getUserId()), index));
-                index++;
-            }
+            DecimalFormat df = new DecimalFormat("#.##");
+            if(timeList != null) {
+                if (timeList.get(user.getUserId()) != null) {
+                    yVals1.add(new BarEntry((float)timeList.get(user.getUserId()), index));
+                } else
+                    yVals1.add(new BarEntry(0f, index));
+            }else
+                yVals1.add(new BarEntry(0f, index));
+            index++;
         }
 
         BarDataSet set1 = new BarDataSet(yVals1, "Minutes of Activity");
@@ -303,8 +308,9 @@ public class Charts extends Fragment implements OnSeekBarChangeListener,
             int hours = (int)((totalSeconds / 60)/60);
             int minutes = (int)(totalSeconds - (hours * 60 * 60))/60;
             int seconds = (int)totalSeconds - (minutes *60) - (hours * 60 * 60);
-            String time = hours > 0 ? String.format(STRING_FORMAT_HMS, hours, minutes, seconds) :
-                    String.format(STRING_FORMAT_MS, minutes, seconds);
+
+            String time = hours > 0 ? String.format("%02d:%02d:%02d", hours, minutes, seconds) :
+                    String.format("%02d:%02d", minutes, seconds);
             return time;
         }
     }
