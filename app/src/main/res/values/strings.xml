@@ -248,7 +248,7 @@
 
     <string name="link_avatar_attribution">&lt;a href=\"https://thenounproject.com/sachan/collection/animals/?oq=animal%20sachan&amp;cidx=8\"Sachan from The Noun Project&lt;/a>"</string>
     <string name="sachan_link">Avatars by Sachan from The Noun Project</string>
-    <string name="days_calculated">Days Calculated</string>
+    <string name="weeks_ago">Weeks Ago</string>
 
 
 </resources>

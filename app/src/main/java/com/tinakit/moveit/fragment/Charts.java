@@ -119,7 +119,7 @@ public class Charts extends Fragment implements OnSeekBarChangeListener,
         mChart.setDrawValueAboveBar(true);
 
 
-        mChart.setDescription("Time");
+        mChart.setDescription("Weekly Elapsed Time");
         Display display = mFragmentActivity.getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
@@ -182,11 +182,11 @@ public class Charts extends Fragment implements OnSeekBarChangeListener,
         for (User user : userList){
             xVals.add(user.getUserName());
         }
-        setData(7, 0);
+        setData(1, 0);
 
         // setting data
-        mSeekBarX.setProgress(7);
-        tvX.setText("7");
+        mSeekBarX.setProgress(1);
+        tvX.setText("1");
         mSeekBarX.setOnSeekBarChangeListener(this);
         // mChart.setDrawLegend(false);
     }
@@ -273,7 +273,15 @@ public class Charts extends Fragment implements OnSeekBarChangeListener,
         cal.add(Calendar.DAY_OF_MONTH, -1 * count);
         Date daysAgo = cal.getTime();
 
-        SparseArray<Float> timeList = mDatabaseHelper.getActivityTimes(daysAgo, new Date());
+        // get previous Sunday
+        Date startDate = new Date();
+        Calendar calendar =Calendar.getInstance();
+        if (Calendar.DAY_OF_WEEK != calendar.SUNDAY){
+            calendar.add( Calendar.DAY_OF_WEEK, -(calendar.get(Calendar.DAY_OF_WEEK)-1));
+            calendar.add(Calendar.DAY_OF_MONTH, -1 * count);
+            startDate = calendar.getTime();
+        }
+        SparseArray<Float> timeList = mDatabaseHelper.getActivityTimes(startDate, new Date());
         int index = 0;
         for (User user : userList){
             DecimalFormat df = new DecimalFormat("#.##");

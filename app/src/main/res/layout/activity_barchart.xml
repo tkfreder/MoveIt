@@ -41,6 +41,6 @@
         android:layout_marginRight="10dp"
         android:gravity="right"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/days_calculated"
+        android:text="@string/weeks_ago"
         />
 </RelativeLayout>
