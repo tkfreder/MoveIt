@@ -47,6 +47,7 @@ import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.interfaces.datasets.IDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.fragment.MyYAxisValueFormatter;
@@ -288,6 +289,7 @@ public class Charts extends Fragment implements OnSeekBarChangeListener,
 
         BarDataSet set1 = new BarDataSet(yVals1, "Minutes of Activity");
         set1.setBarSpacePercent(35f);
+        set1.setValueFormatter(new MyValueFormatter());
 
         ArrayList<IBarDataSet> dataSets = new ArrayList<IBarDataSet>();
         dataSets.add(set1);
@@ -295,8 +297,16 @@ public class Charts extends Fragment implements OnSeekBarChangeListener,
         BarData data = new BarData(xVals, dataSets);
         data.setValueTextSize(10f);
         data.setValueTypeface(mTf);
+        //data.setValueFormatter(new MyValueFormatter());
 
         mChart.setData(data);
+    }
+
+    public class MyValueFormatter implements ValueFormatter{
+        @Override
+        public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
+            return String.format("%.2f", value);
+        }
     }
 
     @SuppressLint("NewApi")
