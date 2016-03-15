@@ -279,7 +279,7 @@ public class Charts extends Fragment implements OnSeekBarChangeListener,
             DecimalFormat df = new DecimalFormat("#.##");
             if(timeList != null) {
                 if (timeList.get(user.getUserId()) != null) {
-                    yVals1.add(new BarEntry(Float.valueOf(df.format(timeList.get(user.getUserId()) / 60)), index));
+                    yVals1.add(new BarEntry((float)timeList.get(user.getUserId()), index));
                 } else
                     yVals1.add(new BarEntry(0f, index));
             }else
@@ -289,7 +289,7 @@ public class Charts extends Fragment implements OnSeekBarChangeListener,
 
         BarDataSet set1 = new BarDataSet(yVals1, "Minutes of Activity");
         set1.setBarSpacePercent(35f);
-        set1.setValueFormatter(new MyValueFormatter());
+        set1.setValueFormatter(new MinuteFormatter());
 
         ArrayList<IBarDataSet> dataSets = new ArrayList<IBarDataSet>();
         dataSets.add(set1);
@@ -297,15 +297,21 @@ public class Charts extends Fragment implements OnSeekBarChangeListener,
         BarData data = new BarData(xVals, dataSets);
         data.setValueTextSize(10f);
         data.setValueTypeface(mTf);
-        //data.setValueFormatter(new MyValueFormatter());
 
         mChart.setData(data);
     }
 
-    public class MyValueFormatter implements ValueFormatter{
+    public class MinuteFormatter implements ValueFormatter{
         @Override
-        public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
-            return String.format("%.2f", value);
+        public String getFormattedValue(float totalSeconds, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
+
+            int hours = (int)((totalSeconds / 60)/60);
+            int minutes = (int)(totalSeconds - (hours * 60 * 60))/60;
+            int seconds = (int)totalSeconds - (minutes *60) - (hours * 60 * 60);
+
+            String time = hours > 0 ? String.format("%02d:%02d:%02d", hours, minutes, seconds) :
+                    String.format("%02d:%02d", minutes, seconds);
+            return time;
         }
     }
 
