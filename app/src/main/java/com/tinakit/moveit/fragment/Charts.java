@@ -280,10 +280,8 @@ public class Charts extends Fragment implements OnSeekBarChangeListener,
             if(timeList != null) {
                 if (timeList.get(user.getUserId()) != null) {
                     yVals1.add(new BarEntry((float)timeList.get(user.getUserId()), index));
-                } else
-                    yVals1.add(new BarEntry(0f, index));
-            }else
-                yVals1.add(new BarEntry(0f, index));
+                }
+            }
             index++;
         }
 
