@@ -311,22 +311,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 " INNER JOIN " + TABLE_USERS + " u on u." + KEY_ACTIVITY_USERS_ID + " = a." + KEY_ACTIVITY_USERS_USER_ID +
                 " INNER JOIN " + TABLE_ACTIVITY_TYPE + " t on t." + KEY_ACTIVITY_TYPE_ID + " = a." + KEY_ACTIVITY_USERS_ACTIVITY_TYPE_ID_FK;
 
-        String CREATE_VIEW_USER_STATS_LIST = "CREATE VIEW " + VIEW_USER_STATS_LIST + " AS " +
-//                "SELECT SUM((strftime('%s'," + KEY_ACTIVITY_END_DATE + ") - strftime('%s'," + KEY_ACTIVITY_START_DATE + "))/60.0) as diffTime " + " , " + KEY_ACTIVITY_START_DATE +
-                "SELECT SUM(strftime('%s'," + KEY_ACTIVITY_END_DATE + ") - strftime('%s'," + KEY_ACTIVITY_START_DATE + ")) as diffTime " +
-                " , " + KEY_ACTIVITY_START_DATE +
-                ", " + KEY_ACTIVITY_END_DATE +
-                ", " + TABLE_USERS + "." + KEY_USER_ID + " AS " +  KEY_ACTIVITY_USERS_USER_ID +
-                " FROM " + TABLE_ACTIVITIES +
-                ", " + TABLE_ACTIVITY_USERS +
-                ", " + TABLE_USERS +
-                " WHERE " + TABLE_ACTIVITIES + "." + KEY_ACTIVITY_ID + " = " + TABLE_ACTIVITY_USERS + "." + KEY_ACTIVITY_USERS_ACTIVITY_ID +
-                " AND " + TABLE_ACTIVITY_USERS + "." + KEY_ACTIVITY_USERS_USER_ID + " = " + TABLE_USERS + "." + KEY_USER_ID +
-                //" FROM " + TABLE_ACTIVITIES  + " d" +
-                //" INNER JOIN " + TABLE_ACTIVITY_USERS + " a on a." + KEY_ACTIVITY_USERS_ACTIVITY_ID + " = d." + KEY_ACTIVITY_ID +
-                //" LEFT JOIN " + TABLE_USERS + " u on u." + KEY_ACTIVITY_USERS_ID + " = a." + KEY_ACTIVITY_USERS_USER_ID +
-                " GROUP BY " + TABLE_USERS + "." + KEY_USER_ID;
-
         String CREATE_VIEW_USERS_REWARDS_DETAIL = "CREATE VIEW " + VIEW_USERS_REWARDS_DETAIL + " AS" +
                 " SELECT u._id AS " + KEY_REWARDUSER_USER_ID_FK +
                 " , u." + KEY_USER_NAME + " AS " + KEY_USER_NAME +
@@ -359,7 +343,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_VIEW_FIRST_LOCATION_POINTS);
         db.execSQL(CREATE_VIEW_ACTIVITY_USERS_DETAIL);
         db.execSQL(CREATE_VIEW_USERS_REWARDS_DETAIL);
-        db.execSQL(CREATE_VIEW_USER_STATS_LIST);
 
         //populate ActivityType table
         db.execSQL("INSERT INTO " + TABLE_ACTIVITY_TYPE + " VALUES (null, 'walk', 4.6, '1995 world record, walking speed meters/second', 1,'walk_48',1);");
@@ -640,17 +623,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         SparseArray<Float> activityTimeList = null;
 
         try {   
-            /*
-            Cursor cursor = db.query(VIEW_USER_STATS_LIST,
-                    new String[]{"diffTime", KEY_ACTIVITY_START_DATE, KEY_ACTIVITY_END_DATE, KEY_ACTIVITY_USERS_USER_ID}
-                    ,"strftime('%s'," + KEY_ACTIVITY_START_DATE + ") >= strftime('%s',?) AND strftime('%s'," + KEY_ACTIVITY_START_DATE + ") < strftime('%s',?)"
-                    //, KEY_ACTIVITY_START_DATE + " BETWEEN ? AND ? "
-                    , new String[]{new SimpleDateFormat(DATE_FORMAT).format(startDate), new SimpleDateFormat(DATE_FORMAT).format(endDate)}
-                    , null
-                    , null
-                    , KEY_ACTIVITY_USERS_USER_ID);
-            */
-
             String query = "SELECT SUM(strftime('%s',endDate) - strftime('%s',startDate)) as diffTime" +
                     ", startDate, endDate, Users._id AS " + KEY_ACTIVITY_USERS_USER_ID +
                     " FROM Activities, ActivityUsers, Users " +
@@ -658,8 +630,6 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                     " AND ActivityUsers.userId = Users._id " +
                     " AND strftime('%s',startDate) >=strftime('%s',?) " +
                     " AND strftime('%s',startDate) < strftime('%s',?) " +
-                    //" AND strftime('%s',startDate) >=strftime('%s','" + new SimpleDateFormat(DATE_FORMAT).format(startDate) + "') " +
-                    //" AND strftime('%s',startDate) < strftime('%s','" + new SimpleDateFormat(DATE_FORMAT).format(endDate) + "') " +
                     " GROUP BY " + KEY_ACTIVITY_USERS_USER_ID;
 
             Cursor cursor = db.rawQuery(query, new String[]{new SimpleDateFormat(DATE_FORMAT).format(startDate), new SimpleDateFormat(DATE_FORMAT).format(endDate)});
