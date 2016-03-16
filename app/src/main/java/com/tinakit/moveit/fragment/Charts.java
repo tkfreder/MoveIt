@@ -56,6 +56,7 @@ import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.module.CustomApplication;
 
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -72,6 +73,7 @@ public class Charts extends Fragment implements OnSeekBarChangeListener,
 
     public static final String CHARTS_TAG= "CHARTS_TAG";
     public static final String CHARTS_BACKSTACK_NAME = "Charts";
+    private static final int SEEKBAR_PERIOD_DAYS = 7;
 
     @Inject
     FitnessDBHelper mDatabaseHelper;
@@ -182,11 +184,11 @@ public class Charts extends Fragment implements OnSeekBarChangeListener,
         for (User user : userList){
             xVals.add(user.getUserName());
         }
-        setData(1, 0);
+        setData(0, 0);
 
         // setting data
-        mSeekBarX.setProgress(1);
-        tvX.setText("1");
+        mSeekBarX.setProgress(0);
+        tvX.setText("0  ");
         mSeekBarX.setOnSeekBarChangeListener(this);
         // mChart.setDrawLegend(false);
     }
@@ -250,8 +252,8 @@ public class Charts extends Fragment implements OnSeekBarChangeListener,
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        tvX.setText("" + (mSeekBarX.getProgress() + 1));
-        setData(mSeekBarX.getProgress() + 1, 0);
+        tvX.setText("" + (mSeekBarX.getProgress()));
+        setData(mSeekBarX.getProgress(), 0);
         mChart.invalidate();
     }
 
@@ -278,10 +280,17 @@ public class Charts extends Fragment implements OnSeekBarChangeListener,
         Calendar calendar =Calendar.getInstance();
         if (Calendar.DAY_OF_WEEK != calendar.SUNDAY){
             calendar.add( Calendar.DAY_OF_WEEK, -(calendar.get(Calendar.DAY_OF_WEEK)-1));
-            calendar.add(Calendar.DAY_OF_MONTH, -1 * count);
+            calendar.add(Calendar.DAY_OF_MONTH, -SEEKBAR_PERIOD_DAYS * count);
+            calendar.set(Calendar.HOUR, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
             startDate = calendar.getTime();
         }
-        SparseArray<Float> timeList = mDatabaseHelper.getActivityTimes(startDate, new Date());
+        calendar.add(Calendar.DATE, SEEKBAR_PERIOD_DAYS);
+        Date endDate = calendar.getTime();
+
+        SparseArray<Float> timeList = mDatabaseHelper.getActivityTimes(startDate, endDate);
         int index = 0;
         for (User user : userList){
             DecimalFormat df = new DecimalFormat("#.##");
