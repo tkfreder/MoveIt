@@ -257,11 +257,11 @@ public class Charts extends Fragment implements OnSeekBarChangeListener,
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         setData(mSeekBarX.getProgress(), 0);
         if(mSeekBarX.getProgress() != 0){
-            tvX.setText("" + (mSeekBarX.getProgress()));
-            mUnitPeriod.setVisibility(View.GONE);
+            tvX.setText(String.valueOf((mSeekBarX.getProgress())));
+            mUnitPeriod.setText(R.string.weeks_ago);
         }else{
             tvX.setText("");
-            mUnitPeriod.setVisibility(View.VISIBLE);
+            mUnitPeriod.setText(R.string.this_week);
         }
         mChart.invalidate();
     }
