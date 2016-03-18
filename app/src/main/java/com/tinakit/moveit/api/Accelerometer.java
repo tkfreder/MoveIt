@@ -30,7 +30,9 @@ public class Accelerometer implements SensorEventListener{
     private SensorManager mSensorManager;
     private Sensor sensorAccelerometer;
     private ScheduledExecutorService executor;
-    private float last_x, last_y, last_z;
+    private float last_x = -1f;
+    private float last_y = -1f;
+    private float last_z = -1f; //initialize to flag that marks this as first call
     private long lastUpdate = 0;
 
     public Accelerometer(FragmentActivity fragmentActivity){
@@ -55,8 +57,7 @@ public class Accelerometer implements SensorEventListener{
                 float speedZ = Math.abs(z - last_z)/diffTime * 10000;
                 //check for inactivity, below shake threshold
                 //if (speed < SHAKE_THRESHOLD){
-                if (!(speedX > SHAKE_THRESHOLD || speedY > SHAKE_THRESHOLD || speedZ > SHAKE_THRESHOLD)) {
-                    // send message to indicate there is new location data
+                if (last_z != -1 && !(speedX > SHAKE_THRESHOLD || speedY > SHAKE_THRESHOLD || speedZ > SHAKE_THRESHOLD)) {
                     Intent intent = new Intent(ACCELEROMETER_INTENT);
                     intent.putExtra(ActivityTracker.ACTIVITY_TRACKER_BROADCAST_RECEIVER, ACCELEROMETER_INTENT);
                     LocalBroadcastManager.getInstance(mFragmentActivity).sendBroadcast(intent);
