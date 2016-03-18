@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
@@ -47,6 +48,7 @@ import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.module.CustomApplication;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import javax.inject.Inject;
@@ -417,6 +419,17 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
             // Back button pressed = RESULT_CANCELLED
             if (resultCode == Activity.RESULT_CANCELED){
                 finish();
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        List<Fragment> fragments = getSupportFragmentManager().getFragments();
+        if (fragments != null) {
+            for (Fragment fragment : fragments) {
+                fragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
             }
         }
     }
