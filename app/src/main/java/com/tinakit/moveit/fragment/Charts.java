@@ -86,6 +86,7 @@ public class Charts extends Fragment implements OnSeekBarChangeListener,
     private ArrayList<String> xVals;
     private View mRootView;
     private FragmentActivity mFragmentActivity;
+    private TextView mUnitPeriod;
 
     @Nullable
     @Override
@@ -188,9 +189,12 @@ public class Charts extends Fragment implements OnSeekBarChangeListener,
 
         // setting data
         mSeekBarX.setProgress(0);
-        tvX.setText("0  ");
+        tvX.setText("");
         mSeekBarX.setOnSeekBarChangeListener(this);
         // mChart.setDrawLegend(false);
+        mUnitPeriod = (TextView)mRootView.findViewById(R.id.unitPeriod);
+        mUnitPeriod.setText(R.string.this_week);
+
     }
 
     @Override
@@ -242,7 +246,6 @@ public class Charts extends Fragment implements OnSeekBarChangeListener,
                 break;
             }
             case R.id.animateXY: {
-
                 mChart.animateXY(3000, 3000);
                 break;
             }
@@ -252,8 +255,14 @@ public class Charts extends Fragment implements OnSeekBarChangeListener,
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        tvX.setText("" + (mSeekBarX.getProgress()));
         setData(mSeekBarX.getProgress(), 0);
+        if(mSeekBarX.getProgress() != 0){
+            tvX.setText("" + (mSeekBarX.getProgress()));
+            mUnitPeriod.setVisibility(View.GONE);
+        }else{
+            tvX.setText("");
+            mUnitPeriod.setVisibility(View.VISIBLE);
+        }
         mChart.invalidate();
     }
 
@@ -309,6 +318,18 @@ public class Charts extends Fragment implements OnSeekBarChangeListener,
         ArrayList<IBarDataSet> dataSets = new ArrayList<IBarDataSet>();
         dataSets.add(set1);
 
+        /*
+        ////////////// second bar
+        ArrayList<BarEntry> yVals2 = new ArrayList<BarEntry>();
+        yVals2.add(new BarEntry(1f, 0));
+        yVals2.add(new BarEntry(2f, 1));
+        yVals2.add(new BarEntry(3f, 2));
+        yVals2.add(new BarEntry(4f, 3));
+        BarDataSet set2 = new BarDataSet(yVals2, "Total Distance");
+        set2.setBarSpacePercent(35f);
+        //set2.setValueFormatter(new MinuteFormatter());
+        dataSets.add(set2);
+*/
         BarData data = new BarData(xVals, dataSets);
         data.setValueTextSize(10f);
         data.setValueTypeface(mTf);
