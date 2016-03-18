@@ -26,13 +26,13 @@
         android:layout_width="25dp"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/seekBar1"
-        android:layout_toLeftOf="@+id/daysAgo"
+        android:layout_toLeftOf="@+id/unitPeriod"
         android:text="14"
         android:layout_marginBottom="15dp"
         android:textAppearance="?android:attr/textAppearanceMedium"
         />
     <TextView
-        android:id="@+id/daysAgo"
+        android:id="@+id/unitPeriod"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/seekBar1"

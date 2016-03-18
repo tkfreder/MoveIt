@@ -179,6 +179,7 @@
     <string name="message_activity_deleted">Activity deleted.</string>
     <string name="message_admin_password_changed">Your password has been updated.</string>
     <string name="message_battery_low_auto_shutoff">Your battery is running low. Tracking has stopped to conserve power.</string>
+    <string name="message_no_location_permission">Without location permission, location data cannot be tracked.</string>
 
     <string name="title_activity_sensor_api">SensorAPI</string>
     <string name="title_activity_fused_location_api">FusedLocationApi</string>
@@ -249,6 +250,7 @@
     <string name="link_avatar_attribution">&lt;a href=\"https://thenounproject.com/sachan/collection/animals/?oq=animal%20sachan&amp;cidx=8\"Sachan from The Noun Project&lt;/a>"</string>
     <string name="sachan_link">Avatars by Sachan from The Noun Project</string>
     <string name="weeks_ago">Weeks Ago</string>
+    <string name="this_week">This Week</string>
 
 
 </resources>
