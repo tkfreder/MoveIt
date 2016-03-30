@@ -12,7 +12,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.tinakit.moveit.R;
-import com.tinakit.moveit.db.DBController;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.Reward;
 import com.tinakit.moveit.model.User;
@@ -24,9 +23,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import javax.inject.Inject;
-
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 
 /**
  * Created by Tina on 1/7/2016.
@@ -67,17 +63,7 @@ public class EditRewardRecyclerAdapter extends RecyclerView.Adapter<EditRewardRe
         }
 
         // get list of Users
-        //mUserList = mDatabaseHelper.getUsers();
-
-        DBController mDBController = new DBController();
-        mDBController.getUsers(mFragmentActivity)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<List<User>>() {
-                    @Override
-                    public void call(List<User> users) {
-                        mUserList = users;
-                    }
-                });
+        mUserList = mDatabaseHelper.getUsers();
     }
 
     public List<Reward> getRewardList(){
