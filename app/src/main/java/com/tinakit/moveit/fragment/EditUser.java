@@ -37,13 +37,15 @@ import com.tinakit.moveit.module.CustomApplication;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.inject.Inject;
 
 /**
  * Created by Tina on 1/8/2016.
  */
-public class EditUser extends Fragment {
+public class EditUser extends Fragment implements Observer {
 
     public static final String EDIT_USER_TAG = "EDIT_USER_TAG";
     public static final String EDIT_USER_USER = "EDIT_USER_USER";
@@ -71,7 +73,7 @@ public class EditUser extends Fragment {
     protected TextView mAdmin;
     protected Button mSaveButton;
     protected EditText mPassword;
-    protected EditText mSecretAnswer;
+    //protected EditText mSecretAnswer;
     protected EditText mEmail;
 
     @Nullable
@@ -102,7 +104,7 @@ public class EditUser extends Fragment {
         mAdmin = (TextView)mRootView.findViewById(R.id.isAdmin);
         mSaveButton = (Button)mRootView.findViewById(R.id.saveButton);
         mPassword = (EditText)mRootView.findViewById(R.id.password);
-        mSecretAnswer = (EditText)mRootView.findViewById(R.id.secretAnswer);
+        //mSecretAnswer = (EditText)mRootView.findViewById(R.id.secretAnswer);
         mEmail = (EditText)mRootView.findViewById(R.id.email);
     }
 
@@ -200,7 +202,7 @@ public class EditUser extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
 
-                displaySecretQuestion();
+                //displaySecretQuestion();
 
                 // check for empty field
                 if (s.toString().trim().equals("")){
@@ -270,7 +272,7 @@ public class EditUser extends Fragment {
                     // Check if no view has focus:
                     View view = getActivity().getCurrentFocus();
                     if (view != null) {
-                        displaySecretQuestion();
+                        //displaySecretQuestion();
                         // close softkeyboard which obscures the hint on TextInputLayout
                         InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
@@ -293,10 +295,11 @@ public class EditUser extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                displaySecretQuestion();
+                //displaySecretQuestion();
             }
         });
 
+        /*
         mSecretAnswer.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -318,6 +321,7 @@ public class EditUser extends Fragment {
                     mSaveButton.setEnabled(false);
             }
         });
+        */
 
         mAvatar.setOnClickListener(avatarClickListener);
         mEditAvatar.setOnClickListener(avatarClickListener);
@@ -395,6 +399,8 @@ public class EditUser extends Fragment {
 
                     if (rowId != -1) {
 
+                        //TODO: refresh User List
+
                         mIsNewUser = false;
 
                         // add a Reward placeholderfor the new user
@@ -416,6 +422,8 @@ public class EditUser extends Fragment {
                     long rowsAffected = mDatabaseHelper.updateUser(mUser);
 
                     if (rowsAffected == 1) {
+
+                        //TODO: refresh User List
 
                         Snackbar.make(mRootView.findViewById(R.id.main_layout), getString(R.string.message_saved_changes), Snackbar.LENGTH_LONG)
                                 .show();
@@ -621,11 +629,17 @@ public class EditUser extends Fragment {
         return user;
     }
 
+    /*
     private void displaySecretQuestion(){
         // ask for secret answer
         mSecretAnswer.setVisibility(View.VISIBLE);
         mSecretAnswer.setError(mUser.getSecretQuestion());
         mSaveButton.setEnabled(false);
     }
+*/
 
+    @Override
+    public void update(Observable observable, Object data) {
+
+    }
 }

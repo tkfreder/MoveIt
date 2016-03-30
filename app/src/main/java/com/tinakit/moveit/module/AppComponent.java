@@ -18,6 +18,7 @@ import com.tinakit.moveit.fragment.UserProfile;
 import com.tinakit.moveit.fragment.UserStats;
 import com.tinakit.moveit.fragment.UserStatsMain;
 import com.tinakit.moveit.model.RegisterDialogFragment;
+import com.tinakit.moveit.model.UserListObservable;
 
 import javax.inject.Singleton;
 
@@ -58,4 +59,5 @@ public interface AppComponent {
     void inject(AdminLoginDialogFragment adminLoginDialogFragment);
     void inject(SecretQuestionDialogFragment secretQuestionDialogFragment);
     void inject(Charts charts);
+    void inject(UserListObservable userListObservable);
 }

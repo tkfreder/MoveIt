@@ -2,6 +2,8 @@ package com.tinakit.moveit.module;
 
 import android.app.Application;
 
+import com.tinakit.moveit.model.UserListObservable;
+
 
 /**
  * Created by Tina on 1/7/2016.
@@ -9,6 +11,7 @@ import android.app.Application;
 public class CustomApplication extends Application {
 
     AppComponent mAppComponent;
+    UserListObservable mUserListObservable;
 
     @Override
     public void onCreate(){
@@ -21,10 +24,12 @@ public class CustomApplication extends Application {
                 .apiModule(new ApiModule())
                 .build();
 
+        mUserListObservable = new UserListObservable();
     }
 
     public AppComponent getAppComponent(){ return mAppComponent;};
 
-
-
+    public UserListObservable getUserListObservable(){
+        return mUserListObservable;
+    }
 }

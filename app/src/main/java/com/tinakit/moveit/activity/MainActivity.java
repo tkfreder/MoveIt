@@ -1,6 +1,7 @@
 package com.tinakit.moveit.activity;
 
 import android.app.Activity;
+import android.app.Application;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -45,10 +46,13 @@ import com.tinakit.moveit.fragment.UserStatsMain;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.RegisterDialogFragment;
 import com.tinakit.moveit.model.User;
+import com.tinakit.moveit.model.UserListObservable;
 import com.tinakit.moveit.module.CustomApplication;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Random;
 
 import javax.inject.Inject;
@@ -100,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
             finish();
         else
             mGoogleApi.buildGoogleApiClient(this);
+
         // get data before initializing UI, need data to pass to ViewPager
         fetchData();
         initializeUI();
@@ -113,19 +118,18 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
     //**********************************************************************************************
 
     private void fetchData(){
-
         //data for ActivityHistory
         mActivityDetailList = mDatabaseHelper.getActivityDetailList(ActivityHistory.ACTIVITY_LIMIT_COUNT);
-
         // get user data
         mUserList = mDatabaseHelper.getUsers();
-
+        // initialize UserListObservable on launch app
+        CustomApplication app = (CustomApplication)getApplication();
+        UserListObservable mUserListObservable = app.getUserListObservable();
+        mUserListObservable.setValue(mUserList);
     }
-
     //**********************************************************************************************
     //  initializeUI()
     //**********************************************************************************************
-
     private void initializeUI(){
         // Toolbar
         setSupportActionBar((Toolbar)findViewById(R.id.toolBar));

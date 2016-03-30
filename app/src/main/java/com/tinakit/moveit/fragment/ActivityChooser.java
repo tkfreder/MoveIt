@@ -40,11 +40,14 @@ import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.ActivityType;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.model.UserActivity;
+import com.tinakit.moveit.model.UserListObservable;
 import com.tinakit.moveit.module.CustomApplication;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.inject.Inject;
 
@@ -53,7 +56,7 @@ import fr.ganfra.materialspinner.MaterialSpinner;
 /**
  * Created by Tina on 12/13/2015.
  */
-public class ActivityChooser  extends Fragment {
+public class ActivityChooser  extends Fragment implements Observer {
 
     // CONSTANTS
     private static final boolean DEBUG = true;
@@ -147,7 +150,10 @@ public class ActivityChooser  extends Fragment {
     private void initializeUI(){
 
         // Get userlist
-        List<User> userList = mDatabaseHelper.getUsers();
+        //List<User> userList = mDatabaseHelper.getUsers();
+        CustomApplication app = ((CustomApplication)getActivity().getApplication());
+        UserListObservable mUserListObservable = app.getUserListObservable();
+        List<User> userList = mUserListObservable.getValue();
         mActivityTypeList = mDatabaseHelper.getActivityTypes();
 
         //RecyclerView
@@ -168,6 +174,12 @@ public class ActivityChooser  extends Fragment {
 
         //display map of starting point
         //mMapFragment.displayStartMap();
+    }
+
+    @Override
+    public void update(Observable observable, Object data) {
+        List<User> userList = (List<User>)data;
+        mRecyclerViewAdapter.setList(userList);
     }
 
     @Override
@@ -296,6 +308,7 @@ public class ActivityChooser  extends Fragment {
 
         private void setList(List<User> userList){
             mUserList = userList;
+            notifyDataSetChanged();
         }
 
         @Override
