@@ -33,7 +33,7 @@ public class UserProfile extends Fragment {
     // CONSTANTS
     public static final String USER_PROFILE_TAG = "USER_PROFILE_TAG";
 
-    @Inject
+    //@Inject
     DBController mDBController;
     //FitnessDBHelper mDatabaseHelper;
 
@@ -82,6 +82,7 @@ public class UserProfile extends Fragment {
     }
 
     private void getUsers(){
+        mDBController = new DBController();
         mDBController.getUsers(getActivity())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<List<User>>() {

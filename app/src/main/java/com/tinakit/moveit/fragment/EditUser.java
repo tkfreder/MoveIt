@@ -49,10 +49,7 @@ public class EditUser extends Fragment {
     private static final String YOUR_REWARD = "Your Reward TBD";
     private static final int DEFAULT_REWARD_POINTS = 200;
 
-    @Inject
-    FitnessDBHelper mDatabaseHelper;
-
-    @Inject
+    //@Inject
     DBController mDBController;
 
     // local cache
@@ -83,7 +80,7 @@ public class EditUser extends Fragment {
         mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // inject DBController //FitnessDBHelper
-        ((CustomApplication)getActivity().getApplication()).getAppComponent().inject(this);
+        //((CustomApplication)getActivity().getApplication()).getAppComponent().inject(this);
 
         initializeUI();
 
@@ -112,6 +109,7 @@ public class EditUser extends Fragment {
         // get UserName list, for validating new UserName
         //mUserList = mDatabaseHelper.getUsers();
 
+        mDBController = new DBController();
         mDBController.getUsers(getActivity())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<List<User>>() {
@@ -399,8 +397,9 @@ public class EditUser extends Fragment {
                 }
 
                 saveUser();
-
+/*
                 if (mIsNewUser) {
+
 
                     long rowId = mDatabaseHelper.addUser(mUser);
 
@@ -449,6 +448,7 @@ public class EditUser extends Fragment {
                         }
                     }
                 }
+                */
             }
 
         });

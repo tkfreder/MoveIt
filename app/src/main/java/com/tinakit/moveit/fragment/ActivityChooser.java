@@ -35,6 +35,7 @@ import com.tinakit.moveit.activity.ActivityTracker;
 import com.tinakit.moveit.activity.PickAvatar;
 import com.tinakit.moveit.api.GoogleApi;
 import com.tinakit.moveit.api.LocationApi;
+import com.tinakit.moveit.db.DBController;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.ActivityType;
@@ -49,6 +50,8 @@ import java.util.List;
 import javax.inject.Inject;
 
 import fr.ganfra.materialspinner.MaterialSpinner;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 
 /**
  * Created by Tina on 12/13/2015.
@@ -81,6 +84,7 @@ public class ActivityChooser  extends Fragment {
     protected ArrayList<UserActivity> mUserActivityList = new ArrayList<>();
     protected List<UserActivity> mUserActivityList_previous;
     private static ActivityChooser mActivityChooser;
+    private List<User> userList;
 
     // API
     private MapFragment mMapFragment;
@@ -146,8 +150,19 @@ public class ActivityChooser  extends Fragment {
 
     private void initializeUI(){
 
+        List<User> userList;
         // Get userlist
-        List<User> userList = mDatabaseHelper.getUsers();
+        //List<User> userList = mDatabaseHelper.getUsers();
+        DBController mDBController = new DBController();
+        mDBController.getUsers(getActivity())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<List<User>>() {
+                    @Override
+                    public void call(List<User> users) {
+                        userList = users;
+                    }
+                });
+
         mActivityTypeList = mDatabaseHelper.getActivityTypes();
 
         //RecyclerView
@@ -386,7 +401,20 @@ public class ActivityChooser  extends Fragment {
             if (resultCode == Activity.RESULT_OK) {
                 User user = data.getParcelableExtra(PickAvatar.PICK_AVATAR_KEY_USER);
                 mDatabaseHelper.updateUser(user);
-                mRecyclerViewAdapter.setList(mDatabaseHelper.getUsers());
+                final List<User> userList = null;
+                DBController mDBController = new DBController();
+                mDBController.getUsers(getActivity())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Action1<List<User>>() {
+                            @Override
+                            public void call(List<User> users) {
+                                userList = users;
+                            }
+                        });
+
+                mRecyclerViewAdapter.setList(userList/*mDatabaseHelper.getUsers()*/);
+
+
                 mRecyclerViewAdapter.notifyDataSetChanged();
             }
         }

@@ -28,7 +28,7 @@ public class DBController {
 
     public Observable<List<User>> getUsers(Activity activity) {
         // Dagger 2 injection
-        ((CustomApplication)activity.getApplication()).getAppComponent().inject(this);
+        //((CustomApplication)activity.getApplication()).getAppComponent().inject(this);
 
         return makeObservable(mFitnessDBHelper.getUsers())
                 .subscribeOn(Schedulers.computation()); // note: do not use Schedulers.io()

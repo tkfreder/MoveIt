@@ -32,6 +32,7 @@ import android.widget.RelativeLayout;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.api.GoogleApi;
+import com.tinakit.moveit.db.DBController;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.fragment.ActivityChooser;
 import com.tinakit.moveit.fragment.ActivityHistory;
@@ -52,6 +53,9 @@ import java.util.List;
 import java.util.Random;
 
 import javax.inject.Inject;
+
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 
 /**
  * Created by Tina on 10/26/2015.
@@ -75,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
 
     //cache
     ArrayList<ActivityDetail> mActivityDetailList;
-    ArrayList<User> mUserList;
+    List<User> mUserList;
     private BackHandledFragment selectedFragment;
     protected final String welcomeScreenShownPref = "welcomeScreenShown";
 
@@ -118,7 +122,16 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
         mActivityDetailList = mDatabaseHelper.getActivityDetailList(ActivityHistory.ACTIVITY_LIMIT_COUNT);
 
         // get user data
-        mUserList = mDatabaseHelper.getUsers();
+        //mUserList = mDatabaseHelper.getUsers();
+        DBController mDBController = new DBController();
+        mDBController.getUsers(this)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<List<User>>() {
+                    @Override
+                    public void call(List<User> users) {
+                        mUserList = users;
+                    }
+                });
 
     }
 

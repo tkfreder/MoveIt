@@ -49,6 +49,7 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.tinakit.moveit.R;
+import com.tinakit.moveit.db.DBController;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.fragment.MyYAxisValueFormatter;
 import com.tinakit.moveit.fragment.DemoBase;
@@ -64,6 +65,9 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.inject.Inject;
+
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 
 /**
  * Created by Tina on 3/9/2016.
@@ -180,7 +184,17 @@ public class Charts extends Fragment implements OnSeekBarChangeListener,
          "def", "ghj", "ikl", "mno" });
         */
 
-        userList = mDatabaseHelper.getUsers();
+        //userList = mDatabaseHelper.getUsers();
+        DBController mDBController = new DBController();
+        mDBController.getUsers(getActivity())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<List<User>>() {
+                    @Override
+                    public void call(List<User> users) {
+                        userList = users;
+                    }
+                });
+
         xVals = new ArrayList<String>();
         for (User user : userList){
             xVals.add(user.getUserName());
