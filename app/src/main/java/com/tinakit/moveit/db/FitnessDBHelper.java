@@ -28,7 +28,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 /**
  * Created by Tina on 9/28/2015.
@@ -438,70 +437,69 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         return rowId;
     }
 
-    Callable<List<User>> getUsers()
-    //public ArrayList<User> getUsers()
+    public ArrayList<User> getUsers()
     {
-        return new Callable<List<User>>() {
-            @Override
-            public List<User> call() {
-                ArrayList<User> userList = new ArrayList<>();
-                try {
+        // Create and/or open the database for writing
+        //SQLiteDatabase db = getReadableDatabase();
 
-                    Cursor cursor = db.query(VIEW_USERS_REWARDS_DETAIL,
-                            new String[]{KEY_REWARDUSER_USER_ID_FK
-                                    , KEY_USER_NAME
-                                    , KEY_USER_IS_ADMIN
-                                    , KEY_USER_WEIGHT
-                                    , KEY_USER_AVATAR_FILENAME
-                                    , KEY_USER_POINTS, KEY_REWARD_NAME
-                                    , KEY_REWARD_POINTS
-                                    , KEY_USER_PASSWORD
-                                    , KEY_USER_EMAIL
-                                    , KEY_USER_SECRET_QUESTION
-                                    , KEY_USER_SECRET_ANSWER},
-                            KEY_USER_IS_ENABLED + "= ?", new String[]{"1"}, null, null, KEY_REWARDUSER_USER_ID_FK);
-                    try{
+        ArrayList<User> userList = new ArrayList<>();
 
-                        if (cursor.moveToFirst())
-                        {
-                            do{
-                                User user = new User();
-                                user.setUserId(cursor.getInt(cursor.getColumnIndex(KEY_REWARDUSER_USER_ID_FK)));
-                                user.setUserName(cursor.getString(cursor.getColumnIndex(KEY_USER_NAME)));
-                                user.setIsAdmin(cursor.getInt(cursor.getColumnIndex(KEY_USER_IS_ADMIN)) == 1 ? true : false);
-                                user.setWeight(cursor.getInt(cursor.getColumnIndex(KEY_USER_WEIGHT)));
-                                user.setAvatarFileName(cursor.getString(cursor.getColumnIndex(KEY_USER_AVATAR_FILENAME)));
-                                user.setPoints(cursor.getInt(cursor.getColumnIndex(KEY_USER_POINTS)));
-                                user.setPassword(cursor.getString(cursor.getColumnIndex(KEY_USER_PASSWORD)));
-                                user.setEmail(cursor.getString(cursor.getColumnIndex(KEY_USER_EMAIL)));
-                                user.setSecretQuestion(cursor.getString(cursor.getColumnIndex(KEY_USER_SECRET_QUESTION)));
-                                user.setSecretAnswer(cursor.getString(cursor.getColumnIndex(KEY_USER_SECRET_ANSWER)));
+        try {
 
-                                // create Reward
-                                Reward reward = new Reward();
-                                reward.setName(cursor.getString(cursor.getColumnIndex(KEY_REWARD_NAME)));
-                                reward.setPoints(cursor.getInt(cursor.getColumnIndex(KEY_REWARD_POINTS)));
-                                user.setReward(reward);
+            Cursor cursor = db.query(VIEW_USERS_REWARDS_DETAIL,
+                    new String[]{KEY_REWARDUSER_USER_ID_FK
+                            , KEY_USER_NAME
+                            , KEY_USER_IS_ADMIN
+                            , KEY_USER_WEIGHT
+                            , KEY_USER_AVATAR_FILENAME
+                            , KEY_USER_POINTS, KEY_REWARD_NAME
+                            , KEY_REWARD_POINTS
+                            , KEY_USER_PASSWORD
+                            , KEY_USER_EMAIL
+                            , KEY_USER_SECRET_QUESTION
+                            , KEY_USER_SECRET_ANSWER},
+                    KEY_USER_IS_ENABLED + "= ?", new String[]{"1"}, null, null, KEY_REWARDUSER_USER_ID_FK);
+            try{
 
-                                userList.add(user);
-                            }while (cursor.moveToNext());
-                        }
+                if (cursor.moveToFirst())
+                {
+                    do{
+                        User user = new User();
+                        user.setUserId(cursor.getInt(cursor.getColumnIndex(KEY_REWARDUSER_USER_ID_FK)));
+                        user.setUserName(cursor.getString(cursor.getColumnIndex(KEY_USER_NAME)));
+                        user.setIsAdmin(cursor.getInt(cursor.getColumnIndex(KEY_USER_IS_ADMIN)) == 1 ? true : false);
+                        user.setWeight(cursor.getInt(cursor.getColumnIndex(KEY_USER_WEIGHT)));
+                        user.setAvatarFileName(cursor.getString(cursor.getColumnIndex(KEY_USER_AVATAR_FILENAME)));
+                        user.setPoints(cursor.getInt(cursor.getColumnIndex(KEY_USER_POINTS)));
+                        user.setPassword(cursor.getString(cursor.getColumnIndex(KEY_USER_PASSWORD)));
+                        user.setEmail(cursor.getString(cursor.getColumnIndex(KEY_USER_EMAIL)));
+                        user.setSecretQuestion(cursor.getString(cursor.getColumnIndex(KEY_USER_SECRET_QUESTION)));
+                        user.setSecretAnswer(cursor.getString(cursor.getColumnIndex(KEY_USER_SECRET_ANSWER)));
 
-                    } finally{
 
-                        if (cursor != null && !cursor.isClosed())
-                        {
-                            cursor.close();
-                        }
-                    }
+                        // create Reward
+                        Reward reward = new Reward();
+                        reward.setName(cursor.getString(cursor.getColumnIndex(KEY_REWARD_NAME)));
+                        reward.setPoints(cursor.getInt(cursor.getColumnIndex(KEY_REWARD_POINTS)));
+                        user.setReward(reward);
 
-                } catch (Exception e) {
-                    Log.d(LOGTAG, "Error during getUsers()");
+                        userList.add(user);
+                    }while (cursor.moveToNext());
                 }
 
-                return userList;
+            } finally{
+
+                if (cursor != null && !cursor.isClosed())
+                {
+                    cursor.close();
+                }
             }
-        };
+
+        } catch (Exception e) {
+            Log.d(LOGTAG, "Error during getUsers()");
+        }
+
+        return userList;
     }
 
     public User getUser(String userName)

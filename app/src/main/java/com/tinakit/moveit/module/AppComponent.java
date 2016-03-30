@@ -5,7 +5,6 @@ import com.tinakit.moveit.activity.MainActivity;
 import com.tinakit.moveit.activity.PickAvatar;
 import com.tinakit.moveit.adapter.EditRewardRecyclerAdapter;
 import com.tinakit.moveit.adapter.UserProfileRecyclerAdapter;
-import com.tinakit.moveit.db.DBController;
 import com.tinakit.moveit.fragment.ActivityChooser;
 import com.tinakit.moveit.fragment.ActivityHistory;
 import com.tinakit.moveit.fragment.AdminInBox;
@@ -59,5 +58,4 @@ public interface AppComponent {
     void inject(AdminLoginDialogFragment adminLoginDialogFragment);
     void inject(SecretQuestionDialogFragment secretQuestionDialogFragment);
     void inject(Charts charts);
-    void inject(DBController dbController);
 }

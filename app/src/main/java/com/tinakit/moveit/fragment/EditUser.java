@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
@@ -18,14 +19,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.PickAvatar;
-import com.tinakit.moveit.db.DBController;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.module.CustomApplication;
@@ -34,9 +39,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
-
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 
 /**
  * Created by Tina on 1/8/2016.
@@ -51,9 +53,6 @@ public class EditUser extends Fragment {
 
     @Inject
     FitnessDBHelper mDatabaseHelper;
-
-    @Inject
-    DBController mDBController;
 
     // local cache
     protected FragmentActivity mFragmentActivity;
@@ -82,7 +81,7 @@ public class EditUser extends Fragment {
         mRootView = inflater.inflate(R.layout.edit_user, container, false);
         mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        // inject DBController //FitnessDBHelper
+        // inject FitnessDBHelper
         ((CustomApplication)getActivity().getApplication()).getAppComponent().inject(this);
 
         initializeUI();
@@ -110,17 +109,7 @@ public class EditUser extends Fragment {
     private void fetchData(){
 
         // get UserName list, for validating new UserName
-        //mUserList = mDatabaseHelper.getUsers();
-
-        mDBController.getUsers(getActivity())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<List<User>>() {
-                    @Override
-                    public void call(List<User> users) {
-                        mUserList = users;
-                    }
-                });
-
+        mUserList = mDatabaseHelper.getUsers();
 
         // initialize mUser_previous in case adding new user
         mUser_previous = new User();
