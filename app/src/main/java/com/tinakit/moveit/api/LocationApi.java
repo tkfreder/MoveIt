@@ -45,6 +45,9 @@ public class LocationApi implements LocationListener, LifeCycle {
     private static long FASTEST_POLLING_FREQUENCY = 5 * 1000; // in milliseconds
     private static final long LOCATION_ACCURACY = 10; //within # meter accuracy, standard is 20 meters
     private boolean mIsTimeLimit = false;
+    private boolean mFirstData = true;
+    private long lastTimeStamp = System.currentTimeMillis();
+    private static long MIN_INTERVAL_TRACKING = 10 * 1000; // in milliseconds
 
 
     public LocationApi(FragmentActivity fragmentActivity, GoogleApiClient googleApiClient){
@@ -73,19 +76,15 @@ public class LocationApi implements LocationListener, LifeCycle {
 
     @Override
     public void onLocationChanged(Location location) {
-        if (DEBUG) Log.d(LOG, "onLocationChanged");
-
-        if (DEBUG) Log.d(LOG, "Accuracy: " + location.getAccuracy());
-
         // save location if meets minimum accuracy
-        if (isAccurate(location)){
-
+        if (isAccurate(location) && (mFirstData || System.currentTimeMillis() - lastTimeStamp >= MIN_INTERVAL_TRACKING)){
+            mFirstData = false;
             // set flag, when start receiving location data that meets accuracy requirement
             mLocationDataCount++;
-
             // save the current location
             mLocation = location;
-
+            // timestamp
+            lastTimeStamp = System.currentTimeMillis();
             // send message to indicate there is new location data
             Intent intent = new Intent(LOCATION_API_INTENT);
             intent.putExtra(ActivityTracker.ACTIVITY_TRACKER_BROADCAST_RECEIVER, LOCATION_API_INTENT);

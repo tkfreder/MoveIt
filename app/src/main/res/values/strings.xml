@@ -111,7 +111,7 @@
     <string name="nav_menu_admin">Admin</string>
 
     <!-- navigation drawer: Admin : tab menu names -->
-    <string name="admin_tab_requests">Requests</string>
+    <string name="admin_tab_requests">Pending</string>
     <string name="admin_tab_rewards">Rewards</string>
     <string name="admin_tab_users">Users</string>
     <string name="admin_tab_history">History</string>

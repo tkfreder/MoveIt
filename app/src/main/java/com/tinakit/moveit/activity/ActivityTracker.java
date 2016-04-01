@@ -80,7 +80,7 @@ public class ActivityTracker extends BackHandledFragment {
     @Inject
     FitnessDBHelper mDatabaseHelper;
 
-    private static final float FEET_COIN_CONVERSION = 1.0f;//  # coins per feet (1 coin/50 ft = 0.02)
+    private static final float FEET_COIN_CONVERSION = 0.04f;//  # coins per feet (1 coin/50 ft = 0.02)
     private static long STOP_SERVICE_TIME_LIMIT = 30 * 60 * 1000 * 60; // 30 minutes in seconds
     private static int DATA_COUNT_MINIMUM = 2; // minimum number of data required before enabling tracker
     private static final int SERVICE_TIMEOUT_MILLISECONDS = 60*1000;
@@ -264,7 +264,7 @@ public class ActivityTracker extends BackHandledFragment {
             public void onClick(View v) {
                 finishTracking(getString(R.string.activity_saved));
                 //save activity data to database on separate background thread
-                new SaveToDB().run();
+                AsyncTask.execute(new SaveToDB());
            }
 
         });
@@ -542,6 +542,9 @@ public class ActivityTracker extends BackHandledFragment {
             } else if (message.equals(LocationApi.LOCATION_API_INTENT)) {
                 //only track data when it has high level of accuracy && has not been inactive within the last second
                 if (mSaveLocationData && !mIsInactive) {
+                    //get location data
+                    Location location = mLocationApi.location();
+                    //only save data if it meets realistic value based on world record for speed.
                     //update cache
                     updateCache(mLocationApi.location());
                     refreshData();
