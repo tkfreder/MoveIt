@@ -84,6 +84,8 @@ public class ActivityChooser  extends Fragment implements Observer {
     protected ArrayList<UserActivity> mUserActivityList = new ArrayList<>();
     protected List<UserActivity> mUserActivityList_previous;
     private static ActivityChooser mActivityChooser;
+    private List<User> mUserList;
+    private UserListObservable mUserListObservable;
 
     // API
     private MapFragment mMapFragment;
@@ -113,6 +115,8 @@ public class ActivityChooser  extends Fragment implements Observer {
         mLocationApi = new LocationApi(mFragmentActivity, mGoogleApi.client());
 
         if(mLocationApi.hasLocationService()){
+            CustomApplication app = ((CustomApplication)getActivity().getApplication());
+            mUserListObservable = app.getUserListObservable();
             initializeUI();
             setActionListeners();
         }
@@ -148,12 +152,10 @@ public class ActivityChooser  extends Fragment implements Observer {
     }
 
     private void initializeUI(){
-
         // Get userlist
         //List<User> userList = mDatabaseHelper.getUsers();
-        CustomApplication app = ((CustomApplication)getActivity().getApplication());
-        UserListObservable mUserListObservable = app.getUserListObservable();
-        List<User> userList = mUserListObservable.getValue();
+        mUserListObservable.addObserver(this);
+        mUserList = mUserListObservable.getValue();
         mActivityTypeList = mDatabaseHelper.getActivityTypes();
 
         //RecyclerView
@@ -164,8 +166,9 @@ public class ActivityChooser  extends Fragment implements Observer {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mFragmentActivity);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(linearLayoutManager);
-        mRecyclerViewAdapter = new MultiChooserRecyclerAdapter(mFragmentActivity, userList, mUserActivityList_previous);
+        mRecyclerViewAdapter = new MultiChooserRecyclerAdapter(mFragmentActivity, mUserList, mUserActivityList_previous);
         mRecyclerView.setAdapter(mRecyclerViewAdapter);
+
 
         //mMapFragment = new MapFragment(getActivity().getSupportFragmentManager(), getActivity());
         //mMapFragment.addMap(R.id.map_container, mContainer);
@@ -180,6 +183,7 @@ public class ActivityChooser  extends Fragment implements Observer {
     public void update(Observable observable, Object data) {
         List<User> userList = (List<User>)data;
         mRecyclerViewAdapter.setList(userList);
+        mRecyclerViewAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -191,6 +195,7 @@ public class ActivityChooser  extends Fragment implements Observer {
     @Override
     public void onDestroy() {
         LocalBroadcastManager.getInstance(mFragmentActivity).unregisterReceiver(mMessageReceiver);
+        mUserListObservable.deleteObserver(this);
         super.onDestroy();
     }
 
@@ -308,7 +313,6 @@ public class ActivityChooser  extends Fragment implements Observer {
 
         private void setList(List<User> userList){
             mUserList = userList;
-            notifyDataSetChanged();
         }
 
         @Override
@@ -399,7 +403,7 @@ public class ActivityChooser  extends Fragment implements Observer {
             if (resultCode == Activity.RESULT_OK) {
                 User user = data.getParcelableExtra(PickAvatar.PICK_AVATAR_KEY_USER);
                 mDatabaseHelper.updateUser(user);
-                mRecyclerViewAdapter.setList(mDatabaseHelper.getUsers());
+                mRecyclerViewAdapter.setList(mUserList/*mDatabaseHelper.getUsers()*/);
                 mRecyclerViewAdapter.notifyDataSetChanged();
             }
         }

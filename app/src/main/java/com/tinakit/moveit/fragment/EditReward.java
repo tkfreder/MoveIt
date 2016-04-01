@@ -19,16 +19,19 @@ import com.tinakit.moveit.adapter.EditRewardRecyclerAdapter;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.Reward;
 import com.tinakit.moveit.model.User;
+import com.tinakit.moveit.model.UserListObservable;
 import com.tinakit.moveit.module.CustomApplication;
 
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.inject.Inject;
 
 /**
  * Created by Tina on 10/4/2015.
  */
-public class EditReward extends Fragment {
+public class EditReward extends Fragment implements Observer {
 
     public static final String EDIT_REWARD_TAG = "EDIT_REWARD_TAG";
     public static final String EDIT_REWARD_USER = "EDIT_REWARD_USER";
@@ -64,8 +67,15 @@ public class EditReward extends Fragment {
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(linearLayoutManager);
 
+        // get list of Users
+        //mUserList = mDatabaseHelper.getUsers();
+        CustomApplication app = ((CustomApplication)mFragmentActivity.getApplication());
+        UserListObservable mUserListObservable = app.getUserListObservable();
+        mUserListObservable.addObserver(this);
+        List<User> userList = mUserListObservable.getValue();
+
         mRewardList = mDatabaseHelper.getAllRewards();
-        mEditRewardRecyclerAdapter = new EditRewardRecyclerAdapter(inflater.getContext(), mFragmentActivity, mRewardList);
+        mEditRewardRecyclerAdapter = new EditRewardRecyclerAdapter(inflater.getContext(), mFragmentActivity, mRewardList, userList);
         mRecyclerView.setAdapter(mEditRewardRecyclerAdapter);
         mSaveButton = (Button)mRootView.findViewById(R.id.saveButton);
         mSaveButton.setOnClickListener(new View.OnClickListener() {
@@ -94,6 +104,12 @@ public class EditReward extends Fragment {
             }
         });
         return mRootView;
+    }
+
+    @Override
+    public void update(Observable observable, Object data) {
+        List<User> userList = (List<User>)data;
+        mEditRewardRecyclerAdapter.setUserList(userList);
     }
 
     @Override

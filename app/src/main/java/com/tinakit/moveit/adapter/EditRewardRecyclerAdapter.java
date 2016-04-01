@@ -15,6 +15,7 @@ import com.tinakit.moveit.R;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.Reward;
 import com.tinakit.moveit.model.User;
+import com.tinakit.moveit.model.UserListObservable;
 import com.tinakit.moveit.module.CustomApplication;
 
 import java.util.ArrayList;
@@ -39,47 +40,34 @@ public class EditRewardRecyclerAdapter extends RecyclerView.Adapter<EditRewardRe
 
     Map<Integer,Reward> mRewardMap;
 
-    public EditRewardRecyclerAdapter(Context context, FragmentActivity fragmentActivity, List<Reward> rewardList) {
+    public EditRewardRecyclerAdapter(Context context, FragmentActivity fragmentActivity, List<Reward> rewardList, List<User> userList) {
         mContext = context;
         mFragmentActivity = fragmentActivity;
         mRewardList = rewardList;
-
-
+        mUserList = userList;
         // inject FitnessDBHelper
         ((CustomApplication)mFragmentActivity.getApplication()).getAppComponent().inject(this);
-
-        // Get singleton instance of database
-        //mDatabaseHelper = FitnessDBHelper.getInstance(context);
-
         // Get Activity Types
         //mRewardList = mDatabaseHelper.getAllRewards();
-
         mRewardMap = new TreeMap<Integer,Reward>();
-
         for (Reward r : mRewardList){
-
             mRewardMap.put(r.getRewardId(), r);
-
         }
-
-        // get list of Users
-        mUserList = mDatabaseHelper.getUsers();
     }
 
     public List<Reward> getRewardList(){
-
-        //for (int i = 0; i < mRewardMap.size(); i++)
-        //    mRewardList.set(i, mRewardMap.get(i));
-
         mRewardList = new ArrayList<Reward>(mRewardMap.values());
-
         return mRewardList;
+    }
+
+    public void setUserList(List<User> userList){
+        mUserList = userList;
+        notifyDataSetChanged();
     }
 
     @Override
     public EditRewardRecyclerAdapter.CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.edit_reward_list_item, viewGroup, false);
-
         CustomViewHolder viewHolder = new CustomViewHolder(view);
         return viewHolder;
     }

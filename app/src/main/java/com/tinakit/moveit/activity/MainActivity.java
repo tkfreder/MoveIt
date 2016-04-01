@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -120,8 +121,16 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
     private void fetchData(){
         //data for ActivityHistory
         mActivityDetailList = mDatabaseHelper.getActivityDetailList(ActivityHistory.ACTIVITY_LIMIT_COUNT);
-        // get user data
         mUserList = mDatabaseHelper.getUsers();
+        /*
+        AsyncTask.execute(new Runnable(){
+            @Override
+            public void run(){
+                // get user data
+                mUserList = mDatabaseHelper.getUsers();
+            }
+        });
+        */
         // initialize UserListObservable on launch app
         CustomApplication app = (CustomApplication)getApplication();
         UserListObservable mUserListObservable = app.getUserListObservable();

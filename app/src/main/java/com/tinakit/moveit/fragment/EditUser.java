@@ -33,6 +33,7 @@ import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.PickAvatar;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.User;
+import com.tinakit.moveit.model.UserListObservable;
 import com.tinakit.moveit.module.CustomApplication;
 
 import java.util.Arrays;
@@ -45,7 +46,7 @@ import javax.inject.Inject;
 /**
  * Created by Tina on 1/8/2016.
  */
-public class EditUser extends Fragment implements Observer {
+public class EditUser extends Fragment {
 
     public static final String EDIT_USER_TAG = "EDIT_USER_TAG";
     public static final String EDIT_USER_USER = "EDIT_USER_USER";
@@ -111,7 +112,10 @@ public class EditUser extends Fragment implements Observer {
     private void fetchData(){
 
         // get UserName list, for validating new UserName
-        mUserList = mDatabaseHelper.getUsers();
+        //mUserList = mDatabaseHelper.getUsers();
+        CustomApplication app = ((CustomApplication)mFragmentActivity.getApplication());
+        UserListObservable mUserListObservable = app.getUserListObservable();
+        mUserList = mUserListObservable.getValue();
 
         // initialize mUser_previous in case adding new user
         mUser_previous = new User();
@@ -399,7 +403,10 @@ public class EditUser extends Fragment implements Observer {
 
                     if (rowId != -1) {
 
-                        //TODO: refresh User List
+                        //notify UserListObserver
+                        CustomApplication app = ((CustomApplication)mFragmentActivity.getApplication());
+                        UserListObservable mUserListObservable = app.getUserListObservable();
+                        mUserListObservable.addUser(mUser);
 
                         mIsNewUser = false;
 
@@ -423,7 +430,10 @@ public class EditUser extends Fragment implements Observer {
 
                     if (rowsAffected == 1) {
 
-                        //TODO: refresh User List
+                        //notify UserListObserver
+                        CustomApplication app = ((CustomApplication)mFragmentActivity.getApplication());
+                        UserListObservable mUserListObservable = app.getUserListObservable();
+                        mUserListObservable.setUser(mUser);
 
                         Snackbar.make(mRootView.findViewById(R.id.main_layout), getString(R.string.message_saved_changes), Snackbar.LENGTH_LONG)
                                 .show();
@@ -637,9 +647,4 @@ public class EditUser extends Fragment implements Observer {
         mSaveButton.setEnabled(false);
     }
 */
-
-    @Override
-    public void update(Observable observable, Object data) {
-
-    }
 }

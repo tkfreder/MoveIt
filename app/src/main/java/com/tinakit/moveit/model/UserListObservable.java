@@ -24,8 +24,29 @@ public class UserListObservable extends Observable {
     public void setValue(List<User> userList)
     {
         mUserList = userList;
-        setChanged();
-        notifyObservers();
+        hasChanged();
+        //setChanged();
+        notifyObservers(mUserList);
+    }
+
+    public void setUser(User user){
+        for(int i = 0; i < mUserList.size(); i++){
+            int currentId = mUserList.get(i).getUserId();
+            if(currentId == user.getUserId()){
+                mUserList.set(i, user);
+                hasChanged();
+                //setChanged();
+                notifyObservers(mUserList);
+                break;
+            }
+        }
+    }
+
+    public void addUser(User user){
+        mUserList.add(user);
+        //setChanged();
+        hasChanged();
+        notifyObservers(mUserList);
     }
     public List<User> getValue()
     {

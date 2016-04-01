@@ -109,6 +109,4 @@ public class Admin extends Fragment {
         viewPager.setAdapter(mViewPagerAdapter);
 
     }
-
-
 }
