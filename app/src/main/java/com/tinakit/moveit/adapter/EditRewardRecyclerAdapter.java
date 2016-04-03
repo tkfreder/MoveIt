@@ -62,7 +62,6 @@ public class EditRewardRecyclerAdapter extends RecyclerView.Adapter<EditRewardRe
 
     public void setUserList(List<User> userList){
         mUserList = userList;
-        notifyDataSetChanged();
     }
 
     @Override

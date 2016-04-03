@@ -20,10 +20,10 @@
             android:id="@+id/nav_admin"
             android:icon="@drawable/settings_24"
             android:title="@string/nav_menu_admin" />
-        <item
+        <!--<item
             android:id="@+id/database"
             android:icon="@drawable/ic_launcher"
-            android:title="Database" />
+            android:title="Database" />-->
     </group>
 
 </menu>

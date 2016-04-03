@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,15 +14,20 @@ import com.tinakit.moveit.R;
 import com.tinakit.moveit.adapter.ViewPagerAdapter;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.IAdminFragmentObserver;
+import com.tinakit.moveit.model.User;
+import com.tinakit.moveit.model.UserListObservable;
+import com.tinakit.moveit.module.CustomApplication;
 import com.tinakit.moveit.tab.SlidingTabLayout;
 
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 // source reference: http://blog.grafixartist.com/material-design-tabs-with-android-design-support-library/
 /**
  * Created by Tina on 1/12/2016.
  */
-public class Admin extends Fragment {
+public class Admin extends Fragment implements Observer {
 
     // CONSTANTS
     public static final String ADMIN_TAG = "ADMIN_TAG";
@@ -30,11 +36,9 @@ public class Admin extends Fragment {
     //@Inject
     //FitnessDBHelper mDatabaseHelper;
 
-    // UI
     protected FragmentActivity mFragmentActivity;
+    private UserListObservable mUserListObservable;
     private View rootView;
-
-    // SlidingTabLayout
     protected ViewPager mViewPager;
     protected ViewPagerAdapter mViewPagerAdapter;
     private SlidingTabLayout mSlidingTabLayout;
@@ -49,9 +53,10 @@ public class Admin extends Fragment {
 
         // Dagger 2 injection
         //((CustomApplication)getActivity().getApplication()).getAppComponent().inject(this);
-
+        CustomApplication app = ((CustomApplication)getActivity().getApplication());
+        mUserListObservable = app.getUserListObservable();
+        mUserListObservable.addObserver(this);
         initializeUI();
-
         setActionListeners();
 
         return rootView;
@@ -68,8 +73,6 @@ public class Admin extends Fragment {
         //TabLayout
         mSlidingTabLayout = (SlidingTabLayout)rootView.findViewById(R.id.tabLayout);
         mSlidingTabLayout.setViewPager(mViewPager);
-
-
     }
 
     private void setActionListeners(){
@@ -108,5 +111,16 @@ public class Admin extends Fragment {
         //mViewPagerAdapter.addFrag(new AdminSettings(), getString(R.string.admin_tab_settings));
         viewPager.setAdapter(mViewPagerAdapter);
 
+    }
+
+    @Override
+    public void update(Observable observable, Object data) {
+        mViewPagerAdapter.updateFragments();
+    }
+
+    @Override
+    public void onDestroy() {
+        mUserListObservable.deleteObserver(this);
+        super.onDestroy();
     }
 }

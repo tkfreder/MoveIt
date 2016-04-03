@@ -216,11 +216,11 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
                         .addToBackStack(Charts.CHARTS_BACKSTACK_NAME)
                         .commit();
                 break;
-
+            /*
             // TODO:DEBUG: display Database tables
             case R.id.database:
                 startActivity(new Intent(this, AndroidDatabaseManager.class));
-                break;
+                break;*/
 
             case R.id.nav_coins:
                 getSupportActionBar().setTitle(getString(R.string.nav_menu_coins));

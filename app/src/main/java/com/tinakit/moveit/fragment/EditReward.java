@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -41,6 +42,7 @@ public class EditReward extends Fragment implements Observer {
 
     private FragmentActivity mFragmentActivity;
     private List<Reward> mRewardList;
+    private UserListObservable mUserListObservable;
 
     // UI widgets
     private View mRootView;
@@ -70,7 +72,7 @@ public class EditReward extends Fragment implements Observer {
         // get list of Users
         //mUserList = mDatabaseHelper.getUsers();
         CustomApplication app = ((CustomApplication)mFragmentActivity.getApplication());
-        UserListObservable mUserListObservable = app.getUserListObservable();
+        mUserListObservable = app.getUserListObservable();
         mUserListObservable.addObserver(this);
         List<User> userList = mUserListObservable.getValue();
 
@@ -110,6 +112,13 @@ public class EditReward extends Fragment implements Observer {
     public void update(Observable observable, Object data) {
         List<User> userList = (List<User>)data;
         mEditRewardRecyclerAdapter.setUserList(userList);
+        mEditRewardRecyclerAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onDestroy() {
+        mUserListObservable.deleteObserver(this);
+        super.onDestroy();
     }
 
     @Override
