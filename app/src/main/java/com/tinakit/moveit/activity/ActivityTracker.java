@@ -169,6 +169,8 @@ public class ActivityTracker extends BackHandledFragment {
         ActionBarDrawerToggle mActionBarDrawerToggle = new ActionBarDrawerToggle(getActivity(),
                 MainActivity.mDrawerLayout, (Toolbar)getActivity().findViewById(R.id.toolBar), R.string.open, R.string.close);
         mActionBarDrawerToggle.setDrawerIndicatorEnabled(false);
+        mActionBarDrawerToggle.setHomeAsUpIndicator(R.drawable.ic_launcher_48); //set your own
+        mActionBarDrawerToggle.syncState();
 
         setButtonOnClickListeners();
         initializeData();
