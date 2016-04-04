@@ -104,7 +104,7 @@ public class EditUser extends Fragment {
         mWeight = (EditText)mRootView.findViewById(R.id.weight);
         mAdmin = (TextView)mRootView.findViewById(R.id.isAdmin);
         mSaveButton = (Button)mRootView.findViewById(R.id.saveButton);
-        mPassword = (EditText)mRootView.findViewById(R.id.password);
+        //admin password mPassword = (EditText)mRootView.findViewById(R.id.password);
         //mSecretAnswer = (EditText)mRootView.findViewById(R.id.secretAnswer);
         mEmail = (EditText)mRootView.findViewById(R.id.email);
     }
@@ -182,7 +182,7 @@ public class EditUser extends Fragment {
 
             mAdmin.setVisibility(View.VISIBLE);
 
-            mPassword.setVisibility(View.VISIBLE);
+            //admin password mPassword.setVisibility(View.VISIBLE);
             //mPassword.setText(mUser.getPassword());
 
             mEmail.setVisibility(View.VISIBLE);
@@ -252,6 +252,8 @@ public class EditUser extends Fragment {
             }
         });
 
+        // admin password
+        /*
         mPassword.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -286,6 +288,7 @@ public class EditUser extends Fragment {
             }
         });
 
+        */
         mEmail.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -385,6 +388,12 @@ public class EditUser extends Fragment {
             @Override
             public void onClick(View v) {
 
+                View view = mFragmentActivity.getCurrentFocus();
+                if (view != null) {
+                    InputMethodManager imm = (InputMethodManager)mFragmentActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                }
+
                 // if this is admin, save username and password in SharedPreferences
                 if (mUser.isAdmin()){
 
@@ -438,6 +447,8 @@ public class EditUser extends Fragment {
                         Snackbar.make(mRootView.findViewById(R.id.main_layout), getString(R.string.message_saved_changes), Snackbar.LENGTH_LONG)
                                 .show();
 
+                        // admin password
+                        /*
                         // send email notification that user changed password
                         if(mHasNewPassword){
                             Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
@@ -454,12 +465,15 @@ public class EditUser extends Fragment {
                                         .show();
                             }
                         }
+                        */
                     }
                 }
             }
 
         });
 
+        // admin password
+        /*
         mPassword.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -478,6 +492,7 @@ public class EditUser extends Fragment {
                     mSaveButton.setEnabled(true);
             }
         });
+        */
     }
 
 
@@ -505,11 +520,13 @@ public class EditUser extends Fragment {
         mUser.setUserName(mUserName.getText().toString());
         mUser.setWeight(Integer.parseInt(mWeight.getText().toString()));
 
+        /*
         if(mUser.isAdmin()){
             mHasNewPassword = true;
         }
-            mUser.setPassword(mPassword.getText().toString());
 
+        mUser.setPassword(mPassword.getText().toString());
+        */
         //any change to avatar should already be saved in OnActivityResult
 
     }
@@ -547,6 +564,8 @@ public class EditUser extends Fragment {
 
         if(isValidWeight() && isValidUserName()) {
 
+            // admin password
+            /*
             if(mAdmin.isSelected()){
 
                 if(mPassword.getText().toString().equals("")){
@@ -558,6 +577,8 @@ public class EditUser extends Fragment {
             }
             else
                 return true;
+                */
+            return true;
         }
         else
             return false;
