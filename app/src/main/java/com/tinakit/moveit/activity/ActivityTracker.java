@@ -20,6 +20,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -162,6 +164,11 @@ public class ActivityTracker extends BackHandledFragment {
         mMapFragment = new MapFragment(getActivity().getSupportFragmentManager(), getActivity());
         mMapFragment.addMap(R.id.map_container, mContainer);
         mBatteryLevel = (TextView)rootView.findViewById(R.id.batteryLevel);
+
+        // diable hamburger icon
+        ActionBarDrawerToggle mActionBarDrawerToggle = new ActionBarDrawerToggle(getActivity(),
+                MainActivity.mDrawerLayout, (Toolbar)getActivity().findViewById(R.id.toolBar), R.string.open, R.string.close);
+        mActionBarDrawerToggle.setDrawerIndicatorEnabled(false);
 
         setButtonOnClickListeners();
         initializeData();

@@ -66,9 +66,7 @@ public class ActivityChooser  extends Fragment implements Observer {
     public static final int PICK_AVATAR_REQUEST = 2;
     public static final int ENABLE_GPS = 3;
     private final static int PERMISSIONS_REQUEST_LOCATION = 123;
-    private static String[] PERMISSIONS_LOCATION = {
-            Manifest.permission.ACCESS_FINE_LOCATION
-    };
+    private static String[] PERMISSIONS_LOCATION = {Manifest.permission.ACCESS_FINE_LOCATION};
 
     @Inject
     GoogleApi mGoogleApi;
@@ -323,6 +321,7 @@ public class ActivityChooser  extends Fragment implements Observer {
 
             // Populate data from ActivityType data object
             customViewHolder.avatar.setImageResource(getResources().getIdentifier(user.getAvatarFileName(), "drawable", mFragmentActivity.getPackageName()));
+            /*
             customViewHolder.avatar.setTag(user);
             customViewHolder.avatar.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -335,7 +334,7 @@ public class ActivityChooser  extends Fragment implements Observer {
                     mFragmentActivity.startActivityForResult(intent, ActivityChooser.PICK_AVATAR_REQUEST);
                 }
             });
-
+            */
             customViewHolder.userName.setText(user.getUserName());
 
             // set tag on radio group
