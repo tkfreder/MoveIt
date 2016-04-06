@@ -1,6 +1,5 @@
 package com.tinakit.moveit.fragment;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -60,26 +59,23 @@ public class AdminInBox extends Fragment {
 
         mRecyclerView = (RecyclerView)mRootView.findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true);
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(fragmentActivity);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(layoutManager);
+
         mRewardListUnfulfilled = mDatabaseHelper.getUnFulfilledRewards();
+        List<User> userList = mDatabaseHelper.getUsers();
+
         mFulfillButton = (Button)mRootView.findViewById(R.id.fulfillButton);
         mNoItemsLayout = (PercentRelativeLayout)mRootView.findViewById(R.id.noItemsLayout);
 
         if (mRewardListUnfulfilled.size() > 0){
+
             mNoItemsLayout.setVisibility(View.GONE);
-            new AsyncTask<Void, Void, List<User>>(){
-                @Override
-                protected List<User> doInBackground(Void... params) {
-                    return mDatabaseHelper.getUsers();
-                }
-                @Override
-                protected void onPostExecute(List<User> users) {
-                    mRecyclerAdapter = new AdminInboxRecyclerAdapter(mRewardListUnfulfilled, users);
-                    mRecyclerView.setAdapter(mRecyclerAdapter);
-                }
-            }.execute();
+
+            mRecyclerAdapter = new AdminInboxRecyclerAdapter(mRewardListUnfulfilled, userList);
+            mRecyclerView.setAdapter(mRecyclerAdapter);
 
             mFulfillButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -121,17 +117,24 @@ public class AdminInBox extends Fragment {
                         }
 
                     } else {
+
                         Snackbar.make(mRootView.findViewById(R.id.recycler_view_main_layout), getString(R.string.error_message_update_reward_earned), Snackbar.LENGTH_LONG)
                                 .show();
                     }
+
+
                 }
             });
 
         } else {
+
             mFulfillButton.setVisibility(View.GONE);
             mNoItemsLayout.setVisibility(View.VISIBLE);
         }
+
+
         return mRootView;
+
     }
 
     public class AdminInboxRecyclerAdapter extends RecyclerView.Adapter<AdminInboxRecyclerAdapter.CustomViewHolder>{
@@ -205,12 +208,19 @@ public class AdminInBox extends Fragment {
             holder.fulfillCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
                     if(isChecked){
+
                         Reward reward = (Reward)buttonView.getTag();
                         mRewardsFulfilledList.add(reward);
                     }
+
                 }
             });
+
+
         }
+
+
     }
 }
