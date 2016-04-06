@@ -250,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
                 getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.fragmentContainer, admin, Admin.ADMIN_TAG)
-                        //.addToBackStack(Admin.ADMIN_BACKSTACK_NAME)
+                        .addToBackStack(Admin.ADMIN_BACKSTACK_NAME)
                         .commit();
         }
     }

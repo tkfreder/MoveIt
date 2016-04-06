@@ -205,7 +205,7 @@ public class ActivityHistory extends Fragment {
                                 public void onClick(DialogInterface dialogInterface, int i) {
                                     android.util.SparseArray<Integer> userIdList = mDatabaseHelper.getActivityUsers(activityId);
                                     for (int index = 0; index < userIdList.size(); index++) {
-                                        int key = userIdList.keyAt(i);
+                                        int key = userIdList.keyAt(index);
                                         int pointValue = userIdList.get(key);
 
                                         // check if user has a reward earned but not fulfilled, if so, remove that reward
