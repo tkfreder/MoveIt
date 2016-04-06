@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
@@ -29,6 +30,7 @@ import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.model.UserActivity;
 import com.tinakit.moveit.module.CustomApplication;
 import com.tinakit.moveit.utility.DateUtility;
+import com.tinakit.moveit.utility.DialogUtility;
 import com.tinakit.moveit.utility.Map;
 import com.tinakit.moveit.utility.UnitConverter;
 
@@ -188,6 +190,7 @@ public class ActivityHistory extends Fragment {
             }
 
             final ImageView deleteButton = customViewHolder.deleteButton;
+
             deleteButton.setTag(activityDetail.getActivityId());
             deleteButton.setTag(R.id.TAG_ACTIVITY_HISTORY_DELETE, i);
             deleteButton.setOnClickListener(new View.OnClickListener() {
@@ -200,9 +203,7 @@ public class ActivityHistory extends Fragment {
                             .setPositiveButton(R.string.button_delete, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
-
                                     android.util.SparseArray<Integer> userIdList = mDatabaseHelper.getActivityUsers(activityId);
-
                                     for (int index = 0; index < userIdList.size(); index++) {
                                         int key = userIdList.keyAt(i);
                                         int pointValue = userIdList.get(key);

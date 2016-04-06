@@ -17,6 +17,7 @@ import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
@@ -216,11 +217,11 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
                         .addToBackStack(Charts.CHARTS_BACKSTACK_NAME)
                         .commit();
                 break;
-            /*
+
             // TODO:DEBUG: display Database tables
             case R.id.database:
                 startActivity(new Intent(this, AndroidDatabaseManager.class));
-                break;*/
+                break;
 
             case R.id.nav_coins:
                 getSupportActionBar().setTitle(getString(R.string.nav_menu_coins));
@@ -249,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
                 getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.fragmentContainer, admin, Admin.ADMIN_TAG)
-                        .addToBackStack(Admin.ADMIN_BACKSTACK_NAME)
+                        //.addToBackStack(Admin.ADMIN_BACKSTACK_NAME)
                         .commit();
         }
     }
