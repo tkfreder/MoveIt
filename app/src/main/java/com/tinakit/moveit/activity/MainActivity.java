@@ -218,10 +218,12 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
                         .commit();
                 break;
 
+
             // TODO:DEBUG: display Database tables
             case R.id.database:
                 startActivity(new Intent(this, AndroidDatabaseManager.class));
                 break;
+
 
             case R.id.nav_coins:
                 getSupportActionBar().setTitle(getString(R.string.nav_menu_coins));
