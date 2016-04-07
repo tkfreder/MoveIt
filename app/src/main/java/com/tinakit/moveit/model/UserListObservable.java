@@ -48,6 +48,12 @@ public class UserListObservable extends Observable {
         hasChanged();
         notifyObservers(mUserList);
     }
+
+    public void deleteUser(User user){
+        mUserList.remove(user);
+        hasChanged();
+        notifyObservers(mUserList);
+    }
     public List<User> getValue()
     {
         return mUserList;
