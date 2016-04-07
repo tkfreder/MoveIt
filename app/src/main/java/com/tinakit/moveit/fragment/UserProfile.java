@@ -17,16 +17,19 @@ import com.tinakit.moveit.R;
 import com.tinakit.moveit.adapter.UserProfileRecyclerAdapter;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.User;
+import com.tinakit.moveit.model.UserListObservable;
 import com.tinakit.moveit.module.CustomApplication;
 
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.inject.Inject;
 
 /**
  * Created by Tina on 12/29/2015.
  */
-public class UserProfile extends Fragment {
+public class UserProfile extends Fragment implements Observer {
 
     // CONSTANTS
     public static final String USER_PROFILE_TAG = "USER_PROFILE_TAG";
@@ -44,6 +47,7 @@ public class UserProfile extends Fragment {
     private RecyclerView mRecyclerView;
     public List<User> mUserList;
     private User mUser;
+    private UserListObservable mUserListObservable;
 
     @Nullable
     @Override
@@ -58,12 +62,17 @@ public class UserProfile extends Fragment {
         ((CustomApplication)getActivity().getApplication()).getAppComponent().inject(this);
 
         // fetch directly from the database
-        mUserList = mDatabaseHelper.getUsers();
+        //mUserList = mDatabaseHelper.getUsers();
 
+        //notify UserListObserver
+        CustomApplication app = ((CustomApplication)mFragmentActivity.getApplication());
+        mUserListObservable = app.getUserListObservable();
+        mUserListObservable.addObserver(this);
+        mUserList = mUserListObservable.getValue();
         initializeUI();
-
         setActionListeners();
 
+        /*
         //TODO: not sure if we still need this if not calling onBackStack
         getActivity().getSupportFragmentManager().addOnBackStackChangedListener(
                 new FragmentManager.OnBackStackChangedListener() {
@@ -74,8 +83,22 @@ public class UserProfile extends Fragment {
                         mRecyclerView.setAdapter(mUserProfileRecyclerAdapter);
                     }
                 });
+         */
 
         return rootView;
+    }
+
+    @Override
+    public void update(Observable observable, Object data) {
+        List<User> userList = (List<User>)data;
+        mUserProfileRecyclerAdapter.setList(userList);
+        mUserProfileRecyclerAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onDestroy() {
+        mUserListObservable.deleteObserver(this);
+        super.onDestroy();
     }
 
     private void initializeUI(){
