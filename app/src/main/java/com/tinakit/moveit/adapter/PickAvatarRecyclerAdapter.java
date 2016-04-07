@@ -27,25 +27,20 @@ public class PickAvatarRecyclerAdapter extends RecyclerView.Adapter<PickAvatarRe
     private List<String> mAvatarFileList;
     private User mUser;
 
-
     public PickAvatarRecyclerAdapter(Context context, FragmentActivity fragmentActivity, List<String> avatarFileList, User user) {
-
         mContext = context;
         mFragmentActivity = fragmentActivity;
         mAvatarFileList = avatarFileList;
         mUser = user;
-
     }
-
 
     @Override
     public PickAvatarRecyclerAdapter.CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.avatar_list_item, viewGroup, false);
-
         CustomViewHolder viewHolder = new CustomViewHolder(view);
         return viewHolder;
     }
+
     @Override
     public void onBindViewHolder(final PickAvatarRecyclerAdapter.CustomViewHolder customViewHolder, int i) {
 
