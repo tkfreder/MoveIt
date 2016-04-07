@@ -57,5 +57,6 @@
         android:layout_toEndOf="@+id/userLinearLayout"
         android:layout_alignParentRight="true"
         android:gravity="center_vertical"
+        android:visibility="gone"
         />
 </android.support.percent.PercentRelativeLayout>
