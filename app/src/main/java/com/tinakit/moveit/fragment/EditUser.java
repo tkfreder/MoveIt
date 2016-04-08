@@ -13,6 +13,7 @@ import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -215,9 +216,7 @@ public class EditUser extends Fragment {
                 }
 
                 else if (isChanged()){
-
                     if(validateForm()){
-
                         mSaveButton.setEnabled(true);
                     }
                     else {
@@ -387,7 +386,6 @@ public class EditUser extends Fragment {
         mSaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 View view = mFragmentActivity.getCurrentFocus();
                 if (view != null) {
                     InputMethodManager imm = (InputMethodManager)mFragmentActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -405,13 +403,11 @@ public class EditUser extends Fragment {
                 }
 
                 saveUser();
-
                 if (mIsNewUser) {
-
                     long rowId = mDatabaseHelper.addUser(mUser);
+                    mUser.setUserId((int)rowId); //Sets the row id for a new user
 
                     if (rowId != -1) {
-
                         //notify UserListObserver
                         CustomApplication app = ((CustomApplication)mFragmentActivity.getApplication());
                         UserListObservable mUserListObservable = app.getUserListObservable();
@@ -425,18 +421,12 @@ public class EditUser extends Fragment {
                         UserProfile userProfile = new UserProfile();
                         //replace current fragment
                         getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, userProfile).commit();
-
                     } else {
-
                         Snackbar.make(mRootView.findViewById(R.id.main_layout), getString(R.string.error_message_add_user), Snackbar.LENGTH_LONG)
                                 .show();
                     }
-
-
                 } else {
-
                     long rowsAffected = mDatabaseHelper.updateUser(mUser);
-
                     if (rowsAffected == 1) {
 
                         //notify UserListObserver
@@ -548,7 +538,6 @@ public class EditUser extends Fragment {
     };
 
     private boolean isChanged(){
-
         String username = new String(mUserName.getText().toString());
 
         if(Integer.parseInt(mWeight.getText().toString()) == (mUser_previous.getWeight()) &&
@@ -557,13 +546,11 @@ public class EditUser extends Fragment {
         }
 
         return true;
-
     }
 
     private boolean validateForm(){
 
         if(isValidWeight() && isValidUserName()) {
-
             // admin password
             /*
             if(mAdmin.isSelected()){

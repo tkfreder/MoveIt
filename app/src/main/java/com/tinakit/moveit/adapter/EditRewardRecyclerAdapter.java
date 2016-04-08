@@ -5,6 +5,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -73,17 +74,14 @@ public class EditRewardRecyclerAdapter extends RecyclerView.Adapter<EditRewardRe
 
     @Override
     public void onBindViewHolder(final EditRewardRecyclerAdapter.CustomViewHolder customViewHolder, int i) {
-
         Reward reward = mRewardList.get(i);
         User theUser = null;
 
         for (User user : mUserList){
-
             if (user.getUserId() == reward.getUserId()){
                 theUser = user;
                 break;
             }
-
         }
 
         // Populate data from Reward data object
