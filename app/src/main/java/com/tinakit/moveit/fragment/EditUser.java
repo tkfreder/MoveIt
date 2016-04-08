@@ -191,25 +191,6 @@ public class EditUser extends Fragment {
                     Snackbar.make(mRootView.findViewById(R.id.main_layout), getString(R.string.message_same_user_settings), Snackbar.LENGTH_LONG)
                             .show();
                 }
-
-
-                /*
-                //only check if name exists if new username is same as the previous one
-                if (!TextUtils.isEmpty(mUser_previous.getUserName())){
-
-                    boolean isSameUserName = s.toString().equals(mUser_previous.getUserName());
-                    if (!isSameUserName){
-                        if (existsUserName()){
-
-                            mUserName.setError(getString(R.string.message_username_exists));
-                            mSaveButton.setEnabled(false);
-                        }
-
-                        else
-                            mSaveButton.setEnabled(true);
-                    }
-                }
-                */
             }
         });
 
@@ -256,17 +237,6 @@ public class EditUser extends Fragment {
                     Snackbar.make(mRootView.findViewById(R.id.main_layout), getString(R.string.message_same_user_settings), Snackbar.LENGTH_LONG)
                             .show();
                 }
-
-                /*
-                if (!TextUtils.isEmpty(mWeight.getText())){
-                    if (!isValidWeight()){
-                        mWeight.setError(getString(R.string.message_weight_empty));
-                        mSaveButton.setEnabled(false);
-                    }
-                    else
-                        mSaveButton.setEnabled(true);
-                }
-                */
             }
         });
 
@@ -284,18 +254,14 @@ public class EditUser extends Fragment {
                 if (mIsNewUser) {
                     long rowId = mDatabaseHelper.addUser(mUser);
                     mUser.setUserId((int)rowId); //Sets the row id for a new user
-
                     if (rowId != -1) {
                         //notify UserListObserver
                         CustomApplication app = ((CustomApplication)mFragmentActivity.getApplication());
                         UserListObservable mUserListObservable = app.getUserListObservable();
                         mUserListObservable.addUser(mUser);
-
                         mIsNewUser = false;
-
                         // add a Reward placeholderfor the new user
                         mDatabaseHelper.insertReward(YOUR_REWARD, DEFAULT_REWARD_POINTS, rowId);
-
                         UserProfile userProfile = new UserProfile();
                         //replace current fragment
                         getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, userProfile).commit();
@@ -306,7 +272,6 @@ public class EditUser extends Fragment {
                 } else {
                     long rowsAffected = mDatabaseHelper.updateUser(mUser);
                     if (rowsAffected == 1) {
-
                         //notify UserListObserver
                         CustomApplication app = ((CustomApplication)mFragmentActivity.getApplication());
                         UserListObservable mUserListObservable = app.getUserListObservable();
@@ -314,15 +279,12 @@ public class EditUser extends Fragment {
 
                         Snackbar.make(mRootView.findViewById(R.id.main_layout), getString(R.string.message_saved_changes), Snackbar.LENGTH_LONG)
                                 .show();
-
                     }
                 }
             }
 
         });
     }
-
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
