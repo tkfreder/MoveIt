@@ -24,8 +24,8 @@ public class UserListObservable extends Observable {
     public void setValue(List<User> userList)
     {
         mUserList = userList;
-        hasChanged();
-        //setChanged();
+        //hasChanged();
+        setChanged();
         notifyObservers(mUserList);
     }
 
@@ -34,8 +34,9 @@ public class UserListObservable extends Observable {
             int currentId = mUserList.get(i).getUserId();
             if(currentId == user.getUserId()){
                 mUserList.set(i, user);
-                hasChanged();
+                //hasChanged();
                 //setChanged();
+                setChanged();
                 notifyObservers(mUserList);
                 break;
             }
@@ -44,14 +45,15 @@ public class UserListObservable extends Observable {
 
     public void addUser(User user){
         mUserList.add(user);
-        //setChanged();
-        hasChanged();
+        setChanged();
+        //hasChanged();
         notifyObservers(mUserList);
     }
 
     public void deleteUser(User user){
         mUserList.remove(user);
-        hasChanged();
+        setChanged();
+        //hasChanged();
         notifyObservers(mUserList);
     }
     public List<User> getValue()

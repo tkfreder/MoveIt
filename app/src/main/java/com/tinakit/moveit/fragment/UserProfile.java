@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -102,7 +103,6 @@ public class UserProfile extends Fragment implements Observer {
     }
 
     private void initializeUI(){
-
         mAddUserButton = (FloatingActionButton)rootView.findViewById(R.id.addUserButton);
 
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
@@ -114,7 +114,6 @@ public class UserProfile extends Fragment implements Observer {
 
         mUserProfileRecyclerAdapter = new UserProfileRecyclerAdapter(getActivity(), mFragmentActivity, mUserList);
         mRecyclerView.setAdapter(mUserProfileRecyclerAdapter);
-
     }
 
     private void setActionListeners(){
@@ -122,9 +121,7 @@ public class UserProfile extends Fragment implements Observer {
         mAddUserButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 //((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(getActivity().getString(R.string.app_bar_header_admin) + " : " + getActivity().getString(R.string.app_bar_header_new_user));
-
                 // check whether UserProfile is already visible
                 EditUser editUser = (EditUser)mFragmentActivity.getSupportFragmentManager().findFragmentByTag(EditUser.EDIT_USER_TAG);
                 if (editUser == null) {
