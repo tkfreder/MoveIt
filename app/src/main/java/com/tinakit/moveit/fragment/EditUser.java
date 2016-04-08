@@ -549,8 +549,7 @@ public class EditUser extends Fragment {
     }
 
     private boolean validateForm(){
-
-        if(isValidWeight() && isValidUserName()) {
+        if(isValidUserName()) {
             // admin password
             /*
             if(mAdmin.isSelected()){
@@ -565,26 +564,14 @@ public class EditUser extends Fragment {
             else
                 return true;
                 */
-            return true;
+            return false;
+        }
+        else if (Integer.parseInt(mWeight.getText().toString()) == 0){
+            mWeight.setError(getString(R.string.message_weight_non_zero));
+            return false;
         }
         else
-            return false;
-    }
-
-    public boolean isValidWeight(){
-
-        String weight = new String(mWeight.getText().toString().trim());
-
-
-        if(weight.equals(""))
-            return false;
-
-        if( Integer.parseInt(mWeight.getText().toString()) == 0){
-
-            return false;
-        }
-
-        return true;
+            return true;
     }
 
     public boolean isValidUserName(){

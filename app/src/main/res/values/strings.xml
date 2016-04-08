@@ -180,6 +180,7 @@
     <string name="message_admin_password_changed">Your password has been updated.</string>
     <string name="message_battery_low_auto_shutoff">Your battery is running low. Tracking has stopped to conserve power.</string>
     <string name="message_no_location_permission">Without location permission, location data cannot be tracked.</string>
+    <string name="message_weight_non_zero">Enter a weight greater than zero.</string>
 
     <string name="title_activity_sensor_api">SensorAPI</string>
     <string name="title_activity_fused_location_api">FusedLocationApi</string>
