@@ -65,7 +65,6 @@ public class EditUser extends Fragment {
     private User mUser_previous;
     private boolean mIsNewUser = false;
     private List<User> mUserList;
-    private boolean mHasNewPassword = false;
 
     // UI Widgets
     protected ImageView mAvatar;
@@ -74,7 +73,6 @@ public class EditUser extends Fragment {
     protected EditText mWeight;
     protected TextView mAdmin;
     protected Button mSaveButton;
-    protected EditText mPassword;
     //protected EditText mSecretAnswer;
     protected EditText mEmail;
 
@@ -105,7 +103,6 @@ public class EditUser extends Fragment {
         mWeight = (EditText)mRootView.findViewById(R.id.weight);
         mAdmin = (TextView)mRootView.findViewById(R.id.isAdmin);
         mSaveButton = (Button)mRootView.findViewById(R.id.saveButton);
-        //admin password mPassword = (EditText)mRootView.findViewById(R.id.password);
         //mSecretAnswer = (EditText)mRootView.findViewById(R.id.secretAnswer);
         mEmail = (EditText)mRootView.findViewById(R.id.email);
     }
@@ -180,12 +177,7 @@ public class EditUser extends Fragment {
             mAvatar.setImageResource(getResources().getIdentifier(user.getAvatarFileName(), "drawable", getActivity().getPackageName()));
         mWeight.setText(String.valueOf(user.getWeight()));
         if (user.isAdmin()){
-
             mAdmin.setVisibility(View.VISIBLE);
-
-            //admin password mPassword.setVisibility(View.VISIBLE);
-            //mPassword.setText(mUser.getPassword());
-
             mEmail.setVisibility(View.VISIBLE);
             mEmail.setText(mUser.getEmail());
         }
@@ -251,43 +243,6 @@ public class EditUser extends Fragment {
             }
         });
 
-        // admin password
-        /*
-        mPassword.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                mHasNewPassword = true;
-            }
-        });
-
-        mPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_NEXT || event.getKeyCode() == KeyEvent.FLAG_EDITOR_ACTION){
-                    // Check if no view has focus:
-                    View view = getActivity().getCurrentFocus();
-                    if (view != null) {
-                        //displaySecretQuestion();
-                        // close softkeyboard which obscures the hint on TextInputLayout
-                        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-                    }
-                }
-                return true;
-            }
-        });
-
-        */
         mEmail.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -392,16 +347,6 @@ public class EditUser extends Fragment {
                     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                 }
 
-                // if this is admin, save username and password in SharedPreferences
-                if (mUser.isAdmin()){
-
-                    SharedPreferences sharedPreferences = getActivity().getPreferences(Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString(AdminLoginDialogFragment.ADMIN_USERNAME, mUserName.getText().toString());
-                    editor.putString(AdminLoginDialogFragment.ADMIN_PASSWORD, mPassword.getText().toString());
-                    editor.commit();
-                }
-
                 saveUser();
                 if (mIsNewUser) {
                     long rowId = mDatabaseHelper.addUser(mUser);
@@ -437,52 +382,11 @@ public class EditUser extends Fragment {
                         Snackbar.make(mRootView.findViewById(R.id.main_layout), getString(R.string.message_saved_changes), Snackbar.LENGTH_LONG)
                                 .show();
 
-                        // admin password
-                        /*
-                        // send email notification that user changed password
-                        if(mHasNewPassword){
-                            Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
-                            emailIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            //emailIntent.setType("plain/text");
-                            emailIntent.setType("message/rfc822");
-                            emailIntent.putExtra(Intent.EXTRA_EMAIL  , new String[]{mUser.getEmail()});
-                            emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.admin_password_changed_subject));
-                            emailIntent.putExtra(Intent.EXTRA_TEXT   , getString(R.string.admin_password_changed_body));
-                            try {
-                                startActivity(emailIntent);
-                            } catch (android.content.ActivityNotFoundException ex) {
-                                Snackbar.make(mRootView.findViewById(R.id.main_layout), getString(R.string.message_admin_password_changed), Snackbar.LENGTH_LONG)
-                                        .show();
-                            }
-                        }
-                        */
                     }
                 }
             }
 
         });
-
-        // admin password
-        /*
-        mPassword.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-                if (mUser.getSecretAnswer().equals(s.toString()))
-                    mSaveButton.setEnabled(true);
-            }
-        });
-        */
     }
 
 
@@ -509,16 +413,6 @@ public class EditUser extends Fragment {
         // save any changes into User object
         mUser.setUserName(mUserName.getText().toString());
         mUser.setWeight(Integer.parseInt(mWeight.getText().toString()));
-
-        /*
-        if(mUser.isAdmin()){
-            mHasNewPassword = true;
-        }
-
-        mUser.setPassword(mPassword.getText().toString());
-        */
-        //any change to avatar should already be saved in OnActivityResult
-
     }
 
     View.OnClickListener avatarClickListener = new View.OnClickListener() {
@@ -550,20 +444,6 @@ public class EditUser extends Fragment {
 
     private boolean validateForm(){
         if(isValidUserName()) {
-            // admin password
-            /*
-            if(mAdmin.isSelected()){
-
-                if(mPassword.getText().toString().equals("")){
-                    mPassword.setError(getString(R.string.message_enter_password));
-                    return false;
-                }
-                else
-                    return true;
-            }
-            else
-                return true;
-                */
             return false;
         }
         else if (Integer.parseInt(mWeight.getText().toString()) == 0){
