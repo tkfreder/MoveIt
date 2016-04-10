@@ -162,32 +162,15 @@ public class EditUser extends Fragment {
 
     private void setActionListeners(){
 
-        mUserName.addTextChangedListener(new TextWatcher() {
+        mUserName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-            @Override
-            public void afterTextChanged(Editable s) {
-                //displaySecretQuestion();
-                // check for empty field
-                if (s.toString().trim().equals("")){
-                    mUserName.setError(getString(R.string.message_username_empty));
-                    mSaveButton.setEnabled(false);
-                }
-                else if (isChanged()){
-                    if(validateForm()){
-                        mSaveButton.setEnabled(true);
-                    }
-                    else {
-                        mSaveButton.setEnabled(false);
-                        mUserName.setError(getString(R.string.message_username_exists));
-                    }
+            public void onFocusChange(View v, boolean hasFocus) {
+
+                if (isChangedUsername()){
+                    validateForm();
                 }
                 else{
-                    mSaveButton.setEnabled(false);
+                    //mSaveButton.setEnabled(false);
                     Snackbar.make(mRootView.findViewById(R.id.main_layout), getString(R.string.message_same_user_settings), Snackbar.LENGTH_LONG)
                             .show();
                 }
@@ -224,13 +207,8 @@ public class EditUser extends Fragment {
                     mSaveButton.setEnabled(false);
                 }
 
-                else if (isChanged()){
-                    if (validateForm())
-                        mSaveButton.setEnabled(true);
-                    else{
-                        mSaveButton.setEnabled(false);
-                        mWeight.setError(getString(R.string.message_weight_empty));
-                    }
+                else if (isChangedUsername()){
+                    validateForm();
                 }
                 else{
                     mSaveButton.setEnabled(false);
@@ -240,23 +218,30 @@ public class EditUser extends Fragment {
             }
         });
 
+        mWeight.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                validateForm();
+            }
+        });
+
         //set tag on mAvatar to save filepath to avatar image
         mSaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 View view = mFragmentActivity.getCurrentFocus();
                 if (view != null) {
-                    InputMethodManager imm = (InputMethodManager)mFragmentActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+                    InputMethodManager imm = (InputMethodManager) mFragmentActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                 }
 
                 saveUser();
                 if (mIsNewUser) {
                     long rowId = mDatabaseHelper.addUser(mUser);
-                    mUser.setUserId((int)rowId); //Sets the row id for a new user
+                    mUser.setUserId((int) rowId); //Sets the row id for a new user
                     if (rowId != -1) {
                         //notify UserListObserver
-                        CustomApplication app = ((CustomApplication)mFragmentActivity.getApplication());
+                        CustomApplication app = ((CustomApplication) mFragmentActivity.getApplication());
                         UserListObservable mUserListObservable = app.getUserListObservable();
                         mUserListObservable.addUser(mUser);
                         mIsNewUser = false;
@@ -273,7 +258,7 @@ public class EditUser extends Fragment {
                     long rowsAffected = mDatabaseHelper.updateUser(mUser);
                     if (rowsAffected == 1) {
                         //notify UserListObserver
-                        CustomApplication app = ((CustomApplication)mFragmentActivity.getApplication());
+                        CustomApplication app = ((CustomApplication) mFragmentActivity.getApplication());
                         UserListObservable mUserListObservable = app.getUserListObservable();
                         mUserListObservable.setUser(mUser);
 
@@ -318,7 +303,7 @@ public class EditUser extends Fragment {
         }
     };
 
-    private boolean isChanged(){
+    private boolean isChangedUsername(){
         String username = new String(mUserName.getText().toString());
         if(Integer.parseInt(mWeight.getText().toString()) == (mUser_previous.getWeight()) &&
                 username.equals(mUser_previous.getUserName())){
@@ -328,10 +313,19 @@ public class EditUser extends Fragment {
     }
 
     private boolean validateForm(){
-        if(isValidUserName()) {
+        mSaveButton.setEnabled(false);
+        if (!isValidUserName() || !isValidWeight()){
+            mSaveButton.setEnabled(false);
             return false;
         }
-        else if (Integer.parseInt(mWeight.getText().toString()) == 0){
+        else{
+            mSaveButton.setEnabled(true);
+            return true;
+        }
+    }
+
+    private boolean isValidWeight(){
+        if (Integer.parseInt(mWeight.getText().toString()) == 0){
             mWeight.setError(getString(R.string.message_weight_non_zero));
             return false;
         }
@@ -342,21 +336,18 @@ public class EditUser extends Fragment {
     public boolean isValidUserName(){
         if (!TextUtils.isEmpty(mUser_previous.getUserName())){
             boolean isSameUserName = new String(mUserName.getText().toString()).equals(mUser_previous.getUserName().toString());
-            if (!isSameUserName){
-                if (existsUserName()){
+            if (!isSameUserName) {
+                if (existsUserName()) {
+                    mUserName.setError(getString(R.string.message_username_exists));
                     return false;
-                 }
-                else
-                    return true;
+                }
             }
-            else
-                return true;
         }
         else if (existsUserName()){
+            mUserName.setError(getString(R.string.message_username_exists));
             return false;
         }
-        else
-            return true;
+        return true;
     }
 
     private boolean existsUserName(){
