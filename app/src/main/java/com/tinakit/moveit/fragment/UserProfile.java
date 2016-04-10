@@ -72,20 +72,7 @@ public class UserProfile extends Fragment implements Observer {
         mUserList = mUserListObservable.getValue();
         initializeUI();
         setActionListeners();
-
-        /*
-        //TODO: not sure if we still need this if not calling onBackStack
-        getActivity().getSupportFragmentManager().addOnBackStackChangedListener(
-                new FragmentManager.OnBackStackChangedListener() {
-                    public void onBackStackChanged() {
-                        // Update your UI here.
-                        mUserList = mDatabaseHelper.getUsers();
-                        mUserProfileRecyclerAdapter = new UserProfileRecyclerAdapter(getActivity(), mFragmentActivity, mUserList);
-                        mRecyclerView.setAdapter(mUserProfileRecyclerAdapter);
-                    }
-                });
-         */
-
+        
         return rootView;
     }
 
