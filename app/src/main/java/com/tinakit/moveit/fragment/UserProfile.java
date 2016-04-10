@@ -72,7 +72,7 @@ public class UserProfile extends Fragment implements Observer {
         mUserList = mUserListObservable.getValue();
         initializeUI();
         setActionListeners();
-        
+
         return rootView;
     }
 
