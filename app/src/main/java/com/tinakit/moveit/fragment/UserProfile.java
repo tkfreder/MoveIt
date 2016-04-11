@@ -104,25 +104,16 @@ public class UserProfile extends Fragment implements Observer {
     }
 
     private void setActionListeners(){
-
         mAddUserButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(getActivity().getString(R.string.app_bar_header_admin) + " : " + getActivity().getString(R.string.app_bar_header_new_user));
-                // check whether UserProfile is already visible
-                EditUser editUser = (EditUser)mFragmentActivity.getSupportFragmentManager().findFragmentByTag(EditUser.EDIT_USER_TAG);
-                if (editUser == null) {
-
-                    editUser = new EditUser();
-                    mFragmentActivity.getSupportFragmentManager()
-                            .beginTransaction()
-                            //add() instead of replace() so BackButton can track via fragment back stack
-                            .add(R.id.fragmentContainer, editUser, EditUser.EDIT_USER_TAG)
-                            .addToBackStack(getString(R.string.app_bar_header_edit_user))
-                            .commit();
-                }
+                EditUser editUser = new EditUser();
+                mFragmentActivity.getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.fragmentContainer, editUser, EditUser.EDIT_USER_TAG)
+                    .addToBackStack(null)
+                    .commit();
             }
         });
     }
-
 }
