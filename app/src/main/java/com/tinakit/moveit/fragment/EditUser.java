@@ -161,11 +161,9 @@ public class EditUser extends Fragment {
     }
 
     private void setActionListeners(){
-
         mUserName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-
                 if (isChangedUsername()){
                     validateForm();
                 }
@@ -206,14 +204,9 @@ public class EditUser extends Fragment {
                     mWeight.setError(getString(R.string.message_weight_empty));
                     mSaveButton.setEnabled(false);
                 }
-
-                else if (isChangedUsername()){
-                    validateForm();
-                }
                 else{
-                    mSaveButton.setEnabled(false);
-                    Snackbar.make(mRootView.findViewById(R.id.main_layout), getString(R.string.message_same_user_settings), Snackbar.LENGTH_LONG)
-                            .show();
+                    if (isChangedWeight())
+                        validateForm();
                 }
             }
         });
@@ -221,7 +214,8 @@ public class EditUser extends Fragment {
         mWeight.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                validateForm();
+                if (isChangedWeight())
+                    validateForm();
             }
         });
 
@@ -246,12 +240,21 @@ public class EditUser extends Fragment {
                         CustomApplication app = ((CustomApplication) mFragmentActivity.getApplication());
                         UserListObservable mUserListObservable = app.getUserListObservable();
                         mUserListObservable.addUser(mUser);
+
                         mIsNewUser = false;
-                        // add a Reward placeholderfor the new user
+                        // add a Reward placeholder for the new user
                         mDatabaseHelper.insertReward(YOUR_REWARD, DEFAULT_REWARD_POINTS, rowId);
-                        UserProfile userProfile = new UserProfile();
-                        //replace current fragment
-                        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, userProfile).commit();
+                        // display success message
+                        Snackbar.make(mRootView.findViewById(R.id.main_layout), getString(R.string.message_added_user), Snackbar.LENGTH_LONG)
+                                .show();
+                        // display all users
+                        //UserProfile userProfile = (UserProfile)getActivity().getSupportFragmentManager().findFragmentByTag(UserStatsMain.USER_STATS_TAG);
+
+                        // display previous screen (displaying all users)
+                        getActivity().getSupportFragmentManager().popBackStack();
+                                //.beginTransaction()
+                                //.addToBackStack(getString(R.string.app_bar_header_edit_user))
+                                //.replace(R.id.fragmentContainer, userProfile).commit();
                     } else {
                         Snackbar.make(mRootView.findViewById(R.id.main_layout), getString(R.string.error_message_add_user), Snackbar.LENGTH_LONG)
                                 .show();
@@ -311,6 +314,14 @@ public class EditUser extends Fragment {
             return false;
         }
         return true;
+    }
+
+    private boolean isChangedWeight(){
+        int weight = Integer.parseInt(mWeight.getText().toString());
+        if(weight == mUser_previous.getWeight())
+            return false;
+        else
+            return true;
     }
 
     private boolean validateForm(){
