@@ -236,6 +236,8 @@ public class EditUser extends Fragment {
                 }
 
                 saveUser();
+
+
                 if (mIsNewUser) {
                     long rowId = mDatabaseHelper.addUser(mUser);
                     mUser.setUserId((int) rowId); //Sets the row id for a new user
@@ -305,8 +307,7 @@ public class EditUser extends Fragment {
 
     private boolean isChangedUsername(){
         String username = new String(mUserName.getText().toString());
-        if(Integer.parseInt(mWeight.getText().toString()) == (mUser_previous.getWeight()) &&
-                username.equals(mUser_previous.getUserName())){
+        if(username.equals(mUser_previous.getUserName())){
             return false;
         }
         return true;
@@ -314,6 +315,7 @@ public class EditUser extends Fragment {
 
     private boolean validateForm(){
         mSaveButton.setEnabled(false);
+
         if (!isValidUserName() || !isValidWeight()){
             mSaveButton.setEnabled(false);
             return false;
@@ -325,27 +327,40 @@ public class EditUser extends Fragment {
     }
 
     private boolean isValidWeight(){
-        if (Integer.parseInt(mWeight.getText().toString()) == 0){
+        if (mWeight.getText().toString().equals("")){
             mWeight.setError(getString(R.string.message_weight_non_zero));
             return false;
         }
-        else
-            return true;
+        else{
+            if (mWeight.getText().toString().trim().equals("") || Integer.parseInt(mWeight.getText().toString()) == 0){
+                mWeight.setError(getString(R.string.message_weight_non_zero));
+                return false;
+            }
+            else
+                return true;
+        }
     }
 
     public boolean isValidUserName(){
-        if (!TextUtils.isEmpty(mUser_previous.getUserName())){
-            boolean isSameUserName = new String(mUserName.getText().toString()).equals(mUser_previous.getUserName().toString());
-            if (!isSameUserName) {
-                if (existsUserName()) {
-                    mUserName.setError(getString(R.string.message_username_exists));
-                    return false;
+        // check if username is empty
+        if (mUserName.getText().toString().trim().equals("")){
+            mUserName.setError(getString(R.string.message_username_empty));
+            return false;
+        }
+        else {
+            if (!TextUtils.isEmpty(mUser_previous.getUserName())){
+                boolean isSameUserName = new String(mUserName.getText().toString()).equals(mUser_previous.getUserName().toString());
+                if (!isSameUserName) {
+                    if (existsUserName()) {
+                        mUserName.setError(getString(R.string.message_username_exists));
+                        return false;
+                    }
                 }
             }
-        }
-        else if (existsUserName()){
-            mUserName.setError(getString(R.string.message_username_exists));
-            return false;
+            else if (existsUserName()){
+                mUserName.setError(getString(R.string.message_username_exists));
+                return false;
+            }
         }
         return true;
     }
