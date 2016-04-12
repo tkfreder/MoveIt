@@ -354,16 +354,16 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
 
         //PLACEHOLDER DATA FOR USERS
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'tina', 1, 125, 'avatar_5', 0, 1, 'tina.k.fredericks@gmail.com', 'tina', null, null);"); // ADMIN, third column = 1
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Parent', 0, 175, 'avatar_4', 0, 1, null, null, null, null);");
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Sister', 0, 50, 'avatar_3', 0, 1, null, null, null, null);");
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Brother', 0, 75, 'avatar_2', 0, 1, null, null, null, null);");
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Mommy', 1, 125, 'avatar_5', 0, 1, 'tina.k.fredericks@gmail.com', 'tina', null, null);"); // ADMIN, third column = 1
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Daddy', 0, 175, 'avatar_4', 0, 1, null, null, null, null);");
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Anna', 0, 50, 'avatar_3', 0, 1, null, null, null, null);");
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Neil', 0, 75, 'avatar_2', 0, 1, null, null, null, null);");
 
         //PLACEHOLDER DATA FOR REWARDS
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (1, 'Reward 1', 1, 1);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (2, 'Reward 2', 5, 2);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (3, 'Reward 3', 10, 3);");
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (4, 'Reward 4', 100, 4);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (1, 'Go out for dinner', 5000, 1);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (2, 'Movie date night', 5000, 2);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (3, 'Best friends sleepover', 5000, 3);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (4, 'Tickets to baseball game', 5000, 4);");
 
         // ie, 2016-02-11 13:19:06:449
 /*
