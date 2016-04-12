@@ -8,14 +8,14 @@
     <TextView
             android:id="@+id/userName"
             android:layout_width="wrap_content"
-            app:layout_widthPercent="15%"
+            app:layout_widthPercent="20%"
             android:layout_height="wrap_content"
             android:text="placeholder name"
             />
     <android.support.design.widget.TextInputLayout
         android:id="@+id/pointsLayout"
         android:layout_width="match_parent"
-        app:layout_widthPercent="25%"
+        app:layout_widthPercent="20%"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/userName"
         android:layout_toEndOf="@+id/userName"
