@@ -183,7 +183,8 @@ public class UserStats extends Fragment {
                 public void onSeriesItemAnimationProgress(float percentComplete, float currentPosition) {
 
                     float percentFilled = ((currentPosition) / 100);
-                    int pointsRemaining = mRewardPoints >= mUser.getPoints() ? Math.round(mRewardPoints * (1 - percentFilled)) : mRewardPoints;
+                    //int pointsRemaining = mRewardPoints >= mUser.getPoints() ? Math.round(mRewardPoints * (1 - percentFilled)) : mRewardPoints;
+                    int pointsRemaining = mRewardPoints >= mUser.getPoints() ? mRewardPoints - mUser.getPoints() : mRewardPoints;
                     textPercentage.setText(String.format("%d more " + (pointsRemaining == 1 ? "coin" : "coins") + " to go!", pointsRemaining));
                 }
 
