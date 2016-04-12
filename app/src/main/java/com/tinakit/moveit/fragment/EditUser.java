@@ -52,8 +52,8 @@ public class EditUser extends Fragment {
     public static final String EDIT_USER_TAG = "EDIT_USER_TAG";
     public static final String EDIT_USER_USER = "EDIT_USER_USER";
     public static final int PICK_AVATAR_REQUEST = 1;
-    private static final String YOUR_REWARD = "Your Reward TBD";
-    private static final int DEFAULT_REWARD_POINTS = 200;
+    private static final String YOUR_REWARD = "put your reward here";
+    private static final int DEFAULT_REWARD_POINTS = 5000;
 
     @Inject
     FitnessDBHelper mDatabaseHelper;
