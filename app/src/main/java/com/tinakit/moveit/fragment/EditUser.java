@@ -33,6 +33,7 @@ import android.widget.TextView;
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.activity.PickAvatar;
 import com.tinakit.moveit.db.FitnessDBHelper;
+import com.tinakit.moveit.model.Reward;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.model.UserListObservable;
 import com.tinakit.moveit.module.CustomApplication;
@@ -236,14 +237,18 @@ public class EditUser extends Fragment {
                     long rowId = mDatabaseHelper.addUser(mUser);
                     mUser.setUserId((int) rowId); //Sets the row id for a new user
                     if (rowId != -1) {
+                        mIsNewUser = false;
+                        // add a Reward placeholder for the new user
+                        int id = (int)mDatabaseHelper.insertReward(YOUR_REWARD, DEFAULT_REWARD_POINTS, rowId);
                         //notify UserListObserver
                         CustomApplication app = ((CustomApplication) mFragmentActivity.getApplication());
                         UserListObservable mUserListObservable = app.getUserListObservable();
+                        Reward reward = new Reward();
+                        reward.setRewardId(id);
+                        reward.setName(YOUR_REWARD);
+                        reward.setPoints(DEFAULT_REWARD_POINTS);
+                        mUser.setReward(reward);
                         mUserListObservable.addUser(mUser);
-
-                        mIsNewUser = false;
-                        // add a Reward placeholder for the new user
-                        mDatabaseHelper.insertReward(YOUR_REWARD, DEFAULT_REWARD_POINTS, rowId);
                         // display success message
                         Snackbar.make(mRootView.findViewById(R.id.main_layout), getString(R.string.message_added_user), Snackbar.LENGTH_LONG)
                                 .show();
