@@ -142,8 +142,6 @@ public class EditUser extends Fragment {
         String avatarFileName = avatarFileList.get(0);
         mUser.setAvatarFileName(avatarFileName);
         mAvatar.setImageResource(getResources().getIdentifier(avatarFileName, "drawable", getActivity().getPackageName()));
-        // set weight
-        mWeight.setText("0");
         // set button text
         mSaveButton.setText(getString(R.string.button_add));
     }
@@ -322,11 +320,14 @@ public class EditUser extends Fragment {
     }
 
     private boolean isChangedWeight(){
-        int weight = Integer.parseInt(mWeight.getText().toString());
-        if(weight == mUser_previous.getWeight())
-            return false;
-        else
-            return true;
+        if (!mWeight.getText().toString().trim().equals("")){
+            int weight = Integer.parseInt(mWeight.getText().toString());
+            if(weight == mUser_previous.getWeight())
+                return false;
+            else
+                return true;
+        }
+        return false;
     }
 
     private boolean validateForm(){
