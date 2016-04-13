@@ -48,17 +48,21 @@ public class EditRewardRecyclerAdapter extends RecyclerView.Adapter<EditRewardRe
         mUserList = userList;
         // inject FitnessDBHelper
         ((CustomApplication)mFragmentActivity.getApplication()).getAppComponent().inject(this);
-        // Get Activity Types
-        //mRewardList = mDatabaseHelper.getAllRewards();
+
+
         mRewardMap = new TreeMap<Integer,Reward>();
         for (Reward r : mRewardList){
             mRewardMap.put(r.getRewardId(), r);
         }
-    }
 
+    }
     public List<Reward> getRewardList(){
         mRewardList = new ArrayList<Reward>(mRewardMap.values());
         return mRewardList;
+    }
+
+    public List<User> getUserList(){
+        return mUserList;
     }
 
     public void setLists(List<User> userList, List<Reward> rewardList){
@@ -75,7 +79,10 @@ public class EditRewardRecyclerAdapter extends RecyclerView.Adapter<EditRewardRe
 
     @Override
     public void onBindViewHolder(final EditRewardRecyclerAdapter.CustomViewHolder customViewHolder, int i) {
-        Reward reward = mRewardList.get(i);
+        //Reward reward = mRewardList.get(i);
+        final User theUser = mUserList.get(i);
+
+        /*
         User theUser = null;
 
         for (User user : mUserList){
@@ -84,15 +91,16 @@ public class EditRewardRecyclerAdapter extends RecyclerView.Adapter<EditRewardRe
                 break;
             }
         }
+        */
 
         // Populate data from Reward data object
-        int numPoints = reward.getPoints();
+        //int numPoints = reward.getPoints();
 
         //customViewHolder.avatar.setImageResource(mContext.getResources().getIdentifier(theUser.getAvatarFileName(), "drawable", mFragmentActivity.getPackageName()));
         customViewHolder.userName.setText(theUser.getUserName());
 
-        customViewHolder.points.setTag(reward);
-        customViewHolder.points.setText(String.valueOf(numPoints));
+        customViewHolder.points.setTag(i/*reward*/);
+        customViewHolder.points.setText(String.valueOf(theUser.getReward().getPoints()/*numPoints*/));
         customViewHolder.points.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -106,16 +114,21 @@ public class EditRewardRecyclerAdapter extends RecyclerView.Adapter<EditRewardRe
 
             @Override
             public void afterTextChanged(Editable s) {
+                //Reward reward = (Reward)customViewHolder.points.getTag();
+                //reward.setPoints(!s.toString().equals("") ? Integer.parseInt(s.toString()) : 0 );
+                //mRewardMap.put(reward.getRewardId(),reward);
+                int index = (int)customViewHolder.points.getTag();
+                Reward reward = mUserList.get(index).getReward();
+                reward.setPoints(Integer.parseInt(s.toString()));
+                theUser.setReward(reward);
+                mUserList.set(index, theUser);
 
-                Reward reward = (Reward)customViewHolder.points.getTag();
-                reward.setPoints(!s.toString().equals("") ? Integer.parseInt(s.toString()) : 0 );
                 mRewardMap.put(reward.getRewardId(),reward);
-
             }
         });
 
-        customViewHolder.name.setTag(reward);
-        customViewHolder.name.setText(reward.getName());
+        customViewHolder.name.setTag(i/*reward*/);
+        customViewHolder.name.setText(theUser.getReward().getName()/*reward.getName()*/);
         customViewHolder.name.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -129,11 +142,16 @@ public class EditRewardRecyclerAdapter extends RecyclerView.Adapter<EditRewardRe
 
             @Override
             public void afterTextChanged(Editable s) {
-
-                Reward reward = (Reward)customViewHolder.points.getTag();
+                //Reward reward = (Reward)customViewHolder.points.getTag();
+                //reward.setName(s.toString());
+                //mRewardMap.put(reward.getRewardId(),reward);
+                int index = (int)customViewHolder.name.getTag();
+                Reward reward = mUserList.get(index).getReward();
                 reward.setName(s.toString());
-                mRewardMap.put(reward.getRewardId(),reward);
+                theUser.setReward(reward);
+                mUserList.set(index, theUser);
 
+                mRewardMap.put(reward.getRewardId(),reward);
             }
         });
 
@@ -195,7 +213,8 @@ public class EditRewardRecyclerAdapter extends RecyclerView.Adapter<EditRewardRe
 
     @Override
     public int getItemCount() {
-        return (null != mRewardList ? mRewardList.size() : 0);
+        //return (null != mRewardList ? mRewardList.size() : 0);
+        return (null != mUserList ? mUserList.size() : 0);
     }
 
     public class CustomViewHolder extends RecyclerView.ViewHolder {
