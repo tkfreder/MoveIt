@@ -324,6 +324,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                 " , u." + KEY_USER_SECRET_QUESTION + " AS " + KEY_USER_SECRET_QUESTION +
                 " , u." + KEY_USER_SECRET_ANSWER + " AS " + KEY_USER_SECRET_ANSWER +
                 " , r." + KEY_REWARD_POINTS + " AS " + KEY_REWARD_POINTS +
+                " , r." + KEY_REWARD_ID + " AS " + KEY_REWARDUSER_REWARD_ID_FK +
                 " , r." + KEY_REWARD_NAME + " AS " + KEY_REWARD_NAME +
                 " FROM " + TABLE_USERS + " u" +
                 //" LEFT JOIN " + TABLE_REWARDUSER + " ru on u." + KEY_USER_ID + " = ru." + KEY_REWARDUSER_USER_ID_FK +
@@ -354,7 +355,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
 
         //PLACEHOLDER DATA FOR USERS
-        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Mommy', 1, 125, 'avatar_5', 0, 1, 'tina.k.fredericks@gmail.com', 'tina', null, null);"); // ADMIN, third column = 1
+        db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Mommy', 1, 125, 'avatar_1', 0, 1, 'tina.k.fredericks@gmail.com', 'tina', null, null);"); // ADMIN, third column = 1
         db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Daddy', 0, 175, 'avatar_4', 0, 1, null, null, null, null);");
         db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Anna', 0, 50, 'avatar_3', 0, 1, null, null, null, null);");
         db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Neil', 0, 75, 'avatar_2', 0, 1, null, null, null, null);");
@@ -457,7 +458,8 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
                             , KEY_USER_PASSWORD
                             , KEY_USER_EMAIL
                             , KEY_USER_SECRET_QUESTION
-                            , KEY_USER_SECRET_ANSWER},
+                            , KEY_USER_SECRET_ANSWER
+                            , KEY_REWARDUSER_REWARD_ID_FK},
                     KEY_USER_IS_ENABLED + "= ?", new String[]{"1"}, null, null, KEY_REWARDUSER_USER_ID_FK);
             try{
 
@@ -479,6 +481,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
 
                         // create Reward
                         Reward reward = new Reward();
+                        reward.setRewardId(cursor.getInt(cursor.getColumnIndex(KEY_REWARDUSER_REWARD_ID_FK)));
                         reward.setName(cursor.getString(cursor.getColumnIndex(KEY_REWARD_NAME)));
                         reward.setPoints(cursor.getInt(cursor.getColumnIndex(KEY_REWARD_POINTS)));
                         user.setReward(reward);
