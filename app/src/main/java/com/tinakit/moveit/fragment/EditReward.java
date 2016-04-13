@@ -111,7 +111,8 @@ public class EditReward extends Fragment implements Observer {
     @Override
     public void update(Observable observable, Object data) {
         List<User> userList = (List<User>)data;
-        mEditRewardRecyclerAdapter.setUserList(userList);
+        List<Reward> rewardList = mDatabaseHelper.getAllRewards();
+        mEditRewardRecyclerAdapter.setLists(userList, rewardList);
         mEditRewardRecyclerAdapter.notifyDataSetChanged();
     }
 

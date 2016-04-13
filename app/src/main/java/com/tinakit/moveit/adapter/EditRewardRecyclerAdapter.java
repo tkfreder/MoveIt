@@ -61,8 +61,9 @@ public class EditRewardRecyclerAdapter extends RecyclerView.Adapter<EditRewardRe
         return mRewardList;
     }
 
-    public void setUserList(List<User> userList){
+    public void setLists(List<User> userList, List<Reward> rewardList){
         mUserList = userList;
+        mRewardList = rewardList;
     }
 
     @Override
