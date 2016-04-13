@@ -361,7 +361,7 @@ public class FitnessDBHelper extends SQLiteOpenHelper {
         db.execSQL("INSERT INTO " + TABLE_USERS + " VALUES (null, 'Neil', 0, 75, 'avatar_2', 0, 1, null, null, null, null);");
 
         //PLACEHOLDER DATA FOR REWARDS
-        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (1, 'Go out for dinner', 100, 1);");
+        db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (1, 'Going out for dinner', 100, 1);");
         db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (2, 'Movie date night', 100, 2);");
         db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (3, 'Best friends sleepover', 100, 3);");
         db.execSQL("INSERT INTO " + TABLE_REWARDS + " VALUES (4, 'Tickets to baseball game', 100, 4);");
