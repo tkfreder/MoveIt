@@ -90,6 +90,11 @@ public class EditReward extends Fragment implements Observer {
                 // changes tracked by adapter, get latest data
                 List<Reward> rewardList = mEditRewardRecyclerAdapter.getRewardList();
                 int rowsAffected = mDatabaseHelper.updateAllRewards(rewardList);
+                CustomApplication app = ((CustomApplication)mFragmentActivity.getApplication());
+                // notify observers that userlist has changed, that is the reward portion of userlist
+                UserListObservable mUserListObservable = app.getUserListObservable();
+                mUserListObservable.setValue(mEditRewardRecyclerAdapter.getUserList());
+
                 if(rowsAffected > 0){
                     Snackbar.make(mRootView.findViewById(R.id.main_layout), getString(R.string.message_update_reward), Snackbar.LENGTH_LONG)
                             .show();
