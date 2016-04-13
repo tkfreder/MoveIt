@@ -26,20 +26,24 @@ import com.tinakit.moveit.adapter.UserStatsRecyclerAdapter;
 import com.tinakit.moveit.adapter.ViewPagerAdapter;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.Reward;
+import com.tinakit.moveit.model.RewardListObservable;
 import com.tinakit.moveit.model.User;
+import com.tinakit.moveit.model.UserListObservable;
 import com.tinakit.moveit.module.CustomApplication;
 import com.tinakit.moveit.utility.CheatSheet;
 import com.tinakit.moveit.utility.DateUtility;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.inject.Inject;
 
 /**
  * Created by Tina on 1/24/2016.
  */
-public class UserStats extends Fragment {
+public class UserStats extends Fragment implements Observer {
 
     // CONSTANTS
     public static final String USER_STATS_TAG = "USER_STATS_TAG";
@@ -63,47 +67,42 @@ public class UserStats extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
         mFragmentActivity  = super.getActivity();
         rootView = inflater.inflate(R.layout.user_stats, container, false);
-
         mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
         // Dagger 2 injection
         ((CustomApplication)getActivity().getApplication()).getAppComponent().inject(this);
-
         initializeUI();
+        // add UserListObservable
+        CustomApplication app = ((CustomApplication)mFragmentActivity.getApplication());
+        UserListObservable mUserListObservable = app.getUserListObservable();
+        mUserListObservable.addObserver(this);
 
         return rootView;
     }
 
-    private void initializeUI(){
+    @Override
+    public void update(Observable observable, Object data) {
+        initializeUI();
+    }
 
+    private void initializeUI(){
         Bundle args = getArguments();
         if(args != null && args.containsKey(USER_STATS_ARG_USER)){
-
             mUser = args.getParcelable(USER_STATS_ARG_USER);
-
             // get rewards earned for this user
             List<Reward> rewardList = mDatabaseHelper.getRewardsEarned(mUser);
             List<Reward> rewardListToFulfill = new ArrayList<>();
 
             if (rewardList.size() > 0){
-
-
                 for (Reward reward : rewardList){
-
                     if(reward.getDateFulfilled() == null){
-
                         rewardListToFulfill.add(reward);
-
                     }
                     // display ribbons for rewards already fulfilled
                     else{
-
                         TextView rewardsEarned = (TextView)rootView.findViewById(R.id.rewardsEarned);
                         rewardsEarned.setVisibility(View.VISIBLE);
-
                         ImageView certificate = new ImageView(mFragmentActivity);
                         certificate.setImageResource(getResources().getIdentifier("ribbon", "drawable", mFragmentActivity.getPackageName()));
                         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(100,100);
@@ -115,21 +114,15 @@ public class UserStats extends Fragment {
                 }
             }
 
-
             // if reward is earned and has not been fulfilled yet, display ribbon
             if ( rewardListToFulfill.size() > 0 ){
-
                 RelativeLayout ribbonLayout = (RelativeLayout)rootView.findViewById(R.id.ribbonLayout);
                 ribbonLayout.setVisibility(View.VISIBLE);
-
                 TextView textPercentage = (TextView)rootView.findViewById(R.id.textPercentage);
                 textPercentage.setVisibility(View.GONE);
-
             }
 
-
             mColorList = new ArrayList<>();
-
             mColorList.add(Color.argb(255, 76, 175, 80)); // green
             mColorList.add(Color.argb(255,194,24,91)); // violet
             mColorList.add(Color.argb(255,25,118,210)); //blue
