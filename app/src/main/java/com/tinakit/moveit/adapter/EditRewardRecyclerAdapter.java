@@ -114,16 +114,16 @@ public class EditRewardRecyclerAdapter extends RecyclerView.Adapter<EditRewardRe
 
             @Override
             public void afterTextChanged(Editable s) {
-                //Reward reward = (Reward)customViewHolder.points.getTag();
-                //reward.setPoints(!s.toString().equals("") ? Integer.parseInt(s.toString()) : 0 );
-                //mRewardMap.put(reward.getRewardId(),reward);
-                int index = (int)customViewHolder.points.getTag();
-                User aUser = mUserList.get(index);
-                Reward reward = mUserList.get(index).getReward();
-                reward.setPoints(Integer.parseInt(s.toString()));
-                aUser.setReward(reward);
-                mUserList.set(index, aUser);
-                //mRewardMap.put(reward.getRewardId(),reward);
+                if (!s.toString().trim().equals("")){
+                    int index = (int)customViewHolder.points.getTag();
+                    User aUser = mUserList.get(index);
+                    Reward reward = mUserList.get(index).getReward();
+                    reward.setPoints(Integer.parseInt(s.toString()));
+                    aUser.setReward(reward);
+                    mUserList.set(index, aUser);
+                } else {
+                    customViewHolder.points.setError(mFragmentActivity.getString(R.string.message_coins_non_zero));
+                }
             }
         });
 
