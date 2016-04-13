@@ -67,6 +67,7 @@ public class Admin extends Fragment implements Observer {
         //ViewPager
         mViewPager = (ViewPager)rootView.findViewById(R.id.tab_viewpager_admin);
         if (mViewPager != null){
+            mViewPager.setOffscreenPageLimit(0);
             setupViewPager(mViewPager);
         }
 
