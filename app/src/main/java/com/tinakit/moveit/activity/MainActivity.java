@@ -47,6 +47,7 @@ import com.tinakit.moveit.fragment.UserProfile;
 import com.tinakit.moveit.fragment.UserStatsMain;
 import com.tinakit.moveit.model.ActivityDetail;
 import com.tinakit.moveit.model.RegisterDialogFragment;
+import com.tinakit.moveit.model.RewardListObservable;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.model.UserListObservable;
 import com.tinakit.moveit.module.CustomApplication;
@@ -81,7 +82,6 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
 
     //cache
     ArrayList<ActivityDetail> mActivityDetailList;
-    ArrayList<User> mUserList;
     private BackHandledFragment selectedFragment;
     protected final String welcomeScreenShownPref = "welcomeScreenShown";
 
@@ -122,20 +122,14 @@ public class MainActivity extends AppCompatActivity implements BackHandledFragme
     private void fetchData(){
         //data for ActivityHistory
         mActivityDetailList = mDatabaseHelper.getActivityDetailList(ActivityHistory.ACTIVITY_LIMIT_COUNT);
-        mUserList = mDatabaseHelper.getUsers();
-        /*
-        AsyncTask.execute(new Runnable(){
-            @Override
-            public void run(){
-                // get user data
-                mUserList = mDatabaseHelper.getUsers();
-            }
-        });
-        */
+
         // initialize UserListObservable on launch app
         CustomApplication app = (CustomApplication)getApplication();
         UserListObservable mUserListObservable = app.getUserListObservable();
-        mUserListObservable.setValue(mUserList);
+        mUserListObservable.setValue(mDatabaseHelper.getUsers());
+        // initialize RewardListObservable
+        RewardListObservable mRewardListObservable = app.getRewardListObservable();
+        mRewardListObservable.setValue(mDatabaseHelper.getAllRewards());
     }
     //**********************************************************************************************
     //  initializeUI()
