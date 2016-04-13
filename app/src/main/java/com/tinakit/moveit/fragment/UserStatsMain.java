@@ -51,40 +51,35 @@ public class UserStatsMain extends Fragment implements Observer {
     protected TextView textPercentage;
     List<SeriesItem> mSeriesItemList;
     protected UserStatsPagerAdapter mUserStatsPagerAdapter;
+    protected ViewPager mViewPager;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mFragmentActivity  = (FragmentActivity)super.getActivity();
         rootView = inflater.inflate(R.layout.user_stats_main, container, false);
-
         mFragmentActivity.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
         // Dagger 2 injection
         ((CustomApplication)getActivity().getApplication()).getAppComponent().inject(this);
-
         // add UserListObservable
         CustomApplication app = ((CustomApplication)mFragmentActivity.getApplication());
         UserListObservable mUserListObservable = app.getUserListObservable();
         mUserListObservable.addObserver(this);
-
         initializeUI();
-
         return rootView;
     }
 
     @Override
     public void update(Observable observable, Object data) {
-        List<User> userList = (List<User>)data;
-        mUserList = userList;
+        setupViewPager(mViewPager);
     }
 
     private void initializeUI(){
-
         // get user data
-        mUserList = mDatabaseHelper.getUsers();
-
-        final ViewPager mViewPager = (ViewPager)rootView.findViewById(R.id.viewpager_user_stats);
+        //mUserList = mDatabaseHelper.getUsers();
+        CustomApplication app = ((CustomApplication)mFragmentActivity.getApplication());
+        mUserList = app.getUserListObservable().getValue();
+        mViewPager = (ViewPager)rootView.findViewById(R.id.viewpager_user_stats);
         mViewPager.setOffscreenPageLimit(0);
         if (mViewPager != null){
             setupViewPager(mViewPager);
