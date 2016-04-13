@@ -54,7 +54,7 @@ public class EditUser extends Fragment {
     public static final String EDIT_USER_USER = "EDIT_USER_USER";
     public static final int PICK_AVATAR_REQUEST = 1;
     private static final String YOUR_REWARD = "put your reward here";
-    private static final int DEFAULT_REWARD_POINTS = 5000;
+    private static final int DEFAULT_REWARD_POINTS = 100;
 
     @Inject
     FitnessDBHelper mDatabaseHelper;
@@ -156,8 +156,8 @@ public class EditUser extends Fragment {
         mWeight.setText(String.valueOf(user.getWeight()));
         if (user.isAdmin()){
             mAdmin.setVisibility(View.VISIBLE);
-            mEmail.setVisibility(View.VISIBLE);
-            mEmail.setText(mUser.getEmail());
+            //mEmail.setVisibility(View.VISIBLE);
+            //mEmail.setText(mUser.getEmail());
         }
     }
 
