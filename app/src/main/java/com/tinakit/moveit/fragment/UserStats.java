@@ -43,7 +43,7 @@ import javax.inject.Inject;
 /**
  * Created by Tina on 1/24/2016.
  */
-public class UserStats extends Fragment implements Observer {
+public class UserStats extends Fragment {
 
     // CONSTANTS
     public static final String USER_STATS_TAG = "USER_STATS_TAG";
@@ -73,17 +73,7 @@ public class UserStats extends Fragment implements Observer {
         // Dagger 2 injection
         ((CustomApplication)getActivity().getApplication()).getAppComponent().inject(this);
         initializeUI();
-        // add UserListObservable
-        CustomApplication app = ((CustomApplication)mFragmentActivity.getApplication());
-        UserListObservable mUserListObservable = app.getUserListObservable();
-        mUserListObservable.addObserver(this);
-
         return rootView;
-    }
-
-    @Override
-    public void update(Observable observable, Object data) {
-        initializeUI();
     }
 
     private void initializeUI(){

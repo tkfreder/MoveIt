@@ -118,12 +118,12 @@ public class EditRewardRecyclerAdapter extends RecyclerView.Adapter<EditRewardRe
                 //reward.setPoints(!s.toString().equals("") ? Integer.parseInt(s.toString()) : 0 );
                 //mRewardMap.put(reward.getRewardId(),reward);
                 int index = (int)customViewHolder.points.getTag();
+                User aUser = mUserList.get(index);
                 Reward reward = mUserList.get(index).getReward();
                 reward.setPoints(Integer.parseInt(s.toString()));
-                theUser.setReward(reward);
-                mUserList.set(index, theUser);
-
-                mRewardMap.put(reward.getRewardId(),reward);
+                aUser.setReward(reward);
+                mUserList.set(index, aUser);
+                //mRewardMap.put(reward.getRewardId(),reward);
             }
         });
 
@@ -146,10 +146,11 @@ public class EditRewardRecyclerAdapter extends RecyclerView.Adapter<EditRewardRe
                 //reward.setName(s.toString());
                 //mRewardMap.put(reward.getRewardId(),reward);
                 int index = (int)customViewHolder.name.getTag();
+                User aUser = mUserList.get(index);
                 Reward reward = mUserList.get(index).getReward();
                 reward.setName(s.toString());
-                theUser.setReward(reward);
-                mUserList.set(index, theUser);
+                aUser.setReward(reward);
+                mUserList.set(index, aUser);
 
                 mRewardMap.put(reward.getRewardId(),reward);
             }

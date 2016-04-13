@@ -17,16 +17,19 @@ import com.hookedonplay.decoviewlib.charts.SeriesItem;
 import com.tinakit.moveit.R;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.User;
+import com.tinakit.moveit.model.UserListObservable;
 import com.tinakit.moveit.module.CustomApplication;
 
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.inject.Inject;
 
 /**
  * Created by Tina on 12/19/2015.
  */
-public class UserStatsMain extends Fragment{
+public class UserStatsMain extends Fragment implements Observer {
 
     // CONSTANTS
     public static final String USER_STATS_TAG = "USER_STATS_TAG";
@@ -60,9 +63,20 @@ public class UserStatsMain extends Fragment{
         // Dagger 2 injection
         ((CustomApplication)getActivity().getApplication()).getAppComponent().inject(this);
 
+        // add UserListObservable
+        CustomApplication app = ((CustomApplication)mFragmentActivity.getApplication());
+        UserListObservable mUserListObservable = app.getUserListObservable();
+        mUserListObservable.addObserver(this);
+
         initializeUI();
 
         return rootView;
+    }
+
+    @Override
+    public void update(Observable observable, Object data) {
+        List<User> userList = (List<User>)data;
+        mUserList = userList;
     }
 
     private void initializeUI(){
