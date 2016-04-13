@@ -72,7 +72,8 @@ public class UserStatsMain extends Fragment implements Observer {
 
     @Override
     public void update(Observable observable, Object data) {
-        mViewPager.setAdapter(mUserStatsPagerAdapter);
+        //mViewPager.setAdapter(mUserStatsPagerAdapter);
+        mUserStatsPagerAdapter.notifyDataSetChanged();
     }
 
     private void initializeUI(){
