@@ -19,6 +19,7 @@ import com.tinakit.moveit.R;
 import com.tinakit.moveit.adapter.EditRewardRecyclerAdapter;
 import com.tinakit.moveit.db.FitnessDBHelper;
 import com.tinakit.moveit.model.Reward;
+import com.tinakit.moveit.model.RewardListObservable;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.model.UserListObservable;
 import com.tinakit.moveit.module.CustomApplication;
@@ -41,6 +42,7 @@ public class EditReward extends Fragment implements Observer {
     FitnessDBHelper mDatabaseHelper;
 
     private FragmentActivity mFragmentActivity;
+    private List<User> mUserList;
     private List<Reward> mRewardList;
     private UserListObservable mUserListObservable;
 
@@ -74,15 +76,18 @@ public class EditReward extends Fragment implements Observer {
         CustomApplication app = ((CustomApplication)mFragmentActivity.getApplication());
         mUserListObservable = app.getUserListObservable();
         mUserListObservable.addObserver(this);
-        List<User> userList = mUserListObservable.getValue();
+        mUserList = mUserListObservable.getValue();
 
-        mRewardList = mDatabaseHelper.getAllRewards();
-        mEditRewardRecyclerAdapter = new EditRewardRecyclerAdapter(inflater.getContext(), mFragmentActivity, mRewardList, userList);
+        //mRewardList = mDatabaseHelper.getAllRewards();
+        mRewardList = app.getRewardListObservable().getValue();
+
+        mEditRewardRecyclerAdapter = new EditRewardRecyclerAdapter(inflater.getContext(), mFragmentActivity, mRewardList, mUserList);
         mRecyclerView.setAdapter(mEditRewardRecyclerAdapter);
         mSaveButton = (Button)mRootView.findViewById(R.id.saveButton);
         mSaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // changes tracked by adapter, get latest data
                 List<Reward> rewardList = mEditRewardRecyclerAdapter.getRewardList();
                 int rowsAffected = mDatabaseHelper.updateAllRewards(rewardList);
                 if(rowsAffected > 0){
@@ -94,8 +99,8 @@ public class EditReward extends Fragment implements Observer {
                             .show();
                 }
                 //check whether user does not already have a reward.  if so, check whether user has enough points to earn their reward
-                List<User> userList = mDatabaseHelper.getUsers();
-                for (User user : userList){
+                //List<User> userList = mDatabaseHelper.getUsers();
+                for (User user : mUserList){
                     boolean isFulfilled = false;
                     Reward reward = mDatabaseHelper.getRewardEarned(user.getUserId(), isFulfilled);
                     // update user total points, if we were able to get a valid point value for the reward
@@ -112,6 +117,8 @@ public class EditReward extends Fragment implements Observer {
     public void update(Observable observable, Object data) {
         List<User> userList = (List<User>)data;
         List<Reward> rewardList = mDatabaseHelper.getAllRewards();
+        //CustomApplication app = ((CustomApplication)mFragmentActivity.getApplication());
+        //app.getRewardListObservable().setValue(rewardList);
         mEditRewardRecyclerAdapter.setLists(userList, rewardList);
         mEditRewardRecyclerAdapter.notifyDataSetChanged();
     }
