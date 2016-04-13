@@ -44,6 +44,7 @@ import com.tinakit.moveit.model.Reward;
 import com.tinakit.moveit.model.UnitSplit;
 import com.tinakit.moveit.model.User;
 import com.tinakit.moveit.model.UserActivity;
+import com.tinakit.moveit.model.UserListObservable;
 import com.tinakit.moveit.module.CustomApplication;
 import com.tinakit.moveit.utility.CalorieCalculator;
 import com.tinakit.moveit.utility.ChronometerUtility;
@@ -273,7 +274,20 @@ public class ActivityTracker extends BackHandledFragment {
             public void onClick(View v) {
                 finishTracking(getString(R.string.activity_saved));
                 //save activity data to database on separate background thread
-                AsyncTask.execute(new SaveToDB());
+                //AsyncTask.execute(new SaveToDB());
+                new AsyncTask<Void,Void,Void>() {
+                    protected Void doInBackground(Void... params) {
+                        new SaveToDB().run();
+                        return null;
+                    }
+
+                    protected void onPostExecute(Void...params) {
+                        CustomApplication app = ((CustomApplication)mFragmentActivity.getApplication());
+                        UserListObservable userListObservable = app.getUserListObservable();
+                        userListObservable.notifyObservers();
+                    }
+
+                }.execute();
            }
 
         });
