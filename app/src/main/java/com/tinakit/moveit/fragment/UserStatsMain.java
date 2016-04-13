@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
@@ -71,7 +72,7 @@ public class UserStatsMain extends Fragment implements Observer {
 
     @Override
     public void update(Observable observable, Object data) {
-        setupViewPager(mViewPager);
+        mViewPager.setAdapter(mUserStatsPagerAdapter);
     }
 
     private void initializeUI(){
@@ -97,7 +98,7 @@ public class UserStatsMain extends Fragment implements Observer {
 
     }
 
-    public static class UserStatsPagerAdapter extends FragmentStatePagerAdapter {
+    public static class UserStatsPagerAdapter extends FragmentPagerAdapter {
 
         public UserStatsPagerAdapter(FragmentManager fm) {
             super(fm);
